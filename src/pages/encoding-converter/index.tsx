@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   FormEncodingConverter,
   FormPEMFileConverter,
@@ -26,7 +27,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const EncodingConverter: React.FC = () => {
+const EncodingConverter: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('encodingConverter');
   const cardHeaders = [
     'Base64 / UTF8',
@@ -36,7 +37,7 @@ const EncodingConverter: React.FC = () => {
   ];
   const [selectedCard, setSelectedCard] = useState<string>(cardHeaders[0]);
 
-  const SelectedComponent: React.FC = () => {
+  const SelectedComponent: React.FC<PropsWithChildren> = () => {
     const placeHolderUTF8 = `${t('PlaceHolderEncoded', {
       text: `${t('Text')}`,
       converter: `${t('UTF8')}`,

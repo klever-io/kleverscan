@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useFees } from '@/contexts/contract/fees';
 import { IQueue, useMulticontract } from '@/contexts/contract/multicontract';
@@ -45,10 +46,9 @@ export interface IHashComponentProps {
   setHash: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export const HashComponent: React.FC<IHashComponentProps> = ({
-  hash,
-  setHash,
-}) => {
+export const HashComponent: React.FC<
+  PropsWithChildren<IHashComponentProps>
+> = ({ hash, setHash }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -65,11 +65,13 @@ export const HashComponent: React.FC<IHashComponentProps> = ({
   return (
     <ExtraOptionContainer>
       {!loading ? (
-        <Link href={`/transaction/${hash}`}>
-          <a target="_blank" rel="noopener noreferrer">
-            Hash: {hash}
-            <IoOpenOutline />
-          </a>
+        <Link
+          href={`/transaction/${hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Hash:{hash}
+          <IoOpenOutline />
         </Link>
       ) : (
         <InlineLoader color="white" />
@@ -82,7 +84,7 @@ export const HashComponent: React.FC<IHashComponentProps> = ({
   );
 };
 
-const Contract: React.FC<IContract> = ({
+const Contract: React.FC<PropsWithChildren<IContract>> = ({
   elementId = 0,
   defaultValues = null,
 }) => {
@@ -219,12 +221,18 @@ const Contract: React.FC<IContract> = ({
         {payload && <ConfirmPayload />}
         {txHash && <HashComponent {...hashProps} />}
 
-        {contractsDescription[currentContract?.contractType] && (
+        {contractsDescription[
+          currentContract?.contractType as keyof typeof contractsDescription
+        ] && (
           <CardContainer>
             <Card>
               <div>
                 <span>
-                  {contractsDescription[currentContract?.contractType]}
+                  {
+                    contractsDescription[
+                      currentContract?.contractType as keyof typeof contractsDescription
+                    ]
+                  }
                 </span>
                 <span>KApp Fee: {kappFee} KLV</span>
               </div>

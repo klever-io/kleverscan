@@ -1,8 +1,9 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { IAsset, ICollectionList } from '@/types';
+import { useDebounce, useFetchPartial } from '@/utils/hooks';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { toast } from 'react-toastify';
@@ -24,7 +25,6 @@ import {
 } from './utils';
 import { ITOTooltips as tooltip } from './utils/tooltips';
 import { Pack, PackInfo, WhitelistInfo } from './utils/types';
-import { useDebounce, useFetchPartial } from '@/utils/hooks';
 
 export type ConfigITOData = {
   receiverAddress: string;
@@ -64,7 +64,10 @@ export const parseConfigITO = (data: ConfigITOData, isNFT?: boolean): void => {
   parseDates(data);
 };
 
-const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const ConfigITO: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<ConfigITOData>();
 
   const { walletAddress } = useExtension();
@@ -105,7 +108,7 @@ const ConfigITO: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   );
 };
 
-const MainSection: React.FC<ISectionProps> = ({
+const MainSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   walletAddress,
   collection,
 }) => {
@@ -150,7 +153,7 @@ const MainSection: React.FC<ISectionProps> = ({
   );
 };
 
-const WhitelistConfigSection: React.FC<ISectionProps> = ({
+const WhitelistConfigSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   walletAddress,
   collection,
 }) => {
@@ -190,7 +193,9 @@ const WhitelistConfigSection: React.FC<ISectionProps> = ({
   );
 };
 
-export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
+export const WhitelistSection: React.FC<
+  PropsWithChildren<{ top?: number }>
+> = ({ top }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
@@ -234,10 +239,9 @@ export const WhitelistSection: React.FC<{ top?: number }> = ({ top }) => {
   );
 };
 
-export const PackInfoSection: React.FC<{
-  top?: number;
-  collection?: ICollectionList;
-}> = ({ top, collection }) => {
+export const PackInfoSection: React.FC<
+  PropsWithChildren<{ top?: number; collection?: ICollectionList }>
+> = ({ top, collection }) => {
   const { control, watch, trigger } = useFormContext();
   const {
     fields,
@@ -268,6 +272,7 @@ export const PackInfoSection: React.FC<{
   const [assetInput, setAssetInput] = useState<string>('');
   const [currency, setCurrency] = useState<IAsset>();
   const debouncedAssetInput = useDebounce(assetInput, 500);
+
   useEffect(() => {
     if (debouncedAssetInput) {
       setLoading(true);

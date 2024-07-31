@@ -3,4 +3,4 @@ kind: Kustomization
 commonLabels:
   app.kubernetes.io/name: klever-explorer
 resources:
-- web-server.yaml
+  - web-server.yaml

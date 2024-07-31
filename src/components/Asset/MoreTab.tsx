@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import Skeleton from '@/components/Skeleton';
@@ -7,7 +8,7 @@ import { useTranslation } from 'next-i18next';
 import React, { useCallback } from 'react';
 import { AssetProps } from './OverviewTab';
 
-export const MoreTab: React.FC<AssetProps> = ({ asset }) => {
+export const MoreTab: React.FC<PropsWithChildren<AssetProps>> = ({ asset }) => {
   const { t } = useTranslation(['common', 'assets']);
 
   const getIssueDate = useCallback(() => {

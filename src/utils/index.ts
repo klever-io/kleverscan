@@ -144,9 +144,11 @@ export const sleep = (ms: number): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, ms));
 
 export const getVotingPowers = (voters: IVote[]): IVotingPowers => {
-  const powers = {};
+  const powers: Record<string, number> = {}; // Correctly type the powers object
   voters?.forEach(voter => {
-    powers[voter.address] = voter?.amount;
+    if (typeof voter.address === 'string' && typeof voter.amount === 'number') {
+      powers[voter.address] = voter.amount; // Ensure voter.amount is a number
+    }
   });
   return powers;
 };

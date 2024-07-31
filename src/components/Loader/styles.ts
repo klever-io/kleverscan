@@ -1,16 +1,23 @@
-import { default as DefaultLoader } from 'react-loader-spinner';
-import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
+import { TailSpin } from 'react-loader-spinner';
 import styled from 'styled-components';
 
-export const Loader = styled(DefaultLoader).attrs(props => ({
-  type: 'TailSpin',
+export const Loader = styled(TailSpin).attrs<{
+  type?: string;
+  color?: string;
+  height?: string | number;
+  width?: string | number;
+}>(props => ({
   color: props.theme.violet,
   height: props.height || 25,
   width: props.width || 25,
 }))``;
 
-export const HomeLoader = styled(DefaultLoader).attrs(props => ({
-  type: 'TailSpin',
+export const HomeLoader = styled(TailSpin).attrs<{
+  type?: string;
+  color?: string;
+  height?: string | number;
+  width?: string | number;
+}>(props => ({
   color: props.theme.violet,
   height: '40%',
   width: '40%',

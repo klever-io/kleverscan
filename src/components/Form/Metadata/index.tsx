@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   InfoIcon,
   StyledTextArea,
@@ -10,7 +11,7 @@ import { useState } from 'react';
 import { AdvancedOptsContainer, ArrowDownIcon, ArrowUpIcon } from '../styles';
 import { ExtraOptionContainer, FieldContainer, InputLabel } from './styles';
 
-const AdvancedOptionsContent: React.FC = () => {
+const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
   const { metadata, setMetadata } = useMulticontract();
   const { bandwidthFeeMultiplier } = useFees();
   const tooltip = `You can add metadata to your transaction. This metadata will be stored on-chain and will be publicly visible. Each byte costs ${bandwidthFeeMultiplier} KLV`;
@@ -40,7 +41,7 @@ const AdvancedOptionsContent: React.FC = () => {
   );
 };
 
-const MetadataOptions: React.FC = () => {
+const MetadataOptions: React.FC<PropsWithChildren> = () => {
   const [showMetadata, setShowMetadata] = useState(false);
 
   return (

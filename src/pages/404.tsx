@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
 import React from 'react';
 import {
@@ -9,7 +10,7 @@ import {
   Number,
 } from '../views/notFound';
 
-const NotFound: React.FC = () => {
+const NotFound: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
 
   const handleBack = () => {

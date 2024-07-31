@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
@@ -44,7 +45,7 @@ const parseAssetTrigger = (data: IAssetTrigger) => {
   parseMetadata(data);
 };
 
-const AssetTrigger: React.FC<IContractProps> = ({
+const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
 }) => {
@@ -280,7 +281,7 @@ const getAssetTriggerForm = (
   }
 };
 
-export const AddRoleSection: React.FC = () => {
+export const AddRoleSection: React.FC<PropsWithChildren> = () => {
   const network = getNetwork();
 
   return (

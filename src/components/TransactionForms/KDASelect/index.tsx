@@ -23,7 +23,7 @@ import { toLocaleFixed } from '@/utils/formatFunctions';
 import { useDebounce } from '@/utils/hooks';
 import { setQuery } from '@/utils/hooks/contract';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQuery } from 'react-query';
@@ -41,7 +41,7 @@ interface IKDASelect {
   required?: boolean;
 }
 
-export const KDASelect: React.FC<IKDASelect> = props => {
+export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
   const { required } = props;
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -108,11 +108,11 @@ export const KDASelect: React.FC<IKDASelect> = props => {
   });
 
   const {
-    data: kassetsList,
-    refetch: refetchKassetsList,
-    isFetching: kassetsFetching,
+    data: kAssetsList,
+    refetch: refetchKAssetsList,
+    isFetching: kAssetsFetching,
   } = useQuery({
-    queryKey: 'kassetsList',
+    queryKey: 'kAssetsList',
     queryFn: getKAssets,
     initialData: [],
     enabled: walletAddress !== '',
@@ -121,10 +121,10 @@ export const KDASelect: React.FC<IKDASelect> = props => {
   const [options, setOptions] = useState<IDropdownItem[]>([]);
 
   const assetsList = useMemo(() => {
-    return kAssetContracts.includes(contractType)
-      ? kassetsList || []
+    return kAssetContracts.includes(contractType) && assetTriggerType !== 1
+      ? kAssetsList || []
       : accountAssetsList || [];
-  }, [accountAssetsList, kassetsList, contractType]);
+  }, [accountAssetsList, kAssetsList, contractType, assetTriggerType]);
 
   useEffect(() => {
     setOptions(
@@ -139,18 +139,18 @@ export const KDASelect: React.FC<IKDASelect> = props => {
   }, [
     walletAddress,
     accountAssetsList,
-    kassetsList,
+    kAssetsList,
     assetTriggerType,
     withdrawType,
   ]);
 
   useEffect(() => {
-    if (!kassetsFetching && !assetsFetching && loading) {
+    if (!kAssetsFetching && !assetsFetching && loading) {
       setLoading(false);
     } else if (!loading) {
       setLoading(true);
     }
-  }, [assetsFetching, kassetsFetching]);
+  }, [assetsFetching, kAssetsFetching]);
 
   const setCollectionValue = async (value?: ICollectionList) => {
     if (!isMultiContract && router.pathname !== '/') {
@@ -176,7 +176,7 @@ export const KDASelect: React.FC<IKDASelect> = props => {
 
   const refetch = () => {
     refetchAssetsList();
-    refetchKassetsList();
+    refetchKAssetsList();
   };
 
   useEffect(() => {
@@ -293,9 +293,9 @@ interface CollectionIDFieldProps {
   collection: ICollectionList;
 }
 
-const CollectionIDField: React.FC<CollectionIDFieldProps> = ({
-  collection,
-}) => {
+const CollectionIDField: React.FC<
+  PropsWithChildren<CollectionIDFieldProps>
+> = ({ collection }) => {
   const [isCustom, setIsCustom] = useState(false);
   const [collectionInputValue, setCollectionInputValue] = useState('');
   const [collectionIdData, setCollectionIdData] = useState<ICollection[]>([]);

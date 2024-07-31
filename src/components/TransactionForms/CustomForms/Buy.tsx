@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { getAsset } from '@/services/requests/asset';
@@ -23,7 +24,10 @@ const parseBuy = (data: FormData) => {
   data.id = data.id.toUpperCase();
 };
 
-const Buy: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Buy: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit, watch } = useFormContext<FormData>();
   const {} = useContract();
   const buyType = watch('buyType');

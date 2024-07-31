@@ -67,7 +67,7 @@ export const parseITOsRequest = async (
 ): Promise<IITOsResponse> => {
   if (itemsITOs && assetsList) {
     const data = itemsITOs.data.itos.map((ITO: IITO, index: number) => {
-      const item = ITO;
+      const item: any = ITO;
       const asset = assetsList.find(
         (asset: IAsset) => asset.assetId === itemsITOs.data.itos[index].assetId,
       );

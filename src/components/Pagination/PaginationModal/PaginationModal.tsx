@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Input from '@/components/Input';
 import React, { useCallback, useEffect, useState } from 'react';
 import { MdClear } from 'react-icons/md';
@@ -17,7 +18,7 @@ interface IPaginationModal {
   setShowModal: React.SetStateAction<any>;
 }
 
-const PaginationModal: React.FC<IPaginationModal> = ({
+const PaginationModal: React.FC<PropsWithChildren<IPaginationModal>> = ({
   totalPages: count,
   page,
   onPaginate,

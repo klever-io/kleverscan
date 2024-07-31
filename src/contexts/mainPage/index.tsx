@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import {
   defaultAggregateData,
   homeAccountsCall,
@@ -10,10 +11,11 @@ import {
   homeProposalsCall,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
+  homeMostTransactedKDAFee,
 } from '@/services/requests/home';
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
-import { IProposal, MostTransferedToken } from '@/types/proposals';
+import { IProposal, MostTransferredToken } from '@/types/proposals';
 import { createContext, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
 
@@ -39,14 +41,15 @@ export interface IHomeData {
   activeValidators?: number;
   lastApprovedProposal?: IProposal;
   nodes?: Node[];
-  mostTransactedTokens: MostTransferedToken[];
-  mostTransactedNFTs: MostTransferedToken[];
+  mostTransactedTokens: MostTransferredToken[];
+  mostTransactedNFTs: MostTransferredToken[];
+  mostTransactedKDAFee: MostTransferredToken[];
   epoch?: number;
 }
 
 export const HomeData = createContext({} as IHomeData);
 
-export const HomeDataProvider: React.FC = ({ children }) => {
+export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const watcherTimeout = 4 * 1000; // 4 secs
 
   const [
@@ -60,6 +63,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     nodes,
     mostTransactedTokens,
     mostTransactedNFTs,
+    mostTransactedKDAFee,
   ] = useQueries([
     {
       queryKey: 'aggregateData',
@@ -111,6 +115,11 @@ export const HomeDataProvider: React.FC = ({ children }) => {
       queryFn: homeMostTransactedNFTs,
       refetchInterval: watcherTimeout,
     },
+    {
+      queryKey: 'mostTransactedKDAFee',
+      queryFn: homeMostTransactedKDAFee,
+      refetchInterval: watcherTimeout,
+    },
   ]);
 
   const prevValuesRef = useRef({
@@ -157,6 +166,7 @@ export const HomeDataProvider: React.FC = ({ children }) => {
     nodes: nodes.data?.nodes,
     mostTransactedTokens: mostTransactedTokens.data || [],
     mostTransactedNFTs: mostTransactedNFTs.data || [],
+    mostTransactedKDAFee: mostTransactedKDAFee.data || [],
     epoch: aggregateResult.data?.overview?.epochNumber,
   };
 

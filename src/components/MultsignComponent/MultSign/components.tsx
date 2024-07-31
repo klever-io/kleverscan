@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Filter from '@/components/Filter';
 import Tooltip from '@/components/Tooltip';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
@@ -32,7 +33,10 @@ import {
   MultisignButton,
 } from '../styles';
 
-const ReactJson = dynamic(import('react-json-view'), { ssr: false });
+const ReactJson = dynamic(
+  () => import('react-json-view').then(mod => mod.default),
+  { ssr: false },
+);
 
 interface IMultisignList {
   hashs: string[];
@@ -43,7 +47,7 @@ interface IMultisignList {
 interface IMultisignOverview {
   multiSignData: IMultisignData;
   loading: boolean;
-  MultiSignList: React.FC<IMultisignList>;
+  MultiSignList: React.FC<PropsWithChildren<IMultisignList>>;
   hashs: string[];
   selectedHash: string;
   setSelectedHash: React.Dispatch<React.SetStateAction<string>>;
@@ -189,7 +193,7 @@ const readFile = (
   }
 };
 
-export const MultiSignList: React.FC<IMultisignList> = ({
+export const MultiSignList: React.FC<PropsWithChildren<IMultisignList>> = ({
   hashs,
   selectedHash,
   setSelectedHash,
@@ -216,7 +220,7 @@ export const MultiSignList: React.FC<IMultisignList> = ({
   );
 };
 
-export const OverviewInfo: React.FC<IMultisignOverview> = ({
+export const OverviewInfo: React.FC<PropsWithChildren<IMultisignOverview>> = ({
   multiSignData,
   loading,
   MultiSignList,
@@ -243,7 +247,7 @@ export const OverviewInfo: React.FC<IMultisignOverview> = ({
   const thresholdPercentage =
     (multisignTotalWeight / (multiSignData?.Threshold ?? 0)) * 100;
 
-  const Progress: React.FC = () => {
+  const Progress: React.FC<PropsWithChildren> = () => {
     return (
       <ProgressBar>
         <ProgressBarContent
@@ -253,7 +257,7 @@ export const OverviewInfo: React.FC<IMultisignOverview> = ({
       </ProgressBar>
     );
   };
-  const ThresholdComponent: React.FC = () => {
+  const ThresholdComponent: React.FC<PropsWithChildren> = () => {
     return (
       <>
         <ProgressBarVotes width={'60%'} noMarginBottom>
@@ -296,7 +300,7 @@ export const OverviewInfo: React.FC<IMultisignOverview> = ({
   return <OverviewDetails {...overviewProps} />;
 };
 
-export const DecodedRawData: React.FC<IDecodedRawData> = ({
+export const DecodedRawData: React.FC<PropsWithChildren<IDecodedRawData>> = ({
   multiSignData,
   isDarkTheme,
 }) => {
@@ -329,7 +333,9 @@ export const DecodedRawData: React.FC<IDecodedRawData> = ({
   );
 };
 
-export const ButtonsComponent: React.FC<IMultisignButtons> = ({
+export const ButtonsComponent: React.FC<
+  PropsWithChildren<IMultisignButtons>
+> = ({
   setSignBcastTransaction,
   multiSignData,
   setTxHash,
@@ -471,6 +477,8 @@ export const ButtonsComponent: React.FC<IMultisignButtons> = ({
   );
 };
 
-export const EmptyTransaction: React.FC<{ msg: string }> = ({ msg }) => {
+export const EmptyTransaction: React.FC<PropsWithChildren<{ msg: string }>> = ({
+  msg,
+}) => {
   return <EmptyMultisign>{msg}</EmptyMultisign>;
 };

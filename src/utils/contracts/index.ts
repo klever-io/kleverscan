@@ -1,4 +1,4 @@
-import { isBeta } from '@/configs/navbar';
+import { isBeta } from '@/configs/transactions';
 import {
   Contract,
   ContractsIndex,
@@ -381,7 +381,7 @@ export const filteredSections = (
   contract: IContract[],
   contractType: string,
   receipts: IReceipt[],
-  precision = 0,
+  precision = 6,
   data?: string[],
 ): JSX.Element[] => {
   const props = {
@@ -557,10 +557,10 @@ export const getLabelForTableField = (
 ): string[] => {
   const type =
     typeof contractType === 'string'
-      ? ContractsName[contractType]
+      ? ContractsName[contractType as keyof typeof ContractsName]
       : ContractsIndex[contractType];
 
-  return contractLabels[type] || [];
+  return contractLabels[type as keyof typeof contractLabels] || [];
 };
 
 export const getHeaderForCSV = (
@@ -568,7 +568,7 @@ export const getHeaderForCSV = (
   header: string[],
 ): string[] => {
   let newHeaders: string[] = [];
-  switch (ContractsIndex[ContractsIndex[Number(router.query.type)]]) {
+  switch (Number(ContractsIndex[Number(router.query.type)])) {
     case ContractsIndex.Transfer:
       newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
       break;
@@ -580,9 +580,6 @@ export const getHeaderForCSV = (
       break;
     case ContractsIndex['Config Validator']:
       newHeaders = [contractTableHeaders[6]];
-      break;
-    case ContractsIndex['Validator Config']:
-      newHeaders = [contractTableHeaders[7]];
       break;
     case ContractsIndex.Freeze:
       newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
@@ -703,7 +700,7 @@ export const getDefaultCells = async (
 
   const amountContract = [];
   const parameter = contract[0]?.parameter as any;
-  let assetId: any = parameter.assetId || '';
+  let assetId: any = parameter?.assetId || parameter?.kda || '';
 
   switch (contract[0].typeString) {
     case Contract.Transfer:
@@ -821,7 +818,7 @@ export const getDefaultCells = async (
       }
     default:
   }
-  const to = parameter.toAddress || '';
+  const to = parameter?.toAddress || '';
   const contractName = ContractsName[contract[0]?.typeString] || '';
   const created = format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
   const parsedbandwidthFee = bandwidthFee / 10 ** 6;
@@ -880,7 +877,7 @@ export const getContractCells = async (
   // const orderID = contract[0].parameter.orderID || '';
 
   const parameter = contract[0]?.parameter as any;
-  const to = parameter.toAddress || '';
+  const to = parameter?.toAddress || '';
   const contractName = ContractsName[contract[0]?.typeString] || '';
   const created = format(fromUnixTime(timestamp), 'yyyy-MM-dd HH:mm:ss'); // csv date pattern
   const cells = [hash, blockNum, created, sender, to, status, contractName];

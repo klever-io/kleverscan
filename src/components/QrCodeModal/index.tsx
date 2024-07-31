@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Receive } from '@/assets/icons';
 import { useScroll } from '@/utils/hooks';
 import { QRCodeSVG } from 'qrcode.react';
@@ -15,7 +16,10 @@ interface IQrCodeModal {
   isOverflow: boolean;
 }
 
-const QrCodeModal: React.FC<IQrCodeModal> = ({ value, isOverflow }) => {
+const QrCodeModal: React.FC<PropsWithChildren<IQrCodeModal>> = ({
+  value,
+  isOverflow,
+}) => {
   const [showModal, setShowModal] = useState(false);
   useScroll(showModal, () => setShowModal(false));
 

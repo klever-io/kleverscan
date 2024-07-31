@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useHomeData } from '@/contexts/mainPage';
 import {
   Cell,
@@ -12,8 +13,9 @@ import {
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
 
-const MostTransacted: React.FC = () => {
-  const { mostTransactedTokens, mostTransactedNFTs } = useHomeData();
+const MostTransacted: React.FC<PropsWithChildren> = () => {
+  const { mostTransactedTokens, mostTransactedNFTs, mostTransactedKDAFee } =
+    useHomeData();
 
   const tables = [
     {
@@ -24,6 +26,11 @@ const MostTransacted: React.FC = () => {
     {
       title: 'Most Transacted NFTs',
       data: mostTransactedNFTs,
+      header: ['Rank', 'Token', 'Total Txn'],
+    },
+    {
+      title: 'Most Transacted KDA Fee',
+      data: mostTransactedKDAFee,
       header: ['Rank', 'Token', 'Total Txn'],
     },
   ];
@@ -42,22 +49,22 @@ const MostTransacted: React.FC = () => {
               </Row>
             </thead>
             <tbody>
-              {table.data.map((item, index) => (
+              {table?.data?.map((item, index) => (
                 <Row key={index}>
                   <Cell>{index + 1}</Cell>
                   <Cell>
-                    <Link href={`/asset/${item.key}`}>
-                      <MostTransactedLink href={`/asset/${item.key}`}>
+                    <Link href={`/asset/${item?.key}`} legacyBehavior>
+                      <MostTransactedLink href={`/asset/${item?.key}`}>
                         <AssetLogo
-                          logo={item.logo}
-                          ticker={item.key}
-                          name={item.key}
+                          logo={item?.logo}
+                          ticker={item?.key}
+                          name={item?.key}
                         />
-                        {item.key}
+                        {item?.key}
                       </MostTransactedLink>
                     </Link>
                   </Cell>
-                  <Cell>{item.doc_count.toLocaleString()}</Cell>
+                  <Cell>{item?.doc_count?.toLocaleString()}</Cell>
                 </Row>
               ))}
             </tbody>

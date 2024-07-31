@@ -37,7 +37,7 @@ export default async function handler(
     return res.status(400).json({ errors: errors });
   }
 
-  const data = {};
+  const data: any = {};
 
   try {
     const { error, status, hash } = await broadcastTXandCheckStatus(

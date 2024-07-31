@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import AdvancedOptions from '@/components/Form/AdvancedOptions';
 import WarningModal from '@/components/Modals/Warning';
 import { useMulticontract } from '@/contexts/contract/multicontract';
@@ -16,7 +17,7 @@ export interface IModalContract {
   closeQuickAccessModal?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ModalContract: React.FC<IModalContract> = ({
+const ModalContract: React.FC<PropsWithChildren<IModalContract>> = ({
   title,
   contractType,
   defaultValues,

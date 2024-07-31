@@ -79,7 +79,8 @@ export const assetsRequest = (
       };
     }
 
-    const assets: IAccountAsset[] = accountResponse.data.account.assets;
+    const assets: { [key: string]: IAccountAsset } =
+      accountResponse.data.account.assets;
 
     if (!Object.keys(assets).length) {
       return {
@@ -99,9 +100,9 @@ export const assetsRequest = (
       route: `assets/list?page=${page}&limit${limit}&asset=${assetsToRequest}`,
     });
     if (!allAccountAssets.error || allAccountAssets.error === '') {
-      assetsArray.forEach((asset: IAsset, index) => {
+      assetsArray.forEach((asset: IAccountAsset, index) => {
         const stakingToInsert = allAccountAssets.data.assets.find(
-          (asset2: IAsset) => asset2.assetId === asset.assetId,
+          (asset2: IAccountAsset) => asset2.assetId === asset.assetId,
         );
         if (stakingToInsert) {
           asset.staking = stakingToInsert.staking;
@@ -378,8 +379,7 @@ export const rewardsFPRPool = (
           route: `assets/${assets[asset]?.assetId}`,
         });
         if (details.error === '') {
-          assets[asset]['minEpochsToWithdraw'] =
-            details?.data?.asset?.staking?.minEpochsToWithdraw;
+          assets[asset].staking = details?.data?.asset?.staking;
         }
       };
 
@@ -392,8 +392,10 @@ export const rewardsFPRPool = (
             bucket.unstakedEpoch === UINT32_MAX &&
             assets?.[asset].assetId.length < 64
           ) {
-            bucket['availableEpoch'] = asset['minEpochsToWithdraw']
-              ? bucket.unstakedEpoch + asset['minEpochsToWithdraw']
+            bucket['availableEpoch'] = assets?.[asset].staking
+              ?.minEpochsToWithdraw
+              ? bucket.unstakedEpoch +
+                assets?.[asset].staking.minEpochsToWithdraw
               : '--';
           } else {
             bucket['availableEpoch'] = bucket.unstakedEpoch + 2; // Default for KLV and KFI

@@ -9,17 +9,16 @@ import {
 } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { default as React, useCallback } from 'react';
+import { PropsWithChildren, default as React, useCallback } from 'react';
 import { AssetProps } from './OverviewTab';
 
 interface StakingRoyaltiesTabProps extends AssetProps {
   setSelectedCard: (card: string) => void;
 }
 
-export const StakingRoyaltiesTab: React.FC<StakingRoyaltiesTabProps> = ({
-  asset,
-  setSelectedCard,
-}) => {
+export const StakingRoyaltiesTab: React.FC<
+  PropsWithChildren<StakingRoyaltiesTabProps>
+> = ({ asset, setSelectedCard }) => {
   const { t } = useTranslation(['common', 'assets']);
   const router = useRouter();
 

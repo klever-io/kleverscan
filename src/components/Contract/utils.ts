@@ -1,5 +1,5 @@
 import { IPackItem } from '@/types/contracts';
-import { ICollectionList, ISplitRoyalties } from '@/types/index';
+import { ICollectionList } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
 import {
@@ -54,7 +54,7 @@ const getType = (rawType: string): TransactionType => {
       type = 'SmartContract';
       break;
   }
-  return TransactionType[type];
+  return TransactionType[type as keyof typeof TransactionType];
 };
 
 const parsePackInfoPrecision = async (payload: any) => {
@@ -203,22 +203,7 @@ const precisionParse = async (
       break;
     case 'CreateAssetContract':
       precision = payload.precision || 0;
-      if (payload?.royalties?.splitRoyalties) {
-        payload.royalties.splitRoyalties.forEach((royalty: ISplitRoyalties) => {
-          if (royalty.percentITOPercentage) {
-            royalty.percentITOPercentage = addPrecision(
-              royalty.percentITOPercentage,
-              percentagePrecision,
-            );
-          }
-          if (royalty.percentITOFixed) {
-            royalty.percentITOFixed = addPrecision(
-              royalty.percentITOFixed,
-              percentagePrecision,
-            );
-          }
-        });
-      }
+
       payload.initialSupply = addPrecision(payload.initialSupply, precision);
 
       payload.maxSupply = addPrecision(payload.maxSupply, precision);
@@ -624,7 +609,7 @@ const parseValues = (
     }
   } else if (contractType === 'ProposalContract') {
     if (values.parameters) {
-      const parameters = {};
+      const parameters: { [key: string]: string } = {};
 
       values.parameters.forEach((parameter: any) => {
         if (
@@ -689,7 +674,7 @@ const parseValues = (
   }
 
   if (values.uris) {
-    const uris = {};
+    const uris: { [key: string]: string } = {};
 
     values.uris.forEach((uri: any) => {
       if (uri.label && uri.address) {
@@ -704,7 +689,7 @@ const parseValues = (
 
   Object.keys(parsedValues).forEach((item: any) => {
     if (parsedValues[item] && parsedValues[item].uris) {
-      const uris = {};
+      const uris: { [key: string]: string } = {};
 
       parsedValues[item].uris.forEach((uri: any) => {
         if (uri.label && uri.address) {
@@ -870,13 +855,13 @@ const buildTransaction = async (
 };
 
 export {
-  getType,
-  getAssetsList,
-  showAssetIdInput,
-  precisionParse,
-  parseValues,
-  contractHaveKDA,
-  contractHaveBucketId,
-  contractsDescription,
   buildTransaction,
+  contractHaveBucketId,
+  contractHaveKDA,
+  contractsDescription,
+  getAssetsList,
+  getType,
+  parseValues,
+  precisionParse,
+  showAssetIdInput,
 };

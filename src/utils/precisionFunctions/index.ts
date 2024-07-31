@@ -18,19 +18,21 @@ export async function getPrecision(
     if (assetIds.length === 0) {
       return {};
     }
-    const aux: string[] = [];
+    const assetsToFetch: string[] = [];
 
     assetIds.forEach(assetId => {
       if (
-        !Object.keys(storedPrecisions).includes(assetId) &&
+        !Object.keys(storedPrecisions)
+          .filter(key => storedPrecisions[key] !== undefined)
+          .includes(assetId) &&
         assetId !== '' &&
-        !aux.includes(assetId)
+        !assetsToFetch.includes(assetId)
       ) {
-        aux.push(assetId);
+        assetsToFetch.push(assetId);
       }
     });
 
-    if (aux.length === 0) {
+    if (assetsToFetch.length === 0) {
       return assetIds.reduce((prev, current) => {
         return {
           ...prev,
@@ -38,20 +40,16 @@ export async function getPrecision(
         };
       }, {});
     }
-    try {
-      const { precisions } = await getPrecisionFromApi(aux);
-      const newPrecisions = { ...storedPrecisions, ...precisions };
-      localStorage.setItem('precisions', JSON.stringify(newPrecisions));
-      return assetIds.reduce((prev, current) => {
-        return {
-          ...prev,
-          [current]: newPrecisions[current],
-        };
-      }, {});
-    } catch (error: any) {
-      console.error(error);
-      throw new Error(error);
-    }
+
+    const precisions = (await getPrecisionFromApi(assetsToFetch))?.precisions;
+    const newPrecisions = { ...storedPrecisions, ...precisions };
+    localStorage.setItem('precisions', JSON.stringify(newPrecisions));
+    return assetIds.reduce((prev, current) => {
+      return {
+        ...prev,
+        [current]: newPrecisions[current],
+      };
+    }, {});
   } else if (typeof assetIds === 'string') {
     const assetId = assetIds;
 
@@ -61,24 +59,19 @@ export async function getPrecision(
 
     if (
       !storedPrecisions ||
-      !Object.keys(storedPrecisions).includes(assetId.split('/')[0])
+      !Object.keys(storedPrecisions)
+        .filter(key => storedPrecisions[key] !== undefined)
+        .includes(assetId.split('/')[0])
     ) {
-      try {
-        const { precisions } = (await getPrecisionFromApi([assetId])) || 0;
-        const newPrecisions = { ...storedPrecisions, ...precisions };
-        localStorage.setItem('precisions', JSON.stringify(newPrecisions));
-        if (precisions[assetId] === undefined) {
-          throw new Error(`This asset does not exist - ${assetId}`);
-        }
-        return precisions[assetId];
-      } catch (error: any) {
-        throw new Error(error);
-      }
+      const precisions = (await getPrecisionFromApi([assetId]))?.precisions;
+      const newPrecisions = { ...storedPrecisions, ...precisions };
+      localStorage.setItem('precisions', JSON.stringify(newPrecisions));
+      return precisions[assetId];
     } else {
       return storedPrecisions[assetId.split('/')[0]];
     }
   } else {
-    throw new Error('Invalid Param');
+    throw new Error('Invalid assetId');
   }
 }
 
@@ -94,7 +87,11 @@ export const getPrecisionFromApi = async (
     const response = await api.post({
       route: `assets/precisions`,
       service: Service.PROXY,
+      query: {
+        limit: 100,
+      },
       body: { assets },
+      tries: 10,
     });
     if (response.error) {
       const messageError =

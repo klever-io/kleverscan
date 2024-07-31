@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
@@ -33,9 +34,11 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
       .map((key, index) => {
         return {
           number: index,
-          parameter: proposalsMap[key].message ? proposalsMap[key].message : '',
+          parameter: proposalsMap[key as keyof typeof proposalsMap].message
+            ? proposalsMap[key as keyof typeof proposalsMap].message
+            : '',
           currentValue: data.parameters[key]?.value
-            ? `${(Number(data.parameters[key].value) / 10 ** proposalsMap[key].precision).toLocaleString()} ${proposalsMap[key].unit}`
+            ? `${(Number(data.parameters[key].value) / 10 ** proposalsMap[key as keyof typeof proposalsMap].precision).toLocaleString()} ${proposalsMap[key as keyof typeof proposalsMap].unit}`
             : '',
         };
       })
@@ -45,7 +48,7 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
   return networkParams;
 };
 
-const NetworkParams: React.FC = () => {
+const NetworkParams: React.FC<PropsWithChildren> = () => {
   const { getInteractionsButtons } = useContractModal();
 
   const rowSections = (props: INetworkParam): IRowSection[] => {

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
 import ReactSelect, { components, Props } from 'react-select';
 import Creatable from 'react-select/creatable';
@@ -7,7 +8,7 @@ interface IBaseSelectProps extends Props {
   creatable?: boolean;
 }
 
-const BaseSelect: React.FC<IBaseSelectProps> = props => {
+const BaseSelect: React.FC<PropsWithChildren<IBaseSelectProps>> = props => {
   const { creatable } = props;
   const Placeholder = (props: any) => {
     return <components.Placeholder {...props} />;

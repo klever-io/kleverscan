@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
@@ -8,7 +9,7 @@ interface IValidatorsProps {
   validators: string[];
 }
 
-const Validators: React.FC<IValidatorsProps> = props => {
+const Validators: React.FC<PropsWithChildren<IValidatorsProps>> = props => {
   const validators = props.validators;
   const requestBlockValidators: Promise<IPaginatedResponse> = Promise.resolve({
     data: { blockValidatorList: validators },

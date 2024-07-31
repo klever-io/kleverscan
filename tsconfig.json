@@ -12,7 +12,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["jest", "@testing-library/jest-dom", "@types/gtag.js"],
+    "types": ["@types/gtag.js"],
     "jsx": "preserve",
     "ignoreDeprecations": "5.0",
     "suppressImplicitAnyIndexErrors": true,
@@ -23,6 +23,6 @@
     },
     "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next-i18next.config.js"],
   "exclude": ["node_modules", "cypress.config.ts", "cypress"]
 }

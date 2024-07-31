@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useMobile } from '@/contexts/mobile';
 import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
@@ -79,7 +80,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Table: React.FC<ITable> = ({
+const Table: React.FC<PropsWithChildren<ITable>> = ({
   type,
   header,
   rowSections,
@@ -309,12 +310,13 @@ const Table: React.FC<ITable> = ({
                             smaller={smaller}
                             totalColumns={header.length}
                             currentColumn={index2}
+                            data-testid={`table-row-${index}`}
                           >
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
                             {Element({
-                              smaller,
+                              $smaller: smaller,
                             })}
                           </MobileCardItem>
                         );

@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -8,7 +9,10 @@ type FormData = {
   orderId: string;
 };
 
-const Unjail: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
+const Unjail: React.FC<PropsWithChildren<IContractProps>> = ({
+  formKey,
+  handleFormSubmit,
+}) => {
   const { handleSubmit } = useFormContext<FormData>();
   const {} = useContract();
 
@@ -19,7 +23,7 @@ const Unjail: React.FC<IContractProps> = ({ formKey, handleFormSubmit }) => {
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>
-        <SectionText>No aditional data needed.</SectionText>
+        <SectionText>No additional data needed.</SectionText>
       </FormSection>
     </FormBody>
   );

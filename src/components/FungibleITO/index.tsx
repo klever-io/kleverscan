@@ -1,7 +1,7 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
-import { useState } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
 import Input from '../Input';
@@ -39,7 +39,7 @@ export const isFloat = (value: number): boolean => {
   return false;
 };
 
-const FungibleITO: React.FC<IFungibleITO> = ({
+const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
   ITO,
   packInfo,
   packInfoIndex,
@@ -72,7 +72,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
 
       for (const rangeIndex in range) {
         if (amount <= range[rangeIndex]) {
-          priceIndex = rangeIndex;
+          priceIndex = Number(rangeIndex);
           break;
         }
       }
@@ -110,7 +110,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
 
   const handleSubmit = async (currencyId: string) => {
     if (!amount) {
-      toast.error(t('noEmptyOrZeroToastError'));
+      toast.error(t('itos:noEmptyOrZeroToastError'));
       return;
     }
 
@@ -136,7 +136,7 @@ const FungibleITO: React.FC<IFungibleITO> = ({
       const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
       if (setTxHash) setTxHash(response.data.txsHashes[0]);
-      toast.success(t('successBroadcastTxToast'));
+      toast.success(t('itos:successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
       toast.error(e.message ? e.message : e);

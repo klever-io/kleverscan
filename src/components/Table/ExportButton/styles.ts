@@ -18,7 +18,7 @@ export const DropdownMenu = styled.div<{ open: boolean }>`
 
   ${props => props.open && `display: block;`}
 
-  ::before {
+  &::before {
     position: absolute;
     top: 0rem;
     right: 12px;

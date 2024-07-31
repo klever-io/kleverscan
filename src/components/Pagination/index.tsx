@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ArrowLeft, ArrowRight } from '@/assets/pagination';
 import React, { useEffect, useState } from 'react';
 import calculate from './paginate';
@@ -11,7 +12,7 @@ interface IPagination {
   onPaginate(page: number): void;
 }
 
-const Pagination: React.FC<IPagination> = ({
+const Pagination: React.FC<PropsWithChildren<IPagination>> = ({
   count,
   page,
   onPaginate,

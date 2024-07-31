@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { ContractsIndex, IContract } from '@/types/contracts';
 import {
   MultiContractContainer,
@@ -10,17 +11,18 @@ interface IMultiContract {
   contractType: string;
   contract: IContract[];
 }
-export const MultiContractToolTip: React.FC<IMultiContract> = ({
-  contractType,
-  contract,
-}) => {
+export const MultiContractToolTip: React.FC<
+  PropsWithChildren<IMultiContract>
+> = ({ contractType, contract }) => {
   const reduceContracts = (): ReducedContract => {
     const reducedContract: ReducedContract = {};
     contract.forEach(innerContract => {
-      if (!reducedContract[innerContract.type]) {
-        reducedContract[innerContract.type] = 1;
-      } else {
-        reducedContract[innerContract.type] += 1;
+      if (!reducedContract[innerContract.type as keyof ReducedContract]) {
+        reducedContract[innerContract.type as keyof ReducedContract] = 1;
+      } else if (reducedContract[innerContract.type as keyof ReducedContract]) {
+        (reducedContract[
+          innerContract.type as keyof ReducedContract
+        ] as number) += 1;
       }
     });
     return reducedContract;
@@ -28,7 +30,7 @@ export const MultiContractToolTip: React.FC<IMultiContract> = ({
 
   const msg = Object.entries(reduceContracts())
     .map(([innerContract, number]) => {
-      return `${ContractsIndex[innerContract]}: ${number}x`;
+      return `${ContractsIndex[innerContract as keyof typeof ContractsIndex]}: ${number}x`;
     })
     .join('\n');
 
@@ -37,7 +39,7 @@ export const MultiContractToolTip: React.FC<IMultiContract> = ({
       <aside style={{ width: 'fit-content' }}>
         <Tooltip
           msg={msg}
-          customStyles={{ offset: { right: 54, top: 5 } }}
+          customStyles={{ offset: 5 }}
           Component={() => (
             <MultiContractContainer>
               {contractType}

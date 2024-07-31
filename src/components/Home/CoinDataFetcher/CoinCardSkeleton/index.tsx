@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Skeleton from '@/components/Skeleton';
 import Link from 'next/link';
 import React from 'react';
@@ -12,7 +13,7 @@ import {
   Name,
 } from '../CoinCard/styles';
 
-const CoinCardSkeleton: React.FC = () => {
+const CoinCardSkeleton: React.FC<PropsWithChildren> = () => {
   return (
     <Container>
       <Carousel style={{ marginBottom: '1rem' }}>
@@ -22,22 +23,20 @@ const CoinCardSkeleton: React.FC = () => {
             <CardContainerSkeleton key={index}>
               <CardContent>
                 <Link href={`#`}>
-                  <a>
-                    <HeaderContainer>
-                      <Skeleton width={70} height={60} />
+                  <HeaderContainer>
+                    <Skeleton width={70} height={60} />
 
-                      <HeaderContentSkeleton>
-                        <Name>
-                          <span style={{ marginBottom: '0.5rem' }}>
-                            <Skeleton width={60} height={21} />
-                          </span>
-                          <span>
-                            <Skeleton height={21} />
-                          </span>
-                        </Name>
-                      </HeaderContentSkeleton>
-                    </HeaderContainer>
-                  </a>
+                    <HeaderContentSkeleton>
+                      <Name>
+                        <span style={{ marginBottom: '0.5rem' }}>
+                          <Skeleton width={60} height={21} />
+                        </span>
+                        <span>
+                          <Skeleton height={21} />
+                        </span>
+                      </Name>
+                    </HeaderContentSkeleton>
+                  </HeaderContainer>
                 </Link>
 
                 <ChartContainerSkeleton>

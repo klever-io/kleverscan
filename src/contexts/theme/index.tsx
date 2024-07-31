@@ -1,8 +1,10 @@
+import { PropsWithChildren } from 'react';
 import theme from '@/styles/theme';
 import darkTheme from '@/styles/theme/dark';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { ThemeProvider } from 'styled-components';
+import { StyleSheetManager, ThemeProvider } from 'styled-components';
 import { setCookie, getCookie } from 'cookies-next';
+import isPropValid from '@emotion/is-prop-valid';
 
 interface ITheme {
   toggleDarkTheme: () => void;
@@ -20,10 +22,9 @@ interface InternalThemeProviderProps {
   initialDarkTheme?: boolean;
 }
 
-export const InternalThemeProvider: React.FC<InternalThemeProviderProps> = ({
-  children,
-  initialDarkTheme = false,
-}) => {
+export const InternalThemeProvider: React.FC<
+  PropsWithChildren<InternalThemeProviderProps>
+> = ({ children, initialDarkTheme = false }) => {
   const [isDarkTheme, setIsDarkTheme] = useState(initialDarkTheme);
 
   useEffect(() => {
@@ -50,10 +51,19 @@ export const InternalThemeProvider: React.FC<InternalThemeProviderProps> = ({
     theme: isDarkTheme ? darkTheme : theme,
   };
 
+  const shouldForwardProp = (propName: string, target: any) => {
+    return typeof target === 'string' ? isPropValid(propName) : true;
+  };
+
   return (
     <ThemeContext.Provider value={values}>
       <ThemeProvider theme={isDarkTheme ? darkTheme : theme}>
-        {children}
+        <StyleSheetManager
+          enableVendorPrefixes
+          shouldForwardProp={shouldForwardProp}
+        >
+          {children}
+        </StyleSheetManager>
       </ThemeProvider>
     </ThemeContext.Provider>
   );

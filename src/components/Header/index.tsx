@@ -1,10 +1,11 @@
+import { PropsWithChildren } from 'react';
 import { ArrowDropdown } from '@/assets/icons';
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 import { useMobile } from '@/contexts/mobile';
 import { useTheme } from '@/contexts/theme';
 import { useScroll } from '@/utils/hooks';
 import { getNetwork } from '@/utils/networkFunctions';
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useRef, useState } from 'react';
@@ -44,15 +45,17 @@ interface IDropdownPages {
   onClick?: () => void;
 }
 
-const NavbarItem: React.FC<INavbarItem> = ({ name, pathTo, pages = [] }) => {
+const NavbarItem: React.FC<PropsWithChildren<INavbarItem>> = ({
+  name,
+  pathTo,
+  pages = [],
+}) => {
   const router = useRouter();
   const DropdownDesktop = ({ page }: IDropdownPages) => {
     return (
       <DropdownItem disabled={router.pathname === page.pathTo}>
         <Link href={page.pathTo} data-testid="navbar-item">
-          <a>
-            <span>{page.name}</span>
-          </a>
+          <span>{page.name}</span>
         </Link>
       </DropdownItem>
     );
@@ -75,7 +78,7 @@ const NavbarItem: React.FC<INavbarItem> = ({ name, pathTo, pages = [] }) => {
   }
 
   return (
-    <Link href={pathTo}>
+    <Link href={pathTo} legacyBehavior>
       <LinkStyled
         disabled={router.pathname.includes(name.toLowerCase())}
         href={pathTo}
@@ -91,7 +94,7 @@ const NavbarItem: React.FC<INavbarItem> = ({ name, pathTo, pages = [] }) => {
   );
 };
 
-export const MobileNavbarItem: React.FC<INavbarItem> = ({
+export const MobileNavbarItem: React.FC<PropsWithChildren<INavbarItem>> = ({
   name,
   Icon,
   pathTo,
@@ -112,20 +115,18 @@ export const MobileNavbarItem: React.FC<INavbarItem> = ({
 
   return (
     <Link href={pathTo}>
-      <a>
-        <MobileItem
-          onClick={onClick}
-          selected={router.pathname === pathTo}
-          data-testid="mobile-navbar-item"
-        >
-          <span>{name}</span>
-        </MobileItem>
-      </a>
+      <MobileItem
+        onClick={onClick}
+        selected={router.pathname === pathTo}
+        data-testid="mobile-navbar-item"
+      >
+        <span>{name}</span>
+      </MobileItem>
     </Link>
   );
 };
 
-const Navbar: React.FC = () => {
+const Navbar: React.FC<PropsWithChildren> = () => {
   const {
     mobileNavbarRef,
     closeMenu,
@@ -180,17 +181,15 @@ const Navbar: React.FC = () => {
             openSearch={!isTablet ? false : openSearch}
           >
             <Link href="/">
-              <a>
-                <Logo onClick={closeMenu}>
-                  <Image
-                    src={isDarkTheme ? '/logo-large.svg' : '/NewLogo.svg'}
-                    alt="Logo"
-                    width="215"
-                    height="29"
-                    loader={({ src, width }) => `${src}?w=${width}`}
-                  />
-                </Logo>
-              </a>
+              <Logo onClick={closeMenu}>
+                <Image
+                  src={isDarkTheme ? '/logo-large.svg' : '/NewLogo.svg'}
+                  alt="Logo"
+                  width="215"
+                  height="29"
+                  loader={({ src, width }) => `${src}?w=${width}`}
+                />
+              </Logo>
             </Link>
             {network !== 'Mainnet' && (
               <span>Running on KleverChain {network}</span>

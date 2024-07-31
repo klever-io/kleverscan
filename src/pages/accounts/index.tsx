@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { Accounts as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
@@ -55,7 +56,7 @@ interface ICard {
   values: Array<string | JSX.Element>;
 }
 
-const Accounts: React.FC<IAccounts> = () => {
+const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
   const [pagination, setPagination] = useState<null | IPagination>(null);
   const [createdYesterday, setCreatedYesterday] = useState<null | number>(null);
   const { t } = useTranslation(['common', 'accounts', 'table']);
@@ -130,13 +131,17 @@ const Accounts: React.FC<IAccounts> = () => {
       values: [
         createdYesterday === pagination?.totalRecords
           ? '--'
-          : createdYesterday?.toLocaleString() ?? <Skeleton />,
+          : (createdYesterday?.toLocaleString() ?? <Skeleton />),
         pagination?.totalRecords?.toLocaleString() ?? <Skeleton />,
       ],
     },
   ];
 
-  const CardContent: React.FC<ICard> = ({ title, headers, values }) => {
+  const CardContent: React.FC<PropsWithChildren<ICard>> = ({
+    title,
+    headers,
+    values,
+  }) => {
     const [uptime] = useState(new Date().getTime());
     const [age, setAge] = useState(getAge(new Date(), t));
 
@@ -194,9 +199,7 @@ const Accounts: React.FC<IAccounts> = () => {
         element: props => (
           <CenteredRow key={address}>
             <Link href={`/account/${address}`}>
-              <a>
-                <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
-              </a>
+              <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
             </Link>
 
             <Copy info="Address" data={address} />

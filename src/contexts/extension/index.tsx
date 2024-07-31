@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import { doIf } from '@/utils/promiseFunctions';
 import { web } from '@klever/sdk-web';
 import {
@@ -22,7 +23,9 @@ interface IExtension {
 
 export const Extension = createContext({} as IExtension);
 
-export const ExtensionProvider: React.FC = ({ children }) => {
+export const ExtensionProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
   const [extensionInstalled, setExtensionInstalled] = useState<boolean>();
   const [extensionLoading, setExtensionLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');

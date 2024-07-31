@@ -1,3 +1,4 @@
+import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
@@ -51,7 +52,7 @@ const Holders: React.FC<IHolders> = ({
       {
         element: props => (
           <AddressContainer key={address}>
-            <Link href={`/account/${address}`}>
+            <Link href={`/account/${address}`} legacyBehavior>
               {parseAddress(address, 40)}
             </Link>
 

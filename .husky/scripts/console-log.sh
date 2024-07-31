@@ -12,10 +12,8 @@ if git diff --cached | grep -E '^\+\+\+ b/.*' | grep -vE '^\+\+\+ b/.husky/scrip
   # Pergunta ao usuário se ele deseja continuar com o commit
   read -p "There are some occurrences of console.log in your modifications. Are you sure you want to continue? (y/n) " yn
   if echo "$yn" | grep -iq "^y$"; then
-    # O usuário quer continuar
     exit 0
   else
-    # O usuário não quer continuar, cancela o commit
     exit 1
   fi
 fi

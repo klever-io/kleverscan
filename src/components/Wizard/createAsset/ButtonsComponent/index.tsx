@@ -51,7 +51,7 @@ export const ButtonsComponent: React.FC<
       previousStep(prev => prev - 1);
       return;
     }
-    handleStep && handleStep(prev => prev - 1);
+    handleStep?.(prev => prev - 1);
   };
 
   useEffect(() => {

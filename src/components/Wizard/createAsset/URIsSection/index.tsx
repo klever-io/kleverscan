@@ -39,21 +39,13 @@ export const URIsSection: React.FC<PropsWithChildren<IAssetInformations>> = ({
   const [addUri, setAddUri] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  let errorLabel = null;
-  let errorUri = null;
+  let errorLabel = errors?.uris?.[currentIndex]?.label;
+  let errorUri = errors?.uris?.[currentIndex]?.uri;
 
   const buttonsProps = {
     handleStep,
     next: true,
   };
-
-  try {
-    errorLabel = eval(`errors?.uris[${currentIndex}]?.label`);
-    errorUri = eval(`errors?.uris[${currentIndex}]?.uri`);
-  } catch {
-    errorLabel = null;
-    errorUri = null;
-  }
 
   if (addUri) {
     buttonsProps.next = !!(!errorLabel && !errorUri);

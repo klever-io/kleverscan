@@ -23,13 +23,8 @@ export const CreateITOSevenStep: React.FC<
   } = useFormContext();
   const status = watch('status');
   const collection = watch('collection');
-  let error = null;
+  let error = errors?.status;
 
-  try {
-    error = eval(`errors?.status`);
-  } catch {
-    error = null;
-  }
   const buttonsProps = {
     handleStep,
     next: !!(!error && checkEmptyField(status)),

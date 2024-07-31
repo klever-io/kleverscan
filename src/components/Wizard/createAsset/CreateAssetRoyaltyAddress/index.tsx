@@ -23,7 +23,12 @@ export const CreateAssetRoyaltyAddress: React.FC<
   const [changeOwnerAddress, setChangeOwnerAddress] = useState(false);
   const [checkedField, setCheckedField] = useState(0);
 
-  const { setValue, register, watch } = useFormContext();
+  const {
+    setValue,
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext();
 
   const { walletAddress } = useExtension();
 
@@ -33,17 +38,11 @@ export const CreateAssetRoyaltyAddress: React.FC<
       setAddress(getWalletAddress);
       setValue('royalties.address', getWalletAddress, { shouldValidate: true });
     }
-  }, []);
+  }, [walletAddress, setValue]);
 
   const { isMobile, isTablet } = useMobile();
   const ownerAddress = watch('royalties.address');
-  let error = null;
-
-  try {
-    error = eval(`errors?.royalties.address`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.royalties?.address;
 
   const buttonsProps = {
     handleStep,

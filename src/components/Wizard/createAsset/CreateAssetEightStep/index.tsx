@@ -20,13 +20,7 @@ export const CreateAssetEightStep: React.FC<
   } = useFormContext();
   const ticker = watch('ticker');
   const assetText = assetType === 0 ? 'token' : 'NFT';
-  let error = null;
-
-  try {
-    error = eval(`errors?.logo`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.logo;
 
   const buttonsProps = {
     handleStep,

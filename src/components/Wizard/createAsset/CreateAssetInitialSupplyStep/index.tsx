@@ -20,15 +20,9 @@ export const CreateAssetInitialSupplyStep: React.FC<
   } = useFormContext();
   const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
-  const initialSupply = watch('initialSupply');
+  watch('initialSupply');
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.initialSupply`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.initialSupply;
 
   const buttonsProps = {
     handleStep,

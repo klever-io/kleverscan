@@ -29,28 +29,16 @@ export const CreateWhitelistedAddress: React.FC<
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  let errorWhitelistedAddress = null;
-  let errorWhitelistedLimit = null;
+  let errorWhitelistedAddress = errors?.whitelistInfo?.[currentIndex]?.address;
+  let errorWhitelistedLimit = errors?.whitelistInfo?.[currentIndex]?.limit;
 
-  const ticker = watch('ticker');
+  watch('ticker');
 
   const buttonsProps = {
     handleStep,
     previousStep,
     next: true,
   };
-
-  try {
-    errorWhitelistedAddress = eval(
-      `errors?.whitelistInfo[${currentIndex}].address`,
-    );
-    errorWhitelistedLimit = eval(
-      `errors?.whitelistInfo[${currentIndex}].limit`,
-    );
-  } catch {
-    errorWhitelistedAddress = null;
-    errorWhitelistedLimit = null;
-  }
 
   const handleNextIndex = () => {
     if (currentIndex < fields.length - 1) {
@@ -63,6 +51,7 @@ export const CreateWhitelistedAddress: React.FC<
       setCurrentIndex(currentIndex - 1);
     }
   };
+
   useEffect(() => {
     if (fields.length === 0) append({});
   }, []);

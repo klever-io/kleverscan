@@ -13,15 +13,14 @@ import {
 export const CreateAssetTickerStep: React.FC<
   PropsWithChildren<IAssetInformations>
 > = ({ informations: { currentStep, title, description }, handleStep, t }) => {
-  const { register, watch } = useFormContext();
-  const ticker = watch('ticker');
-  let error = null;
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext();
 
-  try {
-    error = eval(`errors?.ticker`);
-  } catch {
-    error = null;
-  }
+  const ticker = watch('ticker');
+  let error = errors?.ticker;
 
   const buttonsProps = {
     handleStep,

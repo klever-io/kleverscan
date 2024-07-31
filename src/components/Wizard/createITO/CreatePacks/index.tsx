@@ -1,21 +1,16 @@
+import { WizardLeftArrow } from '@/assets/icons';
 import { PropsWithChildren, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
-import { IAssetITOInformations } from '..';
-import { ButtonsComponent } from '../../createAsset/ButtonsComponent';
+import { useTranslation } from 'react-i18next';
+import { FiPlusSquare } from 'react-icons/fi';
 import {
   BorderedButton,
-  ConfigITOStartTime,
-  ErrorInputContainer,
   ErrorMessage,
   GenericCardContainer,
-  GenericInfoCard,
   GenericInput,
   UriButtonsContainer,
   WizardRightArrowSVG,
 } from '../../createAsset/styles';
-import { useTranslation } from 'react-i18next';
-import { WizardLeftArrow } from '@/assets/icons';
-import { FiPlusSquare } from 'react-icons/fi';
 
 interface IPackInfoITO {
   packInfoIndex: number;
@@ -38,20 +33,10 @@ export const CreatePacks: React.FC<PropsWithChildren<IPackInfoITO>> = ({
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  let errorPackAmount = null;
-  let errorPackPrice = null;
-
-  try {
-    errorPackAmount = eval(
-      `errors?.packInfo[${packInfoIndex}].packs[${currentIndex}].amount`,
-    );
-    errorPackPrice = eval(
-      `errors?.packInfo[${packInfoIndex}].packs[${currentIndex}].price`,
-    );
-  } catch {
-    errorPackAmount = null;
-    errorPackPrice = null;
-  }
+  let errorPackAmount =
+    errors?.packInfo?.[packInfoIndex]?.packs?.[currentIndex]?.amount;
+  let errorPackPrice =
+    errors?.packInfo?.[packInfoIndex]?.packs?.[currentIndex]?.price;
 
   const handleNextIndex = () => {
     if (currentIndex < fields.length - 1) {

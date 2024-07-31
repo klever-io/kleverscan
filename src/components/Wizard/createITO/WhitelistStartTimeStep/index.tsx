@@ -15,18 +15,11 @@ export const WhitelistStartTimeStep: React.FC<
   const {
     register,
     formState: { errors },
-    watch,
   } = useFormContext();
 
-  let errorStartTime = null;
-  let errorEndTime = null;
-  try {
-    errorStartTime = eval(`errors?.whitelistStartTime`);
-    errorEndTime = eval(`errors?.whitelistEndTime`);
-  } catch {
-    errorStartTime = null;
-    errorEndTime = null;
-  }
+  let errorStartTime = errors?.whitelistStartTime;
+  let errorEndTime = errors?.whitelistEndTime;
+
   const buttonsProps = {
     handleStep,
     previousStep,

@@ -15,16 +15,10 @@ export const WhitelistDefaultLimitStep: React.FC<
   const {
     register,
     formState: { errors },
-    watch,
   } = useFormContext();
 
-  let error = null;
+  let error = errors?.whitelistDefaultLimit;
 
-  try {
-    error = eval(`errors?.whitelistDefaultLimit`);
-  } catch {
-    error = null;
-  }
   const buttonsProps = {
     handleStep,
     next: !!!error,

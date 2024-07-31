@@ -20,23 +20,18 @@ export const CreateAssetMaxSupplyStep: React.FC<
   } = useFormContext();
   const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
-  const maxSupply = watch('maxSupply');
+  watch('maxSupply');
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.maxSupply`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.maxSupply;
 
   const buttonsProps = {
     handleStep,
     next: !error,
   };
 
-  const handleInputChange = (e: { target: { value: string } }) => {
-    setInputValue(formatNumberDecimal(e.target.value));
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setInputValue(formatNumberDecimal(value));
   };
 
   return (

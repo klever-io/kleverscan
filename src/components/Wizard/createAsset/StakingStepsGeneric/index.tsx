@@ -28,13 +28,7 @@ export const StakingStepsGeneric: React.FC<
     return `${stakingType} ${t('common.step')}  1/3`;
   };
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.staking.apr`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.staking?.apr;
 
   const buttonsProps = {
     handleStep: setCurrentStep,

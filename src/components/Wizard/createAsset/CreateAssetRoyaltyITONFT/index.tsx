@@ -14,25 +14,11 @@ export const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
   } = useFormContext();
 
   const ticker = watch('ticker');
-  let errorTransferFixed = null;
-  let errorMarketPercentage = null;
-  let errorMarketFixed = null;
-  let errorItoPercentage = null;
-  let errorItoFixed = null;
-
-  try {
-    errorTransferFixed = eval(`errors?.royalties.percentTransferFixed`);
-    errorMarketPercentage = eval(`errors?.royalties.percentMarketPercentage`);
-    errorMarketFixed = eval(`errors?.royalties.marketFixed`);
-    errorItoPercentage = eval(`errors?.royalties.itoPercentage`);
-    errorItoFixed = eval(`errors?.royalties.itoFixed`);
-  } catch {
-    errorTransferFixed = null;
-    errorMarketPercentage = null;
-    errorMarketFixed = null;
-    errorItoPercentage = null;
-    errorItoFixed = null;
-  }
+  let errorTransferFixed = errors?.royalties?.percentTransferFixed;
+  let errorMarketPercentage = errors?.royalties?.percentMarketPercentage;
+  let errorMarketFixed = errors?.royalties?.marketFixed;
+  let errorItoPercentage = errors?.royalties?.itoPercentage;
+  let errorItoFixed = errors?.royalties?.itoFixed;
 
   return (
     <GenericCardContainer>

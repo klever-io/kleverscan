@@ -22,13 +22,8 @@ export const WhitelistStatusStep: React.FC<
     watch,
   } = useFormContext();
   const whitelistStatus = watch('whitelistStatus');
-  let error = null;
+  let error = errors?.whitelistStatus;
 
-  try {
-    error = eval(`errors?.whitelistStatus`);
-  } catch {
-    error = null;
-  }
   const buttonsProps = {
     handleStep,
     next: !!!error,

@@ -29,13 +29,7 @@ export const StakingStepsGenericAprFprTwo: React.FC<
     return `${stakingType} ${t('common.step')} 2/3`;
   };
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.staking.minEpochsToUnstake`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.staking?.minEpochsToUnstake;
 
   const buttonsProps = {
     handleStep: setCurrentStep,

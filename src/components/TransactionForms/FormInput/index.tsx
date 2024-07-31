@@ -1,11 +1,16 @@
-import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEventHandler,
+  PropsWithChildren,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   ChangeHandler,
   FieldValues,
@@ -126,7 +131,9 @@ export const onChangeWrapper = (
 
     const nonEmptyValues = cleanEmptyValues(getValues());
 
-    if (name) eval(`nonEmptyValues.${name} = e.target.value`);
+    if (name) {
+      nonEmptyValues[name] = e.target.value;
+    }
 
     let newQuery: NextParsedUrlQuery = router.query?.contract
       ? { contract: router.query?.contract }
@@ -201,13 +208,7 @@ const FormInput: React.FC<
     }
   }, [type]);
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.${name}`);
-  } catch (e) {
-    error = null;
-  }
+  let error = name && errors[name];
 
   useEffect(() => {
     name && dynamicInitialValue && setValue(name, dynamicInitialValue);

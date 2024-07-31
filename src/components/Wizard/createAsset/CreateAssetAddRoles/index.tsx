@@ -45,13 +45,7 @@ export const CreateAssetAddRoles: React.FC<
     next: true,
   };
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.roles[${currentIndex}]?.address`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.roles?.[currentIndex]?.address;
 
   if (addRole) {
     buttonsProps.next = !!(!error && Object.entries(error || {}).length === 0);
@@ -71,7 +65,7 @@ export const CreateAssetAddRoles: React.FC<
 
   useEffect(() => {
     if (fields.length === 0) append({});
-  }, [fields]);
+  }, [fields, append]);
 
   return !addRole ? (
     <GenericCardContainer>

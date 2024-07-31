@@ -43,7 +43,7 @@ export const DesktopStepsComponent: React.FC<PropsWithChildren<any>> = ({
     if (!advancedStepsLabels) {
       setShowBasicSteps(false);
     }
-  }, [selectedStep]);
+  }, [selectedStep, isNFT, advancedStepsLabels]);
 
   if (!isMobile && !isTablet && selectedStep !== 0) {
     return (

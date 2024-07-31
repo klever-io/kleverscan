@@ -42,7 +42,7 @@ export const CreateAssetStakingStep: React.FC<
       component: <StakingStepsGeneric setCurrentStep={setCurrentStep} />,
     },
     {
-      key: 'staking 2',
+      key: 'staking 2-1',
       label: 'staking 2',
       isDone: false,
       component: (

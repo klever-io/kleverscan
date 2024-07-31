@@ -28,14 +28,9 @@ export const CreateITOFourthStep: React.FC<
   const collection = watch('collection');
   const watchStartTime = watch('startTime');
   const watchStartTimeNow = watch('startTimeStartNow');
-  let errorStartTime = null;
-  let errorEndTime = null;
-  try {
-    errorStartTime = eval(`errors?.startTime`);
-    errorEndTime = eval(`errors?.endTime`);
-  } catch {
-    errorStartTime = null;
-  }
+  let errorStartTime = errors?.startTime;
+  let errorEndTime = errors?.endTime;
+
   const buttonsProps = {
     handleStep,
     next: !!!errorEndTime,

@@ -34,35 +34,19 @@ export const CreateAssetSplitRoyalties: React.FC<
   const [splitRoyalties, setSplitRoyalties] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  let errorsplitAddres = null;
-  let errorSplitTransferPerc = null;
-  let errorSplitITOPerc = null;
-  let errorSplitPercentITOFixed = null;
+  let errorSplitAddress =
+    errors?.royalties.splitRoyalties[currentIndex]?.address;
+  let errorSplitTransferPercent =
+    errors?.royalties.splitRoyalties[currentIndex]?.percentTransferPercentage;
+  let errorSplitITOPercent =
+    errors?.royalties.splitRoyalties[currentIndex]?.percentITOPercentage;
+  let errorSplitPercentITOFixed =
+    errors?.royalties.splitRoyalties[currentIndex]?.percentITOFixed;
 
   const buttonsProps = {
     handleStep,
     next: true,
   };
-
-  try {
-    errorsplitAddres = eval(
-      `errors?.royalties.splitRoyalties[${currentIndex}]?.address`,
-    );
-    errorSplitTransferPerc = eval(
-      `errors?.royalties.splitRoyalties[${currentIndex}]?.percentTransferPercentage`,
-    );
-    errorSplitITOPerc = eval(
-      `errors?.royalties.splitRoyalties[${currentIndex}]?.percentITOPercentage`,
-    );
-    errorSplitPercentITOFixed = eval(
-      `errors?.royalties.splitRoyalties[${currentIndex}]?.percentITOFixed`,
-    );
-  } catch {
-    errorsplitAddres = null;
-    errorSplitTransferPerc = null;
-    errorSplitITOPerc = null;
-    errorSplitPercentITOFixed = null;
-  }
 
   if (splitRoyalties) {
     buttonsProps.next = true;
@@ -128,7 +112,7 @@ export const CreateAssetSplitRoyalties: React.FC<
       <div key={currentIndex}>
         <p>{t('wizards:common.advancedOptions.royalties.howRoyaltiesSplit')}</p>
         <GenericInput
-          error={errorsplitAddres}
+          error={errorSplitAddress}
           type="text"
           autoFocus={true}
           {...register(`royalties.splitRoyalties[${currentIndex}].address`, {
@@ -146,11 +130,11 @@ export const CreateAssetSplitRoyalties: React.FC<
         <p>
           {t('wizards:common.advancedOptions.royalties.royaltyReceiverAddress')}
         </p>
-        {errorsplitAddres && (
-          <ErrorMessage>{errorsplitAddres?.message}</ErrorMessage>
+        {errorSplitAddress && (
+          <ErrorMessage>{errorSplitAddress?.message}</ErrorMessage>
         )}
         <GenericInput
-          error={errorSplitTransferPerc}
+          error={errorSplitTransferPercent}
           type="number"
           {...register(
             `royalties.splitRoyalties[${currentIndex}].percentTransferPercentage`,
@@ -167,12 +151,12 @@ export const CreateAssetSplitRoyalties: React.FC<
             'wizards:common.advancedOptions.royalties.transferPercentageReceiverAddressFee',
           )}
         </p>
-        {errorSplitTransferPerc && (
-          <ErrorMessage>{errorSplitTransferPerc?.message}</ErrorMessage>
+        {errorSplitTransferPercent && (
+          <ErrorMessage>{errorSplitTransferPercent?.message}</ErrorMessage>
         )}
 
         <GenericInput
-          error={errorSplitITOPerc}
+          error={errorSplitITOPercent}
           type="number"
           {...register(
             `royalties.splitRoyalties[${currentIndex}].percentITOPercentage`,
@@ -189,8 +173,8 @@ export const CreateAssetSplitRoyalties: React.FC<
             'wizards:common.advancedOptions.royalties.percentITOPercentageReceiverAddressFee',
           )}
         </p>
-        {errorSplitITOPerc && (
-          <ErrorMessage>{errorSplitITOPerc?.message}</ErrorMessage>
+        {errorSplitITOPercent && (
+          <ErrorMessage>{errorSplitITOPercent?.message}</ErrorMessage>
         )}
 
         <GenericInput

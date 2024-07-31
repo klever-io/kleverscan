@@ -29,8 +29,10 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  let errorTransferPercAmount = null;
-  let errorTransferPerc = null;
+  let errorTransferPercAmount =
+    errors?.royalties.transferPercentage[currentIndex]?.amount;
+  let errorTransferPerc =
+    errors?.royalties.transferPercentage[currentIndex]?.percentage;
 
   const ticker = watch('ticker');
 
@@ -38,18 +40,6 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
     handleStep,
     next: true,
   };
-
-  try {
-    errorTransferPercAmount = eval(
-      `errors?.royalties.transferPercentage[${currentIndex}]?.amount`,
-    );
-    errorTransferPerc = eval(
-      `errors?.royalties.transferPercentage[${currentIndex}]?.percentage`,
-    );
-  } catch {
-    errorTransferPercAmount = null;
-    errorTransferPerc = null;
-  }
 
   const handleNextIndex = () => {
     if (currentIndex < fields.length - 1) {

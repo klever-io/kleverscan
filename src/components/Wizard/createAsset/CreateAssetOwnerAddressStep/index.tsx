@@ -30,7 +30,12 @@ export const CreateAssetOwnerAddressStep: React.FC<
 
   const { walletAddress } = useExtension();
 
-  const { setValue, register, watch } = useFormContext();
+  const {
+    setValue,
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext();
 
   useEffect(() => {
     const getWallet = walletAddress;
@@ -38,17 +43,11 @@ export const CreateAssetOwnerAddressStep: React.FC<
       setAddress(getWallet);
       setValue(formValue || '', getWallet, { shouldValidate: true });
     }
-  }, []);
+  }, [walletAddress]);
 
   const { isMobile, isTablet } = useMobile();
   const ownerAddress = watch(formValue || '');
-  let error = null;
-
-  try {
-    error = eval(`errors?.${formValue}`);
-  } catch {
-    error = null;
-  }
+  let error = formValue && errors[formValue];
 
   const buttonsProps = {
     handleStep,
@@ -102,7 +101,6 @@ export const CreateAssetOwnerAddressStep: React.FC<
                 type="radio"
                 name="ownerAddress"
                 id="ownerAddress"
-                defaultChecked={true}
                 checked={checkedField === 0}
               />
               <label htmlFor="ownerAddress" />

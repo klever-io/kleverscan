@@ -47,13 +47,7 @@ export const CreateITOThirdStep: React.FC<
   const { isMobile, isTablet } = useMobile();
   const receiveAddress = watch(formValue || '');
   const collection = watch('collection');
-  let error = null;
-
-  try {
-    error = eval(`errors?.${formValue}`);
-  } catch {
-    error = null;
-  }
+  let error = formValue && errors[formValue];
 
   const buttonsProps = {
     handleStep,

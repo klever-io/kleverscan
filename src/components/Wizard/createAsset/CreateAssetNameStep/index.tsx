@@ -18,16 +18,14 @@ export const CreateAssetNameStep: React.FC<
   handleStep,
   t,
 }) => {
-  const { register, watch } = useFormContext();
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext();
   const name = watch('name');
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.name`);
-  } catch {
-    error = null;
-  }
+  let error = errors?.name;
 
   const buttonsProps = {
     handleStep,

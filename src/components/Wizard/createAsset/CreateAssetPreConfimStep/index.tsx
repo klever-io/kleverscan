@@ -22,7 +22,7 @@ export const CreateAssetPreConfimStep: React.FC<
   const assetText = assetType === 0 ? 'token' : 'NFT';
 
   const handleAdvancedStepsWrapper = () => {
-    handleAdvancedSteps && handleAdvancedSteps();
+    handleAdvancedSteps?.();
   };
 
   return (

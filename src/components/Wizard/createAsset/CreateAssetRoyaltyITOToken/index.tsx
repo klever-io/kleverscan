@@ -14,16 +14,8 @@ export const CreateAssetRoyaltyITOToken: React.FC<PropsWithChildren<any>> = ({
   } = useFormContext();
 
   const ticker = watch('ticker');
-  let errorTransferPercentage = null;
-  let errorTransferFixed = null;
-
-  try {
-    errorTransferPercentage = eval(`errors?.royalties.itoPercentage`);
-    errorTransferFixed = eval(`errors?.royalties.itoPercentage`);
-  } catch {
-    errorTransferPercentage = null;
-    errorTransferFixed = null;
-  }
+  let errorTransferPercentage = errors?.royalties?.itoPercentage;
+  let errorTransferFixed = errors?.royalties?.itoFixed;
 
   return (
     <GenericCardContainer>

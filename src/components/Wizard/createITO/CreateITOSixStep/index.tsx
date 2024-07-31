@@ -27,13 +27,8 @@ export const CreateITOSixStep: React.FC<
     queryFn: () => getAsset(collection),
   });
 
-  let error = null;
+  let error = errors?.maxAmount;
 
-  try {
-    error = eval(`errors?.maxAmount`);
-  } catch {
-    error = null;
-  }
   const buttonsProps = {
     handleStep,
     next: !!!error,

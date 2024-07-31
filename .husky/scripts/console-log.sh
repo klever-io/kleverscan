@@ -1,20 +1,21 @@
 #!/bin/sh
 # Redirect output to stderr.
 exec 1>&2
-# enable user input
-exec < /dev/tty
 
 consoleregexp='console.log'
-# CHECK
-if test $(git diff --cached | grep $consoleregexp | wc -l) != 0
-then 
-  exec git diff --cached | grep -ne $consoleregexp
-  read -p "There are some occurrences of console.log at your modification. Are you sure want to continue? (y/n)" yn
-  echo $yn | grep ^[Yy]$
-  if [ $? -eq 0 ] 
-  then
-    exit 0; #THE USER WANTS TO CONTINUE
+
+# Verifica se há ocorrências de console.log no diff em cache, excluindo o próprio script
+if git diff --cached | grep -E '^\+\+\+ b/.*' | grep -vE '^\+\+\+ b/.husky/scripts/console-log.sh' | xargs git diff --cached | grep -q $consoleregexp; then
+  # Mostra as linhas com console.log, excluindo o próprio script
+  git diff --cached | grep -E '^\+\+\+ b/.*' | grep -vE '^\+\+\+ b/.husky/scripts/console-log.sh' | xargs git diff --cached | grep -ne $consoleregexp
+
+  # Pergunta ao usuário se ele deseja continuar com o commit
+  read -p "There are some occurrences of console.log in your modifications. Are you sure you want to continue? (y/n) " yn
+  if echo "$yn" | grep -iq "^y$"; then
+    # O usuário quer continuar
+    exit 0
   else
-    exit 1; # THE USER DONT WANT TO CONTINUE SO ROLLBACK
+    # O usuário não quer continuar, cancela o commit
+    exit 1
   fi
 fi

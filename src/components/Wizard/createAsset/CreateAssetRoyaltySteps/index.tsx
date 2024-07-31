@@ -22,10 +22,6 @@ export const CreateAssetRoyaltySteps: React.FC<
   const [royalties, setRoyalties] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
-  const previousSteps = () => {
-    handleStep(prev => prev - 1);
-  };
-
   const commonProps = {
     handleStep: setCurrentStep,
     previousStep: handleStep,

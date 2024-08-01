@@ -1,3 +1,4 @@
+import { parseRoles } from '@/components/Wizard/utils';
 import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { validateImgUrl } from '@/utils/imageValidate';
@@ -24,6 +25,7 @@ import {
   parseProperties,
   parseSplitRoyalties,
   parseStaking,
+  parseStringToNumberSupply,
   parseTickerName,
   parseURIs,
   percentageProps,
@@ -62,7 +64,8 @@ export const parseCreateAsset = (data: ICreateAsset) => {
   parseURIs(dataCopy);
   parseStaking(dataCopy);
   parseProperties(dataCopy);
-
+  parseRoles(dataCopy);
+  parseStringToNumberSupply(dataCopy);
   return dataCopy;
 };
 

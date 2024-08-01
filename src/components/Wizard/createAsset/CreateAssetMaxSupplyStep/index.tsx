@@ -10,9 +10,9 @@ import {
   GenericInput,
 } from '../styles';
 
-export const CreateAssetMaxSupplyStep: React.FC<
-  PropsWithChildren<IAssetInformations>
-> = ({ informations: { description, kleverTip }, handleStep, t }) => {
+export const CreateAssetMaxSupplyStep: React.FC<PropsWithChildren<
+  IAssetInformations
+>> = ({ informations: { description, kleverTip }, handleStep, t }) => {
   const {
     watch,
     register,

@@ -18,9 +18,9 @@ import {
   WizardRightArrowSVG,
 } from '../styles';
 
-export const CreateAssetSplitRoyalties: React.FC<
-  PropsWithChildren<IWizardComponents>
-> = ({ handleStep, t }) => {
+export const CreateAssetSplitRoyalties: React.FC<PropsWithChildren<
+  IWizardComponents
+>> = ({ handleStep, t }) => {
   const {
     control,
     register,
@@ -35,13 +35,14 @@ export const CreateAssetSplitRoyalties: React.FC<
   const [currentIndex, setCurrentIndex] = useState(0);
 
   let errorSplitAddress =
-    errors?.royalties.splitRoyalties[currentIndex]?.address;
+    errors?.royalties?.splitRoyalties?.[currentIndex]?.address;
   let errorSplitTransferPercent =
-    errors?.royalties.splitRoyalties[currentIndex]?.percentTransferPercentage;
+    errors?.royalties?.splitRoyalties?.[currentIndex]
+      ?.percentTransferPercentage;
   let errorSplitITOPercent =
-    errors?.royalties.splitRoyalties[currentIndex]?.percentITOPercentage;
+    errors?.royalties?.splitRoyalties?.[currentIndex]?.percentITOPercentage;
   let errorSplitPercentITOFixed =
-    errors?.royalties.splitRoyalties[currentIndex]?.percentITOFixed;
+    errors?.royalties?.splitRoyalties?.[currentIndex]?.percentITOFixed;
 
   const buttonsProps = {
     handleStep,
@@ -142,13 +143,13 @@ export const CreateAssetSplitRoyalties: React.FC<
               pattern: { value: /\d+/g, message: 'Value must be only numbers' },
               min: { value: 0, message: 'Min value is 0' },
               max: { value: 100, message: 'Max value is 100' },
-            },
+            }
           )}
           placeholder="Transfer Percentage"
         />
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.transferPercentageReceiverAddressFee',
+            'wizards:common.advancedOptions.royalties.transferPercentageReceiverAddressFee'
           )}
         </p>
         {errorSplitTransferPercent && (
@@ -164,13 +165,13 @@ export const CreateAssetSplitRoyalties: React.FC<
               valueAsNumber: true,
               min: { value: 0, message: 'Min value is 0' },
               max: { value: 100, message: 'Max value is 100' },
-            },
+            }
           )}
           placeholder="ITO Percentage"
         />
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.percentITOPercentageReceiverAddressFee',
+            'wizards:common.advancedOptions.royalties.percentITOPercentageReceiverAddressFee'
           )}
         </p>
         {errorSplitITOPercent && (
@@ -186,13 +187,13 @@ export const CreateAssetSplitRoyalties: React.FC<
               valueAsNumber: true,
               min: { value: 0, message: 'Min value is 0' },
               max: { value: 100, message: 'Max value is 100' },
-            },
+            }
           )}
           placeholder="ITO Fixed"
         />
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.itoFixedReceiverAddressFee',
+            'wizards:common.advancedOptions.royalties.itoFixedReceiverAddressFee'
           )}
         </p>
         {errorSplitPercentITOFixed && (

@@ -787,7 +787,7 @@ interface ITxRequest {
 
 const getNonce = async (): Promise<IAccountNonce> => {
   const req = await fetch(
-    `${window.kleverWeb.provider.node}/address/${window.kleverWeb.address}/nonce`,
+    `${window?.kleverWeb?.provider?.node}/address/${window?.kleverWeb?.address}/nonce`,
   );
 
   return (await req.json()) as IAccountNonce;
@@ -826,7 +826,7 @@ const buildTransaction = async (
   const txBody: ITxRequest = {
     type: fistContractType,
     nonce,
-    sender: options?.sender ?? window.kleverWeb.address,
+    sender: options?.sender ?? window?.kleverWeb?.address,
     data: txData || [],
     permID,
     contracts: payloads,
@@ -834,7 +834,7 @@ const buildTransaction = async (
   };
 
   const req = await fetch(
-    `${window.kleverWeb.provider.node}/transaction/send`,
+    `${window?.kleverWeb?.provider?.node}/transaction/send`,
     {
       method: 'POST',
       headers: {

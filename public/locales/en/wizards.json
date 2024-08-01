@@ -209,9 +209,9 @@
   "createSFT": {
     "welcome": {
       "title": "Create a semi fungible token",
-      "description": "To create a KDA fungible token we will guide you through a few steps.",
-      "tooltip": "What is a fungible token?",
-      "kleverTip": "Physical money and cryptocurrencies are fungible, which means they can be traded or exchanged for one another."
+      "description": "To create a KDA semi fungible token we will guide you through a few steps.",
+      "tooltip": "What is a semi fungible token?",
+      "kleverTip": "A semi-fungible token (SFT) can function as both fungible and non-fungible, depending on its use case. For instance, an SFT can represent a ticket that is fungible until it is used, after which it becomes unique."
     },
     "name": {
       "title": "What will be the name of your token?",

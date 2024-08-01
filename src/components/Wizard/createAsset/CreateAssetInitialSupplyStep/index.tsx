@@ -10,9 +10,9 @@ import {
   GenericInput,
 } from '../styles';
 
-export const CreateAssetInitialSupplyStep: React.FC<
-  PropsWithChildren<IWizardComponents>
-> = ({ handleStep, t }) => {
+export const CreateAssetInitialSupplyStep: React.FC<PropsWithChildren<
+  IWizardComponents
+>> = ({ handleStep, t }) => {
   const {
     watch,
     register,

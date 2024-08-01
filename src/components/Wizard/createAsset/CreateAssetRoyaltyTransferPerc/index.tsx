@@ -13,9 +13,9 @@ import {
   WizardRightArrowSVG,
 } from '../styles';
 
-export const CreateAssetRoyaltyTransferPerc: React.FC<
-  PropsWithChildren<IWizardComponents>
-> = ({ handleStep, t }) => {
+export const CreateAssetRoyaltyTransferPerc: React.FC<PropsWithChildren<
+  IWizardComponents
+>> = ({ handleStep, t }) => {
   const {
     control,
     register,
@@ -30,9 +30,9 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
   const [currentIndex, setCurrentIndex] = useState(0);
 
   let errorTransferPercAmount =
-    errors?.royalties.transferPercentage[currentIndex]?.amount;
+    errors?.royalties?.transferPercentage?.[currentIndex]?.amount;
   let errorTransferPerc =
-    errors?.royalties.transferPercentage[currentIndex]?.percentage;
+    errors?.royalties?.transferPercentage?.[currentIndex]?.percentage;
 
   const ticker = watch('ticker');
 
@@ -74,7 +74,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
         <p>
           {t(
             'wizards:common.advancedOptions.royalties.percentageValueTransfers',
-            { ticker },
+            { ticker }
           )}
         </p>
         <GenericInput
@@ -99,7 +99,7 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
               valueAsNumber: true,
               min: { value: 0, message: 'Min value is 0' },
               max: { value: 100, message: 'Max value is 100' },
-            },
+            }
           )}
           placeholder="Percentage"
         />

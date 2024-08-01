@@ -207,10 +207,10 @@
   },
   "createSFT": {
     "welcome": {
-      "title": "Criar um token fungível",
-      "description": "Para criar um token KDA fungível, iremos guiá-lo através de alguns passos.",
-      "tooltip": "O que é um token fungível?",
-      "kleverTip": "Dinheiro físico e criptomoedas são fungíveis, o que significa que podem ser negociados ou trocados uns pelos outros."
+      "title": "Criar um token semi fungível",
+      "description": "Para criar um token semi fungível KDA, iremos guiá-lo por alguns passos.",
+      "tooltip": "O que é um token semi fungível?",
+      "kleverTip": "Um token semi-fungível (SFT) pode funcionar tanto como fungível quanto como não fungível, dependendo do caso de uso. Por exemplo, um SFT pode representar um ingresso que é fungível até ser usado, após o qual se torna único."
     },
     "name": {
       "title": "Qual será o nome do seu token?",

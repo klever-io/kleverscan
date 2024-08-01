@@ -134,7 +134,10 @@ const precisionParse = async (
   };
 
   const addRoyalitiesPrecision = (payload: any, assetPrecision: number) => {
-    if (payload?.royalties === undefined) {
+    if (
+      payload?.royalties === undefined ||
+      Object.keys(payload?.royalties)?.length === 0
+    ) {
       return;
     }
 

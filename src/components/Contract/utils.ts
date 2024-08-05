@@ -134,7 +134,10 @@ const precisionParse = async (
   };
 
   const addRoyalitiesPrecision = (payload: any, assetPrecision: number) => {
-    if (payload?.royalties === undefined) {
+    if (
+      payload?.royalties === undefined ||
+      Object.keys(payload?.royalties)?.length === 0
+    ) {
       return;
     }
 
@@ -176,8 +179,10 @@ const precisionParse = async (
     case 'TransferContract':
     case 'FreezeContract':
     case 'AssetTriggerContract':
+      debugger;
       assetId = payload.assetId ? payload.assetId : payload.kda || 'KLV';
       await addFieldPrecision('amount', assetId);
+      await addFieldPrecision('value', assetId);
       if (payload?.staking?.apr)
         payload.staking.apr = addPrecision(
           payload.staking.apr,

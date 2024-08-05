@@ -1,6 +1,5 @@
-import { PropsWithChildren } from 'react';
 import { FilterArrowDown } from '@/assets/icons';
-import React, { useRef, useState } from 'react';
+import React, { PropsWithChildren, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { Loader } from '../Loader/styles';
 import {
@@ -134,7 +133,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       return getDataArray();
     }
     const regex = new RegExp(`${input}`, 'gi');
-    return getDataArray().filter(item => String(item).match(regex)?.[0]);
+    return getDataArray().filter((item) => String(item).match(regex)?.[0]);
   };
   const filteredArray = filterArrayByInput(inputValue);
 

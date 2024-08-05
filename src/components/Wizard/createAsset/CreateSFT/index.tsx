@@ -222,7 +222,6 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
   const { handleSubmit, watch } = methods;
 
   const log = watch();
-  console.log({ log });
 
   useEffect(() => {
     setSteps((prev) => {
@@ -281,7 +280,6 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
 
   const onSubmit = async (data: any) => {
     data.type = 2;
-    console.log({ data });
     const rowData = parseCreateAsset(data);
     await handleContractSubmit(rowData, '', 'CreateAssetContract', 1);
     window.scrollTo(0, 0);

@@ -42,7 +42,6 @@ export const assetTypes = [
 ];
 
 export const parseCreateAsset = (data: ICreateAsset) => {
-  console.log({ data });
   const dataCopy = JSON.parse(JSON.stringify(data));
   parseTickerName(dataCopy);
   parseSplitRoyalties(dataCopy);
@@ -51,7 +50,6 @@ export const parseCreateAsset = (data: ICreateAsset) => {
   parseProperties(dataCopy);
   parseRoles(dataCopy);
   parseStringToNumberSupply(dataCopy);
-  console.log({ dataCopy });
   return dataCopy;
 };
 

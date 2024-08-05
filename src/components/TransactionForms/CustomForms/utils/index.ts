@@ -49,8 +49,8 @@ export const parseURIs = (data: any) => {
 
   const uris: { [key: string]: string } = {};
   urisReference.forEach((item: any) => {
-    const label = item.label;
-    uris[label] = item.uri;
+    const label = item?.label;
+    uris[label] = item?.uri || item?.value;
   });
   data.uris = uris;
   return uris;

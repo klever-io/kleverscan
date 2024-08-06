@@ -2,6 +2,10 @@ import { TableRowElementProps } from '@/types';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
+export const SpanBold = styled.span`
+  font-weight: 700 !important;
+`;
+
 export const Container = styled.div`
   display: flex;
 

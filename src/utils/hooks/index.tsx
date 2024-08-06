@@ -117,6 +117,8 @@ export const useFetchPartial = <T,>(
           ) {
             setLoading(true);
             if (type !== 'assets') {
+              query = { ...query };
+              query[dataType] = value;
               response = await api.get({
                 route: `${route}`,
                 query: {

@@ -182,7 +182,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
           />
         )}
         <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
-          {closed && selected ? selected : 'All'}
+          {closed && selected ? selected : ''}
         </span>
 
         <CloseContainer empty={selected === allItem} onClick={handleClear}>

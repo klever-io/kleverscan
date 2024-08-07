@@ -34,7 +34,7 @@ export const DesktopStepsComponent: React.FC<PropsWithChildren<any>> = ({
 
   useEffect(() => {
     const assetStep = !isNFT ? 9 : 8;
-    if (selectedStep >= assetStep) {
+        if (selectedStep >= assetStep) {
       setShowBasicSteps(true);
     }
     if (selectedStep < assetStep) {
@@ -78,9 +78,9 @@ export const DesktopStepsComponent: React.FC<PropsWithChildren<any>> = ({
                     </StepsItem>
                     <DesktopStepsLabel
                       onClick={() => handleSelectStep(index)}
-                      isUpperCase={basicStepsLabels[index]
-                        .toLowerCase()
-                        .includes('ticker')}
+                      isUpperCase={basicStepsLabels?.[index]
+                        ?.toLowerCase()
+                        ?.includes('ticker')}
                     >
                       <span>{basicStepsLabels[index]}</span>
                       <span>

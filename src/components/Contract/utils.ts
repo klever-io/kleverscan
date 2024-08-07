@@ -179,7 +179,6 @@ const precisionParse = async (
     case 'TransferContract':
     case 'FreezeContract':
     case 'AssetTriggerContract':
-      debugger;
       assetId = payload.assetId ? payload.assetId : payload.kda || 'KLV';
       await addFieldPrecision('amount', assetId);
       await addFieldPrecision('value', assetId);

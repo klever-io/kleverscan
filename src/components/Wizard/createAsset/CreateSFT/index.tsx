@@ -11,7 +11,6 @@ import { ConfirmSuccessTransaction } from '../ConfirmSuccessTransaction';
 import { ConfirmTransaction } from '../ConfirmTransaction';
 import { CreateAssetAddRoles } from '../CreateAssetAddRoles';
 import { CreateAssetEightStep } from '../CreateAssetEightStep';
-import { CreateAssetInitialSupplyStep } from '../CreateAssetInitialSupplyStep';
 import { CreateAssetMaxSupplyStep } from '../CreateAssetMaxSupplyStep';
 import { CreateAssetNameStep } from '../CreateAssetNameStep';
 import { CreateAssetOwnerAddressStep } from '../CreateAssetOwnerAddressStep';
@@ -119,12 +118,6 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
       component: <CreatePrecisionStep {...stepsProps} />,
     },
     {
-      key: 'selectAssetInitialSupply',
-      label: 'Select Asset Initial Supply',
-      isDone: false,
-      component: <CreateAssetInitialSupplyStep {...stepsProps} />,
-    },
-    {
       key: 'selectAssetMaxSupply',
       label: 'Select Asset Maximum Supply',
       isDone: false,
@@ -221,8 +214,6 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
   });
   const { handleSubmit, watch } = methods;
 
-  const log = watch();
-
   useEffect(() => {
     setSteps((prev) => {
       return prev.map((e, index) => {
@@ -238,7 +229,6 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
   const assetTicker = watch('ticker');
   const assetPrecision = watch('precision');
   const ownerAddress = watch('ownerAddress');
-  const assetInitialSupply = watch('initialSupply');
   const assetMaxSupply = watch('maxSupply');
   const assetImage = watch('logo');
 
@@ -252,7 +242,6 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
     assetTicker,
     parseAddress(ownerAddress, 14),
     assetPrecision,
-    assetInitialSupply || 0,
     assetMaxSupply || infinitySymbol,
     parseAddress(assetImage, 14) || '--',
   ];

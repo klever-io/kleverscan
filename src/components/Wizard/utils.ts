@@ -187,7 +187,7 @@ export const createSFT = (t: TFunction): ICreateAsset => {
     commonValues: {
       assetType: 0,
       additionalFields: true,
-      basicTotalSteps: 7,
+      basicTotalSteps: 6,
     },
     welcome: {
       title: t('wizards:createSFT.welcome.title'),
@@ -247,7 +247,6 @@ export const createSFT = (t: TFunction): ICreateAsset => {
         t(
           'wizards:createSFT.stepsInformations.basicStepsLabels.tokenPrecision',
         ),
-        t('wizards:createSFT.stepsInformations.basicStepsLabels.initialSupply'),
         t('wizards:createSFT.stepsInformations.basicStepsLabels.maxSupply'),
         t('wizards:createSFT.stepsInformations.basicStepsLabels.tokenImage'),
       ],

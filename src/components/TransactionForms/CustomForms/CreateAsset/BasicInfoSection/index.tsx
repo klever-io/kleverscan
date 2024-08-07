@@ -8,8 +8,8 @@ import { validateImgUrl } from '@/utils/imageValidate';
 import { ICreateAsset } from '@klever/sdk-web';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { assetsTooltip as tooltip } from '../../utils/tooltips';
 import { ISectionProps } from '..';
+import { assetsTooltip as tooltip } from '../../utils/tooltips';
 
 export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   isNFT,

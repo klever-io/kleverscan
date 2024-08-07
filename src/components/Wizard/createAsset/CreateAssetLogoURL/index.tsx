@@ -10,7 +10,7 @@ import {
   GenericInput,
 } from '../styles';
 
-export const CreateAssetEightStep: React.FC<
+export const CreateAssetLogoURL: React.FC<
   PropsWithChildren<IAssetInformations>
 > = ({ informations: { currentStep, assetType }, handleStep, t }) => {
   const {

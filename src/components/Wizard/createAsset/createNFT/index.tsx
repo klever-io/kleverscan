@@ -10,7 +10,7 @@ import { createNFT } from '../../utils';
 import { ConfirmSuccessTransaction } from '../ConfirmSuccessTransaction';
 import { ConfirmTransaction } from '../ConfirmTransaction';
 import { CreateAssetAddRoles } from '../CreateAssetAddRoles';
-import { CreateAssetEightStep } from '../CreateAssetEightStep';
+import { CreateAssetLogoURL } from '../CreateAssetLogoURL';
 import { CreateAssetMaxSupplyStep } from '../CreateAssetMaxSupplyStep';
 import { CreateAssetNameStep } from '../CreateAssetNameStep';
 import { CreateAssetOwnerAddressStep } from '../CreateAssetOwnerAddressStep';
@@ -127,7 +127,7 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
       label: 'Add Asset Logo URI',
       isDone: false,
       component: (
-        <CreateAssetEightStep {...stepsProps} informations={assetInfo.logo} />
+        <CreateAssetLogoURL {...stepsProps} informations={assetInfo.logo} />
       ),
     },
     {

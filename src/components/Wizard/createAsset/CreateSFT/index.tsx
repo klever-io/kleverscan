@@ -10,7 +10,7 @@ import { createSFT } from '../../utils';
 import { ConfirmSuccessTransaction } from '../ConfirmSuccessTransaction';
 import { ConfirmTransaction } from '../ConfirmTransaction';
 import { CreateAssetAddRoles } from '../CreateAssetAddRoles';
-import { CreateAssetEightStep } from '../CreateAssetEightStep';
+import { CreateAssetLogoURL } from '../CreateAssetLogoURL';
 import { CreateAssetMaxSupplyStep } from '../CreateAssetMaxSupplyStep';
 import { CreateAssetNameStep } from '../CreateAssetNameStep';
 import { CreateAssetOwnerAddressStep } from '../CreateAssetOwnerAddressStep';
@@ -38,7 +38,7 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
   const assetInfo = createSFT(t);
 
   const handleAdvancedSteps = () => {
-    setSelectedStep((prevStep) => prevStep + 1);
+    setSelectedStep(prevStep => prevStep + 1);
   };
 
   const stepsProps = {
@@ -133,7 +133,7 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
       label: 'Add Asset Logo URI',
       isDone: false,
       component: (
-        <CreateAssetEightStep {...stepsProps} informations={assetInfo.logo} />
+        <CreateAssetLogoURL {...stepsProps} informations={assetInfo.logo} />
       ),
     },
     {
@@ -215,7 +215,7 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
   const { handleSubmit, watch } = methods;
 
   useEffect(() => {
-    setSteps((prev) => {
+    setSteps(prev => {
       return prev.map((e, index) => {
         if (selectedStep > index) {
           return { ...e, isDone: true };
@@ -262,10 +262,8 @@ export const WizCreateSFT: React.FC<PropsWithChildren<any>> = ({
     setSelectedStep,
     setSteps,
   };
-  const {
-    handleSubmit: handleContractSubmit,
-    txHash: txContractHash,
-  } = useContract();
+  const { handleSubmit: handleContractSubmit, txHash: txContractHash } =
+    useContract();
 
   const onSubmit = async (data: any) => {
     data.type = 2;

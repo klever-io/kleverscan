@@ -1,8 +1,9 @@
 import { Assets as Icon } from '@/assets/title-icons';
 import { requestAssetsPoolsQuery } from '@/services/requests/assetsPools';
-import { Header, Mono } from '@/styles/common';
+import { Header, Mono, SpanBold } from '@/styles/common';
 import { IAssetPool, IRowSection } from '@/types';
 import { capitalizeString } from '@/utils/convertString';
+import { formatAmount } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -39,7 +40,9 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
     const handlerStatus = () => (
       <>
         <Row>
-          <span>{kda}</span>
+          <Link href={`/asset/${kda}`} key={kda}>
+            <span>{kda}</span>
+          </Link>
         </Row>
         <Row>
           <Status status={active ? 'success' : 'fail'}>
@@ -67,10 +70,10 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
     const handlerBalance = () => (
       <>
         <Row>
-          <span>{kdaBalance} KDA</span>
+          <span>{formatAmount((klvBalance || 0) / 10 ** 6)} KDA</span>
         </Row>
         <Row>
-          <span>{klvBalance} KLV</span>
+          <SpanBold>{formatAmount((kdaBalance || 0) / 10 ** 6)} KLV</SpanBold>
         </Row>
       </>
     );

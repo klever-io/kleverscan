@@ -19,7 +19,7 @@ import { parseValidators } from '@/utils/parseValues';
 import { AddressContainer } from '@/views/validators/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { PropsWithChildren, useEffect, useMemo } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 
 export const validatorsHeaders = [
   'Rank',

@@ -6,7 +6,7 @@ import Claim from './Claim';
 import ConfigITO from './ConfigITO';
 import ConfigMarketplace from './ConfigMarketplace';
 import ConfigValidator from './ConfigValidator';
-import CreateAsset from './CreateAsset';
+import { CreateAsset } from './CreateAsset';
 import CreateMarketplace from './CreateMarketplace';
 import CreateValidator from './CreateValidator';
 import Delegate from './Delegate';
@@ -40,9 +40,9 @@ interface IRenderContractProps {
   contractProps: IContractProps;
 }
 
-export const RenderContract: React.FC<
-  PropsWithChildren<IRenderContractProps>
-> = ({ contractName, contractProps }) => {
+export const RenderContract: React.FC<PropsWithChildren<
+  IRenderContractProps
+>> = ({ contractName, contractProps }) => {
   const getContractComponent = () => {
     switch (contractName) {
       case 'TransferContract':

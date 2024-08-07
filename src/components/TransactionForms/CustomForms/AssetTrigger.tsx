@@ -1,11 +1,11 @@
-import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
+import { getNetwork } from '@/utils/networkFunctions';
 import { deepCopyObject } from '@/utils/objectFunctions';
 import { IAssetTrigger } from '@klever/sdk-web';
-import React, { useEffect } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
@@ -16,7 +16,9 @@ import {
 } from '../FormInput/styles';
 import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection, SectionTitle } from '../styles';
-import { RoyaltiesSection, StakingSection, URIsSection } from './CreateAsset';
+import { RoyaltiesSection } from './CreateAsset/RoyaltiesSection';
+import { StakingSection } from './CreateAsset/StakingSection';
+import { URIsSection } from './CreateAsset/URIsSection';
 import {
   parseKDAFeePool,
   parseSplitRoyalties,
@@ -24,7 +26,6 @@ import {
   parseURIs,
 } from './utils';
 import { assetTriggerTooltips as tooltip } from './utils/tooltips';
-import { getNetwork } from '@/utils/networkFunctions';
 
 export interface IMetadataOptions {
   metadata: string;
@@ -64,6 +65,7 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const onSubmit = async (data: IAssetTrigger) => {
     const dataDeepCopy = deepCopyObject(data);
+
     parseAssetTrigger(dataDeepCopy);
     await handleFormSubmit(dataDeepCopy);
   };
@@ -93,7 +95,7 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
           triggerType,
           collection,
           walletAddress,
-          metadataProps,
+          metadataProps
         )}
     </FormBody>
   );
@@ -123,7 +125,7 @@ const getAssetTriggerForm = (
   triggerType: number,
   collection: ICollectionList,
   walletAddress: string,
-  { metadata, setMetadata }: IMetadataOptions,
+  { metadata, setMetadata }: IMetadataOptions
 ) => {
   switch (triggerType) {
     case 0:

@@ -1,13 +1,12 @@
-import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import { FormBody, FormSection } from '../styles';
-import { URIsSection } from './CreateAsset';
+import { URIsSection } from './CreateAsset/URIsSection';
 import { parseURIs, percentageProps } from './utils';
 import { validatorTooltips as tooltip } from './utils/tooltips';
 

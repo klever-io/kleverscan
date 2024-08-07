@@ -47,6 +47,12 @@ const QuickAccess: React.FC<{
       icon: <Token />,
     },
     {
+      title: 'Create SFT',
+      type: 'CreateAssetContract',
+      openWiz: () => setWizard('SFT'),
+      icon: <Token />,
+    },
+    {
       title: 'Create ITO',
       type: 'ConfigITOContract',
       openWiz: () => setWizard('ITO'),
@@ -90,10 +96,10 @@ const QuickAccess: React.FC<{
         <Title>What do you want to do?</Title>
       </TitleContainer>
       <Content>
-        {quickAccessContract.map(contract => (
+        {quickAccessContract.map((contract) => (
           <CardItem
             key={JSON.stringify(contract.title)}
-            onClick={e => handleClick(contract, e)}
+            onClick={(e) => handleClick(contract, e)}
           >
             <PlusIcon>{contract.icon}</PlusIcon>
             <p>{contract.title}</p>

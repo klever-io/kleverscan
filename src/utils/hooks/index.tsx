@@ -19,7 +19,7 @@ export const useDidUpdateEffect = (fn: Function, inputs: Array<any>): void => {
 
 export const useScroll = (
   condition: boolean,
-  callback: (this: Window, ev: Event) => any,
+  callback: (this: Window, ev: Event) => any
 ): void => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -39,10 +39,10 @@ export const useScroll = (
 };
 
 export function usePrecision<T extends string | string[]>(
-  assetIds: T,
+  assetIds: T
 ): T extends string ? number : { [assetId: string]: number };
 export function usePrecision(
-  assetIds: string | string[],
+  assetIds: string | string[]
 ): number | { [assetId: string]: number } {
   const [precision, setPrecision] = useState<
     number | { [assetId: string]: number }
@@ -69,12 +69,12 @@ export const useFetchPartial = <T,>(
   type: string,
   route: string,
   dataType: string,
-  query?: { [key: string]: string | number },
+  query?: { [key: string]: string | number }
 ): [
   T[],
   (value: string) => Promise<T[]>,
   boolean,
-  Dispatch<SetStateAction<boolean>>,
+  Dispatch<SetStateAction<boolean>>
 ] => {
   const localStorageName = `all${type}Search`;
   const [items, setItems] = useState<T[]>([]);
@@ -102,17 +102,17 @@ export const useFetchPartial = <T,>(
   }, []);
   return [
     items,
-    value => {
+    (value) => {
       clearTimeout(fetchPartialTimeout);
-      return new Promise(res => {
+      return new Promise((res) => {
         fetchPartialTimeout = setTimeout(async () => {
           let response: PartialResponse;
           if (
             value &&
-            !items.find(asset =>
+            !items.find((asset) =>
               (asset as { [key: string]: string })[dataType]
                 .toUpperCase()
-                .includes(value.toUpperCase()),
+                .includes(value.toUpperCase())
             )
           ) {
             setLoading(true);
@@ -158,14 +158,14 @@ export const useFetchPartial = <T,>(
 export const useSkeleton = (): [
   (
     value: string | number | undefined | JSX.Element[],
-    skeletonParams?: { height?: string | number; width?: number | string },
+    skeletonParams?: { height?: string | number; width?: number | string }
   ) => number | string | JSX.Element | JSX.Element[],
-  Dispatch<SetStateAction<boolean>>,
+  Dispatch<SetStateAction<boolean>>
 ] => {
   const [loading, setLoading] = useState(true);
   const isSkeleton = (
     value: string | number | undefined | JSX.Element[],
-    skeletonParams?: { height?: string | number; width?: number | string },
+    skeletonParams?: { height?: string | number; width?: number | string }
   ): number | string | JSX.Element | JSX.Element[] => {
     return !loading && value ? value : <Skeleton {...skeletonParams} />;
   };
@@ -178,11 +178,11 @@ export type PacksPrecision = {
 
 type PackInfoHookResult = [
   PacksPrecision,
-  Dispatch<SetStateAction<PacksPrecision>>,
+  Dispatch<SetStateAction<PacksPrecision>>
 ];
 
 export const usePackInfoPrecisions = (
-  packInfo: IPackInfo[],
+  packInfo: IPackInfo[]
 ): PackInfoHookResult => {
   const assetIds: string[] = [];
   const getInitialPrecisions = () => {
@@ -195,7 +195,7 @@ export const usePackInfoPrecisions = (
   };
 
   const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(
-    getInitialPrecisions(),
+    getInitialPrecisions()
   );
 
   useEffect(() => {
@@ -211,12 +211,12 @@ export const usePackInfoPrecisions = (
 
 export const useForceUpdate = (): (() => void) => {
   const [value, setValue] = useState(0);
-  return () => setValue(value => value + 1);
+  return () => setValue((value) => value + 1);
 };
 
 export const useDebounce = <T extends unknown>(
   value: T,
-  delay: number,
+  delay: number
 ): T | undefined => {
   const [debouncedValue, setDebouncedValue] = useState<T | undefined>(value);
 

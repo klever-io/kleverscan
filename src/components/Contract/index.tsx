@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useFees } from '@/contexts/contract/fees';
 import { IQueue, useMulticontract } from '@/contexts/contract/multicontract';
@@ -8,7 +7,7 @@ import { useForceUpdate } from '@/utils/hooks';
 import * as clipboard from 'clipboard-polyfill';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AiOutlineClear } from 'react-icons/ai';
@@ -46,16 +45,16 @@ export interface IHashComponentProps {
   setHash: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-export const HashComponent: React.FC<
-  PropsWithChildren<IHashComponentProps>
-> = ({ hash, setHash }) => {
+export const HashComponent: React.FC<PropsWithChildren<
+  IHashComponentProps
+>> = ({ hash, setHash }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await new Promise(resolve =>
-        setTimeout(resolve, 2000 + Math.random() * 1000),
+      await new Promise((resolve) =>
+        setTimeout(resolve, 2000 + Math.random() * 1000)
       );
 
       setLoading(false);
@@ -110,7 +109,7 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
   const forceUpdate = useForceUpdate();
 
   const currentContract = queue.find(
-    (item: IQueue) => item.elementId === elementId,
+    (item: IQueue) => item.elementId === elementId
   ) as IQueue;
 
   const kappFee = getKappFee(currentContract?.contractType);
@@ -135,7 +134,7 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
           contract: currentContract?.contractType,
           contractDetails: JSON.stringify(formMethods.getValues()),
         },
-        router,
+        router
       );
     }
   }, [isMultiContract, router.isReady]);
@@ -145,7 +144,7 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
       data,
       currentContract?.metadata || '',
       currentContract?.contractType,
-      queue.length,
+      queue.length
     );
   };
 
@@ -200,7 +199,7 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
         <Select
           options={contractOptions}
           selectedValue={contractOptions.find(
-            item => item.value === currentContract?.contractType,
+            (item) => item.value === currentContract?.contractType
           )}
           onChange={changeHandler}
           isDisabled={true}
@@ -216,7 +215,7 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
             <LoadingBackground>
               <Loader />
             </LoadingBackground>,
-            window.document.body,
+            window.document.body
           )}
         {payload && <ConfirmPayload />}
         {txHash && <HashComponent {...hashProps} />}

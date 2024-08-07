@@ -1,23 +1,24 @@
-import { PropsWithChildren } from 'react';
 import {
   defaultAggregateData,
   homeAccountsCall,
   homeActiveProposalsCall,
   homeBeforeYesterdayTransactionsCall,
   homeGetAggregateCall,
+  homeMostTransactedKDAFee,
   homeMostTransactedNFTs,
   homeMostTransactedTokens,
   homeNodes,
   homeProposalsCall,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
-  homeMostTransactedKDAFee,
 } from '@/services/requests/home';
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IProposal, MostTransferredToken } from '@/types/proposals';
-import { createContext, useContext, useRef } from 'react';
+import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
+
+const isDev = process.env.NODE_ENV === 'development';
 
 export interface IDaysCoins {
   [coinName: string]: string | number;
@@ -50,7 +51,7 @@ export interface IHomeData {
 export const HomeData = createContext({} as IHomeData);
 
 export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const watcherTimeout = 4 * 1000; // 4 secs
+  const watcherTimeout = isDev ? 100000 : 4 * 1000; // 4 secs
 
   const [
     aggregateResult,

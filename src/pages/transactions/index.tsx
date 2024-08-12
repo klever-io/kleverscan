@@ -1,7 +1,7 @@
-import { PropsWithChildren } from 'react';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
+import LinkWithDropdown from '@/components/LinkWithDropdown';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
   CenteredRow,
@@ -49,20 +50,38 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { TransactionType } from '@klever/sdk-web';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
 interface IRequestTxQuery {
   asset?: string;
 }
-
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
   if (toAddress === '--') {
     return <Mono>{toAddress}</Mono>;
   }
   return (
-    <Link href={`/account/${toAddress}`} key={toAddress} className="address">
-      <Mono>{parseAddress(toAddress, 16)}</Mono>
-    </Link>
+    <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
+      <Link href={`/account/${toAddress}`} key={toAddress} className="address">
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
+      </Link>
+    </LinkWithDropdown>
+  );
+};
+export const mobileAddressSectionElement = (toAddress: string): JSX.Element => {
+  const { isMobile } = useMobile();
+  if (isMobile) {
+    return (
+      <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
+      </LinkWithDropdown>
+    );
+  }
+  return (
+    <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
+      <Link href={`/account/${toAddress}`} key={toAddress} className="address">
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
+      </Link>
+    </LinkWithDropdown>
   );
 };
 
@@ -272,9 +291,13 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`} className="address">
-            <Mono>{parseAddress(sender, 16)}</Mono>
-          </Link>
+          {/* <LinkWithDropdown link={`/account/${sender}`} address={sender}>
+            <Link href={`/account/${sender}`} className="address">
+              <Mono>{parseAddress(sender, 16)}</Mono>
+            </Link>
+          </LinkWithDropdown> */}
+
+          {mobileAddressSectionElement(sender)}
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
       ),

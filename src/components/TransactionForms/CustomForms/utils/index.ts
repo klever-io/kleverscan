@@ -45,7 +45,10 @@ export const parseURIs = (data: any) => {
   }
 
   const urisReference = data.uris;
-  if (urisReference.length === 0) return;
+  if (urisReference.length === 0) {
+    delete data.uris;
+    return;
+  }
 
   const uris: { [key: string]: string } = {};
   urisReference.forEach((item: any) => {

@@ -55,7 +55,7 @@ export const Content = styled.div<{ opened: boolean }>`
   position: fixed;
   z-index: 7;
 
-  background-color: #181935;
+  background-color: #151515;
 
   border-radius: 24px 24px 0 0;
 
@@ -104,7 +104,7 @@ export const AssetVisualization = styled.div`
   padding: 16px;
   border-radius: 8px;
 
-  background-color: #222345;
+  background-color: #181818;
 `;
 
 export const AssetName = styled.h2`

@@ -679,7 +679,7 @@ export const PrecisionCard = styled.div<{ $isSelected: boolean }>`
 
   padding: 1.34rem 0.93rem;
   background-color: ${({ theme }) =>
-    theme.dark ? '#181935' : theme.true.white};
+    theme.dark ? '#151515' : theme.true.white};
   border-radius: 0.5rem;
   color: ${({ theme }) => theme.black};
   font-size: 1rem;
@@ -919,7 +919,7 @@ export const ConnectedWalletContainer = styled.div`
     select {
       padding: 0.85rem;
       border-radius: 10%;
-      background: #181935;
+      background: #151515;
       color: white;
     }
   }
@@ -1126,7 +1126,7 @@ export const AdvancedStepsDesktop = styled.div<{ darkText?: boolean }>`
   gap: 1rem;
   width: 100%;
   padding: 1rem 0;
-  border-top: 1px solid #18193580;
+  border-top: 1px solid #15151580;
 
   > div {
     display: flex;

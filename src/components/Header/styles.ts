@@ -433,7 +433,7 @@ export const DropdownMenu = styled.ul`
   width: max-content;
   padding: 0.7rem;
   background-color: ${props =>
-    props.theme.dark ? '#181935' : props.theme.true.white};
+    props.theme.dark ? '#151515' : props.theme.true.white};
   border-radius: 10px;
 `;
 

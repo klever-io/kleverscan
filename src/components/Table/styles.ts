@@ -13,7 +13,7 @@ export interface TableRowProps {
 }
 
 export const ContainerView = styled.div`
-  overflow-x: auto;
+  overflow-x: visible;
   width: 100%;
 `;
 

@@ -1,10 +1,10 @@
-import { PropsWithChildren } from 'react';
 import ModalContract, {
   IModalContract,
 } from '@/components/Contract/ModalContract';
 import { useRouter } from 'next/router';
 import {
   createContext,
+  PropsWithChildren,
   useCallback,
   useContext,
   useEffect,
@@ -12,7 +12,8 @@ import {
   useState,
 } from 'react';
 import ReactDOM from 'react-dom';
-import { ButtonModal } from './styles';
+import { MdSend } from 'react-icons/md';
+import { ActionItem, ButtonModal } from './styles';
 
 interface IContractModal {
   getInteractionsButtons: (
@@ -26,7 +27,7 @@ export interface IUseInteractionButton {
   title: string;
   contractType: string;
   defaultValues?: any;
-  buttonStyle?: 'primary' | 'secondary';
+  buttonStyle?: 'primary' | 'secondary' | 'contextModal';
 }
 
 export const ContractModal = createContext({} as IContractModal);
@@ -88,6 +89,16 @@ export const ContractModalProvider: React.FC<PropsWithChildren> = ({
             setOpenModal(() => (contractType === '--' ? false : true));
             setModalOptions(() => modalOptions);
           };
+
+          if (buttonStyle === 'contextModal') {
+            return (
+              <ActionItem onClick={() => handleClick()}>
+                <MdSend size={'1.2rem'} />
+                {children}
+                <span>{title}</span>
+              </ActionItem>
+            );
+          }
 
           return (
             <ButtonModal

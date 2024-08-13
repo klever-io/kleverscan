@@ -85,7 +85,7 @@ export const mobileAddressSectionElement = (toAddress: string): JSX.Element => {
   );
 };
 
-const getAssetsAndCurreciesList = (
+const getAssetsAndCurrenciesList = (
   contract: IContract,
   transaction: ITransaction,
 ): string[] => {
@@ -175,7 +175,7 @@ export const requestTransactionsDefault = async (
     (transaction: ITransaction) => {
       if (transaction.contract && transaction.contract.length) {
         transaction.contract.forEach(contract => {
-          assets.push(...getAssetsAndCurreciesList(contract, transaction));
+          assets.push(...getAssetsAndCurrenciesList(contract, transaction));
         });
       }
     },
@@ -291,12 +291,6 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          {/* <LinkWithDropdown link={`/account/${sender}`} address={sender}>
-            <Link href={`/account/${sender}`} className="address">
-              <Mono>{parseAddress(sender, 16)}</Mono>
-            </Link>
-          </LinkWithDropdown> */}
-
           {mobileAddressSectionElement(sender)}
           {toAddressSectionElement(toAddress)}
         </DoubleRow>

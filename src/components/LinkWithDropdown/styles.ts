@@ -6,7 +6,6 @@ interface DropdownProps {
 const FadeIn = keyframes`
   from {
     transform: translateX(0%) translateY(-2rem);
-
   }
   to {
     transform: translateX(0%) translateY(0);
@@ -21,12 +20,11 @@ export const LinkWrapper = styled.div`
 
 export const Dropdown = styled.div<DropdownProps>`
   display: ${({ show }) => (show ? 'block' : 'none')};
-  /* display: block; */
   z-index: 1000;
   position: absolute;
   top: 100%;
   left: 5rem;
-  background-color: #181818;
+  background-color: ${props => props.theme.dropdown.background};
   border: 1px solid 515395;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
@@ -60,10 +58,9 @@ export const QrCodeDropdown = styled.div<{ active: boolean }>`
   right: -10rem;
   z-index: 1000;
   border-radius: 20px;
-  background-color: #181818;
+  background-color: ${props => props.theme.dropdown.background};
   bottom: 2rem;
   display: ${props => (props.active ? 'flex' : 'none')};
-  /* display: flex; */
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -92,7 +89,7 @@ export const DropdownTitle = styled.div`
 export const QrCodeTitle = styled.p`
   font-size: 1rem;
   font-weight: 700;
-  color: ${props => props.theme.true.white};
+  color: ${props => props.theme.black};
 `;
 export const DropdownActionItemPadding = styled.div`
   padding: 1rem 0px;
@@ -110,21 +107,15 @@ export const DropdownActionItem = styled.div<{
   disabled?: boolean;
 }>`
   position: static;
-
   display: flex;
   align-items: center;
   gap: 0.45rem;
-
   height: 2.5rem;
-
   font-size: 14px;
   font-weight: 400;
-
   padding: 0.75rem;
   border: 1px solid transparent;
-
   border-radius: 6px;
-
   cursor: pointer;
   user-select: none;
 
@@ -168,11 +159,6 @@ export const DropdownActionItem = styled.div<{
         color: ${props => props.theme.violet};
       }
     `}
-  
-  /* @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: 1.1rem;
-    gap: 1rem;
-  } */
 
   svg {
     &:nth-child(3) {

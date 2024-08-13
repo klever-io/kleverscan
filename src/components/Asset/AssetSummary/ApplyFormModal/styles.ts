@@ -55,7 +55,7 @@ export const Content = styled.div<{ opened: boolean }>`
   position: fixed;
   z-index: 7;
 
-  background-color: #151515;
+  background-color: ${props => props.theme.white};
 
   border-radius: 24px 24px 0 0;
 

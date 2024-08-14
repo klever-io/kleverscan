@@ -481,6 +481,7 @@ export interface IAsset {
   verified: boolean;
   metadata?: string;
   mime?: string;
+  stakingHolders: number;
 }
 
 export interface IITO {

@@ -1,10 +1,9 @@
-import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ABI, ABIType } from '@/types/contracts';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { getNetwork } from '@/utils/networkFunctions';
 import { abiEncoder, utils } from '@klever/sdk-web';
-import React, { useMemo } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import FormInput from '../../FormInput';
@@ -60,8 +59,9 @@ const parseFunctionArguments = (
   setMetadata: any,
   abi: ABIMap | null,
   scType: number,
-  metadata: string,
+  metadata: string
 ) => {
+  debugger;
   const { arguments: args } = data;
 
   const { function: functionName } = data;
@@ -102,7 +102,7 @@ const parseAbiStructs = (abi: string): Record<string, ABIType> => {
   const parsedAbi: ABI = JSON.parse(abi);
 
   const result = {} as Record<string, ABIType>;
-  Object.keys(parsedAbi?.types).forEach(typeItem => {
+  Object.keys(parsedAbi?.types).forEach((typeItem) => {
     const struct = typeItem;
     const structFields = parsedAbi?.types[typeItem];
 
@@ -113,13 +113,13 @@ const parseAbiStructs = (abi: string): Record<string, ABIType> => {
 };
 
 const parseAbiFunctions = (
-  abi: string,
+  abi: string
 ): { functions: ABIFunctionMap; constructor: ABIFunction } => {
   const parsedAbi: ABI = JSON.parse(abi);
   const types: Record<string, ABIType> = parsedAbi.types || {};
 
   const functions: ABIFunctionMap = {};
-  parsedAbi.endpoints.forEach(endpoint => {
+  parsedAbi.endpoints.forEach((endpoint) => {
     if (endpoint.mutability === 'readonly') return;
 
     const funcName = endpoint.name;
@@ -169,7 +169,7 @@ const parseCallValue = (data: FormData) => {
   const { callValue } = data;
   const newCallValue: { [coin: string]: number } = {};
 
-  ((callValue as unknown as any[]) || []).forEach(value => {
+  (((callValue as unknown) as any[]) || []).forEach((value) => {
     const { label, amount } = value;
     newCallValue[label] = amount;
   });
@@ -179,9 +179,9 @@ const parseCallValue = (data: FormData) => {
 
 const getParsedArgumentsString = (
   args: Argument[] | undefined,
-  abi: ABIMap | null,
+  abi: ABIMap | null
 ): string => {
-  const parsedArgs = (args || []).map(value => {
+  const parsedArgs = (args || []).map((value) => {
     return parseArgument(value.value, value.raw_type, abi, value.type);
   });
 
@@ -192,7 +192,7 @@ const parseArgument = (
   value: any,
   raw_type: string,
   abi: ABIMap | null,
-  jsType: string,
+  jsType: string
 ) => {
   let parsedValue = '';
 
@@ -225,10 +225,10 @@ const parseArgument = (
           const objectType = v.type;
           const parsedValue = abiEncoder.encodeABIValue(
             objectValue,
-            objectType,
+            objectType
           );
           return parsedValue;
-        },
+        }
       );
       parsedValue = structFields.join('');
     }
@@ -243,7 +243,7 @@ const parseArgument = (
     if (!Array.isArray(argument) || argument?.length === 0) {
       return '';
     }
-    const parsedArray = (argument as any[]).map(value => {
+    const parsedArray = (argument as any[]).map((value) => {
       const isOptional = raw_type.toLowerCase().startsWith('option');
 
       const nonOptionalType = isOptional
@@ -258,7 +258,7 @@ const parseArgument = (
 
     parsedValue = abiEncoder.encodeLengthPlusData(
       parsedArray,
-      innerType,
+      innerType
     ) as string;
   } else {
     parsedValue = abiEncoder.encodeABIValue(value, raw_type, !required);
@@ -283,7 +283,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
   const [fileData, setFileData] = React.useState<string>('');
   const [abi, setAbi] = React.useState<ABIMap | null>(null);
   const [propertiesString, setPropertiesString] = React.useState<string>(
-    (0x506).toString(2),
+    (0x506).toString(2)
   );
   const network = getNetwork();
 
@@ -364,7 +364,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
   if (hasFunctions)
     formInputProps['options'] =
       functions &&
-      Object.keys(functions).map(func => ({
+      Object.keys(functions).map((func) => ({
         label: func,
         value: func,
       }));

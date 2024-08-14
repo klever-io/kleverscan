@@ -1,9 +1,8 @@
-import { PropsWithChildren } from 'react';
 import { ABIType, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
 import { utils } from '@klever/sdk-web';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { ABIFunctionArguments } from '.';
@@ -31,7 +30,7 @@ interface IArguments {
 const getInitialValue = (
   rawType: string,
   types?: Record<string, ABIType>,
-  inner = false,
+  inner = false
 ) => {
   const type = utils.getJSType(rawType);
   if (type === 'number') {
@@ -66,114 +65,117 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
   types,
   handleInputChange,
 }) => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues, watch } = useFormContext();
   const router = useRouter();
   const { fields, append, remove, replace } = useFieldArray({
     control,
     name: 'arguments',
   });
-
+  const log = watch();
   useEffect(() => {
     if (args) {
       replace(
-        Object.keys(args).map(key => ({
+        Object.keys(args).map((key) => ({
           name: key,
           type: args[key].type,
           raw_type: args[key].raw_type,
           value: getInitialValue(args[key].raw_type, types),
           required: args[key].required,
-          options: types?.[args[key].raw_type]?.variants?.map(variant => {
+          options: types?.[args[key].raw_type]?.variants?.map((variant) => {
             return {
               label: variant.name,
               value: variant.discriminant,
             };
           }),
-        })),
+        }))
       );
       handleInputChange({} as any);
     }
   }, [args]);
 
   return (
-    <FormSection inner>
-      <SectionTitle>
-        <span>Arguments</span>
-        <TooltipContainer>
-          <InfoIcon size={13} />
-          <TooltipContent>
-            <span>{tooltip.arguments.title}</span>
-          </TooltipContent>
-        </TooltipContainer>
-      </SectionTitle>
-      {fields.map((field: any, index) => {
-        let placeholder = '';
+    console.log({ fields, log }),
+    (
+      <FormSection inner>
+        <SectionTitle>
+          <span>Arguments</span>
+          <TooltipContainer>
+            <InfoIcon size={13} />
+            <TooltipContent>
+              <span>{tooltip.arguments.title}</span>
+            </TooltipContent>
+          </TooltipContainer>
+        </SectionTitle>
+        {fields.map((field: any, index) => {
+          let placeholder = '';
 
-        switch (field.type) {
-          case 'text':
-            placeholder = 'E.g. some text';
-            break;
-          case 'number':
-            placeholder = 'E.g. 01';
-            break;
-          case 'array':
-            placeholder = 'E.g. ["value1", "value2"]';
-            break;
-          case 'object':
-            break;
-        }
+          switch (field.type) {
+            case 'text':
+              placeholder = 'E.g. some text';
+              break;
+            case 'number':
+              placeholder = 'E.g. 01';
+              break;
+            case 'array':
+              placeholder = 'E.g. ["value1", "value2"]';
+              break;
+            case 'object':
+              break;
+          }
 
-        const inputType = field.type === 'enum' ? 'dropdown' : field.type;
+          const inputType = field.type === 'enum' ? 'dropdown' : field.type;
 
-        return (
-          <FormSection key={field.id} inner>
-            <SectionTitle>
-              <HiTrash
-                onClick={() =>
-                  removeWrapper({ index, remove, getValues, router })
+          return (
+            <FormSection key={field.id} inner>
+              <SectionTitle>
+                <HiTrash
+                  onClick={() =>
+                    removeWrapper({ index, remove, getValues, router })
+                  }
+                />
+                Argument {index + 1}
+              </SectionTitle>
+              <FormInput
+                name={`arguments[${index}].value`}
+                title={
+                  field.name
+                    ? `${field.name} (${field.type})`
+                    : `Value ${index + 1} (${field.type})`
                 }
+                dynamicInitialValue={field.value}
+                customOnChange={handleInputChange}
+                type={inputType}
+                placeholder={placeholder}
+                tooltip={tooltip.arguments.value}
+                required={field.required}
+                toggleOptions={['False', 'True']}
+                options={field?.options}
+                canBeNaN
               />
-              Argument {index + 1}
-            </SectionTitle>
-            <FormInput
-              name={`arguments[${index}].value`}
-              title={
-                field.name
-                  ? `${field.name} (${field.type})`
-                  : `Value ${index + 1} (${field.type})`
-              }
-              dynamicInitialValue={field.value}
-              customOnChange={handleInputChange}
-              type={inputType}
-              placeholder={placeholder}
-              tooltip={tooltip.arguments.value}
-              required={field.required}
-              toggleOptions={['False', 'True']}
-              options={field?.options}
-              canBeNaN
+            </FormSection>
+          );
+        })}
+        {args === undefined && (
+          <SelectContainer>
+            <ReactSelect
+              classNamePrefix="react-select"
+              onInputChange={(newValue: any) => {
+                append({
+                  type: utils.getJSType(newValue?.value || ''),
+                  raw_type: newValue?.value || '',
+                  value: getInitialValue(newValue?.value || '', types),
+                });
+              }}
+              value={null}
+              options={RUST_TYPES_WITH_OPTION.map((type) => ({
+                label: `${type} (${utils.getJSType(type)})`,
+                value: type,
+              }))}
+              placeholder="Add Argument"
             />
-          </FormSection>
-        );
-      })}
-      {args === undefined && (
-        <SelectContainer>
-          <ReactSelect
-            classNamePrefix="react-select"
-            onInputChange={(newValue: any) => {
-              append({
-                type: utils.getJSType(newValue.value),
-                raw_type: newValue.value,
-                value: getInitialValue(newValue.value, types),
-              });
-            }}
-            value={null}
-            options={RUST_TYPES_WITH_OPTION.map(type => ({
-              label: `${type} (${utils.getJSType(type)})`,
-              value: type,
-            }))}
-            placeholder="Add Argument"
-          />
-        </SelectContainer>
-      )}
-    </FormSection>
+          </SelectContainer>
+        )}
+      </FormSection>
+    )
   );
 };

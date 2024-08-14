@@ -140,6 +140,8 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
   }, [isMultiContract, router.isReady]);
 
   const handleFormSubmit = async (data: any) => {
+    console.log({ data });
+
     await handleSubmit(
       data,
       currentContract?.metadata || '',

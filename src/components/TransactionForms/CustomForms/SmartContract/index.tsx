@@ -61,7 +61,6 @@ const parseFunctionArguments = (
   scType: number,
   metadata: string
 ) => {
-  debugger;
   const { arguments: args } = data;
 
   const { function: functionName } = data;
@@ -197,7 +196,7 @@ const parseArgument = (
   let parsedValue = '';
 
   const required = !raw_type?.startsWith('Option');
-  let type = utils.getJSType(raw_type);
+  let type = utils.getJSType(raw_type || '');
 
   if (type === raw_type && abi?.types?.[raw_type]?.type === 'enum') {
     raw_type = 'u64';
@@ -260,6 +259,18 @@ const parseArgument = (
       parsedArray,
       innerType
     ) as string;
+  } else if (type === 'variadic' && abi !== null) {
+    let argument = [];
+    try {
+      argument = JSON.parse(value as string);
+    } catch (error) {
+      return '';
+    }
+
+    if (!Array.isArray(argument) || argument?.length === 0) {
+      return '';
+    }
+    parsedValue = abiEncoder.encodeABIValue([argument], raw_type);
   } else {
     parsedValue = abiEncoder.encodeABIValue(value, raw_type, !required);
   }

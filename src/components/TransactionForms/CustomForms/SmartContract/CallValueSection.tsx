@@ -69,7 +69,7 @@ export const CallValueSection: React.FC<PropsWithChildren<IAllowedAssets>> = ({
         </FormSection>
       ))}
       <ButtonContainer type="button" onClick={() => append({})}>
-        Add Token aa
+        Add Token
       </ButtonContainer>
     </FormSection>
   );

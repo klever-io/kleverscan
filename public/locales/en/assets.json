@@ -39,7 +39,7 @@
     "Min Epochs To Claim": "Minimum Epochs To Claim",
     "Min Epochs To Unstake": "Minimum Epochs To Unstake",
     "Min Epochs To Withdraw": "Minimum Epochs To Withdraw",
-    "Qty_Holders": "Qty Holders",
+    "Qty_Holders": "Holders",
     "InfoOtherAssets": "Below are the last epochs where there might be deposits of any asset in the {{asset}}'s FPR Pool.",
     "InfoKLVorKFI": "Below is the registry of the last 100 epochs of {{asset}} total staking.\nHave in mind that deposits for KLV/KFI occur automatically from each transaction.",
     "Title History": "Flexible Proportional Return - {{type}}",

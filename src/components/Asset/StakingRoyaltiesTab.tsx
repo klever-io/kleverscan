@@ -97,7 +97,7 @@ export const StakingRoyaltiesTab: React.FC<
       </Row>
       <Row>
         <strong> {t('assets:Staking.Qty_Holders')}</strong>
-        <span>{asset?.stakingHolders || '--'}</span>
+        <span>{asset?.stakingHolders?.toLocaleString() || '--'}</span>
       </Row>
       {renderAssetStakingAprOrFpr()}
       <Row span={2}>

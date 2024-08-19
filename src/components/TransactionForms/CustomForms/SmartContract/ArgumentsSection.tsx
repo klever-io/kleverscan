@@ -1,9 +1,8 @@
-import { PropsWithChildren } from 'react';
 import { ABIType, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
 import { utils } from '@klever/sdk-web';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { ABIFunctionArguments } from '.';
@@ -13,7 +12,12 @@ import {
   TooltipContainer,
   TooltipContent,
 } from '../../FormInput/styles';
-import { FormSection, SectionTitle, SelectContainer } from '../../styles';
+import {
+  ButtonContainer,
+  FormSection,
+  SectionTitle,
+  SelectContainer,
+} from '../../styles';
 import { removeWrapper } from '../utils';
 import { smartContractTooltips as tooltip } from '../utils/tooltips';
 
@@ -40,7 +44,7 @@ const getInitialValue = (
   if (type === 'checkbox') {
     return false;
   }
-  if (type === 'array') {
+  if (type === 'array' || type === 'variadic') {
     return [];
   }
 
@@ -66,7 +70,9 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
   types,
   handleInputChange,
 }) => {
-  const { control, getValues } = useFormContext();
+  const [isVariadic, setIsVariadic] = useState(false);
+  const [argument, setArgument] = useState({});
+  const { control, getValues, watch } = useFormContext();
   const router = useRouter();
   const { fields, append, remove, replace } = useFieldArray({
     control,
@@ -75,8 +81,10 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
 
   useEffect(() => {
     if (args) {
-      replace(
-        Object.keys(args).map(key => ({
+      const replaceArguments = Object.keys(args).map(key => {
+        const rawType = args[key].raw_type;
+        const type = utils.getJSType(rawType || '');
+        const arg = {
           name: key,
           type: args[key].type,
           raw_type: args[key].raw_type,
@@ -88,8 +96,14 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
               value: variant.discriminant,
             };
           }),
-        })),
-      );
+        };
+        if (type === 'variadic') {
+          setIsVariadic(true);
+          setArgument(arg);
+        }
+        return arg;
+      });
+      replace(replaceArguments);
       handleInputChange({} as any);
     }
   }, [args]);
@@ -115,6 +129,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
           case 'number':
             placeholder = 'E.g. 01';
             break;
+          case 'variadic':
           case 'array':
             placeholder = 'E.g. ["value1", "value2"]';
             break;
@@ -160,9 +175,9 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
             classNamePrefix="react-select"
             onInputChange={(newValue: any) => {
               append({
-                type: utils.getJSType(newValue.value),
-                raw_type: newValue.value,
-                value: getInitialValue(newValue.value, types),
+                type: utils.getJSType(newValue?.value || ''),
+                raw_type: newValue?.value || '',
+                value: getInitialValue(newValue?.value || '', types),
               });
             }}
             value={null}
@@ -173,6 +188,11 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
             placeholder="Add Argument"
           />
         </SelectContainer>
+      )}
+      {isVariadic && (
+        <ButtonContainer type="button" onClick={() => append(argument || {})}>
+          Add Argument
+        </ButtonContainer>
       )}
     </FormSection>
   );

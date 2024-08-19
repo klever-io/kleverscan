@@ -1,6 +1,5 @@
-import { PropsWithChildren } from 'react';
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { PropsWithChildren, useEffect } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import FormInput from '../../FormInput';

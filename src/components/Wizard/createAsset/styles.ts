@@ -27,6 +27,9 @@ export const WizardModal = styled.div<{ openModal?: boolean }>`
     place-content: center;
   }
 `;
+export const HighlightedText = styled.span`
+  color: ${({ theme }) => theme.warning.message};
+`;
 
 export const GenericInfoContainer = styled.div`
   display: flex;

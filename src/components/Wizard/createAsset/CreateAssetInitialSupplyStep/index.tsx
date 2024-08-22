@@ -8,6 +8,7 @@ import {
   GenericCardContainer,
   GenericInfoCard,
   GenericInput,
+  HighlightedText,
 } from '../styles';
 
 export const CreateAssetInitialSupplyStep: React.FC<
@@ -39,13 +40,13 @@ export const CreateAssetInitialSupplyStep: React.FC<
       </div>
       <div>
         <p>{t('wizards:common.basicOptions.initialSupplyOf', { ticker })}</p>
-        <p
-          dangerouslySetInnerHTML={{
-            __html: t('wizards:common.basicOptions.initialSupplyHint', {
-              interpolation: { escapeValue: false },
-            }),
-          }}
-        />
+        <p>
+          {t('wizards:common.basicOptions.initialSupplyHintStart')}
+          <HighlightedText>
+            {t('wizards:common.basicOptions.initialSupplyHintHighlight')}
+          </HighlightedText>
+          {t('wizards:common.basicOptions.initialSupplyHintEnd')}
+        </p>
         <GenericInput
           error={error}
           type="text"

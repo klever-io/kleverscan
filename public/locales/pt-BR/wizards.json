@@ -47,7 +47,9 @@
       "precisionHint": "A precisão do token refere-se ao número de casas decimais que podem ser usadas para representar quantidades fracionárias de um token.",
       "kleverPrecisionTip": "Dica Klever: A precisão do token é uma consideração importante ao criar um token, pois afeta a usabilidade e a divisibilidade do token.",
       "initialSupplyOf": "Oferta Inicial de {{ticker}}",
-      "initialSupplyHint": "A quantidade inicial refere-se à quantidade de tokens que serão criados no início do processo de criação do token.",
+      "initialSupplyHintStart": "A quantidade inicial refere-se à quantidade de tokens que ",
+      "initialSupplyHintHighlight": "será cunhada em sua carteira",
+      "initialSupplyHintEnd": " no início do processo de criação do token.",
       "kleverInitialSupplyTip": "Se não especificado, nenhum token será criado no momento da criação do ativo. A quantidade inicial pode ser ajustada posteriormente por meio da criação, que pode ser controlada por meio do contrato inteligente do token.",
       "maxSupplyOf": "Oferta Máxima de {{ticker}}"
     },

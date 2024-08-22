@@ -97,6 +97,7 @@ const darktheme = {
   warning: {
     background: '#95865188',
     text: '#eb9c27',
+    message: '#FFE380',
   },
   dropdown: {
     background: '#181818',

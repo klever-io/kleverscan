@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { getStatusIcon } from '@/assets/status';
 import { TransactionDetails as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -64,6 +63,7 @@ import {
   CardContainer,
   CardRaw,
   CenteredRow,
+  Row as DetailRow,
   DivDataJson,
   ExpandCenteredRow,
   Hr,
@@ -71,15 +71,14 @@ import {
   KappFeeFailedTx,
   KappFeeSpan,
   KdaFeeSpan,
-  Row as DetailRow,
   SignatureContainer,
   SignatureSpan,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 
 interface IRawTxTheme {
   base00: string;
@@ -883,16 +882,7 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths: string[] = [];
-
-  return {
-    paths,
-    fallback: 'blocking',
-  };
-};
-
-export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
+export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   params,
 }) => {
   const redirectProps: NotFound = {

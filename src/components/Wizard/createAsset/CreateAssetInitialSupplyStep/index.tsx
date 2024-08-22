@@ -8,11 +8,12 @@ import {
   GenericCardContainer,
   GenericInfoCard,
   GenericInput,
+  HighlightedText,
 } from '../styles';
 
-export const CreateAssetInitialSupplyStep: React.FC<PropsWithChildren<
-  IWizardComponents
->> = ({ handleStep, t }) => {
+export const CreateAssetInitialSupplyStep: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, t }) => {
   const {
     watch,
     register,
@@ -39,7 +40,13 @@ export const CreateAssetInitialSupplyStep: React.FC<PropsWithChildren<
       </div>
       <div>
         <p>{t('wizards:common.basicOptions.initialSupplyOf', { ticker })}</p>
-        <p>{t('wizards:common.basicOptions.initialSupplyHint')}</p>
+        <p>
+          {t('wizards:common.basicOptions.initialSupplyHintStart')}
+          <HighlightedText>
+            {t('wizards:common.basicOptions.initialSupplyHintHighlight')}
+          </HighlightedText>
+          {t('wizards:common.basicOptions.initialSupplyHintEnd')}
+        </p>
         <GenericInput
           error={error}
           type="text"

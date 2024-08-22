@@ -27,6 +27,19 @@ export const WizardModal = styled.div<{ openModal?: boolean }>`
     place-content: center;
   }
 `;
+export const HighlightedText = styled.span`
+  color: ${({ theme }) => theme.warning.message};
+`;
+
+export const GenericInfoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  p {
+    font-size: 12px;
+    font-weight: 700;
+  }
+`;
 
 export const WizardContainer = styled.div<{ isFirstContent?: boolean }>`
   display: flex;
@@ -443,15 +456,17 @@ export const GenericInput = styled.input<{
   error?: boolean | null;
   addPadding?: boolean;
   isUpperCase?: boolean;
+  color?: string;
+  borderBottom?: string;
 }>`
   line-height: 2rem;
   height: 4rem;
   min-height: 2rem;
-  border-bottom: 1px solid #585a92;
+  border-bottom: 1px solid ${props => props.borderBottom || '#585a92'};
   padding: 1rem 0.5rem 0.5rem;
   width: 100%;
   font-size: 1.5rem;
-  color: ${({ theme }) => theme.black};
+  color: ${props => props.color || props.theme.black};
   font-family: Manrope, sans-serif;
   transition:
     border 500ms ease,

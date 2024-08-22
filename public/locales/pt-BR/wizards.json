@@ -37,7 +37,8 @@
       "charactersField": "Este campo deve ter {{number}} caracteres",
       "onlyNumbers": "Apenas números são permitidos",
       "validURI": "Insira um URI válido",
-      "onlyNumbersValue": "O valor deve conter apenas números"
+      "onlyNumbersValue": "O valor deve conter apenas números",
+      "IAgree": "Concordo que definir a Oferta Máxima para o mesmo valor da Oferta inicial tornará impossível para os usuários comprarem e o valor total será enviado para minha carteira."
     },
     "basicOptions": {
       "basicInfoText": "Informações básicas",

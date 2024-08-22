@@ -76,6 +76,8 @@ export interface IBaseFormInputProps
   disableCustom?: boolean;
   selectFilter?: (e: any) => any;
   loading?: boolean;
+  warning?: boolean;
+  propsValidate?: () => any;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -182,6 +184,8 @@ const FormInput: React.FC<
   disableCustom = false,
   selectFilter,
   loading = false,
+  warning,
+  propsValidate,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -259,7 +263,6 @@ const FormInput: React.FC<
             if (max && value > max) {
               return `Maximum value is ${max || 100}`;
             }
-
             if (precision !== undefined && value) {
               let parsedValue = value;
 
@@ -279,7 +282,9 @@ const FormInput: React.FC<
                   : 'Only integer numbers allowed';
               }
             }
-
+            if (propsValidate) {
+              return propsValidate?.();
+            }
             return true;
           },
         }));
@@ -304,6 +309,7 @@ const FormInput: React.FC<
   };
 
   let inputProps = {
+    warning,
     type,
     defaultValue,
     ...areaProps,

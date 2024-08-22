@@ -34,6 +34,7 @@ const theme = {
   darkBlue: '#0C0D1C',
   darkBlue300: '#181818',
   blue: '#151515',
+
   darkText: '#515395',
   secondaryText: '#595C98',
   shadow: '#DDDEE7',
@@ -174,6 +175,7 @@ const theme = {
   warning: {
     background: '#fde69388',
     text: '#c5821e',
+    message: '#FFE380',
   },
 
   button: {

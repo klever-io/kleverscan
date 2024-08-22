@@ -1,3 +1,4 @@
+import ToggleButton from '@/components/Button/Toggle';
 import FormInput from '@/components/TransactionForms/FormInput';
 import {
   FormSection,
@@ -10,16 +11,23 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ISectionProps } from '..';
 import { assetsTooltip as tooltip } from '../../utils/tooltips';
+import { GenericInfoContainer } from '../styles';
 
 export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   isNFT,
   isFungible,
 }) => {
   const [logoError, setLogoError] = useState<string | null>(null);
-  const { watch, trigger } = useFormContext<ICreateAsset>();
+  const { watch, trigger, setError, clearErrors } =
+    useFormContext<ICreateAsset>();
   const { walletAddress } = useExtension();
+  const [isEqual, setIsEqual] = useState(false);
+  const [iAgree, setIAgree] = useState(false);
+
   const precision = watch('precision');
   const logo = watch('logo');
+  const initialSupply = watch('initialSupply');
+  const maxSupply = watch('maxSupply');
   let logoTimeout: ReturnType<typeof setTimeout>;
 
   useEffect(() => {
@@ -44,9 +52,31 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
     }
   };
 
+  function handlerOnClick() {
+    setIAgree(old => !old);
+  }
+
   useEffect(() => {
     isValidLogo();
   }, [logo]);
+
+  useEffect(() => {
+    trigger('initialSupply');
+  }, [iAgree]);
+  useEffect(() => {
+    if (initialSupply === maxSupply) {
+      setIsEqual(true);
+    } else {
+      setIsEqual(false);
+    }
+  }, [initialSupply, maxSupply]);
+
+  function handlerValidate() {
+    if (isEqual && !iAgree) {
+      return 'You must agree to continue!';
+    }
+    return true;
+  }
 
   return (
     <FormSection>
@@ -82,6 +112,8 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
           type="number"
           tooltip={tooltip.initialSupply}
           precision={precision}
+          warning={isEqual}
+          propsValidate={handlerValidate}
         />
       )}
       <FormInput
@@ -90,7 +122,18 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
         type="number"
         tooltip={tooltip.maxSupply}
         precision={precision}
+        warning={isEqual}
       />
+      {isEqual && (
+        <GenericInfoContainer>
+          <ToggleButton active={iAgree} onClick={handlerOnClick} />
+          <p>
+            I agree that setting the max. supply to the same value as the
+            initial supply will make it impossible for users to purchase and the
+            entire amount will be sent to my wallet.
+          </p>
+        </GenericInfoContainer>
+      )}
       <FormInput
         name="logo"
         title="Logo"

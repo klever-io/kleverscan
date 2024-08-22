@@ -38,7 +38,8 @@
       "charactersField": "This field must have {{number}} characters",
       "onlyNumbers": "Only numbers are allowed",
       "validURI": "Enter a valid URI",
-      "onlyNumbersValue": "Value must be only numbers"
+      "onlyNumbersValue": "Value must be only numbers",
+      "IAgree": "I agree that setting the max. supply to the same value as the initial supply will make it impossible for users to purchase and the entire amount will be sent to my wallet."
     },
     "basicOptions": {
       "basicInfoText": "Basic information",
@@ -47,7 +48,7 @@
       "precisionHint": "Token precision refers to the number of decimal places that can be used to represent fractional amounts of a token.",
       "kleverPrecisionTip": "Klever Tip: Token precision is an important consideration when creating a token because it affects the usability and divisibility of the token.",
       "initialSupplyOf": "Initial Supply of {{ticker}}",
-      "initialSupplyHint": "The initial amount refers to the quantity of tokens that will be minted at the beginning of the token creation process.",
+      "initialSupplyHint": "The initial amount refers to the quantity of tokens that <span style='color: #FFE380'>will be minted to your wallet</span> at the beginning of the token creation process.",
       "kleverInitialSupplyTip": "If not specified, no tokens will be minted at the time of asset creation. The initial amount can be adjusted later through minting, which can be controlled through the token's smart contract.",
       "maxSupplyOf": "Max. Supply of {{ticker}}"
     },

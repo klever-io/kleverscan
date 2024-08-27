@@ -51,10 +51,6 @@ export const assetTypes = [
     label: 'Non Fungible',
     value: 1,
   },
-  {
-    label: 'Semi Fungible',
-    value: 2,
-  },
 ];
 
 export const parseCreateAsset = (data: ICreateAsset) => {

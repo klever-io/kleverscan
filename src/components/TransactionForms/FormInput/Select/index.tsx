@@ -1,8 +1,7 @@
-import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { onChangeWrapper } from '..';
 import { Container, HiddenInput } from './styles';
@@ -29,6 +28,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   selectFilter?: (e: any) => any;
   loading?: boolean;
   customOnChange?: (e: any) => void;
+  defaultValue?: string;
 }
 
 const Filter: React.FC<PropsWithChildren<IFilter>> = ({
@@ -44,6 +44,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   selectFilter,
   customOnChange,
   loading,
+  defaultValue,
   ...rest
 }) => {
   const { register, setValue, getValues } = useFormContext();
@@ -81,6 +82,14 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       selected && setSelected(selected);
     }
   }, [value, options]);
+  useEffect(() => {
+    if (defaultValue && parseInt(defaultValue)) {
+      setSelected({
+        value: parseInt(defaultValue),
+        label: defaultValue,
+      });
+    }
+  }, [defaultValue]);
 
   return (
     <Container $error={error} isOpenMenu={isSelectOpen}>

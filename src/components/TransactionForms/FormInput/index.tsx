@@ -1,11 +1,16 @@
-import { PropsWithChildren } from 'react';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import dynamic from 'next/dynamic';
 import { NextRouter, useRouter } from 'next/router';
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
+import {
+  ChangeEventHandler,
+  PropsWithChildren,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   ChangeHandler,
   FieldValues,
@@ -333,6 +338,7 @@ const FormInput: React.FC<
     selectFilter,
     customOnChange,
     loading,
+    defaultValue,
     ...rest,
   };
 
@@ -426,6 +432,7 @@ const FormInput: React.FC<
                 options={
                   type === 'dropdown' ? customDropdownOptions : customOptions
                 }
+                defaultValue={defaultValue}
                 value={isCustom}
                 onChange={(e: any) => {
                   setIsCustom(e) as any;

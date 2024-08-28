@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import AdvancedOptions from '@/components/Form/AdvancedOptions';
 import WarningModal from '@/components/Modals/Warning';
 import { useMulticontract } from '@/contexts/contract/multicontract';
@@ -6,7 +5,7 @@ import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { warningMessage } from '@/pages/create-transaction';
 import { QueueItemContainer } from '@/views/create-transaction';
-import { useEffect } from 'react';
+import { PropsWithChildren, useEffect } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { Container, Content, TitleContent } from './styles';
 
@@ -65,6 +64,7 @@ const ModalContract: React.FC<PropsWithChildren<IModalContract>> = ({
         <Content onMouseDown={e => e.stopPropagation()}>
           <TitleContent>
             <h1>{title}</h1>
+            AA
             <AiOutlineClose onClick={closeModal} cursor={'pointer'} />
           </TitleContent>
           {queue.map(item => {

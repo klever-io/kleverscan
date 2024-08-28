@@ -64,7 +64,6 @@ const ModalContract: React.FC<PropsWithChildren<IModalContract>> = ({
         <Content onMouseDown={e => e.stopPropagation()}>
           <TitleContent>
             <h1>{title}</h1>
-            AA
             <AiOutlineClose onClick={closeModal} cursor={'pointer'} />
           </TitleContent>
           {queue.map(item => {

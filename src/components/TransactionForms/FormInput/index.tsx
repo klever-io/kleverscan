@@ -432,7 +432,6 @@ const FormInput: React.FC<
                 options={
                   type === 'dropdown' ? customDropdownOptions : customOptions
                 }
-                defaultValue={defaultValue}
                 value={isCustom}
                 onChange={(e: any) => {
                   setIsCustom(e) as any;

@@ -1,6 +1,5 @@
-import { PropsWithChildren } from 'react';
 import { FilterArrowDown } from '@/assets/icons';
-import React, { useRef, useState } from 'react';
+import React, { PropsWithChildren, useMemo, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { Loader } from '../Loader/styles';
 import {
@@ -104,7 +103,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const handleClear = (e: any) => {
     e.stopPropagation();
     e.preventDefault();
-
+    setSelected(allItem);
     if (onClick) {
       onClick(allItem);
     }
@@ -138,11 +137,13 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   };
   const filteredArray = filterArrayByInput(inputValue);
 
-  const contentProps = {
-    ref: contentRef,
-    open: closed,
-    onClick: () => openDropdown(),
-  };
+  const contentProps = useMemo(() => {
+    return {
+      ref: contentRef,
+      open: closed,
+      onClick: () => openDropdown(),
+    };
+  }, [contentRef, closed, openDropdown]);
 
   const selectorProps = {
     ref: selectorRef,
@@ -180,7 +181,6 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
             isHiddenInput={isHiddenInput}
           />
         )}
-
         <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
           {closed && selected ? selected : ''}
         </span>

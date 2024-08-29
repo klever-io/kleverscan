@@ -182,6 +182,85 @@ export const createToken = (t: TFunction): ICreateAsset => {
     },
   };
 };
+export const createSFT = (t: TFunction): ICreateAsset => {
+  return {
+    commonValues: {
+      assetType: 0,
+      additionalFields: true,
+      basicTotalSteps: 6,
+    },
+    welcome: {
+      title: t('wizards:createSFT.welcome.title'),
+      description: t('wizards:createSFT.welcome.description'),
+      tooltip: t('wizards:createSFT.welcome.tooltip'),
+      kleverTip: t('wizards:createSFT.welcome.kleverTip'),
+      transactionCost: '20,000',
+      timeEstimated: '10min',
+    },
+    name: {
+      currentStep: '1/7',
+      title: t('wizards:createSFT.name.title'),
+      description: t('wizards:createSFT.name.description'),
+      kleverTip: t('wizards:createSFT.name.kleverTip'),
+    },
+    ticker: {
+      currentStep: '2/7',
+      title: t('wizards:createSFT.ticker.title'),
+      description: t('wizards:createSFT.ticker.description'),
+    },
+    ownerAddress: {
+      currentStep: '3/7',
+      formValue: 'ownerAddress',
+      description: t('wizards:createSFT.ownerAddress.description'),
+    },
+    maxSupply: {
+      currentStep: '6/7',
+      description: t('wizards:createSFT.maxSupply.description'),
+      kleverTip: t('wizards:createSFT.maxSupply.kleverTip'),
+    },
+    logo: {
+      assetType: 0,
+      currentStep: '7/7',
+    },
+    advancedSteps: {
+      uris: {
+        currentStep: 'URI',
+      },
+      properties: {
+        title: t('wizards:createSFT.advancedSteps.properties.title'),
+        description: t(
+          'wizards:createSFT.advancedSteps.properties.description',
+        ),
+      },
+    },
+    transactionSuccess: {
+      description: t('wizards:createSFT.transactionSuccess.description'),
+      secondDescription: t(
+        'wizards:createSFT.transactionSuccess.secondDescription',
+      ),
+    },
+    stepsInformations: {
+      basicStepsLabels: [
+        t('wizards:createSFT.stepsInformations.basicStepsLabels.tokenName'),
+        t('wizards:createSFT.stepsInformations.basicStepsLabels.tokenTicker'),
+        t('wizards:createSFT.stepsInformations.basicStepsLabels.ownerAddress'),
+        t(
+          'wizards:createSFT.stepsInformations.basicStepsLabels.tokenPrecision',
+        ),
+        t('wizards:createSFT.stepsInformations.basicStepsLabels.maxSupply'),
+        t('wizards:createSFT.stepsInformations.basicStepsLabels.tokenImage'),
+      ],
+      advancedStepsIndex: [9, 10, 11, 12, 13],
+      advancedStepsLabels: [
+        t('wizards:createSFT.stepsInformations.advancedStepsLabels.uri'),
+        t('wizards:createSFT.stepsInformations.advancedStepsLabels.staking'),
+        t('wizards:createSFT.stepsInformations.advancedStepsLabels.royalties'),
+        t('wizards:createSFT.stepsInformations.advancedStepsLabels.roles'),
+        t('wizards:createSFT.stepsInformations.advancedStepsLabels.properties'),
+      ],
+    },
+  };
+};
 
 export const createNFT = (t: TFunction): ICreateAsset => {
   return {

@@ -5,27 +5,24 @@ import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import {
-  ConfirmSuccessTransaction,
-  ConfirmTransaction,
-  CreateAssetAddRoles,
-  CreateAssetEightStep,
-  CreateAssetMaxSupplyStep,
-  CreateAssetNameStep,
-  CreateAssetOwnerAddressStep,
-  CreateAssetPreConfimStep,
-  CreateAssetPropertiesStep,
-  CreateAssetRoyaltySteps,
-  CreateAssetTickerStep,
-  CreateAssetWelcomeStep,
-  DesktopStepsComponent,
-  StepsBasics,
-  URIsSection,
-  infinitySymbol,
-  propertiesCommonDefaultValues,
-} from '..';
+import { infinitySymbol, propertiesCommonDefaultValues } from '..';
 import { createNFT } from '../../utils';
+import { ConfirmSuccessTransaction } from '../ConfirmSuccessTransaction';
+import { ConfirmTransaction } from '../ConfirmTransaction';
+import { CreateAssetAddRoles } from '../CreateAssetAddRoles';
+import { CreateAssetLogoURL } from '../CreateAssetLogoURL';
+import { CreateAssetMaxSupplyStep } from '../CreateAssetMaxSupplyStep';
+import { CreateAssetNameStep } from '../CreateAssetNameStep';
+import { CreateAssetOwnerAddressStep } from '../CreateAssetOwnerAddressStep';
+import { CreateAssetPreConfimStep } from '../CreateAssetPreConfimStep';
+import { CreateAssetPropertiesStep } from '../CreateAssetPropertiesStep';
+import { CreateAssetRoyaltySteps } from '../CreateAssetRoyaltySteps';
+import { CreateAssetTickerStep } from '../CreateAssetTickerStep';
+import { CreateAssetWelcomeStep } from '../CreateAssetWelcomeStep';
+import { DesktopStepsComponent } from '../DesktopStepsComponent';
+import { StepsBasics } from '../StepsBasics';
 import { WizardBody } from '../styles';
+import { URIsSection } from '../URIsSection';
 
 const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
   setTxHash,
@@ -130,7 +127,7 @@ const WizCreateNFT: React.FC<PropsWithChildren<any>> = ({
       label: 'Add Asset Logo URI',
       isDone: false,
       component: (
-        <CreateAssetEightStep {...stepsProps} informations={assetInfo.logo} />
+        <CreateAssetLogoURL {...stepsProps} informations={assetInfo.logo} />
       ),
     },
     {

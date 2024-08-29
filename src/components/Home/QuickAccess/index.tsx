@@ -47,6 +47,12 @@ const QuickAccess: React.FC<{
       icon: <Token />,
     },
     {
+      title: 'Create SFT',
+      type: 'CreateAssetContract',
+      openWiz: () => setWizard('SFT'),
+      icon: <Token />,
+    },
+    {
       title: 'Create ITO',
       type: 'ConfigITOContract',
       openWiz: () => setWizard('ITO'),

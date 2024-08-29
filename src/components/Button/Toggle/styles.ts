@@ -6,6 +6,7 @@ export const ToggleButtonContainer = styled.div<{ active: boolean }>`
   display: flex;
   align-items: center;
   width: 45px;
+  min-width: 45px;
   height: 22px;
   background-color: ${props =>
     props.active ? props.theme.purple : props.theme.borderLogo};
@@ -13,9 +14,12 @@ export const ToggleButtonContainer = styled.div<{ active: boolean }>`
   user-select: none;
 `;
 
-export const ToggleButtonIcon = styled.button<{
+export const ToggleButtonIcon = styled.button.attrs(props => ({
+  type: props.type || 'button',
+}))<{
   active: boolean;
   hasIcon: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }>`
   height: 16px;
   width: 16px;

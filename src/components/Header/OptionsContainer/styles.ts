@@ -10,7 +10,7 @@ export const MoonIcon = styled(BsMoon)`
   ${props =>
     props.theme.dark &&
     css`
-      color: #181935;
+      color: #151515;
       background-color: ${props => props.theme.true.white};
       border-radius: 50%;
     `}
@@ -35,7 +35,7 @@ export const SunIcon = styled(BsSun)`
   ${props =>
     !props.theme.dark &&
     css`
-      color: #181935;
+      color: #151515;
       background-color: ${props => props.theme.true.white};
       border-radius: 50%;
     `}

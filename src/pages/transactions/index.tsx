@@ -1,16 +1,18 @@
-import { PropsWithChildren } from 'react';
 import { Transactions as Icon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
 import Title from '@/components/Layout/Title';
+import LinkWithDropdown from '@/components/LinkWithDropdown';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import {
   CustomFieldWrapper,
+  InOutSpan,
   Status,
   TimestampInfo,
 } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
+import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
 import {
   CenteredRow,
@@ -48,24 +50,42 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { TransactionType } from '@klever/sdk-web';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
 interface IRequestTxQuery {
   asset?: string;
 }
-
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
   if (toAddress === '--') {
     return <Mono>{toAddress}</Mono>;
   }
   return (
-    <Link href={`/account/${toAddress}`} key={toAddress} className="address">
-      <Mono>{parseAddress(toAddress, 16)}</Mono>
-    </Link>
+    <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
+      <Link href={`/account/${toAddress}`} key={toAddress} className="address">
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
+      </Link>
+    </LinkWithDropdown>
+  );
+};
+export const mobileAddressSectionElement = (toAddress: string): JSX.Element => {
+  const { isMobile } = useMobile();
+  if (isMobile) {
+    return (
+      <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
+      </LinkWithDropdown>
+    );
+  }
+  return (
+    <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
+      <Link href={`/account/${toAddress}`} key={toAddress} className="address">
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
+      </Link>
+    </LinkWithDropdown>
   );
 };
 
-const getAssetsAndCurreciesList = (
+const getAssetsAndCurrenciesList = (
   contract: IContract,
   transaction: ITransaction,
 ): string[] => {
@@ -143,6 +163,7 @@ export const requestTransactionsDefault = async (
   }
 
   const localQuery = { ...router.query, page, limit };
+
   const transactionsResponse = await api.get({
     route: `transaction/list`,
     query: query ?? localQuery,
@@ -154,7 +175,7 @@ export const requestTransactionsDefault = async (
     (transaction: ITransaction) => {
       if (transaction.contract && transaction.contract.length) {
         transaction.contract.forEach(contract => {
-          assets.push(...getAssetsAndCurreciesList(contract, transaction));
+          assets.push(...getAssetsAndCurrenciesList(contract, transaction));
         });
       }
     },
@@ -220,15 +241,17 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     precision,
     data,
   } = props;
+  const router = useRouter();
 
   let toAddress = '--';
   const contractType = getContractType(contract);
-
   if (contractType === Contract.Transfer) {
     const parameter = contract[0].parameter as ITransferContract;
 
     toAddress = parameter.toAddress;
   }
+
+  const inOrOut = router?.query?.account === sender ? 'In' : 'Out';
 
   const customFields = getCustomFields(contract, receipts, precision, data);
 
@@ -268,14 +291,13 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`} className="address">
-            <Mono>{parseAddress(sender, 16)}</Mono>
-          </Link>
+          {mobileAddressSectionElement(sender)}
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
       ),
       span: 1,
     },
+
     {
       element: props =>
         contractType === 'Multi contract' ? (
@@ -342,6 +364,24 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       span: 1,
     },
   ];
+
+  const inOutRow: IRowSection = {
+    element: props => (
+      <DoubleRow {...props} key={inOrOut}>
+        <CenteredRow>
+          <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+            {inOrOut}
+          </InOutSpan>
+        </CenteredRow>
+      </DoubleRow>
+    ),
+    span: 1,
+  };
+
+  if (router?.query?.account) {
+    sections.splice(3, 0, inOutRow);
+    return sections;
+  }
 
   return sections;
 };

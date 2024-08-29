@@ -12,6 +12,7 @@ interface IProps {
   zIndex?: number;
   logoWarning?: boolean;
   paddingTop?: number;
+  warning?: string;
 }
 
 interface ILabel {
@@ -63,6 +64,16 @@ export const StyledInput = styled.input<IProps>`
           background-color: ${transparentize(0.9, theme.red)} !important;
           + label {
             color: ${theme.error} !important;
+          }
+        `
+      : null}
+  ${({ theme, warning }) =>
+    warning
+      ? css`
+          color: ${theme.warning.message} !important;
+          border: 1px solid ${theme.warning.message} !important;
+          + label {
+            color: ${theme.warning.message} !important;
           }
         `
       : null}

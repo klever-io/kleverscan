@@ -6,9 +6,9 @@ import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import { FormBody, FormSection } from '../styles';
-import { URIsSection } from './CreateAsset';
 import { parseURIs, percentageProps } from './utils';
 import { validatorTooltips as tooltip } from './utils/tooltips';
+import { URIsSection } from './CreateAsset/URIsSection';
 
 type FormData = {
   name: string;

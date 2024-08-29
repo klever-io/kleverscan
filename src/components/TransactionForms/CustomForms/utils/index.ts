@@ -15,7 +15,6 @@ export const parseSplitRoyalties = (data: any): void => {
     data.royalties?.splitRoyalties === undefined ||
     !data.royalties?.splitRoyalties?.length
   ) {
-    data.royalties = {};
     return;
   }
 

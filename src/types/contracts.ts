@@ -153,7 +153,7 @@ export interface IRoyaltiesInfo {
   transferFixed: number;
   marketPercentage: number;
   marketFixed: number;
-  percentITOPercentage: number;
+  itoPercentage: number;
   itoFixed: number;
 }
 

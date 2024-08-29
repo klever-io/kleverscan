@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useExtension } from '@/contexts/extension';
 import api from '@/services/api';
@@ -6,7 +5,8 @@ import { myAccountCall } from '@/services/requests/account';
 import { IProposalsResponse } from '@/types/proposals';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import React, { PropsWithChildren, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { IContractProps } from '.';
@@ -28,6 +28,8 @@ const Vote: React.FC<PropsWithChildren<IContractProps>> = ({
   handleFormSubmit,
 }) => {
   const { handleSubmit } = useFormContext<FormData>();
+  const router = useRouter();
+  const ProposalID = router?.query?.number;
 
   const getProposals = async () => {
     const proposalResponse: IProposalsResponse = await api.get({
@@ -88,6 +90,7 @@ const Vote: React.FC<PropsWithChildren<IContractProps>> = ({
           title="Proposal ID"
           type="dropdown"
           options={proposals}
+          defaultValue={ProposalID}
           required
         />
         <br />

@@ -2,7 +2,6 @@ import { proposalsMap } from '@/components/Tabs/NetworkParams/proposalsMap';
 import api from '@/services/api';
 import { IParamList, IResponse } from '@/types';
 import {
-  INetworkParam,
   INetworkParams,
   INodeOverview,
   IParsedNetworkParam,
@@ -117,7 +116,6 @@ export const requestProposals = async (
   const proposals: IProposalsResponse = await api.get({
     route: `proposals/list?status=${status || ''}&page=${page}&limit=${limit}`,
   });
-
   let parsedProposalResponse: any[] = [];
   parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);
   return { ...proposals, data: { proposals: parsedProposalResponse } };

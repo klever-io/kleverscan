@@ -39,7 +39,7 @@
     "Min Epochs To Claim": "Épocas Mínimas para Reivindicar",
     "Min Epochs To Unstake": "Épocas Mínimas para Desapostar",
     "Min Epochs To Withdraw": "Épocas Mínimas para Retirar",
-    "Qty_Holders": "Qtd Holders",
+    "Qtd_Holders": "Holders",
     "InfoOtherAssets": "Abaixo estão as últimas épocas em que podem ter ocorrido depósitos de qualquer ativo no Pool de Retorno Proporcional Flexível (FPR) do {{asset}}.",
     "InfoKLVorKFI": "Abaixo está o registro das últimas 100 épocas de apostas totais do {{asset}}.\nTenha em mente que os depósitos para KLV/KFI ocorrem automaticamente a partir de cada transação.",
     "Title History": "Retorno Proporcional Flexível - {{type}}",

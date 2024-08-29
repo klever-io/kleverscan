@@ -134,7 +134,10 @@ const precisionParse = async (
   };
 
   const addRoyalitiesPrecision = (payload: any, assetPrecision: number) => {
-    if (payload?.royalties === undefined) {
+    if (
+      payload?.royalties === undefined ||
+      Object.keys(payload?.royalties)?.length === 0
+    ) {
       return;
     }
 
@@ -178,6 +181,7 @@ const precisionParse = async (
     case 'AssetTriggerContract':
       assetId = payload.assetId ? payload.assetId : payload.kda || 'KLV';
       await addFieldPrecision('amount', assetId);
+      await addFieldPrecision('value', assetId);
       if (payload?.staking?.apr)
         payload.staking.apr = addPrecision(
           payload.staking.apr,
@@ -787,7 +791,7 @@ interface ITxRequest {
 
 const getNonce = async (): Promise<IAccountNonce> => {
   const req = await fetch(
-    `${window.kleverWeb.provider.node}/address/${window.kleverWeb.address}/nonce`,
+    `${window?.kleverWeb?.provider?.node}/address/${window?.kleverWeb?.address}/nonce`,
   );
 
   return (await req.json()) as IAccountNonce;
@@ -826,7 +830,7 @@ const buildTransaction = async (
   const txBody: ITxRequest = {
     type: fistContractType,
     nonce,
-    sender: options?.sender ?? window.kleverWeb.address,
+    sender: options?.sender ?? window?.kleverWeb?.address,
     data: txData || [],
     permID,
     contracts: payloads,
@@ -834,7 +838,7 @@ const buildTransaction = async (
   };
 
   const req = await fetch(
-    `${window.kleverWeb.provider.node}/transaction/send`,
+    `${window?.kleverWeb?.provider?.node}/transaction/send`,
     {
       method: 'POST',
       headers: {

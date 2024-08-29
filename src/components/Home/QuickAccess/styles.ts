@@ -93,10 +93,10 @@ export const CardItem = styled.div`
     grid-column: span 2;
 
     &:nth-last-child(2) {
-      grid-column: 1/4;
+      grid-column: 0;
     }
     &:nth-last-child(1) {
-      grid-column: 4/7;
+      grid-column: 5/7;
     }
   }
 `;

@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { Copy } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import Title from '@/components/Layout/Title';
@@ -24,7 +23,6 @@ import {
 import { IRowSection } from '@/types/index';
 import {
   INetworkParams,
-  IParsedNetworkParam,
   IParsedNetworkParams,
   IParsedParams,
   IParsedProposalParam,
@@ -75,7 +73,12 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
@@ -158,7 +161,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
       title: `${t('Vote Contract')}`,
       contractType: 'VoteContract',
       defaultValues: {
-        proposalId: router.query.number,
+        proposalId: parseInt(router?.query?.number as string),
         type: 0,
       },
     },
@@ -343,9 +346,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                   <h2>
                     {' '}
                     {isSkeleton(
-                      `${t('common:Titles.Proposal')} # ${
-                        proposal?.proposalId
-                      }`,
+                      `${t('common:Titles.Proposal')} # ${proposal?.proposalId}`,
                     )}
                   </h2>
                 </span>

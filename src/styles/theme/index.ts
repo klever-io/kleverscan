@@ -32,8 +32,9 @@ const theme = {
   lightBlue: '#585A92',
   error: '#9E1313',
   darkBlue: '#0C0D1C',
-  darkBlue300: '#222345',
-  blue: '#181935',
+  darkBlue300: '#181818',
+  blue: '#151515',
+
   darkText: '#515395',
   secondaryText: '#595C98',
   shadow: '#DDDEE7',
@@ -87,7 +88,7 @@ const theme = {
     background: '#06060B',
     socialBorder: '#2c3041',
     text: '#9b9dd1',
-    border: '#181935',
+    border: '#151515',
   },
 
   input: {
@@ -95,7 +96,7 @@ const theme = {
     activeShadow: '#7418c2',
     searchBar: '#0C0D1C',
     borderSearchBar: '#585a92',
-    dateFilter: '#181935',
+    dateFilter: '#151515',
     border: {
       home: '#030307',
       search: '#7B7DB2',
@@ -103,7 +104,7 @@ const theme = {
   },
 
   card: {
-    background: '#222345',
+    background: '#181818',
     text: '#C6C7EB',
     gray: '#F0F0F0',
     secondaryText: '#595C98',
@@ -148,7 +149,7 @@ const theme = {
     gray: '#c6c7eb',
     inputHeader: '#C6C7EB',
     black: '#2e2f47',
-    twilight: '#222345',
+    twilight: '#181818',
     background: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
     largeBackground:
       'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241), rgb(125, 63, 241), rgb(238, 63, 113))',
@@ -174,6 +175,7 @@ const theme = {
   warning: {
     background: '#fde69388',
     text: '#c5821e',
+    message: '#FFE380',
   },
 
   button: {
@@ -208,7 +210,7 @@ const theme = {
   },
 
   kappsDemo: {
-    dark: '#222345',
+    dark: '#181818',
     darker: '#16162c',
   },
 
@@ -218,6 +220,9 @@ const theme = {
 
   ito: {
     darkGray: '#202025',
+  },
+  dropdown: {
+    background: '#f2f2f2',
   },
 };
 

@@ -469,12 +469,10 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
                 )}
               </CenteredRow>
               <CenteredRow>
-                {parameter?.royalties?.percentITOPercentage && (
+                {parameter?.royalties?.itoPercentage && (
                   <>
                     <strong>ITO Percentage:&nbsp;</strong>
-                    <span>
-                      {parameter?.royalties?.percentITOPercentage / 100}%
-                    </span>
+                    <span>{parameter?.royalties?.itoPercentage / 100}%</span>
                   </>
                 )}
               </CenteredRow>
@@ -2878,7 +2876,7 @@ const renderAssetTriggerTypeData: React.FC<
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>ITO Percentage</StrongWidth>
-                <span>{par.royalties.percentITOPercentage / 100 || 0}%</span>
+                <span>{par.royalties.itoPercentage / 100 || 0}%</span>
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>Market Fixed</StrongWidth>

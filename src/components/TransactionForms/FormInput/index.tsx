@@ -340,6 +340,7 @@ const FormInput: React.FC<
     selectFilter,
     customOnChange,
     loading,
+    defaultValue,
     ...rest,
   };
 

@@ -88,7 +88,7 @@ import React, {
 } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { RowAddress, RowAlert } from './styles';
+import { RowAlert } from './styles';
 
 export interface IStakingRewards {
   label: string;
@@ -616,7 +616,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const Overview: React.FC<PropsWithChildren> = () => {
     return (
       <Container>
-        <RowAddress isMobileRow>
+        <Row isMobileRow>
           <span>
             <strong>{t('accounts:SingleAccount.Content.Address')}</strong>
           </span>
@@ -633,7 +633,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
               <SetAccountNameButton />
             </CenteredRow>
           </RowContent>
-        </RowAddress>
+        </Row>
         {IsTokenBurn(router.query.account as string) && (
           <RowAlert>
             <span>{t('accounts:SingleAccount.BlackHole')}</span>

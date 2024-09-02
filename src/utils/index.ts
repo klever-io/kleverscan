@@ -183,7 +183,5 @@ export const validateFormattedVotes = (
 export const IsTokenBurn = (token: string) => {
   const tokenBurn =
     'klv1000000000000000000000000000000000000000000000000000ql8r3r7';
-  if (token === tokenBurn) return true;
-
-  return false;
+  return token === tokenBurn;
 };

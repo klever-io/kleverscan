@@ -1,6 +1,8 @@
 {
   "SingleAccount": {
     "Title": "Account",
+    "BurnAddress": "BURN ADDRESS",
+    "BlackHole": "BLACK HOLE",
     "Tabs": {
       "Permission": "Permission",
       "ProprietaryAssets": "Proprietary Assets",

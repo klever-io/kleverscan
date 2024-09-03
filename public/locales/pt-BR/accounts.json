@@ -2,7 +2,7 @@
   "SingleAccount": {
     "Title": "Conta",
     "BurnAddress": "ENDEREÇO DE QUEIMA",
-    "BlackHole": "Buraco negro: Endereço usado para queima de tokens",
+    "BlackHole": "BURACO NEGRO",
     "Tabs": {
       "Permission": "Permissão",
       "ProprietaryAssets": "Ativos da Conta",

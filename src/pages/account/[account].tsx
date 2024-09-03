@@ -43,6 +43,7 @@ import {
   FrozenContainer,
   Header,
   Row,
+  RowAlert,
   RowContent,
 } from '@/styles/common';
 import { IInnerTableProps, IResponse } from '@/types/index';
@@ -88,7 +89,6 @@ import React, {
 } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { RowAlert } from './styles';
 
 export interface IStakingRewards {
   label: string;
@@ -637,7 +637,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         {IsTokenBurn(router.query.account as string) && (
           <RowAlert>
             <span>{t('accounts:SingleAccount.BlackHole')}</span>
-            <span>{t('accounts:SingleAccount.BurnAddress')}</span>
           </RowAlert>
         )}
         <Row>

@@ -119,7 +119,6 @@ const RenderCoinsCard: React.FC<
 
   return (
     <CardContainer ref={cardRef}>
-      AAAAAAAAAAAAAAAAAAAAAAA
       <CardContent>
         <Link href={`/asset/${shortname}`}>
           <HeaderContainer>

@@ -255,15 +255,21 @@ export const percentageProps = {
 
 export const parseStringToNumberSupply = (data: any): void => {
   if (data.maxSupply && data.maxSupply !== '') {
-    const maxSupply = parseInt(data.maxSupply.replace(/,/g, ''), 10);
+    const maxSupply = parseInt(
+      data?.maxSupply?.toString()?.replace(/,/g, ''),
+      10,
+    );
     data.maxSupply = maxSupply;
   }
   if (data.initialSupply && data.initialSupply !== '') {
-    const initialSupply = parseInt(data.initialSupply.replace(/,/g, ''), 10);
+    const initialSupply = parseInt(
+      data?.initialSupply?.toString()?.replace(/,/g, ''),
+      10,
+    );
     data.initialSupply = initialSupply;
   }
   if (data.maxAmount && data.maxAmount !== '') {
-    const maxAmount = parseInt(data.maxAmount.replace(/,/g, ''), 10);
+    const maxAmount = parseInt(data?.maxAmount?.replace(/,/g, ''), 10);
     data.maxAmount = maxAmount;
   }
 };

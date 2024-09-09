@@ -92,6 +92,7 @@ const CreateAsset: React.FC<PropsWithChildren<IContractProps>> = ({
           type="dropdown"
           options={assetTypes}
           defaultValue={0}
+          required={true}
         />
       </FormSection>
       <BasicInfoSection {...sectionProps} />

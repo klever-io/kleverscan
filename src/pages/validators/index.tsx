@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { Validators as Icon } from '@/assets/cards';
 import { getStatusIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
@@ -20,7 +19,7 @@ import { parseValidators } from '@/utils/parseValues';
 import { AddressContainer } from '@/views/validators/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 
 export const validatorsHeaders = [
   'Rank',
@@ -139,26 +138,29 @@ const Validators: React.FC<PropsWithChildren> = () => {
   const [filterValidators, fetchPartialValidator, loading, setLoading] =
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');
 
-  const filters: IFilter[] = [
-    {
-      title: 'Name',
-      data: filterValidators.map(validator => validator.name || ''),
-      onClick: async value => {
-        if (value === 'All') {
-          setQueryAndRouter({}, router);
-        } else {
-          setQueryAndRouter({ name: value }, router);
-        }
+  const filters: IFilter[] = useMemo(() => {
+    return [
+      {
+        title: 'Name',
+        data: filterValidators
+          .map(validator => validator.name)
+          .filter(validator => !!validator) as string[],
+        onClick: async value => {
+          if (value === 'All') {
+            setQueryAndRouter({}, router);
+          } else {
+            setQueryAndRouter({ name: value }, router);
+          }
+        },
+        onChange: async value => {
+          setLoading(true);
+          await fetchPartialValidator(value);
+        },
+        current: (router.query.name as string) || undefined,
+        loading,
       },
-      onChange: async value => {
-        setLoading(true);
-        await fetchPartialValidator(value);
-      },
-      current: (router.query.name as string) || undefined,
-      loading,
-    },
-  ];
-
+    ];
+  }, [filterValidators, router]);
   const requestValidators = async (page: number, limit: number) => {
     const localQuery = { ...router.query, page, limit };
     const validators = await api.get({

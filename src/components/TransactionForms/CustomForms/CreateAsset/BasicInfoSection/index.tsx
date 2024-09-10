@@ -31,7 +31,7 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
 
   useEffect(() => {
     trigger('initialSupply');
-    trigger('logo');
+    trigger('maxSupply');
   }, [precision, trigger]);
 
   const isValidLogo = async () => {

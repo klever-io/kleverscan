@@ -516,7 +516,7 @@ const FormInput: React.FC<
         type !== 'textarea' &&
         type !== 'object' &&
         type !== 'file' &&
-        type !== 'hidden' && <StyledInput {...inputProps} {...registerRest} />}
+        type !== 'hidden' && <StyledInput {...inputProps} />}
 
       {error && (
         <ErrorMessage

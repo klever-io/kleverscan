@@ -236,6 +236,12 @@ const FormInput: React.FC<
             type,
             customOnChange,
           ),
+          validate: (value: any) => {
+            if (propsValidate) {
+              return propsValidate?.();
+            }
+            return true;
+          },
         })
       : register(name, {
           valueAsNumber: true,
@@ -282,6 +288,7 @@ const FormInput: React.FC<
                   : 'Only integer numbers allowed';
               }
             }
+
             if (propsValidate) {
               return propsValidate?.();
             }
@@ -509,7 +516,7 @@ const FormInput: React.FC<
         type !== 'textarea' &&
         type !== 'object' &&
         type !== 'file' &&
-        type !== 'hidden' && <StyledInput {...inputProps} />}
+        type !== 'hidden' && <StyledInput {...inputProps} {...registerRest} />}
 
       {error && (
         <ErrorMessage

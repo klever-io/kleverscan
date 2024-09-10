@@ -19,6 +19,7 @@ export const isImage = async (
   const timeoutPromise = new Promise(resolve => {
     setTimeout(() => resolve(false), timeout);
   });
+
   return Promise.race([imgPromise, timeoutPromise]);
 };
 
@@ -59,17 +60,48 @@ export const validateImgRequestHeader = async (
 export const validateImgUrl = async (
   url: string,
   timeout: number,
-): Promise<boolean> => {
+): Promise<[boolean, string?]> => {
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const sizeInKB = blob.size / 1024;
+    let width = 0;
+    let height = 0;
+
+    if (sizeInKB > 1024 * 3) {
+      return [false, 'maximum image size should be 3mb'];
+    }
+
+    const img = new Image();
+    img.src = URL.createObjectURL(blob);
+
+    const imgLoaded = new Promise<[number, number]>(resolve => {
+      img.onload = () => {
+        width = img.width;
+        height = img.height;
+        resolve([width, height]);
+      };
+    });
+
+    [width, height] = await imgLoaded;
+
+    if (width > 1920 || height > 1080) {
+      return [false, 'maximum image size should be 1920x1080'];
+    }
+  } catch (error) {
+    return [false];
+  }
+
   if (regexImgUrl(url)) {
-    return true;
+    return [true];
   }
 
   if (await validateImgRequestHeader(url, timeout)) {
-    return true;
+    return [true];
   }
 
   if (await isImage(url, timeout)) {
-    return true;
+    return [true];
   }
-  return false;
+  return [false];
 };

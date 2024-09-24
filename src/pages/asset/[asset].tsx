@@ -88,7 +88,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const requestTransactions = async (page: number, limit: number) => {
     const newQuery = {
       ...router.query,
-      asset: asset?.assetId || router.query.asset || '',
+      asset: router.query.asset || '',
     };
     return await api.get({
       route: `transaction/list`,

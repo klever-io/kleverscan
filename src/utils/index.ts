@@ -179,3 +179,9 @@ export const validateFormattedVotes = (
   });
   return list;
 };
+
+export const IsTokenBurn = (token: string) => {
+  const tokenBurn =
+    'klv1000000000000000000000000000000000000000000000000000ql8r3r7';
+  return token === tokenBurn;
+};

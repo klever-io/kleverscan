@@ -18,8 +18,7 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   isFungible,
 }) => {
   const [logoError, setLogoError] = useState<string | null>(null);
-  const { watch, trigger, setError, clearErrors } =
-    useFormContext<ICreateAsset>();
+  const { watch, trigger } = useFormContext<ICreateAsset>();
   const { walletAddress } = useExtension();
   const [isEqual, setIsEqual] = useState(false);
   const [iAgree, setIAgree] = useState(false);
@@ -40,10 +39,14 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
       'The logo link is invalid, which could lead to your logo not being displayed.';
     try {
       if (!!logo) {
-        const isValid = await validateImgUrl(logo, 2000);
+        const [isValid, erroMessage] = await validateImgUrl(logo, 2000);
         if (!isValid) {
-          setLogoError(logoErrorMsg);
-          return;
+          if (erroMessage) {
+            return erroMessage;
+          } else {
+            setLogoError(logoErrorMsg);
+            return false;
+          }
         }
       }
       setLogoError(null);
@@ -57,12 +60,9 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
   }
 
   useEffect(() => {
-    isValidLogo();
-  }, [logo]);
-
-  useEffect(() => {
     trigger('initialSupply');
   }, [iAgree]);
+
   useEffect(() => {
     if (initialSupply === maxSupply) {
       setIsEqual(true);
@@ -140,6 +140,7 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
         span={2}
         tooltip={tooltip.logo}
         logoError={logoError}
+        propsValidate={isValidLogo}
       />
     </FormSection>
   );

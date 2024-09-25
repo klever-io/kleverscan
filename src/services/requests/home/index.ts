@@ -477,9 +477,13 @@ const homeKfiPriceCall = async (): Promise<
     });
 
     if (!res.error || res.error === '') {
-      const data = res?.data?.prices?.Exchanges.find(
-        (exchange: any) => exchange.ExchangeName === 'Klever',
-      );
+      const data =
+        res?.data?.prices?.Exchanges.find(
+          (exchange: any) => exchange.ExchangeName === 'Klever',
+        ) ||
+        res?.data?.prices?.Exchanges.find(
+          (exchange: any) => !!exchange.ExchangeName,
+        );
 
       if (!data) return;
 
@@ -644,13 +648,13 @@ export {
   homeKlvChartCall,
   homeKlvDataCall,
   homeLastApprovedProposalCall,
+  homeMostTransactedKDAFee,
+  homeMostTransactedNFTs,
+  homeMostTransactedTokens,
   homeNodes,
   homeProposalsCall,
   homeTotalActiveValidators,
   homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
-  homeMostTransactedTokens,
-  homeMostTransactedNFTs,
-  homeMostTransactedKDAFee,
 };

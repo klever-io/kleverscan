@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
@@ -8,7 +7,7 @@ import { parseApr } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
 interface IAssets {
   assetsTableProps: IInnerTableProps;
@@ -30,7 +29,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
     'Token Type',
     'Precision',
     'Balance',
-    'Frozen',
+    'Staking',
     'Unfrozen',
     'Staking Type',
     '',
@@ -100,7 +99,10 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(frozenBalance / 10 ** precision).toLocaleString()} ${ticker}`}
+            msg={`${(
+              frozenBalance /
+              10 ** precision
+            ).toLocaleString()} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span key={frozenBalance}>
@@ -115,7 +117,10 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(unfrozenBalance / 10 ** precision).toLocaleString()} ${ticker}`}
+            msg={`${(
+              unfrozenBalance /
+              10 ** precision
+            ).toLocaleString()} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span key={unfrozenBalance}>

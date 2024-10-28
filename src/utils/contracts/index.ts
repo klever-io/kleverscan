@@ -886,164 +886,310 @@ export const getContractCells = async (
 
   switch (contract[0].typeString) {
     case Contract.Transfer:
-      const coin = parameter?.assetId || 'KLV';
-      let asyncAmount = await getParsedAmount(parameter, coin);
-      cells.push(coin, asyncAmount);
+      try {
+        const coin = parameter?.assetId || 'KLV';
+        let asyncAmount = await getParsedAmount(parameter, coin);
+        cells.push(coin, asyncAmount);
+      } catch (e) {
+        console.error(Contract.Transfer, e);
+        throw new Error(`Error Getting Transfer Contract Cells: ${e}`);
+      }
       break;
     case Contract.CreateAsset:
-      let name = parameter?.name || '';
-      const ticker = parameter?.ticker || '';
-      cells.push(name, ticker);
+      try {
+        let name = parameter?.name || '';
+        const ticker = parameter?.ticker || '';
+        cells.push(name, ticker);
+      } catch (e) {
+        console.error(Contract.CreateAsset, e);
+        throw new Error(`Error Getting Create Asset Contract Cells: ${e}`);
+      }
       break;
     case Contract.CreateValidator:
-      const rewardAddress = parameter?.config.rewardAddress || '';
-      const canDelegate = parameter?.config.canDelegate || '';
-      cells.push(rewardAddress, canDelegate);
+      try {
+        const rewardAddress = parameter?.config.rewardAddress || '';
+        const canDelegate = parameter?.config.canDelegate || '';
+        cells.push(rewardAddress, canDelegate);
+      } catch (e) {
+        console.error(Contract.CreateValidator, e);
+        throw new Error(`Error Getting Create Validator Contract Cells: ${e}`);
+      }
       break;
     case Contract.ValidatorConfig:
-      const blsPublicKey = parameter?.config.blsPublicKey || '';
-      cells.push(blsPublicKey);
+      try {
+        const blsPublicKey = parameter?.config.blsPublicKey || '';
+        cells.push(blsPublicKey);
+      } catch (e) {
+        console.error(Contract.ValidatorConfig, e);
+        throw new Error(`Error Getting Validator Config Contract Cells: ${e}`);
+      }
       break;
     case Contract.Freeze:
-      let assetId = parameter?.assetId || 'KLV';
-      asyncAmount = await getParsedAmount(parameter, assetId);
-      cells.push(assetId, asyncAmount);
+      try {
+        let assetId = parameter?.assetId || 'KLV';
+        const asyncAmount = await getParsedAmount(parameter, assetId);
+        cells.push(assetId, asyncAmount);
+      } catch (e) {
+        console.error(Contract.Freeze, e);
+        throw new Error(`Error Getting Freeze Contract Cells: ${e}`);
+      }
       break;
     case Contract.Unfreeze:
-      let bucketID = parameter?.bucketID || '';
-      cells.push(bucketID);
+      try {
+        let bucketID = parameter?.bucketID || '';
+        cells.push(bucketID);
+      } catch (e) {
+        console.error(Contract.Unfreeze, e);
+        throw new Error(`Error Getting Unfreeze Contract Cells: ${e}`);
+      }
       break;
     case Contract.Delegate:
-      bucketID = parameter?.bucketID || '';
-      cells.push(bucketID);
+      try {
+        const bucketID = parameter?.bucketID || '';
+        cells.push(bucketID);
+      } catch (e) {
+        console.error(Contract.Delegate, e);
+        throw new Error(`Error Getting Delegate Contract Cells: ${e}`);
+      }
       break;
     case Contract.Undelegate:
-      bucketID = parameter?.bucketID || '';
-      cells.push(bucketID);
+      try {
+        const bucketID = parameter?.bucketID || '';
+        cells.push(bucketID);
+      } catch (e) {
+        console.error(Contract.Undelegate, e);
+        throw new Error(`Error Getting Undelegate Contract Cells: ${e}`);
+      }
       break;
     case Contract.Withdraw:
-      let filteredReceipts = filterReceipts(receipts, index);
-      assetId = parameter?.assetId || 'KLV';
-      asyncAmount = await getAmountFromReceipts(assetId, 18, filteredReceipts);
-      cells.push(assetId, asyncAmount);
+      try {
+        const filteredReceipts = filterReceipts(receipts, index);
+        const assetId = parameter?.assetId || 'KLV';
+        const asyncAmount = await getAmountFromReceipts(
+          assetId,
+          18,
+          filteredReceipts,
+        );
+        cells.push(assetId, asyncAmount);
+      } catch (e) {
+        console.error(Contract.Withdraw, e);
+        throw new Error(`Error Getting Withdraw Contract Cells: ${e}`);
+      }
       break;
     case Contract.Claim:
-      filteredReceipts = filterReceipts(receipts, index);
-      const claimType = parameter?.claimType || '';
-      const claimReceipt = findReceipt(filteredReceipts, 17) as
-        | IClaimReceipt
-        | undefined;
-      asyncAmount = await getAmountFromReceipts(
-        claimReceipt?.assetId || '',
-        17,
-        filteredReceipts,
-      );
-      cells.push(claimType, claimReceipt?.assetId, asyncAmount);
+      try {
+        const filteredReceipts = filterReceipts(receipts, index);
+        const claimType = parameter?.claimType || '';
+        const claimReceipt = findReceipt(filteredReceipts, 17) as
+          | IClaimReceipt
+          | undefined;
+        const asyncAmount = await getAmountFromReceipts(
+          claimReceipt?.assetId || '',
+          17,
+          filteredReceipts,
+        );
+        cells.push(claimType, claimReceipt?.assetId, asyncAmount);
+      } catch (e) {
+        console.error(Contract.Claim, e);
+        throw new Error(`Error Getting Claim Contract Cells: ${e}`);
+      }
       break;
     case Contract.Unjail:
-      cells.push(parsedkAppFee, parsedbandwidthFee);
+      try {
+        cells.push(parsedkAppFee, parsedbandwidthFee);
+      } catch (e) {
+        console.error(Contract.Unjail, e);
+        throw new Error(`Error Getting Unjail Contract Cells: ${e}`);
+      }
       break;
     case Contract.AssetTrigger:
-      let triggerType = parameter?.triggerType || '';
-      cells.push(triggerType);
+      try {
+        let triggerType = parameter?.triggerType || '';
+        cells.push(triggerType);
+      } catch (e) {
+        console.error(Contract.AssetTrigger, e);
+        throw new Error(`Error Getting Asset Trigger Contract Cells: ${e}`);
+      }
       break;
     case Contract.SetAccountName:
-      name = parameter?.name || '';
-      cells.push(name);
+      try {
+        const name = parameter?.name || '';
+        cells.push(name);
+      } catch (e) {
+        console.error(Contract.SetAccountName, e);
+        throw new Error(`Error Getting Set Account Name Contract Cells: ${e}`);
+      }
       break;
     case Contract.Proposal:
-      const description = parameter?.description || '';
-      cells.push(description);
+      try {
+        const description = parameter?.description || '';
+        cells.push(description);
+      } catch (e) {
+        console.error(Contract.SetAccountName, e);
+        throw new Error(`Error Getting Proposal Contract Cells: ${e}`);
+      }
       break;
     case Contract.Vote:
-      const proposalId = parameter?.proposalId || '';
-      let amount = parameter?.amount / 10 ** 6 || '';
-      cells.push(proposalId, amount);
+      try {
+        const proposalId = parameter?.proposalId || '';
+        let amount = parameter?.amount / 10 ** 6 || '';
+        cells.push(proposalId, amount);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(`Error Getting Vote Contract Cells: ${e}`);
+      }
       break;
     case Contract.ConfigITO:
-      assetId = parameter?.assetId || 'KLV';
-      cells.push(assetId);
+      try {
+        const assetId = parameter?.assetId || 'KLV';
+        cells.push(assetId);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(`Error Getting Config ITO Contract Cells: ${e}`);
+      }
       break;
     case Contract.SetITOPrices:
-      assetId = parameter?.assetId || 'KLV';
-      cells.push(assetId);
+      try {
+        const assetId = parameter?.assetId || 'KLV';
+        cells.push(assetId);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(`Error Getting Set ITO Prices Contract Cells: ${e}`);
+      }
       break;
     case Contract.Buy:
-      const buyType = parameter?.buyType || '';
-      let currencyID = parameter?.currencyID || '';
-      filteredReceipts = filterReceipts(receipts, index);
-      const senderKAppTransferReceipt = findReceiptWithSender(
-        filteredReceipts,
-        14,
-        sender,
-      ) as IKAppTransferReceipt | undefined;
-      let currencyIDPrecision: any = 6;
-      let amountPrecision: any = 0;
-      if (parameter?.currencyID !== 'KLV' && parameter?.currencyID !== 'KFI') {
-        currencyIDPrecision = await getPrecision(
-          parameter?.currencyID || 'KLV',
-        );
-      }
-      if (parameter?.buyType === 'MarketBuy') {
-        if (status !== 'fail') {
-          amountPrecision = await getPrecision(
-            senderKAppTransferReceipt?.assetId ?? '',
+      try {
+        const buyType = parameter?.buyType || '';
+        let currencyID = parameter?.currencyID || '';
+        const filteredReceipts = filterReceipts(receipts, index);
+        const senderKAppTransferReceipt = findReceiptWithSender(
+          filteredReceipts,
+          14,
+          sender,
+        ) as IKAppTransferReceipt | undefined;
+        let currencyIDPrecision: any = 6;
+        let amountPrecision: any = 0;
+        if (
+          parameter?.currencyID !== 'KLV' &&
+          parameter?.currencyID !== 'KFI'
+        ) {
+          currencyIDPrecision = await getPrecision(
+            parameter?.currencyID || 'KLV',
           );
-        } else {
-          amountPrecision = 0;
         }
-      } else if (parameter?.buyType === 'ITOBuy') {
-        amountPrecision = (await getPrecision(parameter?.id)) || '';
-      }
-      let buyPrice = getBuyPrice(parameter, senderKAppTransferReceipt);
-      let buyAmount = getBuyAmount(parameter, senderKAppTransferReceipt);
+        if (parameter?.buyType === 'MarketBuy') {
+          if (status !== 'fail') {
+            amountPrecision = await getPrecision(
+              senderKAppTransferReceipt?.assetId ?? '',
+            );
+          } else {
+            amountPrecision = 0;
+          }
+        } else if (parameter?.buyType === 'ITOBuy') {
+          amountPrecision = (await getPrecision(parameter?.id)) || '';
+        }
+        let buyPrice = getBuyPrice(parameter, senderKAppTransferReceipt);
+        let buyAmount = getBuyAmount(parameter, senderKAppTransferReceipt);
 
-      if (buyPrice) {
-        buyPrice = buyPrice / 10 ** currencyIDPrecision;
+        if (buyPrice) {
+          buyPrice = buyPrice / 10 ** currencyIDPrecision;
+        }
+        if (buyAmount) {
+          buyAmount = buyAmount / 10 ** amountPrecision;
+        }
+        cells.push(buyType, currencyID, buyPrice, buyAmount);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(`Error Getting Buy Contract Cells: ${e}`);
       }
-      if (buyAmount) {
-        buyAmount = buyAmount / 10 ** amountPrecision;
-      }
-      cells.push(buyType, currencyID, buyPrice, buyAmount);
       break;
     case Contract.Sell:
-      const marketType = parameter?.marketType || '';
-      currencyID = parameter?.currencyID;
-      assetId = parameter?.assetId || 'KLV';
-      const precision = (await getPrecision(
-        parameter?.currencyID || 'KLV',
-      )) as number;
-      const price = (parameter?.price || 0) / 10 ** precision;
-      amount = 1;
-      cells.push(marketType, currencyID, assetId, price, amount);
+      try {
+        const marketType = parameter?.marketType || '';
+        const currencyID = parameter?.currencyID;
+        const assetId = parameter?.assetId || 'KLV';
+        const precision = (await getPrecision(
+          parameter?.currencyID || 'KLV',
+        )) as number;
+        const price = (parameter?.price || 0) / 10 ** precision;
+        const amount = 1;
+        cells.push(marketType, currencyID, assetId, price, amount);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(`Error Getting Sell Contract Cells: ${e}`);
+      }
       break;
     case Contract.CancelMarketOrder:
-      const orderID = parameter?.orderID || '';
-      cells.push(orderID);
+      try {
+        const orderID = parameter?.orderID || '';
+        cells.push(orderID);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(
+          `Error Getting Cancel Market Order Contract Cells: ${e}`,
+        );
+      }
       break;
     case Contract.CreateMarketplace:
-      name = parameter?.name || '';
-      cells.push(name);
+      try {
+        const name = parameter?.name || '';
+        cells.push(name);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(
+          `Error Getting Create Marketplace Contract Cells: ${e}`,
+        );
+      }
       break;
     case Contract.ConfigMarketplace:
-      cells.push(parsedkAppFee, parsedbandwidthFee);
+      try {
+        cells.push(parsedkAppFee, parsedbandwidthFee);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(
+          `Error Getting Config Marketplace Contract Cells: ${e}`,
+        );
+      }
       break;
     case Contract.UpdateAccountPermission:
-      const permission = parameter?.permissions?.permissionName;
-      cells.push(permission);
+      try {
+        const permission = parameter?.permissions?.permissionName;
+        cells.push(permission);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(
+          `Error Getting Update Account Permission Contract Cells: ${e}`,
+        );
+      }
       break;
     case Contract.Deposit:
-      const depositType = parameter?.depositTypeString || '';
-      const id = parameter?.id || '';
-      cells.push(depositType, id);
+      try {
+        const depositType = parameter?.depositTypeString || '';
+        const id = parameter?.id || '';
+        cells.push(depositType, id);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(`Error Getting Deposit Contract Cells: ${e}`);
+      }
       break;
     case Contract.ITOTrigger:
-      triggerType = parameter?.triggerType || '';
-      const assetID = parameter?.assetId || '';
-      cells.push(triggerType, assetID);
+      try {
+        const triggerType = parameter?.triggerType || '';
+        const assetID = parameter?.assetId || '';
+        cells.push(triggerType, assetID);
+      } catch (e) {
+        console.error(Contract.Vote, e);
+        throw new Error(`Error Getting ITO Trigger Contract Cells: ${e}`);
+      }
+
       break;
     default:
-      cells.push(parsedkAppFee, parsedbandwidthFee);
+      try {
+        cells.push(parsedkAppFee, parsedbandwidthFee);
+      } catch (e) {
+        console.error('Default', e);
+        throw new Error(`Error Getting Default Contract Cells: ${e}`);
+      }
   }
 
   cells.push(isMulticontract, nonce);

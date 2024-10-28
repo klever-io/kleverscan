@@ -1044,7 +1044,7 @@ export const getContractCells = async (
         const assetId = parameter?.assetId || 'KLV';
         cells.push(assetId);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.ConfigITO, e);
         throw new Error(`Error Getting Config ITO Contract Cells: ${e}`);
       }
       break;
@@ -1053,7 +1053,7 @@ export const getContractCells = async (
         const assetId = parameter?.assetId || 'KLV';
         cells.push(assetId);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.SetITOPrices, e);
         throw new Error(`Error Getting Set ITO Prices Contract Cells: ${e}`);
       }
       break;
@@ -1099,7 +1099,7 @@ export const getContractCells = async (
         }
         cells.push(buyType, currencyID, buyPrice, buyAmount);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.Buy, e);
         throw new Error(`Error Getting Buy Contract Cells: ${e}`);
       }
       break;
@@ -1115,7 +1115,7 @@ export const getContractCells = async (
         const amount = 1;
         cells.push(marketType, currencyID, assetId, price, amount);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.Sell, e);
         throw new Error(`Error Getting Sell Contract Cells: ${e}`);
       }
       break;
@@ -1124,7 +1124,7 @@ export const getContractCells = async (
         const orderID = parameter?.orderID || '';
         cells.push(orderID);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.CancelMarketOrder, e);
         throw new Error(
           `Error Getting Cancel Market Order Contract Cells: ${e}`,
         );
@@ -1135,7 +1135,7 @@ export const getContractCells = async (
         const name = parameter?.name || '';
         cells.push(name);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.CreateMarketplace, e);
         throw new Error(
           `Error Getting Create Marketplace Contract Cells: ${e}`,
         );
@@ -1145,7 +1145,7 @@ export const getContractCells = async (
       try {
         cells.push(parsedkAppFee, parsedbandwidthFee);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.ConfigMarketplace, e);
         throw new Error(
           `Error Getting Config Marketplace Contract Cells: ${e}`,
         );
@@ -1156,7 +1156,7 @@ export const getContractCells = async (
         const permission = parameter?.permissions?.permissionName;
         cells.push(permission);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.UpdateAccountPermission, e);
         throw new Error(
           `Error Getting Update Account Permission Contract Cells: ${e}`,
         );
@@ -1168,7 +1168,7 @@ export const getContractCells = async (
         const id = parameter?.id || '';
         cells.push(depositType, id);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.Deposit, e);
         throw new Error(`Error Getting Deposit Contract Cells: ${e}`);
       }
       break;
@@ -1178,7 +1178,7 @@ export const getContractCells = async (
         const assetID = parameter?.assetId || '';
         cells.push(triggerType, assetID);
       } catch (e) {
-        console.error(Contract.Vote, e);
+        console.error(Contract.ITOTrigger, e);
         throw new Error(`Error Getting ITO Trigger Contract Cells: ${e}`);
       }
 

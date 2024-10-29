@@ -180,8 +180,9 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
   renderMetadata,
 }) => {
   const parameter = par as ITransferContract;
-  const assetID = parameter?.assetId || 'KLV';
+  const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
   const precision = usePrecision(assetID);
+
   const filteredReceipts = rec as ITransferReceipt[];
 
   const hasTransferPercentageRoyalties = parameter?.kdaRoyalties;
@@ -270,7 +271,7 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <CenteredRow>
           <strong>
             {parameter.amount
-              ? toLocaleFixed(parameter?.amount / 10 ** precision, precision)
+              ? toLocaleFixed(parameter.amount / 10 ** precision, precision)
               : '--'}
           </strong>
           {renderAssetId(parameter)}
@@ -913,7 +914,7 @@ export const Freeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
 }) => {
   const parameter = par as IFreezeContract;
   const filteredReceipts = rec as IFreezeReceipt[];
-  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
   const precision = usePrecision(assetID);
   const freezeReceipt = findReceipt(filteredReceipts, 3) as
     | IFreezeReceipt
@@ -1464,7 +1465,7 @@ export const AssetTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
 }) => {
   const { t } = useTranslation('common');
   const parameter = par as IAssetTriggerContract;
-  const assetID = parameter?.assetId?.split('/')[0] || 'KLV';
+  const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
   const precision = usePrecision(assetID);
   const filteredReceipts = rec as IBuyReceipt[];
   const noncesReceipts = getNFTNonces(filteredReceipts, parameter, sender);
@@ -1632,8 +1633,8 @@ export const ConfigITO: React.FC<PropsWithChildren<IIndexedContract>> = ({
   renderMetadata,
 }) => {
   const parameter = par as IConfigITOContract;
-  const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
-  const precision = usePrecision(assetId);
+  const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
+  const precision = usePrecision(assetID);
   const [packsPrecision] = usePackInfoPrecisions(
     parameter?.packInfo ? parameter.packInfo : [],
   );
@@ -1697,8 +1698,8 @@ export const SetITOPrices: React.FC<PropsWithChildren<IIndexedContract>> = ({
   renderMetadata,
 }) => {
   const parameter = par as ISetITOPricesContract;
-  const assetId = parameter?.assetId?.split('/')[0] || 'KLV';
-  const precision = usePrecision(assetId);
+  const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
+  const precision = usePrecision(assetID);
   const [packsPrecision] = usePackInfoPrecisions(
     parameter?.packInfo ? parameter.packInfo : [],
   );
@@ -1715,7 +1716,7 @@ export const SetITOPrices: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <strong>Asset Id</strong>
         </span>
-        <span>{assetId}</span>
+        <span>{assetID}</span>
       </Row>
       {parameter.packInfo &&
         renderPackInfoComponents(

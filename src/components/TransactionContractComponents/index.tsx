@@ -270,7 +270,6 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <CenteredRow>
           <strong>
-            aaaa
             {parameter.amount
               ? toLocaleFixed(parameter.amount / 10 ** precision, precision)
               : '--'}

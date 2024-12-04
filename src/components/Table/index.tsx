@@ -60,13 +60,13 @@ export interface ITable {
     | 'launchPad';
 
   header: string[];
-  rowSections?: (item: any) => IRowSection[];
+  rowSections: (item: any) => IRowSection[];
   dataName?: string;
   request: (page: number, limit: number) => Promise<IPaginatedResponse>;
   interval?: number;
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
-  Filters?: React.FC<PropsWithChildren>;
+  Filters?: React.FC;
   smaller?: boolean;
   showPagination?: boolean;
 }
@@ -230,11 +230,18 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         </FloatContainer>
       )}
       <ContainerView ref={tableRef}>
-        <TableBody $smaller={smaller}>
-          {!isMobile && !isTablet && rowSections && (
+        <TableBody smaller={smaller}>
+          {!isMobile && !isTablet && (
             <TableRow>
               {header?.map((item, index) => (
-                <HeaderItem key={JSON.stringify(item)} $smaller={smaller}>
+                <HeaderItem
+                  key={JSON.stringify(item)}
+                  smaller={smaller}
+                  totalColumns={header.length}
+                  currentColumn={index}
+                  dynamicWidth={rowSections(item)?.[index]?.width}
+                  maxWidth={rowSections(item)?.[index]?.maxWidth}
+                >
                   {item}
                 </HeaderItem>
               ))}
@@ -248,34 +255,6 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                 .map((_, index) => (
                   <TableRow key={String(index)}>
                     {header?.map((item, index2) => {
-                      const isLastItem = rowSections
-                        ? rowSections(item)?.length &&
-                          index2 === rowSections(item).length - 1
-                        : false;
-                      let itemWidth = rowSections
-                        ? rowSections(item)?.[index2]?.width ||
-                          (tableRef.current?.offsetWidth &&
-                            (tableRef.current?.offsetWidth - 32) /
-                              header.length)
-                        : 0;
-
-                      if (itemWidth && itemWidth > 236) {
-                        itemWidth = 236;
-                      }
-                      if (isLastItem) {
-                        const previousWidth = rowSections
-                          ? rowSections(item)
-                              .slice(0, index2)
-                              .reduce((acc, curr) => {
-                                return acc + (curr.width || itemWidth || 0);
-                              }, 0)
-                          : 0;
-
-                        itemWidth =
-                          tableRef.current?.offsetWidth &&
-                          tableRef.current?.offsetWidth - 32 - previousWidth;
-                      }
-
                       return (
                         <MobileCardItem
                           isAssets={type === 'assets' || type === 'proposals'}
@@ -283,8 +262,9 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                           key={String(index2) + String(index)}
                           columnSpan={2}
                           isLastRow={index === limit - 1}
-                          dynamicWidth={itemWidth}
-                          $smaller={smaller}
+                          dynamicWidth={rowSections(item)?.[index2]?.width}
+                          maxWidth={rowSections(item)?.[index2]?.maxWidth}
+                          smaller={smaller}
                         >
                           <DoubleRow {...props}>
                             {type !== 'accounts' && <Skeleton width="100%" />}
@@ -311,13 +291,10 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                 >
                   {rowSections &&
                     rowSections(item)?.map(
-                      ({ element: Element, span, width }, index2) => {
+                      ({ element: Element, span, width, maxWidth }, index2) => {
                         const [updatedSpanCount, isRightAligned] =
                           processRowSectionsLayout(spanCount, span);
                         spanCount = updatedSpanCount;
-                        const isLastItem =
-                          rowSections(item)?.length &&
-                          index2 === rowSections(item).length - 1;
 
                         return (
                           <MobileCardItem
@@ -329,7 +306,8 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                             columnSpan={span}
                             isLastRow={isLastRow}
                             dynamicWidth={width}
-                            $smaller={smaller}
+                            maxWidth={maxWidth}
+                            smaller={smaller}
                             totalColumns={header.length}
                             currentColumn={index2}
                             data-testid={`table-row-${index}`}

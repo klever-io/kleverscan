@@ -37,7 +37,7 @@ export const TableGradientBorder = css`
   background-clip: padding-box, border-box;
 `;
 
-export const TableBody = styled.div<{ $smaller?: boolean }>`
+export const TableBody = styled.div<{ smaller?: boolean }>`
   min-width: fit-content;
   width: 100%;
 
@@ -56,7 +56,7 @@ export const TableBody = styled.div<{ $smaller?: boolean }>`
     gap: 40px;
 
     ${props =>
-      props.$smaller &&
+      props.smaller &&
       css`
         padding: 8px;
       `}
@@ -66,15 +66,22 @@ export const TableBody = styled.div<{ $smaller?: boolean }>`
 `;
 
 export const HeaderItem = styled.div<{
-  $smaller?: boolean;
+  smaller?: boolean;
+  totalColumns?: number;
+  currentColumn?: number;
+  dynamicWidth?: number;
+  maxWidth?: number;
 }>`
   display: table-cell;
   padding: 6px 16px;
   padding-bottom: 32px;
-  white-space: nowrap;
+  white-space: ${props => (props.maxWidth ? 'unset' : 'nowrap')};
+  width: ${props =>
+    props.dynamicWidth ? `${props.dynamicWidth}px` : 'fit-content'};
+  max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
 
   ${props =>
-    props.$smaller &&
+    props.smaller &&
     css`
       font-size: 0.75rem;
       padding: 4px 8px;
@@ -116,7 +123,8 @@ export const MobileCardItem = styled.div<{
   isAccountPage?: boolean;
   isLastRow?: boolean;
   dynamicWidth?: number;
-  $smaller?: boolean;
+  maxWidth?: number;
+  smaller?: boolean;
   totalColumns?: number;
   currentColumn?: number;
 }>`
@@ -178,6 +186,8 @@ export const MobileCardItem = styled.div<{
     width: ${props =>
       props.dynamicWidth ? `${props.dynamicWidth}px` : 'fit-content'};
 
+    max-width: ${props => (props.maxWidth ? `${props.maxWidth}px` : 'none')};
+
     padding: 12px 16px;
 
     font-size: 0.875rem;
@@ -206,7 +216,7 @@ export const MobileCardItem = styled.div<{
           `}
 
     ${props =>
-      props.$smaller &&
+      props.smaller &&
       css`
         font-size: 0.75rem;
         padding: 8px 8px;

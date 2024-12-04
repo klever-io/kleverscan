@@ -133,7 +133,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       return getDataArray();
     }
     const regex = new RegExp(`${input}`, 'gi');
-    return getDataArray().filter((item) => String(item).match(regex)?.[0]);
+    return getDataArray().filter(item => String(item).match(regex)?.[0]);
   };
   const filteredArray = filterArrayByInput(inputValue);
 

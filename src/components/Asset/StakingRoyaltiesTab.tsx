@@ -96,8 +96,8 @@ export const StakingRoyaltiesTab: React.FC<
         <span>{asset?.staking?.minEpochsToWithdraw || '--'}</span>
       </Row>
       <Row>
-        <strong> {t('assets:Staking.Qtd_Holders')}</strong>
-        <span>{asset?.stakingHolders || '--'}</span>
+        <strong> {t('assets:Staking.Qty_Holders')}</strong>
+        <span>{asset?.stakingHolders?.toLocaleString() || '--'}</span>
       </Row>
       {renderAssetStakingAprOrFpr()}
       <Row span={2}>

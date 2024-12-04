@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { BitcoinMe, VoxSwap } from '@/assets/swap-exchange';
 import { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
@@ -25,7 +24,7 @@ import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import { ImageLoaderProps } from 'next/legacy/image';
 import Link from 'next/link';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { PropsWithChildren, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
 import { useQueries } from 'react-query';
 import CoinCardSkeleton from '../CoinCardSkeleton';

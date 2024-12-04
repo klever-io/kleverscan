@@ -13,6 +13,7 @@ const defaultEnvs = [
   'NEXT_PUBLIC_ADD_ASSET_INFO_VALUE',
   'DIRECTUS_STATIC_TOKEN',
   'DEFAULT_CDN_HOST',
+  'GA_TRACKING_ID',
 ];
 
 const getEnvs = () => {

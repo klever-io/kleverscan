@@ -49,9 +49,9 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
   const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
   const sections: IRowSection[] = ownerAddress
     ? [
-        { element: (props) => <p key={rank}>{rank}°</p>, span: 1, width: 100 },
+        { element: props => <p key={rank}>{rank}°</p>, span: 1, width: 100 },
         {
-          element: (props) => (
+          element: props => (
             <DoubleRow {...props} key={ownerAddress + status}>
               <span>
                 {
@@ -75,7 +75,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
         },
 
         {
-          element: (props) => (
+          element: props => (
             <DoubleRow {...props} key={status + rating}>
               <span>{capitalizeString(status)}</span>
               <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
@@ -84,7 +84,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
           span: 1,
         },
         {
-          element: (props) => (
+          element: props => (
             <DoubleRow {...props} key={staked}>
               <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
               <span key={commission}>{commission / 10 ** 2}%</span>
@@ -93,7 +93,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
           span: 1,
         },
         {
-          element: (props) => (
+          element: props => (
             <DoubleRow {...props} key={totalProduced}>
               <span>{totalProduced}</span>
               <CenteredRow>
@@ -122,7 +122,7 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
           span: 1,
         },
         {
-          element: (props) => (
+          element: props => (
             <Progress percent={cumulativeStaked} key={cumulativeStaked} />
           ),
           span: 2,
@@ -135,28 +135,24 @@ const validatorsRowSections = (validator: IValidator): IRowSection[] => {
 
 const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const [
-    filterValidators,
-    fetchPartialValidator,
-    loading,
-    setLoading,
-  ] = useFetchPartial<IValidator>('validators', 'validator/list', 'name');
+  const [filterValidators, fetchPartialValidator, loading, setLoading] =
+    useFetchPartial<IValidator>('validators', 'validator/list', 'name');
 
   const filters: IFilter[] = useMemo(() => {
     return [
       {
         title: 'Name',
         data: filterValidators
-          .map((validator) => validator.name)
-          .filter((validator) => !!validator) as string[],
-        onClick: async (value) => {
+          .map(validator => validator.name)
+          .filter(validator => !!validator) as string[],
+        onClick: async value => {
           if (value === 'All') {
             setQueryAndRouter({}, router);
           } else {
             setQueryAndRouter({ name: value }, router);
           }
         },
-        onChange: async (value) => {
+        onChange: async value => {
           setLoading(true);
           await fetchPartialValidator(value);
         },
@@ -165,7 +161,6 @@ const Validators: React.FC<PropsWithChildren> = () => {
       },
     ];
   }, [filterValidators, router]);
-
   const requestValidators = async (page: number, limit: number) => {
     const localQuery = { ...router.query, page, limit };
     const validators = await api.get({

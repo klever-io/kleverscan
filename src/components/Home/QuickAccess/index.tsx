@@ -1,4 +1,5 @@
 import { Currency, PaperPlus, Token, Transfer } from '@/assets/transaction';
+import { getNetwork } from '@/utils/networkFunctions';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import { FaRegSnowflake, FaRocket, FaVoteYea } from 'react-icons/fa';
@@ -27,6 +28,7 @@ const QuickAccess: React.FC<{
   const [contractType, setContractType] = useState('');
   const [openModalTransactions, setOpenModalTransactions] = useState(false);
   const [titleModal, setTitleModal] = useState('');
+  const network = getNetwork();
 
   const quickAccessContract: IShortCutContract[] = [
     {
@@ -46,12 +48,16 @@ const QuickAccess: React.FC<{
       openWiz: () => setWizard('NFT'),
       icon: <Token />,
     },
-    {
-      title: 'Create SFT',
-      type: 'CreateAssetContract',
-      openWiz: () => setWizard('SFT'),
-      icon: <Token />,
-    },
+    ...(network !== 'mainnet'
+      ? [
+          {
+            title: 'Create SFT',
+            type: 'CreateAssetContract',
+            openWiz: () => setWizard('SFT'),
+            icon: <Token />,
+          },
+        ]
+      : []),
     {
       title: 'Create ITO',
       type: 'ConfigITOContract',
@@ -96,10 +102,11 @@ const QuickAccess: React.FC<{
         <Title>What do you want to do?</Title>
       </TitleContainer>
       <Content>
-        {quickAccessContract.map((contract) => (
+        {quickAccessContract.map(contract => (
           <CardItem
             key={JSON.stringify(contract.title)}
-            onClick={(e) => handleClick(contract, e)}
+            onClick={e => handleClick(contract, e)}
+            isMainNet={network !== 'mainnet'}
           >
             <PlusIcon>{contract.icon}</PlusIcon>
             <p>{contract.title}</p>

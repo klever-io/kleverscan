@@ -251,7 +251,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     toAddress = parameter.toAddress;
   }
 
-  const inOrOut = router?.query?.account === sender ? 'In' : 'Out';
+  const inOrOut = router?.query?.account === sender ? 'Out' : 'In';
 
   const customFields = getCustomFields(contract, receipts, precision, data);
 

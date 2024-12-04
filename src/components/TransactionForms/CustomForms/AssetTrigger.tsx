@@ -65,7 +65,7 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const onSubmit = async (data: IAssetTrigger) => {
     const dataDeepCopy = deepCopyObject(data);
-
+    parseURIs(data);
     parseAssetTrigger(dataDeepCopy);
     await handleFormSubmit(dataDeepCopy);
   };

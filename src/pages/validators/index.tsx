@@ -161,7 +161,6 @@ const Validators: React.FC<PropsWithChildren> = () => {
       },
     ];
   }, [filterValidators, router]);
-
   const requestValidators = async (page: number, limit: number) => {
     const localQuery = { ...router.query, page, limit };
     const validators = await api.get({

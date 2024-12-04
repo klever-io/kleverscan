@@ -92,7 +92,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     };
     return await api.get({
       route: `transaction/list`,
-      query: { page, limit, ...newQuery },
+      query: { ...newQuery, page, limit },
     });
   };
 
@@ -107,7 +107,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     if (asset) {
       const response = await api.get({
         route: `assets/holders/${asset.assetId}`,
-        query: { page, limit, ...newQuery },
+        query: { ...newQuery, page, limit },
       });
 
       let parsedHolders: IBalance[] = [];

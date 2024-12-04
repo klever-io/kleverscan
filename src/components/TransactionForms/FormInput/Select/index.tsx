@@ -82,6 +82,14 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       selected && setSelected(selected);
     }
   }, [value, options]);
+  useEffect(() => {
+    if (defaultValue && parseInt(defaultValue)) {
+      setSelected({
+        value: parseInt(defaultValue),
+        label: defaultValue,
+      });
+    }
+  }, [defaultValue]);
 
   useEffect(() => {
     if (defaultValue && parseInt(defaultValue)) {

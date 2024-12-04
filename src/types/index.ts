@@ -1054,6 +1054,7 @@ export interface IRowSection {
   element: React.FC<PropsWithChildren<TableRowElementProps>>;
   span: number;
   width?: number;
+  maxWidth?: number;
 }
 
 export type Place = 'top' | 'right' | 'bottom' | 'left';

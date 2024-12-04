@@ -82,6 +82,7 @@ const Vote: React.FC<PropsWithChildren<IContractProps>> = ({
   useEffect(() => {
     refetch();
   }, [senderAccount]);
+
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>

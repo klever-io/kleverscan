@@ -65,7 +65,7 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const onSubmit = async (data: IAssetTrigger) => {
     const dataDeepCopy = deepCopyObject(data);
-
+    parseURIs(data);
     parseAssetTrigger(dataDeepCopy);
     await handleFormSubmit(dataDeepCopy);
   };
@@ -95,7 +95,7 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
           triggerType,
           collection,
           walletAddress,
-          metadataProps
+          metadataProps,
         )}
     </FormBody>
   );
@@ -125,7 +125,7 @@ const getAssetTriggerForm = (
   triggerType: number,
   collection: ICollectionList,
   walletAddress: string,
-  { metadata, setMetadata }: IMetadataOptions
+  { metadata, setMetadata }: IMetadataOptions,
 ) => {
   switch (triggerType) {
     case 0:

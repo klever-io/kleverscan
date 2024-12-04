@@ -273,10 +273,7 @@ export const parseStringToNumberSupply = (data: any): void => {
     data.initialSupply = initialSupply;
   }
   if (data.maxAmount && data.maxAmount !== '') {
-    const maxAmount = parseInt(
-      data?.maxAmount?.toString()?.replace(/,/g, ''),
-      10,
-    );
+    const maxAmount = parseInt(data?.maxAmount?.replace(/,/g, ''), 10);
     data.maxAmount = maxAmount;
   }
 };

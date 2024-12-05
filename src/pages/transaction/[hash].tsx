@@ -75,7 +75,7 @@ import {
   SignatureSpan,
 } from '@/views/transactions/detail';
 import { ReceiveBackground } from '@/views/validator';
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
@@ -882,16 +882,7 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths: string[] = [];
-
-  return {
-    paths,
-    fallback: 'blocking',
-  };
-};
-
-export const getStaticProps: GetStaticProps<ITransactionPage> = async ({
+export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   params,
 }) => {
   const redirectProps: NotFound = {

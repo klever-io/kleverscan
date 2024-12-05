@@ -16,7 +16,9 @@ import {
 } from '../FormInput/styles';
 import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection, SectionTitle } from '../styles';
-import { RoyaltiesSection, StakingSection, URIsSection } from './CreateAsset';
+import { RoyaltiesSection } from './CreateAsset/RoyaltiesSection';
+import { StakingSection } from './CreateAsset/StakingSection';
+import { URIsSection } from './CreateAsset/URIsSection';
 import {
   parseKDAFeePool,
   parseSplitRoyalties,

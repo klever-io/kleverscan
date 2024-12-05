@@ -104,7 +104,6 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     e.stopPropagation();
     e.preventDefault();
     setSelected(allItem);
-
     if (onClick) {
       onClick(allItem);
     }
@@ -182,7 +181,6 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
             isHiddenInput={isHiddenInput}
           />
         )}
-
         <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
           {closed && selected ? selected : ''}
         </span>

@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import Copy from '@/components/Copy';
@@ -44,10 +43,11 @@ import {
   FrozenContainer,
   Header,
   Row,
+  RowAlert,
   RowContent,
 } from '@/styles/common';
 import { IInnerTableProps, IResponse } from '@/types/index';
-import { setQueryAndRouter } from '@/utils';
+import { IsTokenBurn, setQueryAndRouter } from '@/utils';
 import { contractsList } from '@/utils/contracts';
 import {
   filterOperations,
@@ -81,7 +81,12 @@ import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 
@@ -629,6 +634,11 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
             </CenteredRow>
           </RowContent>
         </Row>
+        {IsTokenBurn(router.query.account as string) && (
+          <RowAlert>
+            <span>{t('accounts:SingleAccount.BlackHole')}</span>
+          </RowAlert>
+        )}
         <Row>
           <span>
             <strong>

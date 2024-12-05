@@ -131,7 +131,7 @@ export const LinksContainer = styled.div`
   flex: 0 0 20%;
 
   &:nth-child(-n + 4) {
-    border-bottom: 1px solid #222345;
+    border-bottom: 1px solid #181818;
   }
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     &:nth-child(-n + 4) {

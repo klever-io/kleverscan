@@ -6,7 +6,7 @@ import Claim from './Claim';
 import ConfigITO from './ConfigITO';
 import ConfigMarketplace from './ConfigMarketplace';
 import ConfigValidator from './ConfigValidator';
-import CreateAsset from './CreateAsset';
+import { CreateAsset } from './CreateAsset';
 import CreateMarketplace from './CreateMarketplace';
 import CreateValidator from './CreateValidator';
 import Delegate from './Delegate';

@@ -91,6 +91,15 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     }
   }, [defaultValue]);
 
+  useEffect(() => {
+    if (defaultValue && parseInt(defaultValue)) {
+      setSelected({
+        value: parseInt(defaultValue),
+        label: defaultValue,
+      });
+    }
+  }, [defaultValue]);
+
   return (
     <Container $error={error} isOpenMenu={isSelectOpen}>
       <BaseSelect

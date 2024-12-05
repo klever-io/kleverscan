@@ -76,6 +76,8 @@ export interface IBaseFormInputProps
   disableCustom?: boolean;
   selectFilter?: (e: any) => any;
   loading?: boolean;
+  warning?: boolean;
+  propsValidate?: () => any;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -131,7 +133,9 @@ export const onChangeWrapper = (
 
     const nonEmptyValues = cleanEmptyValues(getValues());
 
-    if (name) eval(`nonEmptyValues.${name} = e.target.value`);
+    if (name) {
+      nonEmptyValues[name] = e.target.value;
+    }
 
     let newQuery: NextParsedUrlQuery = router.query?.contract
       ? { contract: router.query?.contract }
@@ -180,6 +184,8 @@ const FormInput: React.FC<
   disableCustom = false,
   selectFilter,
   loading = false,
+  warning,
+  propsValidate,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -206,13 +212,7 @@ const FormInput: React.FC<
     }
   }, [type]);
 
-  let error = null;
-
-  try {
-    error = eval(`errors?.${name}`);
-  } catch (e) {
-    error = null;
-  }
+  let error = name && errors[name];
 
   useEffect(() => {
     name && dynamicInitialValue && setValue(name, dynamicInitialValue);
@@ -236,6 +236,12 @@ const FormInput: React.FC<
             type,
             customOnChange,
           ),
+          validate: (value: any) => {
+            if (propsValidate) {
+              return propsValidate?.();
+            }
+            return true;
+          },
         })
       : register(name, {
           valueAsNumber: true,
@@ -263,7 +269,6 @@ const FormInput: React.FC<
             if (max && value > max) {
               return `Maximum value is ${max || 100}`;
             }
-
             if (precision !== undefined && value) {
               let parsedValue = value;
 
@@ -284,6 +289,9 @@ const FormInput: React.FC<
               }
             }
 
+            if (propsValidate) {
+              return propsValidate?.();
+            }
             return true;
           },
         }));
@@ -308,6 +316,7 @@ const FormInput: React.FC<
   };
 
   let inputProps = {
+    warning,
     type,
     defaultValue,
     ...areaProps,

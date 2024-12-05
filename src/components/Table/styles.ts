@@ -13,7 +13,7 @@ export interface TableRowProps {
 }
 
 export const ContainerView = styled.div`
-  overflow-x: auto;
+  overflow-x: visible;
   width: 100%;
 `;
 
@@ -287,6 +287,10 @@ export const Status = styled.span<IStatus>`
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: fit-content;
   }
+`;
+
+export const InOutSpan = styled(Status)`
+  min-width: 50px !important;
 `;
 
 export const EmptyRow = styled.div`

@@ -1,4 +1,3 @@
-import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { useFees } from '@/contexts/contract/fees';
 import { IQueue, useMulticontract } from '@/contexts/contract/multicontract';
@@ -8,7 +7,7 @@ import { useForceUpdate } from '@/utils/hooks';
 import * as clipboard from 'clipboard-polyfill';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { FormProvider, useForm } from 'react-hook-form';
 import { AiOutlineClear } from 'react-icons/ai';

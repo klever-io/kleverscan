@@ -4,7 +4,7 @@ const darktheme = {
   ...theme,
   dark: true,
   background: '#06060B',
-  white: '#181935',
+  white: '#151515',
   black: '#FFFF',
   gray700: '#B7BDC6',
   darkText: '#C6C7EB',
@@ -61,16 +61,16 @@ const darktheme = {
   },
 
   modalBackground: {
-    background: '#222345',
+    background: '#181818',
     title: 'linear-gradient(104deg, rgb(238, 63, 113), rgb(125, 63, 241))',
   },
 
   qrcodeTooltip: {
-    background: '#222345',
+    background: '#181818',
   },
 
   circleBackground: {
-    light: '#222345',
+    light: '#181818',
   },
   footer: {
     ...theme.footer,
@@ -78,7 +78,7 @@ const darktheme = {
   },
 
   accountCard: {
-    frozenBackground: '#222345',
+    frozenBackground: '#181818',
     cardStaking: '#4b4d80',
   },
 
@@ -91,12 +91,16 @@ const darktheme = {
     steps: '#fff',
     stepsBackground: 'rgba(24, 25, 53, 0.5)',
     stepsLine: '#646693',
-    cardAddress: '#222345',
+    cardAddress: '#181818',
   },
 
   warning: {
     background: '#95865188',
     text: '#eb9c27',
+    message: '#FFE380',
+  },
+  dropdown: {
+    background: '#181818',
   },
 };
 export default darktheme;

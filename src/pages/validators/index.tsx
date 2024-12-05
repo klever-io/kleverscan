@@ -192,6 +192,10 @@ const Validators: React.FC<PropsWithChildren> = () => {
     filters,
   };
 
+  // useEffect(() => {
+  //   fetchPartialValidator('');
+  // }, [fetchPartialValidator]);
+
   return <Detail {...detailProps} />;
 };
 

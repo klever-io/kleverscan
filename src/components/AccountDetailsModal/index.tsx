@@ -111,8 +111,12 @@ export const AccountDetailsModal: React.FC<
       route: `transaction/send-user-funds/${walletAddress}`,
     });
 
-    if (response.code === 'internal_error') {
-      toast.error('You already ordered KLV in less than 24 hours!');
+    if (response?.error) {
+      const error =
+        response?.error.replace('transaction generation failed:', '') ||
+        'You already ordered KLV in less than 24 hours!';
+
+      toast.error(error);
       setLoadingBalance(false);
     } else {
       toast.success('Test KLV request successful!');

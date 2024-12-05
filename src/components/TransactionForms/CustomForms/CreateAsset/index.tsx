@@ -1,4 +1,5 @@
 import { parseRoles } from '@/components/Wizard/utils';
+import { getNetwork } from '@/utils/networkFunctions';
 import { ICreateAsset } from '@klever/sdk-web';
 import React, { PropsWithChildren } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -26,21 +27,6 @@ export interface ISectionProps {
   precision?: number;
 }
 
-export const assetTypes = [
-  {
-    label: 'Fungible',
-    value: 0,
-  },
-  {
-    label: 'Non Fungible',
-    value: 1,
-  },
-  {
-    label: 'Semi Fungible',
-    value: 2,
-  },
-];
-
 export const parseCreateAsset = (data: ICreateAsset) => {
   const dataCopy = JSON.parse(JSON.stringify(data));
   parseTickerName(dataCopy);
@@ -60,6 +46,27 @@ export const CreateAsset: React.FC<PropsWithChildren<IContractProps>> = ({
   const { handleSubmit, watch } = useFormContext<ICreateAsset>();
 
   const type = watch('type');
+
+  const network = getNetwork();
+
+  const assetTypes = [
+    {
+      label: 'Fungible',
+      value: 0,
+    },
+    {
+      label: 'Non Fungible',
+      value: 1,
+    },
+    ...(network !== 'Mainnet'
+      ? [
+          {
+            label: 'Semi Fungible',
+            value: 2,
+          },
+        ]
+      : []),
+  ];
 
   const isFungible = type === 0;
   const isNFT = type === 1;

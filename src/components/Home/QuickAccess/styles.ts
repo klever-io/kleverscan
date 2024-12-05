@@ -39,7 +39,9 @@ export const TitleContainer = styled.div`
   }
 `;
 
-export const CardItem = styled.div`
+export const CardItem = styled.div<{
+  isMainNet: boolean;
+}>`
   ${DefaultCardStyles}
   display: flex;
   flex-direction: column;
@@ -93,10 +95,10 @@ export const CardItem = styled.div`
     grid-column: span 2;
 
     &:nth-last-child(2) {
-      grid-column: 0;
+      grid-column: ${props => (props.isMainNet ? 0 : '1/4')};
     }
     &:nth-last-child(1) {
-      grid-column: 5/7;
+      grid-column: ${props => (props.isMainNet ? '5/7' : '4/7')};
     }
   }
 `;

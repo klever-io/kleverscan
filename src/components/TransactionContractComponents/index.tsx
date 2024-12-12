@@ -181,8 +181,8 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
 }) => {
   const parameter = par as ITransferContract;
   const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
-
   const precision = usePrecision(assetID);
+
   const filteredReceipts = rec as ITransferReceipt[];
 
   const hasTransferPercentageRoyalties = parameter?.kdaRoyalties;
@@ -270,8 +270,8 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <CenteredRow>
           <strong>
-            {parameter?.amount
-              ? toLocaleFixed(parameter?.amount / 10 ** precision, precision)
+            {parameter.amount
+              ? toLocaleFixed(parameter.amount / 10 ** precision, precision)
               : '--'}
           </strong>
           {renderAssetId(parameter)}

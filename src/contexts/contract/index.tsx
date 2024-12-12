@@ -242,6 +242,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         assetId: 'KLV',
         label: 'KLV',
         value: 'KLV',
+        assetType: 'Fungible',
         precision: KLV_PRECISION,
         isNFT: false,
         isFungible: true,
@@ -490,9 +491,15 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
           transaction_type: selectedContractType,
         });
       }
-    } catch (e: any) {
+    } catch (e) {
       console.warn(`%c ${e}`, 'color: red');
-      toast.error(e.message ? e.message : e);
+
+      const errorMessage =
+        typeof e === 'object' && e !== null && 'message' in e
+          ? (e as { message: string }).message
+          : String(e);
+
+      toast.error(errorMessage);
     } finally {
       resetFormsData();
     }

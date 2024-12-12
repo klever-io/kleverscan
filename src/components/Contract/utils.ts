@@ -361,6 +361,7 @@ const filterByProperties = (
 const showAssetIdInput = (
   contractType: string,
   typeAssetTrigger: number | null,
+  assetType: string | number,
 ): boolean => {
   if (
     contractType === 'AssetTriggerContract' &&
@@ -368,6 +369,9 @@ const showAssetIdInput = (
     !isNaN(typeAssetTrigger)
   ) {
     const singleNFTContracts = [1, 2, 8];
+    if (assetType === 'SemiFungible') {
+      singleNFTContracts.push(0);
+    }
     return singleNFTContracts.includes(typeAssetTrigger);
   }
 

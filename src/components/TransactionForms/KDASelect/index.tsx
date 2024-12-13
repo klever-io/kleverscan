@@ -210,7 +210,11 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
     selectedCollection &&
     !selectedCollection?.isFungible &&
     !collectionContracts.includes(contractType) &&
-    showAssetIdInput(contractType, assetTriggerType);
+    showAssetIdInput(
+      contractType,
+      assetTriggerType,
+      selectedCollection?.assetType,
+    );
 
   useEffect(() => {
     if (router.isReady && router.query.contractDetails) {
@@ -334,16 +338,18 @@ const CollectionIDField: React.FC<
     },
   });
 
-  const collectionOptions: IDropdownItem[] = useMemo(() => {
-    return collectionIdData.map(asset => {
-      const parseCollectionId = asset.assetId.split('/')[1];
-      return { label: parseCollectionId, value: parseCollectionId };
-    });
-  }, [collectionIdData]);
-
   const selectedCollection = collectionIdData?.filter(
     e => String(e.nftNonce) === watchCollectionAssetId,
   )[0];
+
+  const collectionOptions: IDropdownItem[] = useMemo(() => {
+    const allCollectionIdData = collectionIdData.map(asset => {
+      const parseCollectionId = asset.assetId.split('/')[1];
+      return { label: parseCollectionId, value: parseCollectionId };
+    });
+    allCollectionIdData.unshift({ label: 'New Collection', value: '' });
+    return allCollectionIdData;
+  }, [collectionIdData, selectedCollection?.assetType]);
 
   const selectedCollectionId = collectionOptions?.filter(
     e => e.value === watchCollectionAssetId,

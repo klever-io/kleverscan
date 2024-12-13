@@ -50,6 +50,7 @@ export interface ICollectionList {
   label: string;
   value: string;
   assetId: string;
+  assetType: number | string;
   isNFT: boolean;
   isFungible: boolean;
   frozenBalance?: number;
@@ -861,7 +862,7 @@ export interface ICollection {
   collection: string;
   nftNonce: number;
   assetName: string;
-  assetType: number;
+  assetType: number | string;
   balance: number;
   precision: number;
   frozenBalance: number;

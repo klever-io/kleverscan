@@ -103,6 +103,8 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
 
 const getMintForm = (collection: ICollectionList, walletAddress: string) => {
   const hasInternalId = collection.value?.split('/').length > 1;
+  const { watch } = useFormContext();
+  const watchCollectionAssetId = watch('collectionAssetId');
 
   return (
     <FormSection>
@@ -114,7 +116,10 @@ const getMintForm = (collection: ICollectionList, walletAddress: string) => {
         tooltip={tooltip.receiver}
       />
       <FormInput name="amount" title="Amount" type="number" required />
-      {!collection.isNFT && !collection.isFungible && !hasInternalId ? (
+      {!collection.isNFT &&
+      !collection.isFungible &&
+      !hasInternalId &&
+      !watchCollectionAssetId ? (
         <FormInput name="value" title="Max Amount for new ID" type="number" />
       ) : null}
     </FormSection>

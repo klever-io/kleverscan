@@ -286,7 +286,6 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
     setDate(selectedDays.start);
     inputRef.current?.blur();
     setCalendarOpen(false);
-    // setButtonActive(false);
   }, [selectedDays, startTime, endTime, filterDate]);
 
   const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -325,7 +324,7 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
         </OutsideContainer>
 
         {calendarOpen && (
-          <CalendarContainer onMouseDown={e => e.preventDefault()}>
+          <CalendarContainer>
             <CalendarHeader>
               <strong>
                 <h3>Date Filter</h3>
@@ -392,6 +391,7 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
                 <TimeSelector>
                   <label>Start Time:</label>
                   <TimeInput
+                    style={{ WebkitAppearance: 'none' }}
                     type="time"
                     id="start-time"
                     value={startTime}

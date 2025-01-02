@@ -149,7 +149,8 @@ export const TimeInput = styled.input`
   border: 1px solid ${props => props.theme.gray700};
   ${props => props.theme.dark && `color-scheme: dark;`}
   border-radius: 0.25rem;
-  width: 7rem;
+  min-width: 4rem;
+  max-width: 5.2rem;
 `;
 
 export const CalendarContainer = styled.div`

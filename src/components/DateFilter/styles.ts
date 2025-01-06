@@ -146,10 +146,14 @@ export const TimeInput = styled.input`
   color: ${props => props.theme.black};
   justify-items: center;
   padding: 0 0.1rem;
-  border: 1px solid ${props => props.theme.gray700};
+  border-bottom: 1px solid ${props => props.theme.gray700};
   ${props => props.theme.dark && `color-scheme: dark;`}
-  border-radius: 0.25rem;
+  /* border-radius: 0.25rem; */
   width: fit-content;
+  min-width: 4rem;
+  &::-webkit-calendar-picker-indicator {
+    display: none;
+  }
 `;
 
 export const CalendarContainer = styled.div`

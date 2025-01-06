@@ -148,7 +148,6 @@ export const TimeInput = styled.input`
   padding: 0 0.1rem;
   border-bottom: 1px solid ${props => props.theme.gray700};
   ${props => props.theme.dark && `color-scheme: dark;`}
-  /* border-radius: 0.25rem; */
   width: fit-content;
   min-width: 4rem;
   &::-webkit-calendar-picker-indicator {

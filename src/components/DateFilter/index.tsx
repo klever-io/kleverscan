@@ -391,7 +391,6 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
                 <TimeSelector>
                   <label>Start Time:</label>
                   <TimeInput
-                    style={{ WebkitAppearance: 'none' }}
                     type="time"
                     id="start-time"
                     value={startTime}

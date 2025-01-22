@@ -56,7 +56,7 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const { metadata, setMetadata, queue } = useMulticontract();
 
-  const collection = queue[formKey].collection;
+  const collection = queue[formKey]?.collection;
 
   const metadataProps = {
     metadata,

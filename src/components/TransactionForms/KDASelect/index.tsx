@@ -153,7 +153,7 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
   }, [assetsFetching, kAssetsFetching]);
 
   const setCollectionValue = async (value?: ICollectionList) => {
-    if (!isMultiContract && router.pathname !== '/') {
+    if (isMultiContract && router.pathname !== '/') {
       value?.value &&
         (await setQuery('collection', value?.value || '', router));
 

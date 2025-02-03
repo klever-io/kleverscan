@@ -185,3 +185,7 @@ export const IsTokenBurn = (token: string) => {
     'klv1000000000000000000000000000000000000000000000000000ql8r3r7';
   return token === tokenBurn;
 };
+
+export const toUpperCaseValue = (value: string): string => {
+  return value.toUpperCase();
+};

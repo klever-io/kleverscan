@@ -153,7 +153,7 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
   }, [assetsFetching, kAssetsFetching]);
 
   const setCollectionValue = async (value?: ICollectionList) => {
-    if (isMultiContract && router.pathname !== '/') {
+    if (!isMultiContract && router.pathname !== '/') {
       value?.value &&
         (await setQuery('collection', value?.value || '', router));
 
@@ -268,14 +268,16 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
           onChange={onChangeHandler}
           loading={loading}
           selectedValue={
-            selectedCollection?.value
-              ? selectedCollection
-              : queue[0].collection
-                ? {
-                    label: queue[0].collection?.label || '',
-                    value: queue[0].collection?.value || '',
-                  }
-                : undefined
+            isMultiContract
+              ? undefined
+              : selectedCollection?.value
+                ? selectedCollection
+                : queue[0].collection
+                  ? {
+                      label: queue[0].collection?.label || '',
+                      value: queue[0].collection?.value || '',
+                    }
+                  : undefined
           }
           zIndex={3}
           error={Boolean(collectionError)}

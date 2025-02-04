@@ -72,7 +72,7 @@ export const StakingRoyaltiesTab: React.FC<
         </span>
       </Row>
 
-      {asset?.staking?.fpr.length > 0 && (
+      {asset?.staking.interestType === 'FPRI' && (
         <Row>
           <strong>{t('assets:Staking.Current FPR Amount')}</strong>
 

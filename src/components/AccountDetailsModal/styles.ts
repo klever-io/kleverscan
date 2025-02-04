@@ -20,7 +20,7 @@ export const UserInfoContainer = styled.div<{
 }>`
   position: fixed;
   top: 4.4rem;
-  right: 5.6rem;
+  right: 0rem;
   z-index: 7;
 
   visibility: ${props => (props.openUserInfos ? 'visible' : 'hidden')};
@@ -28,18 +28,18 @@ export const UserInfoContainer = styled.div<{
 
   transition: opacity 0.1s linear;
 
-  background-color: ${props => props.theme.card.background};
+  /* background-color: ${props => props.theme.card.background}; */
+
+  background-color: #12121b;
 
   display: flex;
   flex-direction: column;
 
-  width: ${props => (props.isMobile ? '95vw' : '20rem')};
+  width: ${props => (props.isMobile ? '95vw' : '25rem')};
   max-width: 25rem;
-  border: 1px solid ${props => props.theme.card.border};
-  border-radius: 0.375rem;
+  /* border: 1px solid ${props => props.theme.card.border}; */
+  border-radius: 1rem 0 0 1rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-
-  padding: 10px;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     right: unset;
@@ -58,8 +58,9 @@ export const HeaderInfo = styled.div`
   justify-content: space-between;
   align-items: center;
 
-  padding-inline-start: 0.75rem;
-  padding-inline-end: 0.75rem;
+  /* padding-inline-start: 0.75rem;
+  padding-inline-end: 0.75rem; */
+  padding-bottom: 1rem;
 
   color: ${props => props.theme.true.white};
   font-size: 1.2rem;
@@ -70,19 +71,22 @@ export const HeaderInfo = styled.div`
     gap: 0.5rem;
     align-items: center;
   }
+
+  p {
+    font-size: 1rem;
+  }
 `;
 
-export const QRCodeContainer = styled.div`
+export const MyWalletContainer = styled.div`
   position: relative;
   gap: 0.5rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
 
-  border-bottom: 1px solid ${props => props.theme.line.border};
+  border: 1px solid #181935;
+  border-radius: 8px;
 
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
+  padding: 0.5rem;
 
   color: ${props => props.theme.true.white};
 
@@ -97,14 +101,52 @@ export const QRCodeContainer = styled.div`
   }
 `;
 
+export const MyProjectsContent = styled.div`
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 1rem;
+
+  border: 1px solid #181935;
+  background-color: #13131d;
+  border-radius: 8px;
+
+  padding: 0.5rem;
+
+  color: ${props => props.theme.true.white};
+
+  small {
+    font-weight: 400;
+  }
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    small {
+      padding-top: 0.5rem;
+    }
+  }
+`;
+
+export const MyProjectsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    small {
+      padding-top: 0.5rem;
+    }
+  }
+`;
+
 export const QRCodeContent = styled.div`
   display: flex;
   justify-content: center;
   border-radius: 1rem;
-  padding: 1rem;
 
   div {
-    --size: 114px;
+    --size: 80px;
 
     background-color: #fff;
     width: var(--size);
@@ -118,6 +160,81 @@ export const QRCodeContent = styled.div`
       margin: auto;
     }
   }
+`;
+
+export const MyWalletContent = styled.div`
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  background-color: #181821;
+  border-radius: 0.5rem;
+  padding: 1rem;
+`;
+
+export const AssetItem = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  cursor: pointer;
+`;
+
+export const AssetContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const AssetName = styled.div`
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  font-size: 0.875rem;
+  p:nth-child(2) {
+    color: ${props => props.theme.gray700};
+    font-size: 0.625rem;
+    font-weight: 700;
+  }
+`;
+
+export const AssetPrice = styled.div`
+  display: flex;
+  align-items: end;
+  flex-direction: column;
+  font-size: 0.875rem;
+  p:nth-child(2) {
+    color: ${props => props.theme.gray700};
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+`;
+
+export const MyWalletInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+
+  div:first-child {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+`;
+
+export const PrimaryAssetContent = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 1.5rem;
+  gap: 0.5rem;
 `;
 
 export const ReloadContainer = styled.div`
@@ -256,7 +373,6 @@ export const IoReloadSharpWrapper = styled.div<{
 export const BodyContent = styled.div`
   position: relative;
 
-  padding-top: 1rem;
   width: 100%;
   color: ${props => props.theme.lightGray};
 
@@ -264,9 +380,98 @@ export const BodyContent = styled.div`
   flex-direction: column;
   gap: 4px;
 
+  > div:nth-child(1) {
+    border: none;
+  }
+
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     gap: 0.5rem;
   }
+`;
+
+export const SeeTokens = styled.div`
+  color: ${props => props.theme.true.white};
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.5rem 0;
+`;
+
+export const OwnedItem = styled.div<{
+  secondary?: boolean;
+  active?: boolean;
+  disabled?: boolean;
+}>`
+  position: static;
+
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  height: 2.5rem;
+
+  font-size: 1rem;
+  font-weight: 500;
+  color: ${props => props.theme.true.white};
+
+  cursor: pointer;
+  user-select: none;
+
+  ${props =>
+    props.disabled &&
+    css`
+      cursor: not-allowed;
+      opacity: 0.75;
+      filter: grayscale(0.25);
+    `}
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: 1.1rem;
+    gap: 1rem;
+  }
+
+  svg {
+    margin-left: auto;
+
+    transition: transform 0.2s ease-in-out;
+    ${props =>
+      props.active &&
+      css`
+        transform: rotate(180deg);
+      `}
+  }
+`;
+
+export const Pill = styled.div<{
+  full?: boolean;
+}>`
+  padding: 0.5rem 1rem;
+
+  display: flex;
+
+  width: fit-content;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #222345;
+
+  color: ${props => props.theme.true.white};
+  font-weight: 400;
+  font-size: 0.85rem;
+
+  border-radius: 1rem;
+
+  ${props =>
+    props.full &&
+    css`
+      width: 100%;
+    `}
 `;
 
 export const ActionItem = styled.div<{
@@ -282,39 +487,12 @@ export const ActionItem = styled.div<{
 
   height: 2.5rem;
 
-  font-size: 14px;
-  font-weight: 400;
-
-  padding: 0.75rem;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: ${props => props.theme.true.white};
 
   cursor: pointer;
   user-select: none;
-
-  ${props =>
-    props.active &&
-    css`
-      color: ${props.theme.true.white};
-      background-color: ${props.theme.footer.border};
-      border-bottom: 1px solid ${props => props.theme.card.border};
-
-      border-radius: 6px 6px 0 0;
-      font-weight: 500;
-    `}
-
-  ${props =>
-    props.secondary &&
-    css`
-      margin-left: 24px;
-      margin-right: 4px;
-
-      background-color: ${props.theme.blue};
-
-      &:last-child {
-        margin-bottom: 4px;
-      }
-    `}
 
   ${props =>
     props.disabled &&
@@ -324,22 +502,6 @@ export const ActionItem = styled.div<{
       filter: grayscale(0.25);
     `}
 
-    ${props =>
-    !props.disabled &&
-    !props.active &&
-    css`
-      &:hover {
-        border: 1px solid ${props => props.theme.card.border};
-
-        background-color: ${props => props.theme.footer.border};
-        color: ${props => props.theme.true.white};
-
-        path:nth-child() {
-          fill: ${props => props.theme.true.white};
-        }
-      }
-    `}
-  
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     font-size: 1.1rem;
     gap: 1rem;
@@ -367,9 +529,12 @@ export const SubSection = styled.div<{ active?: boolean }>`
       flex-direction: column;
       gap: 4px;
 
-      border: 1px solid ${props => props.theme.card.border};
-      border-radius: 6px;
+      /* border: 1px solid ${props => props.theme.card.border}; */
+      /* border-radius: 6px; */
 
-      backdrop-filter: brightness(0.9);
+      /* backdrop-filter: brightness(0.9); */
     `}
+
+  padding: 1rem;
+  border-top: 1px solid #222345;
 `;

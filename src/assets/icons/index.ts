@@ -27,6 +27,7 @@ import LaunchPadPlus from './launchpad-plus.svg';
 import LineArrowUpSquare from './line-arrow-up-square.svg';
 import PageDownload from './page-download.svg';
 import Plug from './plug.svg';
+import Wallet from './wallet.svg';
 import PlusSquare from './plus-square.svg';
 import PlusWhite from './plus-white.svg';
 import Plus from './plus.svg';
@@ -52,6 +53,8 @@ import WizardPlusSquare from './wizard-plus-square.svg';
 import WizardRightArrow from './wizard-right-arrow.svg';
 import WizardTxSuccess from './wizard-tx-success.svg';
 import ArrowDownHide from './arrow-down-hide.svg';
+import LogOut from './log-out.svg';
+import CategoryTransparent from './category-transparent.svg';
 
 export {
   Arrow,
@@ -108,4 +111,7 @@ export {
   Plug,
   Check,
   ArrowDownHide,
+  Wallet,
+  LogOut,
+  CategoryTransparent,
 };

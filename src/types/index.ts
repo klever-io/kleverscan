@@ -320,6 +320,7 @@ export interface IBalance {
 export interface IAccountAsset {
   address: string;
   assetId: string;
+  assetName: string;
   assetType: number;
   balance: number;
   precision: number;

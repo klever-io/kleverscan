@@ -18,6 +18,7 @@ import { formatAmount } from '@/utils/formatFunctions';
 import { UINT32_MAX } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { NextRouter } from 'next/router';
+import { getAssetsByPartialSymbol } from '../asset';
 
 interface IQueryParams {
   page?: number;
@@ -308,6 +309,35 @@ export const pricesCall = async (): Promise<number | undefined> => {
   }
 };
 
+export const assetsPricesCall = async (
+  assetIds: string[],
+): Promise<{ [key: string]: number } | undefined> => {
+  try {
+    const formattedNames = assetIds.map(id => `${id}/USD`);
+
+    const res = await api.post({
+      route: 'prices/prices',
+      service: Service.PROXY,
+      body: { names: formattedNames },
+      useApiProxy: true,
+    });
+
+    if (!res.error || res.error === '') {
+      const prices = res?.data?.prices?.symbols;
+
+      const pricesMap: { [key: string]: number } = {};
+      assetIds.forEach((id, index) => {
+        pricesMap[id] = prices[index]?.price;
+      });
+
+      return pricesMap;
+    }
+    return Promise.reject(new Error(res?.error));
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export const KLVAllowancePromise = async (
   address: string,
 ): Promise<IAllowanceResponse | undefined> => {
@@ -474,7 +504,7 @@ export const getAccountBalanceRequest = async (
     if (res.error === 'cannot find account in database') {
       // Handle error or return default value
       return {
-        otherAssets: [{ assetId: 'KLV', balance: '0' }],
+        otherAssets: [{ assetId: 'KLV', assetName: 'Klever', balance: '0' }],
         balance: { klv: '0' },
       };
     }
@@ -483,16 +513,26 @@ export const getAccountBalanceRequest = async (
 
   const klvAvailableBalance = res?.data?.account?.balance;
   const accountAssets = res?.data?.account.assets;
+  const assetIds = Object.keys(accountAssets);
+  const assetDetails = await getAssetsByPartialSymbol(assetIds);
   const otherAssets: IAssetBalance[] = accountAssets
-    ? Object.values(accountAssets).map(asset => ({
-        assetId: asset.assetId,
-        balance: formatAmount(asset.balance / 10 ** asset.precision),
-      }))
+    ? Object.values(accountAssets).map(asset => {
+        const assetDetail = assetDetails.find(
+          detail => detail.assetId === asset.assetId,
+        );
+
+        return {
+          assetId: asset.assetId,
+          assetName: asset.assetName,
+          balance: (asset.balance / 10 ** asset.precision).toLocaleString(),
+          logo: assetDetail?.logo || '',
+        };
+      })
     : [];
 
   const balance =
     typeof klvAvailableBalance === 'number'
-      ? { klv: formatAmount(klvAvailableBalance / 10 ** 6) }
+      ? { klv: (klvAvailableBalance / 10 ** 6).toLocaleString() }
       : { klv: '0' };
 
   return { otherAssets, balance };

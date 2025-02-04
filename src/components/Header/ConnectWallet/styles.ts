@@ -317,10 +317,14 @@ export const BackgroundHelper = styled.div<{ opened: boolean }>`
 
 export const ConnectedWallet = styled.div`
   display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+  align-items: center;
+  flex-direction: row;
   position: relative;
-  &::after {
+  background-color: #161616;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  gap: 0.5rem;
+  /* &::after {
     width: 0.5rem;
     height: 0.5rem;
     border-radius: 50%;
@@ -328,12 +332,18 @@ export const ConnectedWallet = styled.div`
     content: '';
     position: absolute;
     right: -15px;
-  }
+  } */
 `;
 
 export const GraySpan = styled.span`
-  color: ${props =>
-    props.theme.dark ? props.theme.true.white : props.theme.navbar.text};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.3rem;
+  &:hover {
+    filter: brightness(1.3);
+    background-color: ${props => props.theme.card.background};
+  }
 `;
 
 export const BlackSpan = styled.span`

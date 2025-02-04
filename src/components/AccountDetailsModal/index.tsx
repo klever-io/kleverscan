@@ -1,5 +1,5 @@
 import { KLV } from '@/assets/coins';
-import { Check, Plug } from '@/assets/icons';
+import { Wallet, ArrowRight, CategoryTransparent } from '@/assets/icons';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
@@ -21,34 +21,39 @@ import {
   useRef,
   useState,
 } from 'react';
-import { AiOutlineClose } from 'react-icons/ai';
-import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
-import { IoMdAddCircle } from 'react-icons/io';
-import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
+
 import { MdContentCopy } from 'react-icons/md';
-import { RiArrowDownSLine, RiArrowRightSLine } from 'react-icons/ri';
+import { RiArrowDownSLine } from 'react-icons/ri';
 import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import {
   ActionItem,
-  BalanceContainer,
+  AssetContent,
+  AssetItem,
+  AssetName,
+  AssetPrice,
   BodyContent,
-  ContainerAsset,
-  DropdownIcon,
-  HeaderInfo,
-  IoReloadSharpWrapper,
-  OtherAssetsContainer,
-  QRCodeContainer,
+  MyProjectsContainer,
+  MyProjectsContent,
+  MyWalletContainer,
+  MyWalletContent,
+  MyWalletInfo,
+  OwnedItem,
+  Pill,
+  PrimaryAssetContent,
   QRCodeContent,
-  ReloadContainer,
-  SpanDropdown,
+  SeeTokens,
   SubSection,
   UserInfoContainer,
 } from './styles';
+import { getAssetsByOwner } from '@/services/requests/asset';
+
+import AssetLogo from '../Logo/AssetLogo';
 
 export interface IAssetBalance {
   assetId: string;
+  assetName: string;
   balance: string;
 }
 
@@ -76,6 +81,8 @@ export const AccountDetailsModal: React.FC<
   const [expandAssets, setExpandAssets] = useState<boolean>(false);
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
   const [openNetworks, setOpenNetworks] = useState<boolean>(false);
+  const [openWallet, setOpenWallet] = useState<boolean>(true);
+  const [openCategory, setOpenCategory] = useState<boolean>(false);
 
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
   const { walletAddress, connectExtension, logoutExtension } = useExtension();
@@ -92,18 +99,73 @@ export const AccountDetailsModal: React.FC<
     },
   });
 
+  const reorderAssets = (
+    assets: IAssetBalance[],
+  ): { firstFour: IAssetBalance[]; remaining: IAssetBalance[] } => {
+    const klvIndex = assets.findIndex(asset => asset.assetId === 'KLV');
+    const kfiIndex = assets.findIndex(asset => asset.assetId === 'KFI');
+
+    const result = [...assets];
+
+    if (klvIndex !== -1) {
+      const [klv] = result.splice(klvIndex, 1);
+      result.unshift(klv);
+    }
+
+    if (kfiIndex !== -1 && kfiIndex !== 0) {
+      const [kfi] = result.splice(kfiIndex, 1);
+      result.splice(1, 0, kfi);
+    }
+
+    const firstFour = result.slice(0, 4);
+    const remaining = result.slice(4);
+
+    return { firstFour, remaining };
+  };
+
   const { balance, otherAssets } = useMemo(() => {
     if (data) {
       const { balance, otherAssets } = data;
-      return { balance, otherAssets };
+      const { firstFour, remaining } = reorderAssets(otherAssets);
+
+      return {
+        balance,
+        otherAssets: {
+          firstFour,
+          remaining,
+        },
+      };
     }
     return {
       balance: {
         klv: '',
       },
-      otherAssets: [],
+      otherAssets: {
+        firstFour: [],
+        remaining: [],
+      },
     };
   }, [data]);
+
+  const assetIds = otherAssets.firstFour.map(asset => asset.assetId);
+
+  const { data: ownedAssets } = useQuery({
+    queryKey: ['ownedAssets', walletAddress],
+    queryFn: () => getAssetsByOwner(walletAddress),
+    enabled: !!walletAddress,
+  });
+
+  const [openAccordions, setOpenAccordions] = useState(
+    ownedAssets?.length ? [ownedAssets[0].assetId] : [],
+  );
+
+  const toggleAccordion = (assetId: string) => {
+    setOpenAccordions(prev =>
+      prev.includes(assetId)
+        ? prev.filter(accordionId => accordionId !== assetId)
+        : [...prev, assetId],
+    );
+  };
 
   const requestKLV = async () => {
     setLoadingBalance(true);
@@ -168,7 +230,7 @@ export const AccountDetailsModal: React.FC<
       const getPrimaryAsset: IAssetBalance = JSON.parse(storagePrimaryAssets);
       setPrimaryAsset([getPrimaryAsset]);
 
-      const newPrimaryAsset = otherAssets.find(
+      const newPrimaryAsset = otherAssets.firstFour.find(
         asset => asset.assetId === getPrimaryAsset.assetId,
       );
 
@@ -190,87 +252,153 @@ export const AccountDetailsModal: React.FC<
 
   return (
     <UserInfoContainer openUserInfos={openUserInfos} isMobile={isMobile}>
-      <HeaderInfo>
-        <div>
-          <BiWalletAlt size={'1em'} />
-          <p>My Wallet</p>
-        </div>
-        <AiOutlineClose
-          onClick={() => setOpenUserInfos(false)}
-          cursor={'pointer'}
-        />
-      </HeaderInfo>
-      <QRCodeContainer>
-        {walletAddress && (
-          <QRCodeContent>
-            <div>
-              <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
-            </div>
-          </QRCodeContent>
-        )}
-        {walletAddress && <small>{parseAddress(walletAddress, 25)}</small>}
-
-        <ReloadContainer>
-          <BalanceContainer>
-            <ContainerAsset onClick={() => setExpandAssets(!expandAssets)}>
-              {primaryAsset.length > 0 ? (
-                <>
-                  <>
-                    <span>{primaryAsset[0].balance || '---'}</span>
-                    {primaryAsset[0].assetId === 'KLV' ? (
-                      <KLV />
-                    ) : (
-                      <span>{primaryAsset[0].assetId}</span>
-                    )}
-                  </>
-                </>
-              ) : (
-                <>
-                  <span>{balance['klv']}</span>
-                  <KLV />
-                </>
-              )}
-              <SpanDropdown {...dropdownProps}>
-                <DropdownIcon $openOtherAssets={!expandAssets} />
-                {expandAssets && otherAssets.length > 0 && (
-                  <OtherAssetsContainer isMobile={isMobile}>
-                    {otherAssets.map((asset: any) => (
-                      <div
-                        key={JSON.stringify(asset)}
-                        onClick={() => {
-                          onClickSetAssetPrimary(asset.assetId, asset.balance);
-                          setExpandAssets(false);
-                        }}
-                      >
-                        <span>{asset.balance}</span>
-                        <p>{asset.assetId}</p>
-                      </div>
-                    ))}
-                  </OtherAssetsContainer>
-                )}
-              </SpanDropdown>
-            </ContainerAsset>
-            <IoReloadSharpWrapper
-              onClick={() => getAccountBalance()}
-              $loading={loadingBalance}
-            >
-              <IoReloadSharp />
-            </IoReloadSharpWrapper>
-          </BalanceContainer>
-        </ReloadContainer>
-      </QRCodeContainer>
       <BodyContent>
-        <Link
-          href={`/account/${walletAddress}`}
-          onClick={() => setOpenUserInfos(false)}
-        >
-          <ActionItem>
-            <BiWalletAlt size={'1.2rem'} />
-            <p>Account Details</p>
-            <RiArrowRightSLine size={'1.2em'} />
+        <SubSection active={openWallet}>
+          <ActionItem
+            onClick={() => {
+              setOpenWallet(!openWallet);
+            }}
+            active={openWallet}
+          >
+            <Wallet />
+            <p>My Wallet</p>
+            <RiArrowDownSLine size={'1.5rem'} />
           </ActionItem>
-        </Link>
-        <Link
+          {openWallet && (
+            <MyWalletContainer>
+              <MyWalletContent>
+                <MyWalletInfo>
+                  <div>
+                    {walletAddress && (
+                      <span>{parseAddress(walletAddress, 15)}</span>
+                    )}
+                    {walletAddress && (
+                      <Copy info="Wallet Address" data={walletAddress}>
+                        <MdContentCopy size={'1rem'} />
+                      </Copy>
+                    )}
+                  </div>
+
+                  <div>
+                    {primaryAsset.length > 0 ? (
+                      <PrimaryAssetContent>
+                        {primaryAsset[0].assetId === 'KLV' ? (
+                          <KLV />
+                        ) : (
+                          <span>{primaryAsset[0].assetId}</span>
+                        )}
+                        <span>{primaryAsset[0].balance || '---'}</span>
+                      </PrimaryAssetContent>
+                    ) : (
+                      <PrimaryAssetContent>
+                        <KLV />
+                        <span>{balance['klv']}</span>
+                      </PrimaryAssetContent>
+                    )}
+                  </div>
+                </MyWalletInfo>
+                <div>
+                  {walletAddress && (
+                    <QRCodeContent>
+                      <div>
+                        <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
+                      </div>
+                    </QRCodeContent>
+                  )}
+                </div>
+              </MyWalletContent>
+
+              {otherAssets.firstFour.map((asset: any) => (
+                <AssetItem
+                  key={asset.assetId}
+                  onClick={() => {
+                    onClickSetAssetPrimary(asset.assetId, asset.balance);
+                    setExpandAssets(false);
+                  }}
+                >
+                  <div>
+                    <AssetLogo
+                      logo={asset?.logo || ''}
+                      ticker={asset?.assetName || ''}
+                      name={asset?.assetName || ''}
+                      size={24}
+                    />
+                  </div>
+                  <AssetContent>
+                    <AssetName>
+                      <p>{asset.assetId}</p>
+                      <p>{asset.assetName}</p>
+                    </AssetName>
+                    <AssetPrice>
+                      <p>{asset.balance}</p>
+                    </AssetPrice>
+                  </AssetContent>
+                </AssetItem>
+              ))}
+
+              <Link
+                href={`/account/${walletAddress}?tab=Assets`}
+                onClick={() => setOpenUserInfos(false)}
+              >
+                <SeeTokens>
+                  <p>
+                    See all{' '}
+                    {otherAssets.remaining.length +
+                      otherAssets.firstFour.length}{' '}
+                    tokens
+                  </p>
+
+                  <ArrowRight />
+                </SeeTokens>
+              </Link>
+            </MyWalletContainer>
+          )}
+        </SubSection>
+
+        {ownedAssets?.length && (
+          <SubSection active={openCategory}>
+            <ActionItem
+              onClick={() => {
+                setOpenCategory(!openCategory);
+              }}
+              active={openCategory}
+            >
+              <CategoryTransparent />
+              <p>My Projects</p>
+              <RiArrowDownSLine size={'1.5rem'} />
+            </ActionItem>
+
+            {openCategory && (
+              <MyProjectsContainer>
+                {ownedAssets.map(asset => (
+                  <MyProjectsContent key={asset.assetId}>
+                    <OwnedItem
+                      onClick={() => toggleAccordion(asset.assetId)}
+                      active={openAccordions.includes(asset.assetId)}
+                    >
+                      <AssetLogo
+                        logo={asset?.logo || ''}
+                        ticker={asset?.ticker || ''}
+                        name={asset?.name || ''}
+                        size={24}
+                      />
+                      <p>{asset.name}</p>
+                      <RiArrowDownSLine size={'1.5rem'} />
+                    </OwnedItem>
+
+                    {openAccordions.includes(asset.assetId) && (
+                      <Link href={`/asset/${asset.assetId}`}>
+                        <Pill full={true}>Go to Asset page</Pill>
+                      </Link>
+                    )}
+                  </MyProjectsContent>
+                ))}
+              </MyProjectsContainer>
+            )}
+          </SubSection>
+        )}
+
+        {/* <Link
           href={`/create-transaction`}
           onClick={() => setOpenUserInfos(false)}
         >
@@ -279,17 +407,18 @@ export const AccountDetailsModal: React.FC<
             <p>Create Transaction</p>
             <RiArrowRightSLine size={'1.2em'} />
           </ActionItem>
-        </Link>
-        <SubSection active={openNetworks}>
+        </Link> */}
+
+        {/* <SubSection active={openNetworks}>
           <ActionItem
             onClick={() => {
               setOpenNetworks(!openNetworks);
             }}
             active={openNetworks}
           >
-            <Plug />
+            <Plug size={'1.5rem'} />
             <p>Change Network</p>
-            <RiArrowDownSLine size={'1.2em'} />
+            <RiArrowDownSLine size={'1.5rem'} />
           </ActionItem>
           {openNetworks && (
             <>
@@ -323,31 +452,14 @@ export const AccountDetailsModal: React.FC<
               </ActionItem>
             </>
           )}
-        </SubSection>
+        </SubSection> */}
 
-        {network === 'Testnet' && (
+        {/* {network === 'Testnet' && (
           <ActionItem onClick={requestKLV}>
             <IoMdAddCircle size={'1.2rem'} />
             <p>Request Test KLV</p>
           </ActionItem>
-        )}
-        {walletAddress && (
-          <Copy info="Wallet Address" data={walletAddress}>
-            <ActionItem>
-              <MdContentCopy size={'1.2rem'} />
-              <p>Copy Address</p>
-            </ActionItem>
-          </Copy>
-        )}
-        <ActionItem
-          onClick={() => {
-            logoutExtension();
-            setOpenUserInfos(false);
-          }}
-        >
-          <BiLogOut size={'1.2rem'} />
-          <p>Disconnect</p>
-        </ActionItem>
+        )} */}
       </BodyContent>
     </UserInfoContainer>
   );

@@ -53,8 +53,31 @@ export const getAssetByPartialSymbol = async (
         asset: res.data.assets[0],
       };
   }
-
   return result;
+};
+
+export const getAssetsByPartialSymbol = async (
+  assetRef: string[],
+): Promise<IAsset[]> => {
+  if (assetRef?.length) {
+    const res = await api.get({
+      route: `assets/list?asset=${assetRef.join(',')}`,
+    });
+
+    if (res?.data?.assets?.length) return res.data.assets;
+  }
+  return [];
+};
+
+export const getAssetsByOwner = async (address: string): Promise<IAsset[]> => {
+  if (address?.length) {
+    const res = await api.get({
+      route: `assets/list?owner=${address}`,
+    });
+
+    if (res?.data?.assets?.length) return res.data.assets;
+  }
+  return [];
 };
 
 export const assetInfoCall = async (router: NextRouter): Promise<any> => {

@@ -19,6 +19,7 @@ import {
 } from './styles';
 import { useRouter } from 'next/router';
 import { useMobile } from '@/contexts/mobile';
+import { LogOut, Wallet } from '@/assets/icons';
 
 interface IConnectWallet {
   clickConnection: () => void;
@@ -38,6 +39,7 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
     connectExtension,
     openDrawer,
     setOpenDrawer,
+    logoutExtension,
   } = useExtension();
 
   const downloadK5 = 'https://onelink.to/455hxv';
@@ -67,9 +69,15 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
   const connectAndOpen = () => {
     if (!walletAddress) {
       connectExtension();
+      setOpenUserInfos(false); // Ensure modal is closed on reconnect
     } else {
       setOpenUserInfos(!openUserInfos);
     }
+  };
+
+  const handleLogout = () => {
+    logoutExtension();
+    setOpenUserInfos(false); // Close modal on logout
   };
 
   const closeMenu = () => {
@@ -79,8 +87,10 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
   useEffect(() => {
     if (autoConnectWallet === 'true') {
       connectAndOpen();
+    } else {
+      setOpenUserInfos(false); // Ensure modal is closed after auto connection
     }
-  }, []);
+  }, [autoConnectWallet]);
 
   useEffect(() => {
     document.body.style.overflow = openDrawer ? 'hidden' : 'visible';
@@ -125,7 +135,7 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
           condition={!!walletAddress}
         >
           <ConnectButton
-            onClick={() => connectAndOpen()}
+            onClick={connectAndOpen}
             key={String(extensionInstalled)}
             walletAddress={!!walletAddress}
             $loading={extensionLoading}
@@ -138,8 +148,11 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
                   <ConnectedWallet
                     onClick={() => setOpenUserInfos(!openUserInfos)}
                   >
-                    <GraySpan>Connected Wallet</GraySpan>
+                    <Wallet />
                     <BlackSpan>{parseAddress(walletAddress, 12)}</BlackSpan>
+                    <GraySpan onClick={handleLogout}>
+                      <LogOut />
+                    </GraySpan>
                   </ConnectedWallet>
                 )}
                 {!walletAddress && (
@@ -151,7 +164,6 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
                       alt="Wallet"
                       loader={({ src, width }) => `${src}?w=${width}`}
                     />
-
                     <span>Connect Wallet</span>
                   </>
                 )}
@@ -160,6 +172,7 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
           </ConnectButton>
         </Tour>
       )}
+
       {walletAddress &&
         ReactDOM.createPortal(
           <AccountDetailsModal

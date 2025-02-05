@@ -34,24 +34,20 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
 
   useEffect(() => {
     const validateCurrency = async (): Promise<void> => {
-      if (currencyValue === '') {
-        setCurrencyIsValid(false);
-        setError('Invalid Currency');
-        return;
-      }
-
       setIsLoading(true);
       setError('');
 
       try {
-        const data = await getAsset(currencyValue);
+        if (currencyValue !== '') {
+          const data = await getAsset(currencyValue);
 
-        if (data?.data?.asset?.assetType === 'Fungible') {
-          setCurrencyIsValid(true);
-          setError('');
-        } else {
-          setCurrencyIsValid(false);
-          setError('Invalid Currency');
+          if (data?.data?.asset?.assetType === 'Fungible') {
+            setCurrencyIsValid(true);
+            setError('');
+          } else {
+            setCurrencyIsValid(false);
+            setError('Invalid Currency');
+          }
         }
       } catch (err) {
         setError('Error validating currency');
@@ -65,7 +61,7 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
     return () => clearTimeout(timeoutId);
   }, [currencyValue]);
 
-  const handlerValidate = () => {
+  const handlerValidate = async () => {
     if (!currencyIsValid) {
       return error;
     }
@@ -112,6 +108,7 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
               } pool`}
               required
               loading={isLoading}
+              logoError={!currencyIsValid ? error : null}
               propsValidate={handlerValidate}
             />
           </FormSection>

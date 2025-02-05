@@ -14,6 +14,7 @@ import * as gtag from '../utils/gtag/gtag';
 
 import { getCookie } from 'cookies-next';
 import { InternalThemeProvider } from '@/contexts/theme';
+import Maintenance from './maintenance';
 
 //add window methods to global scope
 declare global {
@@ -45,6 +46,12 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
       router.events.off('routeChangeComplete', handleRouteChange);
     };
   }, [router.events]);
+
+  const isMaintenance = new Date() > new Date('2021-09-01T00:00:00Z');
+
+  if (isMaintenance) {
+    return <Maintenance />;
+  }
 
   return (
     <>

@@ -36,6 +36,7 @@ import {
   TooltipContent,
   ValidateButton,
 } from './styles';
+import { InlineLoader } from '@/components/Loader';
 
 const Select = dynamic(() => import('./Select'), {
   ssr: false,
@@ -426,6 +427,7 @@ const FormInput: React.FC<
           {tooltip && (
             <TooltipContainer>
               <InfoIcon />
+              {loading && <InlineLoader />}
               <TooltipContent>
                 <span>{tooltip}</span>
               </TooltipContent>

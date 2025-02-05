@@ -1,10 +1,4 @@
-import {
-  PropsWithChildren,
-  useState,
-  ChangeEvent,
-  useEffect,
-  useCallback,
-} from 'react';
+import { PropsWithChildren, useState, ChangeEvent, useEffect } from 'react';
 import { depositTypes } from '@/utils/contracts';
 import { toUpperCaseValue } from '@/utils';
 import React from 'react';
@@ -13,6 +7,7 @@ import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import { KDASelect } from '../KDASelect';
 import { FormBody, FormSection } from '../styles';
+import { getAsset } from '@/services/requests/asset';
 
 type FormData = {
   depositType: number;
@@ -49,20 +44,7 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
       setError('');
 
       try {
-        const fetchResponse = fetch(
-          `${
-            process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance'
-          }/assets/${currencyValue}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        );
-
-        const res = await fetchResponse;
-        const data = await res.json();
+        const data = await getAsset(currencyValue);
 
         if (data?.data?.asset?.assetType === 'Fungible') {
           setCurrencyIsValid(true);
@@ -78,7 +60,7 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
         setIsLoading(false);
       }
     };
-    const timeoutId = setTimeout(validateCurrency, 500);
+    const timeoutId = setTimeout(validateCurrency, 1000);
 
     return () => clearTimeout(timeoutId);
   }, [currencyValue]);
@@ -130,7 +112,7 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
               } pool`}
               required
               loading={isLoading}
-              warning={!currencyIsValid}
+              error={error}
               propsValidate={handlerValidate}
             />
           </FormSection>

@@ -47,9 +47,22 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
     };
   }, [router.events]);
 
-  const isMaintenance = new Date() > new Date('2021-09-01T00:00:00Z');
+  // Create a Date object for February 7th, 2025, 5 PM UTC
+  const targetDate = new Date(Date.UTC(2025, 1, 7, 17, 0, 0)); // Month is 0-indexed (1 = February)
 
-  if (isMaintenance) {
+  // Get the current UTC date and time
+  const currentDate = new Date();
+
+  // Compare current date with target date
+  const isTargetDate =
+    currentDate.getUTCFullYear() === targetDate.getUTCFullYear() &&
+    currentDate.getUTCMonth() === targetDate.getUTCMonth() &&
+    currentDate.getUTCDate() === targetDate.getUTCDate() &&
+    currentDate.getUTCHours() === targetDate.getUTCHours() &&
+    currentDate.getUTCMinutes() === targetDate.getUTCMinutes() &&
+    currentDate.getUTCSeconds() === targetDate.getUTCSeconds();
+
+  if (isTargetDate) {
     return <Maintenance />;
   }
 

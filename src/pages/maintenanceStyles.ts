@@ -16,6 +16,14 @@ export const Main = styled.main`
   background-color: black;
 `;
 
+export const TextWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 40rem;
+`;
+
 export const Title1 = styled.h1`
   text-align: center;
   margin: 20px;
@@ -25,10 +33,11 @@ export const Title1 = styled.h1`
   font-size: 36px;
   line-height: 32.8px;
   @media (min-width: 768px) {
+    margin-top: 0;
     font-family: 'Manrope';
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 30px;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 42px;
   }
 `;
 
@@ -43,9 +52,9 @@ export const P1 = styled.p`
   line-height: 16.8px;
   @media (min-width: 768px) {
     font-family: 'Manrope';
-    font-weight: 700;
+    font-weight: 400;
     font-size: 20px;
-    line-height: 30px;
+    line-height: 25px;
   }
 `;
 
@@ -60,7 +69,7 @@ export const Title3 = styled.h3`
   @media (min-width: 768px) {
     font-family: 'Montserrat';
     font-weight: 700;
-    font-size: 20px;
+    font-size: 30px;
     line-height: 30px;
   }
 `;
@@ -75,7 +84,7 @@ export const P2 = styled.p`
   @media (min-width: 768px) {
     font-family: 'Manrope';
     font-weight: 600;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 30px;
   }
 `;

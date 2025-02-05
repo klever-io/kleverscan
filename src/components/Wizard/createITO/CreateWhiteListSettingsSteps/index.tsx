@@ -86,7 +86,7 @@ export const CreateWhiteListSettingsSteps: React.FC<
             centered
             onClick={() => handleStep(prev => prev + 1)}
           >
-            {t('common:Statements.Yes')}
+            {t('common:Statements.No')}
           </WizardButton>
         </ButtonsContainer>
 

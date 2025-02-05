@@ -23,8 +23,8 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
   const { handleSubmit, watch } = useFormContext<FormData>();
   const [currencyValue, setCurrencyValue] = useState<string>('');
   const [currencyIsValid, setCurrencyIsValid] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
 
   const depositType: number = watch('depositType');
 
@@ -112,7 +112,6 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
               } pool`}
               required
               loading={isLoading}
-              error={error}
               propsValidate={handlerValidate}
             />
           </FormSection>

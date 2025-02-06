@@ -14,7 +14,7 @@ import * as gtag from '../utils/gtag/gtag';
 
 import { getCookie } from 'cookies-next';
 import { InternalThemeProvider } from '@/contexts/theme';
-import Maintenance from './maintenance';
+import Maintenance from '@/components/Maintenance';
 
 //add window methods to global scope
 declare global {
@@ -47,24 +47,23 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
     };
   }, [router.events]);
 
-  // Create a Date object for February 7th, 2025, 5 PM UTC
-  const targetDate = new Date(Date.UTC(2025, 1, 7, 17, 0, 0)); // Month is 0-indexed (1 = February)
+  const startDate = new Date(Date.UTC(2025, 1, 6, 16, 0, 0)); // Month is 0-indexed (1 = February)
+  const endDate = new Date(Date.UTC(2025, 1, 7, 17, 0, 0)); // Month is 0-indexed (1 = February)
 
-  // Get the current UTC date and time
   const currentDate = new Date();
 
-  // Compare current date with target date
-  const isTargetDate =
-    currentDate.getUTCFullYear() === targetDate.getUTCFullYear() &&
-    currentDate.getUTCMonth() === targetDate.getUTCMonth() &&
-    currentDate.getUTCDate() === targetDate.getUTCDate() &&
-    currentDate.getUTCHours() === targetDate.getUTCHours() &&
-    currentDate.getUTCMinutes() === targetDate.getUTCMinutes() &&
-    currentDate.getUTCSeconds() === targetDate.getUTCSeconds();
+  const isTargetDate = currentDate >= startDate && currentDate <= endDate;
 
-  if (isTargetDate) {
-    return <Maintenance />;
-  }
+  const RenderedComponent: React.FC = () => {
+    if (isTargetDate) {
+      return <Maintenance />;
+    }
+    return (
+      <LayoutWrapper>
+        <Component {...pageProps} />;
+      </LayoutWrapper>
+    );
+  };
 
   return (
     <>
@@ -76,9 +75,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
       </Head>
       <InternalThemeProvider initialDarkTheme={initialDarkTheme}>
         <ContextProviders>
-          <LayoutWrapper>
-            <Component {...pageProps} />
-          </LayoutWrapper>
+          <RenderedComponent />
           <GlobalStyle />
           <NProgress />
         </ContextProviders>

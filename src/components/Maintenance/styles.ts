@@ -88,7 +88,7 @@ export const Title3 = styled.h3`
   font-weight: 500;
   margin-bottom: 0;
   font-size: 24px;
-  line-height: 100%;
+  line-height: 110%;
   @media (min-width: 768px) {
     font-size: 30px;
   }
@@ -100,7 +100,7 @@ export const P2 = styled.p`
   font-family: 'Manrope';
   font-weight: 400;
   font-size: 14px;
-  line-height: 30px;
+  line-height: 150%;
 `;
 
 export const LearnMore = styled.button`

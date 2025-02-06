@@ -5,8 +5,8 @@ export const Picture = styled.picture`
   aspect-ratio: 1/1;
 
   @media (max-width: 768px) {
+    max-width: 400px;
     width: 100%;
-    position: absolute;
   }
 
   img {
@@ -15,8 +15,6 @@ export const Picture = styled.picture`
 
     @media (max-width: 768px) {
       width: 100%;
-      position: absolute;
-      filter: opacity(0.15) grayscale(100%);
     }
   }
 `;
@@ -26,7 +24,7 @@ export const Main = styled.main`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: fit-content;
+  min-height: 100vh;
 `;
 
 export const TextWrapper = styled.div`
@@ -34,15 +32,15 @@ export const TextWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
-  height: calc(100vh - 11.5rem);
-  max-width: 50rem;
+  justify-content: center;
 
-  top: 0px;
-  @media (min-width: 768px) {
-    height: fit-content;
-    justify-content: center;
-    top: -80px;
+  max-width: 50rem;
+  top: -80px;
+
+  @media (max-width: 768px) {
+    gap: 2rem;
+
+    margin: 10px;
   }
 `;
 
@@ -69,7 +67,7 @@ export const Message = styled.div`
 
 export const P1 = styled.p`
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   color: ${({ theme }) => theme.black};
   text-align: center;
   font-family: 'Manrope';

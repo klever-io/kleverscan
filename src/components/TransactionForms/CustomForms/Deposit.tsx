@@ -1,4 +1,10 @@
-import { PropsWithChildren, useState, ChangeEvent, useEffect } from 'react';
+import {
+  PropsWithChildren,
+  useState,
+  ChangeEvent,
+  useEffect,
+  useCallback,
+} from 'react';
 import { depositTypes } from '@/utils/contracts';
 import { toUpperCaseValue } from '@/utils';
 import React from 'react';
@@ -24,18 +30,22 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
   const [currencyValue, setCurrencyValue] = useState<string>('');
   const [currencyIsValid, setCurrencyIsValid] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
+  const [apiError, setApiError] = useState<string>('');
 
   const depositType: number = watch('depositType');
 
   const onSubmit = async (data: FormData) => {
-    await handleFormSubmit(data);
+    try {
+      await handleFormSubmit(data);
+      setApiError('');
+    } catch (err) {
+      setApiError('Error submitting form');
+    }
   };
 
   useEffect(() => {
     const validateCurrency = async (): Promise<void> => {
       setIsLoading(true);
-      setError('');
 
       try {
         if (currencyValue !== '') {
@@ -43,14 +53,14 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
 
           if (data?.data?.asset?.assetType === 'Fungible') {
             setCurrencyIsValid(true);
-            setError('');
+            setApiError('');
           } else {
             setCurrencyIsValid(false);
-            setError('Invalid Currency');
+            setApiError('Invalid Currency');
           }
         }
       } catch (err) {
-        setError('Error validating currency');
+        setApiError('Error validating currency');
         setCurrencyIsValid(false);
       } finally {
         setIsLoading(false);
@@ -61,12 +71,12 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
     return () => clearTimeout(timeoutId);
   }, [currencyValue]);
 
-  const handlerValidate = async () => {
+  const handlerValidate = useCallback(async () => {
     if (!currencyIsValid) {
-      return error;
+      return 'Invalid Currency';
     }
     return true;
-  };
+  }, [currencyIsValid]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const newValue = toUpperCaseValue(e.target.value);
@@ -108,7 +118,7 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
               } pool`}
               required
               loading={isLoading}
-              logoError={!currencyIsValid ? error : null}
+              apiError={apiError}
               propsValidate={handlerValidate}
             />
           </FormSection>

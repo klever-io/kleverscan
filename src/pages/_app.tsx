@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useCallback } from 'react';
 import ContextProviders from '@/components/ContextProviders';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import App from 'next/app';
@@ -54,7 +54,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
 
   const isTargetDate = currentDate >= startDate && currentDate <= endDate;
 
-  const RenderedComponent: React.FC = () => {
+  const RenderedComponent: React.FC = useCallback(() => {
     if (isTargetDate) {
       return <Maintenance />;
     }
@@ -63,7 +63,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
         <Component {...pageProps} />;
       </LayoutWrapper>
     );
-  };
+  }, [isTargetDate, pageProps]);
 
   return (
     <>

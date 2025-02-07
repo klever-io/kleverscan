@@ -48,7 +48,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
   }, [router.events]);
 
   const startDate = new Date(Date.UTC(2025, 1, 6, 16, 0, 0)); // Month is 0-indexed (1 = February)
-  const endDate = new Date(Date.UTC(2025, 1, 7, 17, 0, 0)); // Month is 0-indexed (1 = February)
+  const endDate = new Date(Date.UTC(2025, 1, 6, 16, 0, 0)); // Month is 0-indexed (1 = February)
 
   const currentDate = new Date();
 

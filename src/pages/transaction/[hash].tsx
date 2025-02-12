@@ -903,7 +903,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
     return redirectProps;
   }
 
-  if (tx?.contract.some(contract => contract.type == 99)) {
+  if (tx?.contract.some(contract => contract.type == 63)) {
     const nodeTransaction: any = await api.get({
       service: Service.NODE,
       route: `transaction/${hash}?withResults=true`,

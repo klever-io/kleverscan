@@ -91,7 +91,7 @@ export enum ContractsIndex {
   'Update Account Permission',
   'Deposit',
   'ITO Trigger',
-  'Smart Contract' = 99,
+  'Smart Contract' = 63,
 }
 
 export interface ReducedContract {
@@ -121,7 +121,7 @@ export interface ReducedContract {
   [23]?: number;
   [24]?: number;
   [25]?: number;
-  [99]?: number;
+  [63]?: number;
 }
 
 export interface IContractOption {

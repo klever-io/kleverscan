@@ -6,7 +6,6 @@ import {
   useCallback,
 } from 'react';
 import { depositTypes } from '@/utils/contracts';
-import { toUpperCaseValue } from '@/utils';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
@@ -79,7 +78,7 @@ const Deposit: React.FC<PropsWithChildren<IContractProps>> = ({
   }, [currencyIsValid]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    const newValue = toUpperCaseValue(e.target.value);
+    const newValue = e.target.value.toUpperCase();
     setCurrencyValue(newValue);
   };
 

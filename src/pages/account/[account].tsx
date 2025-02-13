@@ -31,7 +31,6 @@ import {
   ownedAssetsRequest,
   pricesCall,
   rewardsFPRPool,
-  transactionsRequest,
 } from '@/services/requests/account';
 import {
   CardContent,
@@ -89,6 +88,7 @@ import React, {
 } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
+import { requestTransactionsDefault } from '../transactions';
 
 export interface IStakingRewards {
   label: string;
@@ -293,7 +293,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
           return ownedAssetsRequest(address)(page, limit);
         case t('common:Titles.Transactions'):
-          return transactionsRequest(address, router.query)(page, limit);
+          return requestTransactionsDefault(
+            page,
+            limit,
+            router,
+            undefined,
+            address,
+          );
         case t('accounts:SingleAccount.Tabs.Buckets'):
           return bucketsRequest(address)(page, limit);
         case t('accounts:SingleAccount.Tabs.Rewards'):

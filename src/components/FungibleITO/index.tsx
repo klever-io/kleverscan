@@ -50,28 +50,6 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
   const { t } = useTranslation('assets');
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [currencyPrecision, setCurrencyPrecision] = useState<null | number>(
-    null,
-  );
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const precision = await getPrecision(packInfo.key);
-        if (!precision) {
-          throw new Error('Error calculating pack price, please reload page.');
-        }
-        setCurrencyPrecision(precision);
-      } catch (e) {
-        console.error(e);
-        if (e instanceof Error) {
-          toast.error(e.message);
-        } else {
-          toast.error(String(e));
-        }
-      }
-    })();
-  }, []);
 
   const calculateCost = (indexPackData: number, qtyPacks: number) => {
     const packs = ITO.packData[indexPackData].packs;
@@ -135,7 +113,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
       return;
     }
 
-    if (!currencyPrecision) {
+    if (!packInfo?.precision) {
       toast.error('Error calculating pack price, please reload page.');
       return;
     }
@@ -147,7 +125,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
       amount: amount * 10 ** ITO.precision,
       currencyAmount:
         calculateCost(packInfoIndex, packInfo.packs.length) *
-        10 ** currencyPrecision,
+        10 ** packInfo.precision,
     };
 
     const parsedPayload = {

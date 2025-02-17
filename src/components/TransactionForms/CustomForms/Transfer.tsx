@@ -27,7 +27,7 @@ const Transfer: React.FC<PropsWithChildren<IContractProps>> = ({
   const { setSelectedRoyaltiesFees, queue } = useMulticontract();
   const amount = watch('amount');
 
-  const collection = queue[formKey].collection;
+  const collection = queue[formKey]?.collection;
 
   useEffect(() => {
     if (collection?.royalties?.transferPercentage) {

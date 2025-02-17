@@ -32,7 +32,7 @@ const ITOTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const { queue } = useMulticontract();
 
-  const collection = queue[formKey].collection;
+  const collection = queue[formKey]?.collection;
 
   const triggerType = watch('triggerType');
 

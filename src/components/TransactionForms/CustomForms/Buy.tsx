@@ -19,11 +19,10 @@ type FormData = {
   amount: number;
 };
 
-const parseBuy = (data: FormData, currencyPrecision: number) => {
+const parseBuy = (data: FormData) => {
   data.buyType = data.buyType ? 1 : 0;
   data.currencyId = data.currencyId.toUpperCase();
   data.id = data.id.toUpperCase();
-  data.currencyAmount = Number(data.currencyAmount) * 10 ** currencyPrecision;
 };
 
 const Buy: React.FC<PropsWithChildren<IContractProps>> = ({
@@ -39,7 +38,7 @@ const Buy: React.FC<PropsWithChildren<IContractProps>> = ({
   const [currencyPrecision, setCurrencyPrecision] = useState<number>(0);
 
   const onSubmit = async (data: FormData) => {
-    parseBuy(data, currencyPrecision);
+    parseBuy(data);
     await handleFormSubmit(data);
   };
 

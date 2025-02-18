@@ -10,6 +10,7 @@ import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import { FormBody, FormSection, RoyaltiesContainer } from '../styles';
+import { getNetwork } from '@/utils/networkFunctions';
 
 type FormData = {
   buyType: number;
@@ -32,10 +33,9 @@ const Buy: React.FC<PropsWithChildren<IContractProps>> = ({
   const { handleSubmit, watch } = useFormContext<FormData>();
   const buyType = watch('buyType');
   const id = watch('id');
-  const currencyId = watch('currencyId');
   const { setSelectedRoyaltiesFees } = useMulticontract();
   const [ITOFixedFee, setITOFixedFee] = useState(0);
-  const [currencyPrecision, setCurrencyPrecision] = useState<number>(0);
+  const network = getNetwork();
 
   const onSubmit = async (data: FormData) => {
     parseBuy(data);
@@ -90,13 +90,12 @@ const Buy: React.FC<PropsWithChildren<IContractProps>> = ({
           type="number"
           required
         />
-        {!buyType && (
+        {!buyType && network !== 'Mainnet' && (
           <FormInput
             name="currencyAmount"
             title={'Currency Amount'}
             type="number"
             required
-            precision={currencyPrecision}
           />
         )}
       </FormSection>

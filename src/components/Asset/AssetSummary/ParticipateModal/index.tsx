@@ -250,6 +250,10 @@ export const ParticipateModal: React.FC<
       toast.error('Please enter a valid amount');
       return;
     }
+    if (!selectedPackData.precision) {
+      toast.error('Error while calculating pack price. Please reload page');
+      return;
+    }
 
     if (!extensionInstalled) {
       setOpenDrawer(true);
@@ -263,7 +267,8 @@ export const ParticipateModal: React.FC<
       buyType: 0,
       id: ITO.assetId,
       currencyId: selectedPackCurrency,
-      amount: assetAmount * 10 ** (await getPrecision(ITO.assetId)),
+      currencyAmount: currencyAmount * 10 ** selectedPackData.precision,
+      amount: assetAmount * 10 ** ITO.precision,
     };
 
     try {

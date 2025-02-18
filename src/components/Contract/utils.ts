@@ -246,11 +246,23 @@ const precisionParse = async (
       await addFieldPrecision('defaultLimitPerAddress', payload.kda);
       break;
     case 'BuyContract':
-      assetId = payload.buyType === 0 ? payload.id : payload.currencyId;
-      precision = (await getPrecision(assetId)) as number;
-      if (precision !== undefined) {
-        payload.amount = addPrecision(payload.amount, precision);
-      } else return;
+      if (payload.buyType === 0) {
+        const assetId = payload.id;
+        const assetIdPrecision = (await getPrecision(assetId)) as number;
+        payload.amount = addPrecision(payload.amount, assetIdPrecision);
+
+        const currencyId = payload.currencyId;
+        const currencyIdPrecision = (await getPrecision(currencyId)) as number;
+        payload.currencyAmount = addPrecision(
+          payload.currencyAmount,
+          currencyIdPrecision,
+        );
+      } else {
+        const currencyId = payload.currencyId;
+        const itemPrice = payload.amount;
+        const currencyIdPrecision = (await getPrecision(currencyId)) as number;
+        payload.amount = addPrecision(itemPrice, currencyIdPrecision);
+      }
       break;
     case 'SellContract':
       assetId = payload.currencyId;
@@ -361,6 +373,7 @@ const filterByProperties = (
 const showAssetIdInput = (
   contractType: string,
   typeAssetTrigger: number | null,
+  assetType: string | number,
 ): boolean => {
   if (
     contractType === 'AssetTriggerContract' &&
@@ -368,6 +381,9 @@ const showAssetIdInput = (
     !isNaN(typeAssetTrigger)
   ) {
     const singleNFTContracts = [1, 2, 8];
+    if (assetType === 'SemiFungible') {
+      singleNFTContracts.push(0);
+    }
     return singleNFTContracts.includes(typeAssetTrigger);
   }
 

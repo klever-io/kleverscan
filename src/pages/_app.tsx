@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useCallback } from 'react';
 import ContextProviders from '@/components/ContextProviders';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import App from 'next/app';
@@ -14,6 +14,7 @@ import * as gtag from '../utils/gtag/gtag';
 
 import { getCookie } from 'cookies-next';
 import { InternalThemeProvider } from '@/contexts/theme';
+import Maintenance from '@/components/Maintenance';
 
 //add window methods to global scope
 declare global {
@@ -46,6 +47,24 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
     };
   }, [router.events]);
 
+  const startDate = new Date(Date.UTC(2025, 1, 6, 16, 0, 0)); // Month is 0-indexed (1 = February)
+  const endDate = new Date(Date.UTC(2025, 1, 6, 16, 0, 0)); // Month is 0-indexed (1 = February)
+
+  const currentDate = new Date();
+
+  const isTargetDate = currentDate >= startDate && currentDate <= endDate;
+
+  const RenderedComponent: React.FC = useCallback(() => {
+    if (isTargetDate) {
+      return <Maintenance />;
+    }
+    return (
+      <LayoutWrapper>
+        <Component {...pageProps} />;
+      </LayoutWrapper>
+    );
+  }, [isTargetDate, pageProps]);
+
   return (
     <>
       <Head>
@@ -56,9 +75,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
       </Head>
       <InternalThemeProvider initialDarkTheme={initialDarkTheme}>
         <ContextProviders>
-          <LayoutWrapper>
-            <Component {...pageProps} />
-          </LayoutWrapper>
+          <RenderedComponent />
           <GlobalStyle />
           <NProgress />
         </ContextProviders>

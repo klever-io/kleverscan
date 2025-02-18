@@ -287,19 +287,15 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     (page: number, limit: number): Promise<any> => {
       const address = router.query.account as string;
 
+      const query = { address };
+
       switch (router.query.tab) {
         case t('common:Titles.Assets'):
           return assetsRequest(address)(page, limit);
         case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
           return ownedAssetsRequest(address)(page, limit);
         case t('common:Titles.Transactions'):
-          return requestTransactionsDefault(
-            page,
-            limit,
-            router,
-            undefined,
-            address,
-          );
+          return requestTransactionsDefault(page, limit, router, query);
         case t('accounts:SingleAccount.Tabs.Buckets'):
           return bucketsRequest(address)(page, limit);
         case t('accounts:SingleAccount.Tabs.Rewards'):

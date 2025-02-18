@@ -69,25 +69,6 @@ const Buy: React.FC<PropsWithChildren<IContractProps>> = ({
     })();
   }, [id]);
 
-  useEffect(() => {
-    (async function () {
-      const lowerCaseCurrencyId = currencyId?.toLocaleLowerCase();
-      if (
-        lowerCaseCurrencyId === 'klv' ||
-        lowerCaseCurrencyId === 'kfi' ||
-        idIsAsset(lowerCaseCurrencyId)
-      ) {
-        const res = await getAsset(currencyId);
-        if (!res.error || res.error === '') {
-          const asset = res.data?.asset;
-          if (asset) {
-            setCurrencyPrecision(asset.precision);
-          }
-        }
-      }
-    })();
-  }, [currencyId]);
-
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
       <FormSection>

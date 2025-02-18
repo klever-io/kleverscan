@@ -54,6 +54,7 @@ import React, { PropsWithChildren } from 'react';
 
 interface IRequestTxQuery {
   asset?: string;
+  address?: string;
 }
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
   if (toAddress === '--') {
@@ -157,7 +158,6 @@ export const requestTransactionsDefault = async (
   limit: number,
   router: NextRouter,
   query?: IRequestTxQuery,
-  address?: string,
 ): Promise<IAssetTransactionResponse> => {
   while (!router.isReady) {
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -166,7 +166,7 @@ export const requestTransactionsDefault = async (
   const localQuery = { ...router.query, page, limit };
 
   const transactionsResponse = await api.get({
-    route: `transaction/list${address ? `?address=${address}` : ''}`,
+    route: `transaction/list`,
     query: query ?? localQuery,
   });
 

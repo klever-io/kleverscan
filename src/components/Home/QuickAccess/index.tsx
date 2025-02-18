@@ -96,7 +96,7 @@ const QuickAccess: React.FC<{
   };
 
   return (
-    <Container>
+    <Container id="quick-access">
       <TitleContainer>
         <small>{t('QuickAccess Description')}</small>
         <Title>What do you want to do?</Title>

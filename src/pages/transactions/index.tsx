@@ -54,6 +54,7 @@ import React, { PropsWithChildren } from 'react';
 
 interface IRequestTxQuery {
   asset?: string;
+  address?: string;
 }
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
   if (toAddress === '--') {

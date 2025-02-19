@@ -553,6 +553,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setPayload(formsData.current);
       setTxLoading(false);
     } else if (queueLength > 1) {
+      setTxLoading(false);
       if (formsData.current.length === queueLength) {
         formSend();
       }

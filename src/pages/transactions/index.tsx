@@ -167,7 +167,7 @@ export const requestTransactionsDefault = async (
     ...router.query,
     page,
     limit,
-    address: router.query.account,
+    address: router.pathname.includes('/account') ? router.query.account : '',
   };
   delete localQuery.account;
 

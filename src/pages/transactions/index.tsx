@@ -163,12 +163,12 @@ export const requestTransactionsDefault = async (
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  const localQuery = {
+  const localQuery: { [key: string]: any } = {
     ...router.query,
     page,
     limit,
-    address: router.query.account,
   };
+  router.query.account && (localQuery['address'] = router.query.account);
   delete localQuery.account;
 
   const transactionsResponse = await api.get({

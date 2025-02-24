@@ -89,7 +89,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
           type: args[key].type,
           raw_type: args[key].raw_type,
           value: getInitialValue(args[key].raw_type, types),
-          required: args[key].required,
+          required: type !== 'checkbox' && args[key].required,
           options: types?.[args[key].raw_type]?.variants?.map(variant => {
             return {
               label: variant.name,

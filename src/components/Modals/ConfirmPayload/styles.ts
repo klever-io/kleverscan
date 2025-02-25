@@ -39,11 +39,9 @@ export const HiddenTextArea = styled.textarea`
 `;
 
 export const ErrorMessage = styled.div`
-  position: absolute;
-  bottom: 0;
-  transform: translateY(100%);
+  margin: 10px;
 
-  color: ${props => props.theme.status.warning};
+  color: ${props => props.theme.status.error};
   display: flex;
   align-items: center;
   gap: 1rem;

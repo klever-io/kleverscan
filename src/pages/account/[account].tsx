@@ -267,9 +267,12 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   };
 
   const filterFromTo = (op: number) => {
+    const address = router.query.account as string;
     const updatedQuery = { ...router.query };
     if (op === 0) {
       delete updatedQuery.role;
+      delete updatedQuery.fromAddress;
+      delete updatedQuery.toAddress;
       setQueryAndRouter(
         {
           ...updatedQuery,
@@ -277,9 +280,11 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         router,
       );
     } else if (op === 1) {
-      setQueryAndRouter({ ...updatedQuery, role: 'sender' }, router);
+      delete updatedQuery.toAddress;
+      setQueryAndRouter({ ...updatedQuery, fromAddress: address }, router);
     } else if (op === 2) {
-      setQueryAndRouter({ ...updatedQuery, role: 'receiver' }, router);
+      delete updatedQuery.fromAddress;
+      setQueryAndRouter({ ...updatedQuery, toAddress: address }, router);
     }
   };
 

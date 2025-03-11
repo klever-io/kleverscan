@@ -18,9 +18,9 @@ import {
   WizardRightArrowSVG,
 } from '../styles';
 
-export const CreateAssetSplitRoyalties: React.FC<PropsWithChildren<
-  IWizardComponents
->> = ({ handleStep, t }) => {
+export const CreateAssetSplitRoyalties: React.FC<
+  PropsWithChildren<IWizardComponents>
+> = ({ handleStep, t }) => {
   const {
     control,
     register,
@@ -143,13 +143,13 @@ export const CreateAssetSplitRoyalties: React.FC<PropsWithChildren<
               pattern: { value: /\d+/g, message: 'Value must be only numbers' },
               min: { value: 0, message: 'Min value is 0' },
               max: { value: 100, message: 'Max value is 100' },
-            }
+            },
           )}
           placeholder="Transfer Percentage"
         />
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.transferPercentageReceiverAddressFee'
+            'wizards:common.advancedOptions.royalties.transferPercentageReceiverAddressFee',
           )}
         </p>
         {errorSplitTransferPercent && (
@@ -165,13 +165,13 @@ export const CreateAssetSplitRoyalties: React.FC<PropsWithChildren<
               valueAsNumber: true,
               min: { value: 0, message: 'Min value is 0' },
               max: { value: 100, message: 'Max value is 100' },
-            }
+            },
           )}
           placeholder="ITO Percentage"
         />
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.percentITOPercentageReceiverAddressFee'
+            'wizards:common.advancedOptions.royalties.percentITOPercentageReceiverAddressFee',
           )}
         </p>
         {errorSplitITOPercent && (
@@ -187,13 +187,13 @@ export const CreateAssetSplitRoyalties: React.FC<PropsWithChildren<
               valueAsNumber: true,
               min: { value: 0, message: 'Min value is 0' },
               max: { value: 100, message: 'Max value is 100' },
-            }
+            },
           )}
           placeholder="ITO Fixed"
         />
         <p>
           {t(
-            'wizards:common.advancedOptions.royalties.itoFixedReceiverAddressFee'
+            'wizards:common.advancedOptions.royalties.itoFixedReceiverAddressFee',
           )}
         </p>
         {errorSplitPercentITOFixed && (

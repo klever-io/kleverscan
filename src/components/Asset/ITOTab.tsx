@@ -19,6 +19,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { HashComponent } from '../Contract';
 
 export interface ITOTabProps {
   ITO: IParsedITO | undefined;
@@ -29,7 +30,7 @@ export const ITOTab: React.FC<PropsWithChildren<ITOTabProps>> = ({ ITO }) => {
   const { t } = useTranslation('itos');
   const router = useRouter();
   const [expand, setExpand] = useState({ whitelist: false, packs: false });
-  const [txHash, setTxHash] = useState('');
+  const [txHash, setTxHash] = useState<string | null>(null);
 
   useEffect(() => {
     if (extensionInstalled) {
@@ -172,6 +173,7 @@ export const ITOTab: React.FC<PropsWithChildren<ITOTabProps>> = ({ ITO }) => {
           )}
           {ITO.packData && (
             <ExpandableRow expandVar={expand.packs} span={2}>
+              {txHash && <HashComponent hash={txHash} setHash={setTxHash} />}
               <ExpandWrapper
                 expandVar={expand.packs}
                 style={{ marginBottom: expand.packs ? '1rem' : '0' }}

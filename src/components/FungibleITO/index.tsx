@@ -1,7 +1,7 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
 import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { IParsedITO } from 'types';
 import Input from '../Input';
@@ -18,6 +18,7 @@ import {
   Row,
   TotalPrice,
 } from './styles';
+import { getPrecision } from '@/utils/precisionFunctions';
 
 interface IFungibleITO {
   ITO: IParsedITO;
@@ -51,45 +52,43 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
   const [loading, setLoading] = useState(false);
 
   const calculateCost = (indexPackData: number, qtyPacks: number) => {
-    if (ITO) {
-      const packs = ITO.packData[indexPackData].packs;
-      if (qtyPacks === 1) {
+    const packs = ITO.packData[indexPackData].packs;
+    if (qtyPacks === 1) {
+      return amount * packs[0].price;
+    } else if (qtyPacks === 2) {
+      if (amount >= 0 && amount <= packs[0].amount) {
         return amount * packs[0].price;
-      } else if (qtyPacks === 2) {
-        if (amount >= 0 && amount <= packs[0].amount) {
-          return amount * packs[0].price;
-        } else if (amount >= packs[1].price) {
-          return amount * packs[1].price;
-        }
+      } else if (amount >= packs[1].price) {
+        return amount * packs[1].price;
       }
-
-      let priceIndex;
-      const range: number[] = [];
-
-      packs.forEach((pack: IPackItem) => {
-        range.push(pack.amount);
-      });
-
-      for (const rangeIndex in range) {
-        if (amount <= range[rangeIndex]) {
-          priceIndex = Number(rangeIndex);
-          break;
-        }
-      }
-
-      let cost = 0;
-
-      if (!priceIndex) {
-        priceIndex = packs.length - 1;
-        cost = amount * packs[priceIndex].price;
-      } else {
-        cost = amount * packs[priceIndex].price;
-      }
-
-      return isFloat(cost) && String(cost).length > 10
-        ? cost.toPrecision(5)
-        : cost;
     }
+
+    let priceIndex;
+    const range: number[] = [];
+
+    packs.forEach((pack: IPackItem) => {
+      range.push(pack.amount);
+    });
+
+    for (const rangeIndex in range) {
+      if (amount <= range[rangeIndex]) {
+        priceIndex = Number(rangeIndex);
+        break;
+      }
+    }
+
+    let cost = 0;
+
+    if (!priceIndex) {
+      priceIndex = packs.length - 1;
+      cost = amount * packs[priceIndex].price;
+    } else {
+      cost = amount * packs[priceIndex].price;
+    }
+
+    return isFloat(cost) && String(cost).length > 10
+      ? Number(cost.toPrecision(5))
+      : cost;
   };
 
   const calculatePriceRange = (
@@ -114,11 +113,19 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
       return;
     }
 
+    if (!packInfo?.precision) {
+      toast.error('Error calculating pack price, please reload page.');
+      return;
+    }
+
     const payload = {
       buyType: 0,
       id: ITO.assetId,
       currencyId,
       amount: amount * 10 ** ITO.precision,
+      currencyAmount:
+        calculateCost(packInfoIndex, packInfo.packs.length) *
+        10 ** packInfo.precision,
     };
 
     const parsedPayload = {

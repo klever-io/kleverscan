@@ -15,7 +15,7 @@ import {
 
 export const displayITOpacks = (
   ITO: IParsedITO,
-  setTxHash: Dispatch<SetStateAction<string>>,
+  setTxHash: Dispatch<SetStateAction<string | null>>,
   t: TFunction,
 ): JSX.Element => {
   return (

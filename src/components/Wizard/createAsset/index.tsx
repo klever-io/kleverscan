@@ -91,7 +91,7 @@ export const propertiesValues = (t: TFunction): any[] => {
       isDefaultChecked: true,
       property: 'canChangeOwner',
       tooltip: t(
-        'wizards:common.advancedOptions.properties.tooltipChangeOwner'
+        'wizards:common.advancedOptions.properties.tooltipChangeOwner',
       ),
     },
     {

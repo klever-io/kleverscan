@@ -78,7 +78,7 @@ const Transfer: React.FC<PropsWithChildren<IContractProps>> = ({
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
-      <KDASelect validateFields={['amount']} />
+      <KDASelect validateFields={['amount']} required />
       <FormSection>
         {!collection?.isNFT && (
           <FormInput

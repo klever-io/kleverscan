@@ -506,7 +506,15 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         typeof e === 'object' && e !== null && 'message' in e
           ? (e as { message: string }).message
           : String(e);
-      toast.error(errorMessage);
+
+      if (
+        errorMessage.includes('invalid signature threshold') ||
+        errorMessage.includes('no contract permission')
+      ) {
+        toast.error(errorMessage.split(': ')[3]);
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       resetFormsData();
     }

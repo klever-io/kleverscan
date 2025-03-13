@@ -33,6 +33,7 @@ import {
   TableContainer,
   TableRow,
   TableRowProps,
+  TableEmptyData,
 } from './styles';
 
 export interface ITable {
@@ -328,7 +329,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
 
           {!isFetching &&
             (!response?.items || response?.items?.length === 0) && (
-              <>
+              <TableEmptyData>
                 <RetryContainer onClick={() => refetch()} $loading={isFetching}>
                   <span>Retry</span>
                   <IoReloadSharp size={20} />
@@ -336,7 +337,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                 <EmptyRow {...props}>
                   <p>Oops! Apparently no data here.</p>
                 </EmptyRow>
-              </>
+              </TableEmptyData>
             )}
         </TableBody>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>

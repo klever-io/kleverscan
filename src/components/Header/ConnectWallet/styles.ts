@@ -6,6 +6,7 @@ import styled, { css, keyframes } from 'styled-components';
 export const ConnectButton = styled.div<{
   walletAddress?: boolean;
   $loading?: boolean;
+  $searching?: boolean;
 }>`
   max-width: 200px;
   width: 100%;
@@ -14,7 +15,8 @@ export const ConnectButton = styled.div<{
   border-radius: 24px;
   position: relative;
   background: ${props => (props.walletAddress ? 'none' : props.theme.violet)};
-
+  opacity: ${props => (props.$searching ? '0' : '1')};
+  pointer-events: ${props => (props.$searching ? 'none' : 'all')};
   display: flex;
   gap: 8px;
   align-items: center;

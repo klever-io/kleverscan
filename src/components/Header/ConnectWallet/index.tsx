@@ -13,7 +13,6 @@ import {
   BackGroundUserInfo,
   BlackSpan,
   ConnectButton,
-  ConnectContainer,
   ConnectedWallet,
   GraySpan,
 } from './styles';

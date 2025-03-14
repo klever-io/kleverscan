@@ -74,8 +74,8 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
 
           window.kleverHub.onAccountChanged((e: any) => {
             if (
-              e.chain === 'KLV' ||
-              (e.chain === 1 && e.address.length === 62)
+              (e.chain === 'KLV' || e.chain === 1) &&
+              e.address.length === 62
             ) {
               setWalletAddress(e.address);
             } else {

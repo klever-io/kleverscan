@@ -73,7 +73,10 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
           await window.kleverHub.initialize();
 
           window.kleverHub.onAccountChanged((e: any) => {
-            if (e.chain === 'KLV' && e.address.length === 62) {
+            if (
+              e.chain === 'KLV' ||
+              (e.chain === 1 && e.address.length === 62)
+            ) {
               setWalletAddress(e.address);
             } else {
               logoutExtension();

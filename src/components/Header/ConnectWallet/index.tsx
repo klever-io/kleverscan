@@ -13,7 +13,6 @@ import {
   BackGroundUserInfo,
   BlackSpan,
   ConnectButton,
-  ConnectContainer,
   ConnectedWallet,
   GraySpan,
 } from './styles';
@@ -34,6 +33,7 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
   const {
     walletAddress,
     extensionLoading,
+    searchingExtension,
     extensionInstalled,
     connectExtension,
     openDrawer,
@@ -92,18 +92,16 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
     <>
       {!extensionInstalled && (
         <>
-          <ConnectContainer>
-            <ConnectButton onClick={handleClick}>
-              <Image
-                src="/Wallet.svg"
-                alt="Wallet"
-                loader={({ src, width }) => `${src}?w=${width}`}
-                width={25}
-                height={25}
-              />
-              <span>Connect Wallet</span>
-            </ConnectButton>
-          </ConnectContainer>
+          <ConnectButton onClick={handleClick} $searching={searchingExtension}>
+            <Image
+              src="/Wallet.svg"
+              alt="Wallet"
+              loader={({ src, width }) => `${src}?w=${width}`}
+              width={25}
+              height={25}
+            />
+            <span>Connect Wallet</span>
+          </ConnectButton>
           <BackgroundHelper
             onClick={closeMenu}
             onTouchStart={closeMenu}

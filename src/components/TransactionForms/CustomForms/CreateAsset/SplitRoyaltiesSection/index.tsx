@@ -17,9 +17,9 @@ import { ButtonContainer } from '../../../styles';
 import { percentageProps, removeWrapper } from '../../utils';
 import { assetsTooltip as tooltip } from '../../utils/tooltips';
 
-export const SplitRoyaltiesSection: React.FC<PropsWithChildren<
-  ISectionProps
->> = ({ isFungible }) => {
+export const SplitRoyaltiesSection: React.FC<
+  PropsWithChildren<ISectionProps>
+> = ({ isFungible }) => {
   const { control, getValues } = useFormContext();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({

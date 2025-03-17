@@ -18,9 +18,9 @@ interface IStakingSectionProps {
   isFPR?: boolean;
 }
 
-export const StakingSection: React.FC<PropsWithChildren<
-  IStakingSectionProps
->> = ({ assetTrigger = false, isFPR: isFPRProp }) => {
+export const StakingSection: React.FC<
+  PropsWithChildren<IStakingSectionProps>
+> = ({ assetTrigger = false, isFPR: isFPRProp }) => {
   const { watch, setValue } = useFormContext();
   const isFPR = watch('staking.interestType');
 

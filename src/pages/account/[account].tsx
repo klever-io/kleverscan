@@ -31,7 +31,6 @@ import {
   ownedAssetsRequest,
   pricesCall,
   rewardsFPRPool,
-  transactionsRequest,
 } from '@/services/requests/account';
 import {
   CardContent,
@@ -89,6 +88,7 @@ import React, {
 } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
+import { requestTransactionsDefault } from '../transactions';
 
 export interface IStakingRewards {
   label: string;
@@ -267,9 +267,12 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   };
 
   const filterFromTo = (op: number) => {
+    const address = router.query.account as string;
     const updatedQuery = { ...router.query };
     if (op === 0) {
       delete updatedQuery.role;
+      delete updatedQuery.fromAddress;
+      delete updatedQuery.toAddress;
       setQueryAndRouter(
         {
           ...updatedQuery,
@@ -277,9 +280,11 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         router,
       );
     } else if (op === 1) {
-      setQueryAndRouter({ ...updatedQuery, role: 'sender' }, router);
+      delete updatedQuery.toAddress;
+      setQueryAndRouter({ ...updatedQuery, fromAddress: address }, router);
     } else if (op === 2) {
-      setQueryAndRouter({ ...updatedQuery, role: 'receiver' }, router);
+      delete updatedQuery.fromAddress;
+      setQueryAndRouter({ ...updatedQuery, toAddress: address }, router);
     }
   };
 
@@ -293,7 +298,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
           return ownedAssetsRequest(address)(page, limit);
         case t('common:Titles.Transactions'):
-          return transactionsRequest(address, router.query)(page, limit);
+          return requestTransactionsDefault(page, limit, router);
         case t('accounts:SingleAccount.Tabs.Buckets'):
           return bucketsRequest(address)(page, limit);
         case t('accounts:SingleAccount.Tabs.Rewards'):

@@ -34,7 +34,7 @@ export const DesktopStepsComponent: React.FC<PropsWithChildren<any>> = ({
 
   useEffect(() => {
     const assetStep = !isNFT ? 9 : 8;
-        if (selectedStep >= assetStep) {
+    if (selectedStep >= assetStep) {
       setShowBasicSteps(true);
     }
     if (selectedStep < assetStep) {

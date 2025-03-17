@@ -38,14 +38,24 @@ export const asyncDoIf = async (
  * @param intervalMS time interval between your promise calls
  * @returns Promise void
  */
-export const doIf = async (
-  success: () => any,
-  failure: () => any,
-  condition: () => boolean,
-  timeoutMS = 5000,
-  intervalMS = 100,
-): Promise<void> => {
+export const doIf = async ({
+  success,
+  failure,
+  finallyCb,
+  condition,
+  timeoutMS,
+  intervalMS,
+}: {
+  success: () => any;
+  failure: () => any;
+  finallyCb: () => any;
+  condition: () => boolean;
+  timeoutMS?: number;
+  intervalMS?: number;
+}): Promise<void> => {
   let interval: any;
+  timeoutMS = timeoutMS || 3000;
+  intervalMS = intervalMS || 100;
 
   const IntervalPromise = new Promise(resolve => {
     interval = setInterval(() => {
@@ -75,4 +85,5 @@ export const doIf = async (
   });
 
   await Promise.race([IntervalPromise, TimeoutPromise]);
+  finallyCb();
 };

@@ -136,6 +136,7 @@ const ConfirmPayload: React.FC<PropsWithChildren> = () => {
           onKeyDown={() => textAreaRef.current?.focus()}
           onClick={() => textAreaRef.current?.focus()}
         >
+          <ErrorMessage>{error}</ErrorMessage>
           <SyntaxHighlighter
             customStyle={{
               backgroundColor: 'transparent',
@@ -169,8 +170,6 @@ const ConfirmPayload: React.FC<PropsWithChildren> = () => {
           ) : (
             <></>
           )}
-
-          <ErrorMessage>{error}</ErrorMessage>
         </DetailsRow>
 
         <ButtonsRow>

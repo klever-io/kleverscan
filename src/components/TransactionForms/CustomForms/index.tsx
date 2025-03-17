@@ -40,9 +40,9 @@ interface IRenderContractProps {
   contractProps: IContractProps;
 }
 
-export const RenderContract: React.FC<PropsWithChildren<
-  IRenderContractProps
->> = ({ contractName, contractProps }) => {
+export const RenderContract: React.FC<
+  PropsWithChildren<IRenderContractProps>
+> = ({ contractName, contractProps }) => {
   const getContractComponent = () => {
     switch (contractName) {
       case 'TransferContract':

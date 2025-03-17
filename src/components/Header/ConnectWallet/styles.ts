@@ -6,6 +6,7 @@ import styled, { css, keyframes } from 'styled-components';
 export const ConnectButton = styled.div<{
   walletAddress?: boolean;
   $loading?: boolean;
+  $searching?: boolean;
 }>`
   max-width: 200px;
   width: 100%;
@@ -14,7 +15,8 @@ export const ConnectButton = styled.div<{
   border-radius: 24px;
   position: relative;
   background: ${props => (props.walletAddress ? 'none' : props.theme.violet)};
-
+  opacity: ${props => (props.$searching ? '0' : '1')};
+  pointer-events: ${props => (props.$searching ? 'none' : 'all')};
   display: flex;
   gap: 8px;
   align-items: center;
@@ -91,32 +93,6 @@ export const ConnectButton = styled.div<{
 export const ButtonAndCopy = styled.div`
   display: flex;
   align-items: center;
-`;
-
-export const ConnectContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  user-select: none;
-  justify-content: flex-start;
-  align-items: flex-start;
-
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 200px;
-    margin-left: 0;
-    margin-top: auto;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    flex-direction: column;
-  }
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 100%;
-    flex-direction: column-reverse;
-    align-items: flex-end;
-    gap: 1.5rem;
-  }
 `;
 
 export const NavBarOptionsContainer = styled.div`

@@ -117,7 +117,9 @@ export const TableRow = styled.div<TableRowProps>`
 `;
 
 export const TableEmptyData = styled.div`
-  display: table-cell;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
   width: 100%;
 `;

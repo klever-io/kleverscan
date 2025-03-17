@@ -11,6 +11,7 @@ import {
 import { toast } from 'react-toastify';
 
 interface IExtension {
+  searchingExtension: boolean;
   extensionInstalled: boolean | undefined;
   connectExtension: () => Promise<void>;
   logoutExtension: () => void;
@@ -30,27 +31,31 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
   const [extensionLoading, setExtensionLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [openDrawer, setOpenDrawer] = useState(false);
+  const [searchingExtension, setSearchingExtension] = useState(true);
 
   useEffect(() => {
     const init = async () => {
       if (typeof window !== 'undefined') {
-        await doIf(
-          () => setExtensionInstalled(true),
-          () => {
+        doIf({
+          success: () => {
+            setExtensionInstalled(true);
+            connectExtension();
+          },
+          failure: () => {
             logoutExtension();
             setExtensionInstalled(false);
           },
-          () => window.kleverWeb !== undefined,
-          1500, //timeout
-        );
+          finallyCb: () => setSearchingExtension(false),
+          condition: () => window.kleverWeb !== undefined,
+        });
       }
     };
+
     init();
   }, []);
 
   const logoutExtension = useCallback(async () => {
     setWalletAddress('');
-    sessionStorage.removeItem('walletAddress');
   }, [walletAddress]);
 
   const connectExtension = async () => {
@@ -73,7 +78,10 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
           await window.kleverHub.initialize();
 
           window.kleverHub.onAccountChanged((e: any) => {
-            if (e.chain === 'KLV' && e.address.length === 62) {
+            if (
+              (e.chain === 'KLV' || e.chain === 1) &&
+              e.address.length === 62
+            ) {
               setWalletAddress(e.address);
             } else {
               logoutExtension();
@@ -102,6 +110,7 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
   };
 
   const values: IExtension = {
+    searchingExtension,
     extensionInstalled,
     connectExtension,
     logoutExtension,

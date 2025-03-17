@@ -240,6 +240,25 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
     setCollectionValue(value);
   };
 
+  const handleSelectedValue = () => {
+    if (isMultiContract) {
+      return undefined;
+    }
+
+    if (selectedCollection?.value) {
+      return selectedCollection;
+    }
+
+    if (queue[0].collection) {
+      return {
+        label: queue[0].collection?.label || '',
+        value: queue[0].collection?.value || '',
+      };
+    }
+
+    return undefined;
+  };
+
   return (
     <SelectContainer key={selectedCollection?.assetId}>
       <SelectContent configITO={contractType === 'ConfigITOContract'}>
@@ -267,16 +286,7 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
           options={options}
           onChange={onChangeHandler}
           loading={loading}
-          selectedValue={
-            selectedCollection?.value
-              ? selectedCollection
-              : queue[0].collection
-                ? {
-                    label: queue[0].collection?.label || '',
-                    value: queue[0].collection?.value || '',
-                  }
-                : undefined
-          }
+          selectedValue={handleSelectedValue()}
           zIndex={3}
           error={Boolean(collectionError)}
         />

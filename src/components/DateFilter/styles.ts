@@ -126,6 +126,35 @@ export const Input = styled.input`
   }
 `;
 
+export const TimeFilterContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 1rem 0 1rem;
+  color: ${props => props.theme.black};
+`;
+
+export const TimeSelector = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  color: ${props => props.theme.black};
+`;
+
+export const TimeInput = styled.input`
+  color: ${props => props.theme.black};
+  justify-items: center;
+  padding: 0 0.1rem;
+  border-bottom: 1px solid ${props => props.theme.gray700};
+  ${props => props.theme.dark && `color-scheme: dark;`}
+  width: fit-content;
+  min-width: 4rem;
+  &::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+`;
+
 export const CalendarContainer = styled.div`
   display: flex;
   flex-direction: column;

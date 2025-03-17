@@ -33,6 +33,7 @@ import {
   TableContainer,
   TableRow,
   TableRowProps,
+  TableEmptyData,
 } from './styles';
 
 export interface ITable {
@@ -231,22 +232,25 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
       )}
       <ContainerView ref={tableRef}>
         <TableBody smaller={smaller}>
-          {!isMobile && !isTablet && (
-            <TableRow>
-              {header?.map((item, index) => (
-                <HeaderItem
-                  key={JSON.stringify(item)}
-                  smaller={smaller}
-                  totalColumns={header.length}
-                  currentColumn={index}
-                  dynamicWidth={rowSections(item)?.[index]?.width}
-                  maxWidth={rowSections(item)?.[index]?.maxWidth}
-                >
-                  {item}
-                </HeaderItem>
-              ))}
-            </TableRow>
-          )}
+          {!isMobile &&
+            !isTablet &&
+            response?.items &&
+            response?.items.length !== 0 && (
+              <TableRow>
+                {header?.map((item, index) => (
+                  <HeaderItem
+                    key={JSON.stringify(item)}
+                    smaller={smaller}
+                    totalColumns={header.length}
+                    currentColumn={index}
+                    dynamicWidth={rowSections(item)?.[index]?.width}
+                    maxWidth={rowSections(item)?.[index]?.maxWidth}
+                  >
+                    {item}
+                  </HeaderItem>
+                ))}
+              </TableRow>
+            )}
 
           {isLoading && (
             <>
@@ -328,7 +332,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
 
           {!isFetching &&
             (!response?.items || response?.items?.length === 0) && (
-              <>
+              <TableEmptyData>
                 <RetryContainer onClick={() => refetch()} $loading={isFetching}>
                   <span>Retry</span>
                   <IoReloadSharp size={20} />
@@ -336,7 +340,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                 <EmptyRow {...props}>
                   <p>Oops! Apparently no data here.</p>
                 </EmptyRow>
-              </>
+              </TableEmptyData>
             )}
         </TableBody>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>

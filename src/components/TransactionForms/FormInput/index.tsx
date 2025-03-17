@@ -36,6 +36,7 @@ import {
   TooltipContent,
   ValidateButton,
 } from './styles';
+import { InlineLoader } from '@/components/Loader';
 
 const Select = dynamic(() => import('./Select'), {
   ssr: false,
@@ -82,10 +83,12 @@ export interface IBaseFormInputProps
 
 export interface IFormInputProps extends IBaseFormInputProps {
   name: string;
+  apiError?: string | null;
 }
 
 export interface ICustomFormInputProps extends IBaseFormInputProps {
   onChange: ChangeEventHandler<any>;
+  apiError?: string | null;
 }
 
 export const customOptions = [
@@ -177,6 +180,7 @@ const FormInput: React.FC<
   creatable,
   precision = 8,
   logoError = null,
+  apiError = null,
   handleScrollBottom,
   dynamicInitialValue,
   canBeNaN = false,
@@ -204,6 +208,8 @@ const FormInput: React.FC<
     getValues,
   } = useFormContext();
 
+  const error = name && (errors[name] || (apiError && { message: apiError }));
+
   useDidUpdateEffect(() => {
     if (type === 'dropdown') {
       setIsCustom(customDropdownOptions[0]);
@@ -211,8 +217,6 @@ const FormInput: React.FC<
       setIsCustom(customOptions[0]);
     }
   }, [type]);
-
-  let error = name && errors[name];
 
   useEffect(() => {
     name && dynamicInitialValue && setValue(name, dynamicInitialValue);
@@ -426,6 +430,7 @@ const FormInput: React.FC<
           {tooltip && (
             <TooltipContainer>
               <InfoIcon />
+              {loading && <InlineLoader />}
               <TooltipContent>
                 <span>{tooltip}</span>
               </TooltipContent>
@@ -518,12 +523,12 @@ const FormInput: React.FC<
         type !== 'file' &&
         type !== 'hidden' && <StyledInput {...inputProps} />}
 
-      {error && (
+      {(error || apiError) && (
         <ErrorMessage
           style={{ color: 'red', fontSize: '0.8rem' }}
           warning={title === 'Logo'}
         >
-          {error?.message}
+          {error?.message || apiError}
         </ErrorMessage>
       )}
       {logoError && (

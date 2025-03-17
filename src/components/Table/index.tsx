@@ -329,15 +329,22 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
 
           {!isFetching &&
             (!response?.items || response?.items?.length === 0) && (
-              <TableEmptyData>
-                <RetryContainer onClick={() => refetch()} $loading={isFetching}>
-                  <span>Retry</span>
-                  <IoReloadSharp size={20} />
-                </RetryContainer>
-                <EmptyRow {...props}>
-                  <p>Oops! Apparently no data here.</p>
-                </EmptyRow>
-              </TableEmptyData>
+              <TableRow>
+                <TableEmptyData>
+                  <div style={{ display: 'flow' }}>
+                    <RetryContainer
+                      onClick={() => refetch()}
+                      $loading={isFetching}
+                    >
+                      <span>Retry</span>
+                      <IoReloadSharp size={20} />
+                    </RetryContainer>
+                    <EmptyRow {...props}>
+                      <p>Oops! Apparently no data here.</p>
+                    </EmptyRow>
+                  </div>
+                </TableEmptyData>
+              </TableRow>
             )}
         </TableBody>
         <BackTopButton onClick={handleScrollTop} isHidden={scrollTop}>

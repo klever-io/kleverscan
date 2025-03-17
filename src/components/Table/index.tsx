@@ -234,8 +234,8 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         <TableBody smaller={smaller}>
           {!isMobile &&
             !isTablet &&
-            !response?.items &&
-            response?.items?.length === 0 && (
+            response?.items &&
+            response?.items.length !== 0 && (
               <TableRow>
                 {header?.map((item, index) => (
                   <HeaderItem

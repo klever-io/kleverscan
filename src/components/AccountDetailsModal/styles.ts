@@ -1,12 +1,9 @@
-import { transparentize } from 'polished';
-import { MdArrowDropDown } from 'react-icons/md';
 import styled, { css, keyframes } from 'styled-components';
 
 export const FadeIn = keyframes`
   from {
     opacity: 0.1;
     transform: translateX(-25%) translateY(-4px);
-
   }
   to {
     opacity: 1;
@@ -22,46 +19,35 @@ export const UserInfoContainer = styled.div<{
   top: 4.4rem;
   right: 0rem;
   z-index: 7;
-
-  visibility: ${props => (props.openUserInfos ? 'visible' : 'hidden')};
-  opacity: ${props => (props.openUserInfos ? '1' : '0')};
-
-  transition: opacity 0.1s linear;
-
-  /* background-color: ${props => props.theme.card.background}; */
-
-  background-color: #12121b;
-
-  display: flex;
-  flex-direction: column;
-
   width: ${props => (props.isMobile ? '95vw' : '25rem')};
   max-width: 25rem;
-  /* border: 1px solid ${props => props.theme.card.border}; */
+  max-height: calc(100vh - 5rem);
+  display: flex;
+  flex-direction: column;
+  visibility: ${props => (props.openUserInfos ? 'visible' : 'hidden')};
+  opacity: ${props => (props.openUserInfos ? '1' : '0')};
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: ${({ theme }) => (theme.dark ? '#12121b' : '#F8FAFC')};
   border-radius: 1rem 0 0 1rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: opacity 0.1s linear;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     right: unset;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
     font-size: 1.3rem;
   }
 `;
 
 export const HeaderInfo = styled.div`
   position: relative;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  /* padding-inline-start: 0.75rem;
-  padding-inline-end: 0.75rem; */
   padding-bottom: 1rem;
-
   color: ${props => props.theme.true.white};
   font-size: 1.2rem;
   font-weight: 400;
@@ -79,16 +65,13 @@ export const HeaderInfo = styled.div`
 
 export const MyWalletContainer = styled.div`
   position: relative;
-  gap: 0.5rem;
   display: flex;
   flex-direction: column;
-
-  border: 1px solid #181935;
-  border-radius: 8px;
-
+  gap: 0.5rem;
   padding: 0.5rem;
-
   color: ${props => props.theme.true.white};
+  border: 1px solid ${({ theme }) => (theme.dark ? '#181935' : '#4D4D4D')};
+  border-radius: 8px;
 
   small {
     font-weight: 400;
@@ -103,19 +86,14 @@ export const MyWalletContainer = styled.div`
 
 export const MyProjectsContent = styled.div`
   position: relative;
-
   display: flex;
   flex-direction: column;
-
   gap: 1rem;
-
-  border: 1px solid #181935;
-  background-color: #13131d;
-  border-radius: 8px;
-
   padding: 0.5rem;
-
   color: ${props => props.theme.true.white};
+  background-color: #13131d;
+  border: 1px solid ${({ theme }) => (theme.dark ? '#181935' : '#4D4D4D')};
+  border-radius: 8px;
 
   small {
     font-weight: 400;
@@ -147,11 +125,10 @@ export const QRCodeContent = styled.div`
 
   div {
     --size: 80px;
-
-    background-color: #fff;
     width: var(--size);
     height: var(--size);
     padding: 0.3rem;
+    background-color: #fff;
     border-radius: 0.2rem;
 
     svg {
@@ -164,20 +141,20 @@ export const QRCodeContent = styled.div`
 
 export const MyWalletContent = styled.div`
   display: flex;
-  width: 100%;
-  height: 100%;
   flex-direction: row;
   justify-content: space-between;
-  background-color: #181821;
-  border-radius: 0.5rem;
+  width: 100%;
+  height: 100%;
   padding: 1rem;
+  background-color: ${({ theme }) => (theme.dark ? '#181821' : '#1E1E1E')};
+  border-radius: 0.5rem;
 `;
 
 export const AssetItem = styled.div`
   display: flex;
-  width: 100%;
   flex-direction: row;
   align-items: center;
+  width: 100%;
   gap: 0.5rem;
   padding: 0 1rem;
   cursor: pointer;
@@ -186,33 +163,33 @@ export const AssetItem = styled.div`
 export const AssetContent = styled.div`
   display: flex;
   flex-direction: row;
-  width: 100%;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 `;
 
 export const AssetName = styled.div`
   display: flex;
-  align-items: start;
   flex-direction: column;
+  align-items: start;
   font-size: 0.875rem;
+  font-weight: 700;
+  color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#1E1E1E')};
+
   p:nth-child(2) {
-    color: ${props => props.theme.gray700};
     font-size: 0.625rem;
     font-weight: 700;
+    color: ${({ theme }) => (theme.dark ? '#B7BDC6' : '#6F6F6F')};
   }
 `;
 
 export const AssetPrice = styled.div`
   display: flex;
-  align-items: end;
   flex-direction: column;
+  align-items: end;
   font-size: 0.875rem;
-  p:nth-child(2) {
-    color: ${props => props.theme.gray700};
-    font-size: 0.75rem;
-    font-weight: 400;
-  }
+  font-weight: 700;
+  color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#1E1E1E')};
 `;
 
 export const MyWalletInfo = styled.div`
@@ -233,27 +210,27 @@ export const PrimaryAssetContent = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  font-size: 1.5rem;
   gap: 0.5rem;
+  font-size: 1.5rem;
 `;
 
 export const ReloadContainer = styled.div`
   display: flex;
   align-items: center;
-  width: 100%;
   justify-content: center;
+  width: 100%;
   min-height: 1.5rem;
 `;
 
 export const BalanceContainer = styled.span`
-  font-weight: 600;
-  color: ${props => props.theme.violet};
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   gap: 0.5rem;
   padding: 0 0 0 1.5rem;
+  color: ${props => props.theme.violet};
+  font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
 `;
@@ -267,85 +244,9 @@ export const ContainerAsset = styled.div`
 
 export const SpanDropdown = styled.div`
   display: flex;
+
   svg {
     cursor: pointer;
-  }
-`;
-
-export const DropdownIcon = styled(MdArrowDropDown)<{
-  $openOtherAssets: boolean;
-}>`
-  font-size: 2rem;
-  transform: rotate(${props => (props.$openOtherAssets ? 0 : 180)}deg);
-`;
-
-export const OtherAssetsContainer = styled.div<{ isMobile?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-  max-width: 30rem;
-  min-width: 10rem;
-  max-height: 15rem;
-  overflow: auto;
-  position: absolute;
-  top: ${props => (props.isMobile ? '15rem' : '13.5rem')};
-  left: ${props => (props.isMobile ? '8.5rem' : '6.2rem')};
-  padding: 0.75rem 0.75rem;
-  box-shadow:
-    0 0.4rem 0.8rem 0 rgba(0, 0, 0, 0.2),
-    0 0.6rem 1rem 0 rgba(0, 0, 0, 0.19);
-  background-color: ${props => props.theme.card.assetText};
-  border-radius: 0.5rem;
-  transform: translateX(-25%);
-  animation: ${FadeIn} 0.1s ease-in-out;
-  z-index: 2;
-
-  div {
-    display: flex;
-    white-space: nowrap;
-    cursor: pointer;
-    gap: 0.4rem;
-    width: 100%;
-    max-height: 5rem;
-    min-height: 1.6rem;
-    justify-content: flex-end;
-    padding-right: 0.5rem;
-    padding-left: 0.3rem;
-    align-items: center;
-
-    &:hover {
-      border-radius: 0.375rem;
-      background-color: ${props => props.theme.footer.border};
-      color: ${props => props.theme.true.white};
-      font-weight: 500;
-    }
-  }
-  span,
-  p {
-    text-overflow: ellipsis;
-    font-weight: 600;
-    color: ${props => props.theme.lightGray};
-    font-size: 0.9rem;
-  }
-
-  &::-webkit-scrollbar {
-    position: absolute;
-    height: 0.5rem;
-    width: 0.4rem;
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 15px;
-  }
-  &:hover {
-    &::-webkit-scrollbar-thumb {
-      background: ${props => transparentize(0.75, props.theme.black)};
-    }
   }
 `;
 
@@ -362,23 +263,21 @@ export const IoReloadSharpWrapper = styled.div<{
   $loading: boolean;
 }>`
   svg {
-    cursor: pointer;
     margin-top: 0.3rem;
     margin-left: auto;
     color: ${props => props.theme.darkText};
+    cursor: pointer;
     animation: ${props => (props.$loading ? rotate : 'none')} 1s linear infinite;
   }
 `;
 
 export const BodyContent = styled.div`
   position: relative;
-
-  width: 100%;
-  color: ${props => props.theme.lightGray};
-
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 4px;
+  color: ${props => props.theme.lightGray};
 
   > div:nth-child(1) {
     border: none;
@@ -390,16 +289,30 @@ export const BodyContent = styled.div`
 `;
 
 export const SeeTokens = styled.div`
-  color: ${props => props.theme.true.white};
-
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  padding: 0.5rem 0;
+  color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#1E1E1E')};
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 0.5rem 0;
+
+  svg {
+    path {
+      stroke: ${props => (props.theme.dark ? '#FFFFFF' : '#1E1E1E')};
+    }
+  }
+`;
+
+export const Usage = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  color: #b7bdc6;
+  font-size: 0.625rem;
+  font-weight: 700;
 `;
 
 export const OwnedItem = styled.div<{
@@ -408,17 +321,13 @@ export const OwnedItem = styled.div<{
   disabled?: boolean;
 }>`
   position: static;
-
   display: flex;
   align-items: center;
   gap: 0.45rem;
-
   height: 2.5rem;
-
+  color: ${props => props.theme.true.white};
   font-size: 1rem;
   font-weight: 500;
-  color: ${props => props.theme.true.white};
-
   cursor: pointer;
   user-select: none;
 
@@ -430,56 +339,48 @@ export const OwnedItem = styled.div<{
       filter: grayscale(0.25);
     `}
 
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: 1.1rem;
-    gap: 1rem;
-  }
-
   svg {
     margin-left: auto;
-
     transition: transform 0.2s ease-in-out;
+
     ${props =>
       props.active &&
       css`
         transform: rotate(180deg);
       `}
   }
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: 1.1rem;
+    gap: 1rem;
+  }
 `;
 
 export const AccordionContent = styled.div`
-  color: ${props => props.theme.true.white};
-
   display: flex;
-  gap: 0.5rem;
   flex-direction: column;
   width: 100%;
+  gap: 0.5rem;
+  color: ${props => props.theme.true.white};
 `;
 
 export const TransactionContainer = styled.div`
-  color: ${props => props.theme.true.white};
-  gap: 0.375rem;
-
   display: flex;
   flex-direction: row;
   width: 100%;
+  gap: 0.375rem;
+  color: ${props => props.theme.true.white};
 `;
 
 export const TransactionContent = styled.div`
-  color: ${props => props.theme.true.white};
-
-  background-color: #171723;
-
-  border-radius: 0.5rem;
-
-  padding: 0.5rem;
-
-  gap: 0.25rem;
-
   display: flex;
   flex-direction: column;
   width: 100%;
-
+  gap: 0.25rem;
+  padding: 0.5rem;
+  color: ${props => props.theme.true.white};
+  background-color: #171723;
+  border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 700;
 
@@ -507,19 +408,33 @@ export const TransactionContent = styled.div`
   }
 `;
 
+export const TotalTransactions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  color: ${props => props.theme.true.white};
+
+  span {
+    color: #4ebc87;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+`;
+
 export const ProgressBarContainer = styled.div`
   width: 100%;
+  height: 0.5rem;
   background-color: #1e1e29;
   border-radius: 0.5rem;
-  height: 0.5rem;
   overflow: hidden;
 `;
 
 export const ProgressBarFill = styled.div<{
   percentage?: number;
 }>`
-  height: 100%;
   width: ${props => props.percentage}%;
+  height: 100%;
   background-color: ${props => {
     const percentage = props.percentage;
     if (percentage <= 50) return '#4EBC87';
@@ -535,40 +450,32 @@ export const Pill = styled.div<{
   bgColor?: string;
   borderColor?: string;
 }>`
-  background-color: ${props => props.bgColor};
-  padding: 0.5rem 1rem;
   display: flex;
-  width: fit-content;
   align-items: center;
   justify-content: center;
-  border: 1px solid ${props => props.borderColor || '#222345'};
+  width: ${props => (props.full ? '100%' : 'fit-content')};
+  padding: 0.5rem 1rem;
   color: ${props => props.theme.true.white};
-  font-weight: 700;
-  font-size: 0.85rem;
+  background-color: ${props => props.bgColor};
+  border: 1px solid ${props => props.borderColor || '#222345'};
   border-radius: 2rem;
-  ${props =>
-    props.full &&
-    css`
-      width: 100%;
-    `}
+  font-size: 0.85rem;
+  font-weight: 700;
 `;
+
 export const ActionItem = styled.div<{
   secondary?: boolean;
   active?: boolean;
   disabled?: boolean;
 }>`
   position: static;
-
   display: flex;
   align-items: center;
   gap: 0.45rem;
-
   height: 2.5rem;
-
+  color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#1E1E1E')};
   font-size: 1rem;
-  font-weight: 500;
-  color: ${props => props.theme.true.white};
-
+  font-weight: 700;
   cursor: pointer;
   user-select: none;
 
@@ -580,16 +487,18 @@ export const ActionItem = styled.div<{
       filter: grayscale(0.25);
     `}
 
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    font-size: 1.1rem;
-    gap: 1rem;
-  }
-
   svg {
+    &:nth-child(1) {
+      path {
+        fill: ${props =>
+          props.theme.dark ? props.theme.true.white : props.theme.true.black};
+      }
+    }
+
     &:nth-child(3) {
       margin-left: auto;
-
       transition: transform 0.2s ease-in-out;
+
       ${props =>
         props.active &&
         css`
@@ -597,9 +506,17 @@ export const ActionItem = styled.div<{
         `}
     }
   }
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    font-size: 1.1rem;
+    gap: 1rem;
+  }
 `;
 
 export const SubSection = styled.div<{ active?: boolean }>`
+  padding: 1rem;
+  border-top: 1px solid ${({ theme }) => (theme.dark ? '#222345' : '#E1E1E1')};
+
   ${props =>
     props.active &&
     css`
@@ -607,7 +524,4 @@ export const SubSection = styled.div<{ active?: boolean }>`
       flex-direction: column;
       gap: 4px;
     `}
-
-  padding: 1rem;
-  border-top: 1px solid #222345;
 `;

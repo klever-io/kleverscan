@@ -48,8 +48,10 @@ import {
   QRCodeContent,
   SeeTokens,
   SubSection,
+  TotalTransactions,
   TransactionContainer,
   TransactionContent,
+  Usage,
   UserInfoContainer,
 } from './styles';
 import { getAssetsByOwner, getOwnedAssets } from '@/services/requests/asset';
@@ -203,28 +205,6 @@ export const AccountDetailsModal: React.FC<
         ? prev.filter(accordionId => accordionId !== assetId)
         : [...prev, assetId],
     );
-  };
-
-  const requestKLV = async () => {
-    setLoadingBalance(true);
-    const response = await api.post({
-      route: `transaction/send-user-funds/${walletAddress}`,
-    });
-
-    if (response?.error) {
-      const error =
-        response?.error.replace('transaction generation failed:', '') ||
-        'You already ordered KLV in less than 24 hours!';
-
-      toast.error(error);
-      setLoadingBalance(false);
-    } else {
-      toast.success('Test KLV request successful!');
-      setLoadingBalance(true);
-      getAccountBalance();
-    }
-
-    setLoadingBalance(false);
   };
 
   const onClickSetAssetPrimary = (assetId: string, balance: string) => {
@@ -440,7 +420,18 @@ export const AccountDetailsModal: React.FC<
                               <TransactionContainer>
                                 <TransactionContent>
                                   <p>Total transactions</p>
-                                  {asset.transactionData?.totalRecords}
+
+                                  <TotalTransactions>
+                                    {asset.transactionData?.totalRecords}
+                                    <span>
+                                      +
+                                      {asset.transactionData?.totalRecords >
+                                        0 &&
+                                      asset.transactionLastDay?.totalRecords
+                                        ? `${((asset.transactionLastDay.totalRecords / asset.transactionData.totalRecords) * 100).toFixed(2)}%`
+                                        : '0%'}
+                                    </span>
+                                  </TotalTransactions>
                                 </TransactionContent>
                                 <TransactionContent>
                                   <p>Last 24h</p>
@@ -462,22 +453,19 @@ export const AccountDetailsModal: React.FC<
                                   {poolMetrics.totalKLVUsed} /{' '}
                                   {poolMetrics.total} KLV
                                 </h4>
-                                <p>Usage</p>
-                                <p
-                                  style={{
-                                    textAlign: 'right',
-                                    marginTop: '4px',
-                                    fontSize: '0.9em',
-                                    fontWeight: 'bold',
-                                  }}
-                                >
-                                  {(
-                                    (poolMetrics.totalKLVUsed /
-                                      poolMetrics.total) *
-                                    100
-                                  ).toFixed(2)}
-                                  /100%
-                                </p>
+
+                                <Usage>
+                                  <p>Usage</p>
+                                  <p>
+                                    {(
+                                      (poolMetrics.totalKLVUsed /
+                                        poolMetrics.total) *
+                                      100
+                                    ).toFixed(2)}
+                                    /100%
+                                  </p>
+                                </Usage>
+
                                 <ProgressBarContainer>
                                   <ProgressBarFill
                                     percentage={
@@ -491,27 +479,33 @@ export const AccountDetailsModal: React.FC<
                             </TransactionContainer>
                           )}
 
-                          <div style={{ width: '100%' }}>
-                            <Link
-                              href={`create-transaction?contract=DepositContract&contractDetails=%7B"depositType"%3A1%2C"collection"%3A"${asset.assetId}"%7D`}
-                            >
-                              <Pill
-                                full={true}
-                                bgColor="#AA33B5"
-                                borderColor="#AA33B5"
+                          {poolMetrics && (
+                            <div style={{ width: '100%' }}>
+                              <Link
+                                href={`create-transaction?contract=DepositContract&contractDetails=%7B"depositType"%3A1%2C"collection"%3A"${asset.assetId}"%7D`}
                               >
-                                Deposit to KDA Fee Pool
-                              </Pill>
-                            </Link>
-                          </div>
+                                <Pill
+                                  full={true}
+                                  bgColor="#AA33B5"
+                                  borderColor="#AA33B5"
+                                >
+                                  Deposit to KDA Fee Pool
+                                </Pill>
+                              </Link>
+                            </div>
+                          )}
 
-                          <div style={{ width: '100%' }}>
-                            <Link href={`/asset/${asset.assetId}`}>
-                              <Pill full={true} borderColor="#AA33B5">
-                                Go to KDA Fee Pool Page
-                              </Pill>
-                            </Link>
-                          </div>
+                          {poolMetrics && (
+                            <div style={{ width: '100%' }}>
+                              <Link
+                                href={`/asset/${asset.assetId}?card=KDA+Pool`}
+                              >
+                                <Pill full={true} borderColor="#AA33B5">
+                                  Go to KDA Fee Pool Page
+                                </Pill>
+                              </Link>
+                            </div>
+                          )}
 
                           <div style={{ width: '100%' }}>
                             <Link href={`/asset/${asset.assetId}`}>

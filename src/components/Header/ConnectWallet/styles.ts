@@ -320,19 +320,11 @@ export const ConnectedWallet = styled.div`
   align-items: center;
   flex-direction: row;
   position: relative;
-  background-color: #161616;
+  background-color: ${({ theme }) => (theme.dark ? '#161616' : '#FFFFFF')};
+  border: 1px solid ${({ theme }) => (theme.dark ? '#161616' : '#E1E1E1')};
   border-radius: 0.5rem;
   padding: 0.75rem;
   gap: 0.5rem;
-  /* &::after {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background-color: ${props => props.theme.green};
-    content: '';
-    position: absolute;
-    right: -15px;
-  } */
 `;
 
 export const GraySpan = styled.span`
@@ -348,4 +340,6 @@ export const GraySpan = styled.span`
 
 export const BlackSpan = styled.span`
   color: ${props => props.theme.black};
+  font-size: 0.75rem;
+  font-weight: 700;
 `;

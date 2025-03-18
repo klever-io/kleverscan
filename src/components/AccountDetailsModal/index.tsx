@@ -28,6 +28,7 @@ import { useQuery } from 'react-query';
 import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import {
+  AccordionContent,
   ActionItem,
   AssetContent,
   AssetItem,
@@ -42,12 +43,16 @@ import {
   OwnedItem,
   Pill,
   PrimaryAssetContent,
+  ProgressBarContainer,
+  ProgressBarFill,
   QRCodeContent,
   SeeTokens,
   SubSection,
+  TransactionContainer,
+  TransactionContent,
   UserInfoContainer,
 } from './styles';
-import { getAssetsByOwner } from '@/services/requests/asset';
+import { getAssetsByOwner, getOwnedAssets } from '@/services/requests/asset';
 
 import AssetLogo from '../Logo/AssetLogo';
 
@@ -151,9 +156,42 @@ export const AccountDetailsModal: React.FC<
 
   const { data: ownedAssets } = useQuery({
     queryKey: ['ownedAssets', walletAddress],
-    queryFn: () => getAssetsByOwner(walletAddress),
+    queryFn: () => getOwnedAssets(walletAddress),
     enabled: !!walletAddress,
   });
+
+  const calculatePoolMetrics = asset => {
+    if (!asset.poolData) {
+      return {
+        available: 0,
+        quotient: 0,
+        used: 0,
+        total: 0,
+      };
+    }
+
+    const { precision } = asset;
+    const { klvBalance, kdaBalance, fRatioKDA, fRatioKLV } = asset.poolData;
+
+    const parsedKLVBalance = klvBalance / 10 ** 6;
+
+    const parsedKdaBalance = kdaBalance / 10 ** precision;
+
+    const available = klvBalance / 10 ** 6;
+
+    const quotient = fRatioKDA / 10 ** precision / (fRatioKLV / 10 ** 6);
+
+    const totalKLVUsed = parsedKdaBalance / quotient;
+
+    const total = totalKLVUsed + parsedKLVBalance;
+
+    return {
+      available,
+      quotient,
+      totalKLVUsed,
+      total,
+    };
+  };
 
   const [openAccordions, setOpenAccordions] = useState(
     ownedAssets?.length ? [ownedAssets[0].assetId] : [],
@@ -285,7 +323,12 @@ export const AccountDetailsModal: React.FC<
                         {primaryAsset[0].assetId === 'KLV' ? (
                           <KLV />
                         ) : (
-                          <span>{primaryAsset[0].assetId}</span>
+                          <AssetLogo
+                            logo=""
+                            ticker={primaryAsset[0]?.assetId || ''}
+                            name={primaryAsset[0]?.assetId || ''}
+                            size={24}
+                          />
                         )}
                         <span>{primaryAsset[0].balance || '---'}</span>
                       </PrimaryAssetContent>
@@ -370,29 +413,116 @@ export const AccountDetailsModal: React.FC<
 
             {openCategory && (
               <MyProjectsContainer>
-                {ownedAssets.map(asset => (
-                  <MyProjectsContent key={asset.assetId}>
-                    <OwnedItem
-                      onClick={() => toggleAccordion(asset.assetId)}
-                      active={openAccordions.includes(asset.assetId)}
-                    >
-                      <AssetLogo
-                        logo={asset?.logo || ''}
-                        ticker={asset?.ticker || ''}
-                        name={asset?.name || ''}
-                        size={24}
-                      />
-                      <p>{asset.name}</p>
-                      <RiArrowDownSLine size={'1.5rem'} />
-                    </OwnedItem>
+                {ownedAssets.map(asset => {
+                  const poolMetrics = asset.poolData
+                    ? calculatePoolMetrics(asset)
+                    : null;
 
-                    {openAccordions.includes(asset.assetId) && (
-                      <Link href={`/asset/${asset.assetId}`}>
-                        <Pill full={true}>Go to Asset page</Pill>
-                      </Link>
-                    )}
-                  </MyProjectsContent>
-                ))}
+                  return (
+                    <MyProjectsContent key={asset.assetId}>
+                      <OwnedItem
+                        onClick={() => toggleAccordion(asset.assetId)}
+                        active={openAccordions.includes(asset.assetId)}
+                      >
+                        <AssetLogo
+                          logo={asset?.logo || ''}
+                          ticker={asset?.ticker || ''}
+                          name={asset?.name || ''}
+                          size={24}
+                        />
+                        <p>{asset.name}</p>
+                        <RiArrowDownSLine size={'1.5rem'} />
+                      </OwnedItem>
+                      {openAccordions.includes(asset.assetId) && (
+                        <AccordionContent>
+                          {asset.transactionData &&
+                            asset.transactionLastDay && (
+                              <TransactionContainer>
+                                <TransactionContent>
+                                  <p>Total transactions</p>
+                                  {asset.transactionData?.totalRecords}
+                                </TransactionContent>
+                                <TransactionContent>
+                                  <p>Last 24h</p>
+                                  {asset.transactionLastDay &&
+                                  asset.transactionLastDay.totalRecords > 0
+                                    ? `+${asset.transactionLastDay.totalRecords}`
+                                    : asset.transactionLastDay?.totalRecords ||
+                                      0}
+                                </TransactionContent>
+                              </TransactionContainer>
+                            )}
+
+                          {poolMetrics && (
+                            <TransactionContainer>
+                              <TransactionContent>
+                                <h2>KDA Fee Pool</h2>
+                                <h3>{poolMetrics.available} available KLV</h3>
+                                <h4>
+                                  {poolMetrics.totalKLVUsed} /{' '}
+                                  {poolMetrics.total} KLV
+                                </h4>
+                                <p>Usage</p>
+                                <p
+                                  style={{
+                                    textAlign: 'right',
+                                    marginTop: '4px',
+                                    fontSize: '0.9em',
+                                    fontWeight: 'bold',
+                                  }}
+                                >
+                                  {(
+                                    (poolMetrics.totalKLVUsed /
+                                      poolMetrics.total) *
+                                    100
+                                  ).toFixed(2)}
+                                  /100%
+                                </p>
+                                <ProgressBarContainer>
+                                  <ProgressBarFill
+                                    percentage={
+                                      (poolMetrics.totalKLVUsed /
+                                        poolMetrics.total) *
+                                      100
+                                    }
+                                  />
+                                </ProgressBarContainer>
+                              </TransactionContent>
+                            </TransactionContainer>
+                          )}
+
+                          <div style={{ width: '100%' }}>
+                            <Link
+                              href={`create-transaction?contract=DepositContract&contractDetails=%7B"depositType"%3A1%2C"collection"%3A"${asset.assetId}"%7D`}
+                            >
+                              <Pill
+                                full={true}
+                                bgColor="#AA33B5"
+                                borderColor="#AA33B5"
+                              >
+                                Deposit to KDA Fee Pool
+                              </Pill>
+                            </Link>
+                          </div>
+
+                          <div style={{ width: '100%' }}>
+                            <Link href={`/asset/${asset.assetId}`}>
+                              <Pill full={true} borderColor="#AA33B5">
+                                Go to KDA Fee Pool Page
+                              </Pill>
+                            </Link>
+                          </div>
+
+                          <div style={{ width: '100%' }}>
+                            <Link href={`/asset/${asset.assetId}`}>
+                              <Pill full={true}>Go to Asset page</Pill>
+                            </Link>
+                          </div>
+                        </AccordionContent>
+                      )}
+                    </MyProjectsContent>
+                  );
+                })}
               </MyProjectsContainer>
             )}
           </SubSection>

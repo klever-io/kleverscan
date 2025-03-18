@@ -447,33 +447,111 @@ export const OwnedItem = styled.div<{
   }
 `;
 
-export const Pill = styled.div<{
-  full?: boolean;
-}>`
-  padding: 0.5rem 1rem;
+export const AccordionContent = styled.div`
+  color: ${props => props.theme.true.white};
 
   display: flex;
+  gap: 0.5rem;
+  flex-direction: column;
+  width: 100%;
+`;
 
+export const TransactionContainer = styled.div`
+  color: ${props => props.theme.true.white};
+  gap: 0.375rem;
+
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+`;
+
+export const TransactionContent = styled.div`
+  color: ${props => props.theme.true.white};
+
+  background-color: #171723;
+
+  border-radius: 0.5rem;
+
+  padding: 0.5rem;
+
+  gap: 0.25rem;
+
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  font-size: 0.875rem;
+  font-weight: 700;
+
+  p {
+    font-size: 0.625rem;
+    font-weight: 400;
+  }
+
+  h2 {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: ${props => props.theme.gray700};
+  }
+
+  h3 {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: ${props => props.theme.gray700};
+  }
+
+  h4 {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: ${props => props.theme.black};
+  }
+`;
+
+export const ProgressBarContainer = styled.div`
+  width: 100%;
+  background-color: #1e1e29;
+  border-radius: 0.5rem;
+  height: 0.5rem;
+  overflow: hidden;
+`;
+
+export const ProgressBarFill = styled.div<{
+  percentage?: number;
+}>`
+  height: 100%;
+  width: ${props => props.percentage}%;
+  background-color: ${props => {
+    const percentage = props.percentage;
+    if (percentage <= 50) return '#4EBC87';
+    if (percentage <= 75) return '#AF9500';
+    if (percentage <= 90) return '#FF8008';
+    return '#F84960';
+  }};
+  transition: width 0.3s ease;
+`;
+
+export const Pill = styled.div<{
+  full?: boolean;
+  bgColor?: string;
+  borderColor?: string;
+}>`
+  background-color: ${props => props.bgColor};
+  padding: 0.5rem 1rem;
+  display: flex;
   width: fit-content;
-
   align-items: center;
   justify-content: center;
-
-  border: 1px solid #222345;
-
+  border: 1px solid ${props => props.borderColor || '#222345'};
   color: ${props => props.theme.true.white};
-  font-weight: 400;
+  font-weight: 700;
   font-size: 0.85rem;
-
-  border-radius: 1rem;
-
+  border-radius: 2rem;
   ${props =>
     props.full &&
     css`
       width: 100%;
     `}
 `;
-
 export const ActionItem = styled.div<{
   secondary?: boolean;
   active?: boolean;
@@ -528,11 +606,6 @@ export const SubSection = styled.div<{ active?: boolean }>`
       display: flex;
       flex-direction: column;
       gap: 4px;
-
-      /* border: 1px solid ${props => props.theme.card.border}; */
-      /* border-radius: 6px; */
-
-      /* backdrop-filter: brightness(0.9); */
     `}
 
   padding: 1rem;

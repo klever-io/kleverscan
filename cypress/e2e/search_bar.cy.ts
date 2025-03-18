@@ -9,8 +9,10 @@ describe('Search bar', () => {
     cy.get('[data-testid="search"]').type('KLV', { delay: 300 });
 
     cy.get('[data-testid="card-item"]').contains('KLV');
+    cy.wait(3000);
     cy.get('[data-testid="search"]').type('{enter}');
 
+    cy.wait(1000);
     cy.url().should('include', '/asset/KLV');
   });
 
@@ -21,9 +23,10 @@ describe('Search bar', () => {
 
     cy.get('[data-testid="search"]').type('100', { delay: 300 });
 
-    cy.get('[data-testid="card-item"]').contains('1');
+    cy.get('[data-testid="card-item"]').contains('100');
+    cy.wait(3000);
     cy.get('[data-testid="search"]').type('{enter}');
-    cy.url().should('include', '/block/1');
+    cy.url().should('include', '/block/100');
   });
 
   it('should search for an address', () => {
@@ -36,8 +39,14 @@ describe('Search bar', () => {
       { delay: 10 },
     );
 
-    cy.get('[data-testid="card-item"]').contains('wsjl');
+    cy.get('[data-testid="card-item"]').contains(
+      'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl',
+    );
+    cy.wait(3000);
     cy.get('[data-testid="search"]').type('{enter}');
+
+    cy.wait(1000);
+
     cy.url().should(
       'include',
       '/account/klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl',

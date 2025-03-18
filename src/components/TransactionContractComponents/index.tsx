@@ -58,7 +58,11 @@ import {
   findReceiptWithSender,
   findReceipts,
 } from '@/utils/findKey';
-import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import {
+  displayBucketId,
+  formatDate,
+  toLocaleFixed,
+} from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   PacksPrecision,
@@ -949,7 +953,7 @@ export const Freeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <span>
             <strong>Bucket Id</strong>
           </span>
-          <span>{freezeReceipt?.bucketId}</span>
+          <span>{displayBucketId(freezeReceipt?.bucketId, assetID)}</span>
         </Row>
       )}
       {renderMetadata()}
@@ -975,6 +979,7 @@ export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
     | IUnfreezeReceipt
     | undefined;
   const undelegateReceipt = findReceipt(filteredReceipts, 7);
+  const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
 
   return (
     <>
@@ -996,8 +1001,11 @@ export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <span>
           <CenteredRow>
-            <span>{parameter?.bucketID}</span>
-            <Copy data={parameter?.bucketID} info="Bucket Id"></Copy>
+            <span>{displayBucketId(unfreezeReceipt?.bucketId, assetID)}</span>
+            <Copy
+              data={displayBucketId(unfreezeReceipt?.bucketId, assetID)}
+              info="Bucket Id"
+            ></Copy>
           </CenteredRow>
         </span>
       </Row>

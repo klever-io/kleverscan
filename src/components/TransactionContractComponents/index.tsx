@@ -58,7 +58,11 @@ import {
   findReceiptWithSender,
   findReceipts,
 } from '@/utils/findKey';
-import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import {
+  displayBucketId,
+  formatDate,
+  toLocaleFixed,
+} from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   PacksPrecision,
@@ -920,28 +924,6 @@ export const Freeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
     | IFreezeReceipt
     | undefined;
 
-  const displayBucketId = () => {
-    if (!freezeReceipt || !freezeReceipt.bucketId) return '';
-
-    if (assetID !== 'KLV' && assetID !== 'KFI') {
-      try {
-        const hexString = freezeReceipt.bucketId.startsWith('0x')
-          ? freezeReceipt.bucketId.slice(2)
-          : freezeReceipt.bucketId;
-
-        const bytes = new Uint8Array(
-          hexString.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || [],
-        );
-        return new TextDecoder().decode(bytes);
-      } catch (error) {
-        console.error('Error converting bucket ID to UTF-8:', error);
-        return freezeReceipt.bucketId;
-      }
-    }
-
-    return freezeReceipt.bucketId;
-  };
-
   return (
     <>
       <Row>
@@ -971,7 +953,7 @@ export const Freeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <span>
             <strong>Bucket Id</strong>
           </span>
-          <span>{displayBucketId()}</span>
+          <span>{displayBucketId(freezeReceipt?.bucketId, assetID)}</span>
         </Row>
       )}
       {renderMetadata()}
@@ -999,28 +981,6 @@ export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
   const undelegateReceipt = findReceipt(filteredReceipts, 7);
   const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
 
-  const displayBucketId = () => {
-    if (!unfreezeReceipt || !unfreezeReceipt.bucketId) return '';
-
-    if (assetID !== 'KLV' && assetID !== 'KFI') {
-      try {
-        const hexString = unfreezeReceipt.bucketId.startsWith('0x')
-          ? unfreezeReceipt.bucketId.slice(2)
-          : unfreezeReceipt.bucketId;
-
-        const bytes = new Uint8Array(
-          hexString.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || [],
-        );
-        return new TextDecoder().decode(bytes);
-      } catch (error) {
-        console.error('Error converting bucket ID to UTF-8:', error);
-        return unfreezeReceipt.bucketId;
-      }
-    }
-
-    return unfreezeReceipt.bucketId;
-  };
-
   return (
     <>
       <Row>
@@ -1041,8 +1001,11 @@ export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <span>
           <CenteredRow>
-            <span>{displayBucketId()}</span>
-            <Copy data={displayBucketId()} info="Bucket Id"></Copy>
+            <span>{displayBucketId(unfreezeReceipt?.bucketId, assetID)}</span>
+            <Copy
+              data={displayBucketId(unfreezeReceipt?.bucketId, assetID)}
+              info="Bucket Id"
+            ></Copy>
           </CenteredRow>
         </span>
       </Row>

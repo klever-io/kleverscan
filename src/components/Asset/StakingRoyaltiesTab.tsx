@@ -71,16 +71,20 @@ export const StakingRoyaltiesTab: React.FC<
           )}
         </span>
       </Row>
-      <Row>
-        <strong>{t('assets:Staking.Current FPR Amount')}</strong>
 
-        <span>
-          {toLocaleFixed(
-            (asset?.staking?.currentFPRAmount || 0) / 10 ** asset?.precision,
-            asset?.precision,
-          )}
-        </span>
-      </Row>
+      {asset?.staking.interestType === 'FPRI' && (
+        <Row>
+          <strong>{t('assets:Staking.Current FPR Amount')}</strong>
+
+          <span>
+            {toLocaleFixed(
+              (asset?.staking?.currentFPRAmount || 0) / 10 ** asset?.precision,
+              asset?.precision,
+            )}
+          </span>
+        </Row>
+      )}
+
       <Row>
         <strong> {t('assets:Staking.Min Epochs To Claim')}</strong>
 

@@ -67,7 +67,7 @@ const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
                   <span>{allowance / 10 ** KLV_PRECISION || 0}</span>
                 </FrozenContent>
               )}
-              {allStakingRewards?.length && allStakingRewards?.length > 3 && (
+              {!!allStakingRewards?.length && allStakingRewards?.length > 3 && (
                 <ButtonContent onClick={() => toggleExpand(assetId)}>
                   <p>
                     {expanded[assetId]

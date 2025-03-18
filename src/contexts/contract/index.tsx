@@ -481,6 +481,14 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
           unsignedTx.result,
         );
         const response = await web.broadcastTransactions([signedTx]);
+        if (response.error) {
+          const messageError = response.error;
+          if (messageError.includes('no signatures provided')) {
+            throw new Error(messageError.split(': ')[2]);
+          } else {
+            throw new Error(messageError);
+          }
+        }
         setTxHash(response.data.txsHashes[0]);
         toast.success('Transaction broadcast successfully');
         gtagEvent('send_transaction', {
@@ -499,7 +507,14 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
           ? (e as { message: string }).message
           : String(e);
 
-      toast.error(errorMessage);
+      if (
+        errorMessage.includes('invalid signature threshold') ||
+        errorMessage.includes('no contract permission')
+      ) {
+        toast.error(errorMessage.split(': ')[3]);
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       resetFormsData();
     }
@@ -546,6 +561,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
       setPayload(formsData.current);
       setTxLoading(false);
     } else if (queueLength > 1) {
+      setTxLoading(false);
       if (formsData.current.length === queueLength) {
         formSend();
       }

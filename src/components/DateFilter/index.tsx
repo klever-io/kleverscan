@@ -22,6 +22,9 @@ import {
   MonthPicker,
   OutsideContainer,
   OutsideContent,
+  TimeFilterContainer,
+  TimeInput,
+  TimeSelector,
   Warning,
 } from './styles';
 
@@ -81,18 +84,6 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
     delete updatedQuery.startdate;
     delete updatedQuery.enddate;
     setQueryAndRouter(updatedQuery, router);
-  };
-  const filterDate = (selectedDays: ISelectedDays) => {
-    setQueryAndRouter(
-      {
-        ...router.query,
-        startdate: selectedDays.start.getTime().toString(),
-        enddate: selectedDays.end
-          ? (selectedDays.end.getTime() + 24 * 60 * 60 * 1000).toString()
-          : (selectedDays.start.getTime() + 24 * 60 * 60 * 1000).toString(),
-      },
-      router,
-    );
   };
 
   const [date, setDate] = useState(currentDate);
@@ -207,22 +198,6 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
     [selectedDays, firstSelection],
   );
 
-  const handleConfirmClick = useCallback(() => {
-    filterDate(selectedDays);
-
-    setInputValue(
-      `${selectedDays?.start?.toLocaleString().split(',')[0]}${
-        selectedDays.end
-          ? ' - ' + selectedDays?.end?.toLocaleString().split(',')[0]
-          : ''
-      }`,
-    );
-    setDate(selectedDays.start);
-    inputRef.current?.blur();
-    setCalendarOpen(false);
-    setButtonActive(false);
-  }, [selectedDays, filterDate]);
-
   const handleClear = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -265,6 +240,62 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
     'December',
   ];
 
+  const [startTime, setStartTime] = useState('00:00');
+  const [endTime, setEndTime] = useState('23:59');
+
+  const formatDateWithTime = (date: Date, time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const newDate = new Date(date);
+    newDate.setHours(hours, minutes, 0, 0);
+
+    return newDate;
+  };
+
+  const filterDate = (
+    selectedDays: ISelectedDays,
+    startTime: string,
+    endTime: string,
+  ) => {
+    const startDateWithTime = formatDateWithTime(selectedDays.start, startTime);
+    const endDateWithTime = selectedDays.end
+      ? formatDateWithTime(selectedDays.end, endTime)
+      : formatDateWithTime(selectedDays.start, endTime);
+
+    setQueryAndRouter(
+      {
+        ...router.query,
+        startdate: startDateWithTime.getTime().toString(),
+        enddate: endDateWithTime.getTime().toString(),
+      },
+      router,
+    );
+  };
+
+  const handleConfirmClick = useCallback(() => {
+    filterDate(selectedDays, startTime, endTime);
+    const startWithTime = formatDateWithTime(selectedDays.start, startTime);
+    const endWithTime = selectedDays.end
+      ? formatDateWithTime(selectedDays.end, endTime)
+      : startWithTime;
+
+    setInputValue(
+      `${startWithTime.toLocaleString()} - ${
+        endWithTime ? endWithTime.toLocaleString() : ''
+      }`,
+    );
+    setDate(selectedDays.start);
+    inputRef.current?.blur();
+    setCalendarOpen(false);
+  }, [selectedDays, startTime, endTime, filterDate]);
+
+  const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartTime(e.target.value);
+  };
+
+  const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndTime(e.target.value);
+  };
+
   return router.isReady ? (
     <FilterContainer open={calendarOpen}>
       <span>Date Filter</span>
@@ -293,7 +324,7 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
         </OutsideContainer>
 
         {calendarOpen && (
-          <CalendarContainer onMouseDown={e => e.preventDefault()}>
+          <CalendarContainer>
             <CalendarHeader>
               <strong>
                 <h3>Date Filter</h3>
@@ -356,6 +387,27 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
                   <span>Nothing on this date</span>
                 </Warning>
               )}
+              <TimeFilterContainer>
+                <TimeSelector>
+                  <label>Start Time:</label>
+                  <TimeInput
+                    type="time"
+                    id="start-time"
+                    value={startTime}
+                    onChange={handleStartTimeChange}
+                  />
+                </TimeSelector>
+
+                <TimeSelector>
+                  <label>End Time:</label>
+                  <TimeInput
+                    type="time"
+                    id="end-time"
+                    value={endTime}
+                    onChange={handleEndTimeChange}
+                  />
+                </TimeSelector>
+              </TimeFilterContainer>
               <Confirm onClick={handleConfirmClick} isActive={buttonActive}>
                 {' '}
                 Confirm

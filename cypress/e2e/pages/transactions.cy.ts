@@ -20,11 +20,18 @@ describe('Transactions Page', () => {
       const statusFilter = cy
         .get(':nth-child(2) > [data-testid="selector"]')
         .click();
+
+      cy.wait(1000);
+
       statusFilter.contains('Success').click();
 
       const typeFilter = cy.get(':nth-child(3) > [data-testid="selector"]');
       typeFilter.click();
 
+      cy.wait(1000);
+      typeFilter.type(type, { delay: 300 });
+
+      cy.wait(1000);
       typeFilter.contains(type).click();
 
       cy.get('[data-testid="table-row-0"]')

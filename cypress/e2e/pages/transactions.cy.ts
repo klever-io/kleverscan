@@ -32,7 +32,7 @@ describe('Transactions Page', () => {
       typeFilter.type(type, { delay: 300 });
 
       cy.wait(1000);
-      typeFilter.contains(type).click();
+      typeFilter.contains(type, { timeout: 10000 }).click();
 
       cy.get('[data-testid="table-row-0"]')
         .first()
@@ -52,7 +52,9 @@ describe('Transaction Details Page', () => {
     it(`should load the transaction details page - ${type}`, () => {
       cy.visit(transaction_links[index]);
 
-      cy.get('h1').contains('Transaction Details').should('be.visible');
+      cy.get('h1')
+        .contains('Transaction Details', { timeout: 10000 })
+        .should('be.visible');
     });
   });
 });

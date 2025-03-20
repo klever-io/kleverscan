@@ -18,14 +18,16 @@ describe('Transactions Page', () => {
 
     it(`should filter transactions by type - ${type}`, () => {
       const statusFilter = cy
-        .get(':nth-child(2) > [data-testid="selector"]')
+        .get(':nth-child(2) > [data-testid="selector"]', { timeout: 10000 })
         .click();
 
       cy.wait(1000);
 
       statusFilter.contains('Success').click();
 
-      const typeFilter = cy.get(':nth-child(3) > [data-testid="selector"]');
+      const typeFilter = cy.get(':nth-child(3) > [data-testid="selector"]', {
+        timeout: 10000,
+      });
       typeFilter.click();
 
       cy.wait(1000);

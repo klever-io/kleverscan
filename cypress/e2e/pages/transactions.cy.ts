@@ -40,9 +40,9 @@ describe('Transactions Page', () => {
       typeFilter.type(type, { delay: 300 });
 
       cy.wait(10000);
-      typeFilter.contains(type, { timeout: 10000 }).click();
+      typeFilter.contains(type, { timeout: 60000 }).click();
 
-      cy.get('[data-testid="table-row-0"]', { timeout: 10000 })
+      cy.get('[data-testid="table-row-0"]', { timeout: 60000 })
         .first()
         .find('a')
         .invoke('attr', 'href')

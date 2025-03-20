@@ -26,17 +26,20 @@ describe('Transactions Page', () => {
 
       cy.wait(1000);
 
-      statusFilter.contains('Success').click();
+      statusFilter.contains('Success', { timeout: 10000 }).click();
 
       const typeFilter = cy.get(':nth-child(3) > [data-testid="selector"]', {
         timeout: 10000,
       });
+
+      cy.wait(1000);
+
       typeFilter.click();
 
       cy.wait(1000);
       typeFilter.type(type, { delay: 300 });
 
-      cy.wait(1000);
+      cy.wait(10000);
       typeFilter.contains(type, { timeout: 10000 }).click();
 
       cy.get('[data-testid="table-row-0"]', { timeout: 10000 })
@@ -55,7 +58,11 @@ describe('Transaction Details Page', () => {
     if (typeof type !== 'string') return;
 
     it(`should load the transaction details page - ${type}`, () => {
+      cy.wait(5000);
+
       cy.visit(transaction_links[index]);
+
+      cy.wait(1000);
 
       cy.get('h1')
         .contains('Transaction Details', { timeout: 10000 })

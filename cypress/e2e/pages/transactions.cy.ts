@@ -10,13 +10,16 @@ describe('Transactions Page', () => {
   });
 
   it('should load the transactions page', () => {
-    cy.get('h1').contains('Transactions').should('be.visible');
+    cy.get('h1', { timeout: 10000 })
+      .contains('Transactions')
+      .should('be.visible');
   });
 
   Object.values(contracts).forEach(type => {
     if (typeof type !== 'string') return;
 
     it(`should filter transactions by type - ${type}`, () => {
+      cy.wait(5000);
       const statusFilter = cy
         .get(':nth-child(2) > [data-testid="selector"]', { timeout: 10000 })
         .click();

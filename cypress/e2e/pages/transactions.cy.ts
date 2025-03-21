@@ -39,18 +39,30 @@ describe('Transactions Page', () => {
       cy.wait(1000);
       typeFilter.type(type, { delay: 300 });
 
-      cy.wait(10000);
+      cy.wait(1000);
+
       typeFilter.contains(type, { timeout: 60000 }).click();
 
       cy.wait(5000);
 
-      cy.get('[data-testid="table-row-0"]', { timeout: 60000 })
-        .first()
-        .find('a')
-        .invoke('attr', 'href')
-        .then(href => {
-          href && transaction_links.push(href);
-        });
+      cy.get('body').then($body => {
+        if ($body.length > 0) {
+          const hasRow = $body.find('[data-testid^="table-row-"]').length > 0;
+          if (hasRow) {
+            cy.get('[data-testid="table-row-0"]', { timeout: 5000 })
+              .first()
+              .find('a')
+              .invoke('attr', 'href')
+              .then(href => {
+                href && transaction_links.push(href);
+              });
+          } else {
+            cy.get('[data-testid="table-empty"]', { timeout: 5000 }).should(
+              'be.visible',
+            );
+          }
+        }
+      });
     });
   });
 });

@@ -231,7 +231,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         </FloatContainer>
       )}
       <ContainerView ref={tableRef}>
-        <TableBody smaller={smaller}>
+        <TableBody smaller={smaller} data-testid="table-body">
           {!isMobile &&
             !isTablet &&
             response?.items &&
@@ -337,7 +337,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                   <span>Retry</span>
                   <IoReloadSharp size={20} />
                 </RetryContainer>
-                <EmptyRow {...props}>
+                <EmptyRow {...props} data-testid="table-empty">
                   <p>Oops! Apparently no data here.</p>
                 </EmptyRow>
               </TableEmptyData>

@@ -2,7 +2,7 @@
 
 import { contracts } from '../../../src/configs/transactions';
 
-const transaction_links: string[] = [];
+const transaction_links: { name: string; link: string }[] = [];
 
 describe('Transactions Page', () => {
   beforeEach(() => {
@@ -54,7 +54,7 @@ describe('Transactions Page', () => {
               .find('a')
               .invoke('attr', 'href')
               .then(href => {
-                href && transaction_links.push(href);
+                href && transaction_links.push({ name: type, link: href });
               });
           } else {
             cy.get('[data-testid="table-empty"]', { timeout: 5000 }).should(
@@ -68,22 +68,30 @@ describe('Transactions Page', () => {
 });
 
 describe('Transaction Details Page', () => {
-  Object.values(contracts).forEach((type, index) => {
+  Object.values(contracts).forEach(type => {
     if (typeof type !== 'string') return;
 
     it(`should load the transaction details page - ${type}`, () => {
-      cy.wait(5000);
-
-      cy.visit({
-        url: transaction_links[index],
-        timeout: 60000,
-      });
+      const findType = transaction_links.find(
+        transaction => transaction.name === type,
+      );
 
       cy.wait(5000);
 
-      cy.get('h1', { timeout: 60000 })
-        .contains('Transaction Details', { timeout: 60000 })
-        .should('be.visible');
+      if (findType) {
+        cy.visit({
+          url: findType.link,
+          timeout: 60000,
+        });
+
+        cy.wait(5000);
+
+        cy.get('h1', { timeout: 60000 })
+          .contains('Transaction Details', { timeout: 60000 })
+          .should('be.visible');
+      } else {
+        cy.log('No transaction found');
+      }
     });
   });
 });

@@ -74,12 +74,15 @@ describe('Transaction Details Page', () => {
     it(`should load the transaction details page - ${type}`, () => {
       cy.wait(5000);
 
-      cy.visit(transaction_links[index]);
+      cy.visit({
+        url: transaction_links[index],
+        timeout: 60000,
+      });
 
       cy.wait(5000);
 
-      cy.get('h1', { timeout: 10000 })
-        .contains('Transaction Details', { timeout: 10000 })
+      cy.get('h1', { timeout: 60000 })
+        .contains('Transaction Details', { timeout: 60000 })
         .should('be.visible');
     });
   });

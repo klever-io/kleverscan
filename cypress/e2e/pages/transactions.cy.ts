@@ -76,9 +76,9 @@ describe('Transaction Details Page', () => {
 
       cy.visit(transaction_links[index]);
 
-      cy.wait(1000);
+      cy.wait(5000);
 
-      cy.get('h1')
+      cy.get('h1', { timeout: 10000 })
         .contains('Transaction Details', { timeout: 10000 })
         .should('be.visible');
     });

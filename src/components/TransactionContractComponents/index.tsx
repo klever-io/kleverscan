@@ -450,13 +450,13 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
               <CenteredRow>
                 <span>
                   <strong>Transfer Fixed:&nbsp;</strong>
-                  {parameter?.royalties?.transferFixed / 1000000 || 0} KLV
+                  {parameter?.royalties?.transferFixed / 10 ** 6 || 0} KLV
                 </span>
               </CenteredRow>
               <CenteredRow>
                 <span>
                   <strong>Market Fixed:&nbsp;</strong>
-                  {parameter?.royalties?.marketFixed / 1000000 || 0} KLV
+                  {parameter?.royalties?.marketFixed / 10 ** 6 || 0} KLV
                 </span>
               </CenteredRow>
               <CenteredRow>
@@ -468,7 +468,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
               <CenteredRow>
                 <span>
                   <strong>ITO Fixed:&nbsp;</strong>
-                  {parameter?.royalties?.itoFixed / 1000000 || 0} KLV
+                  {parameter?.royalties?.itoFixed / 10 ** 6 || 0} KLV
                 </span>
               </CenteredRow>
               <CenteredRow>

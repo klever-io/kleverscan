@@ -447,41 +447,37 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
                 </Link>
                 <Copy data={parameter.royalties?.address}></Copy>
               </CenteredRow>
-              {parameter.royalties?.transferFixed && (
+              <CenteredRow>
                 <span>
                   <strong>Transfer Fixed:&nbsp;</strong>
-                  {parameter?.royalties?.transferFixed / 1000000} KLV
+                  {parameter?.royalties?.transferFixed / 1000000 || 0} KLV
                 </span>
-              )}
-              {parameter?.royalties?.marketFixed && (
+              </CenteredRow>
+              <CenteredRow>
                 <span>
                   <strong>Market Fixed:&nbsp;</strong>
-                  {parameter?.royalties?.marketFixed / 1000000} KLV
+                  {parameter?.royalties?.marketFixed / 1000000 || 0} KLV
                 </span>
-              )}
-              {parameter?.royalties?.marketPercentage && (
+              </CenteredRow>
+              <CenteredRow>
                 <span>
                   <strong>Market Percent:&nbsp;</strong>
-                  {parameter?.royalties?.marketPercentage / 100}%
+                  {parameter?.royalties?.marketPercentage / 100 || 0}%
                 </span>
-              )}
-              <CenteredRow>
-                {parameter?.royalties?.itoFixed && (
-                  <>
-                    <strong>ITO Fixed:&nbsp;</strong>
-                    <span>{parameter?.royalties?.itoFixed / 1000000} KLV</span>
-                  </>
-                )}
               </CenteredRow>
               <CenteredRow>
-                {parameter?.royalties?.itoPercentage && (
-                  <>
-                    <strong>ITO Percentage:&nbsp;</strong>
-                    <span>{parameter?.royalties?.itoPercentage / 100}%</span>
-                  </>
-                )}
+                <span>
+                  <strong>ITO Fixed:&nbsp;</strong>
+                  {parameter?.royalties?.itoFixed / 1000000 || 0} KLV
+                </span>
               </CenteredRow>
-              {parameter?.royalties?.transferPercentage && (
+              <CenteredRow>
+                <span>
+                  <strong>ITO Percentage:&nbsp;</strong>
+                  {parameter?.royalties?.itoPercentage / 100 || 0}%
+                </span>
+              </CenteredRow>
+              {parameter?.royalties?.transferPercentage?.length > 0 && (
                 <RoyaltiesTransferPercentage>
                   <strong>Transfer Percentage:&nbsp;</strong>
                   <div>

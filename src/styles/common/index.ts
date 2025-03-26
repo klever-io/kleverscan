@@ -171,7 +171,6 @@ export const tableEffects = css`
 export const RowAlert = styled.div`
   display: flex;
   align-items: center;
-  padding: 1.5rem 2rem;
   gap: 1rem;
   span {
     font-size: 14px;

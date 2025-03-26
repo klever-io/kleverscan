@@ -376,9 +376,13 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     element: props => (
       <DoubleRow {...props} key={inOrOut}>
         <CenteredRow>
-          <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
-            {inOrOut}
-          </InOutSpan>
+          {contractType === 'TransferContractType' ? (
+            <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+              {inOrOut}
+            </InOutSpan>
+          ) : (
+            <InOutSpan status={'icon'}>- -</InOutSpan>
+          )}
         </CenteredRow>
       </DoubleRow>
     ),

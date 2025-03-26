@@ -60,7 +60,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
     }
     return (
       <LayoutWrapper>
-        <Component {...pageProps} />;
+        <Component {...pageProps} />
       </LayoutWrapper>
     );
   }, [isTargetDate, pageProps]);

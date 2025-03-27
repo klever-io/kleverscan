@@ -14,14 +14,26 @@ export const FadeIn = keyframes`
 export const UserInfoContainer = styled.div<{
   openUserInfos: boolean;
   isMobile: boolean;
+  hasOwnedAssets?: boolean;
 }>`
   position: fixed;
-  top: 4.4rem;
+  top: ${props => {
+    if (props.isMobile) {
+      return '50%';
+    }
+
+    return '0';
+  }};
   right: 0rem;
   z-index: 7;
   width: ${props => (props.isMobile ? '95vw' : '25rem')};
   max-width: 25rem;
-  max-height: calc(100vh - 5rem);
+  max-height: ${props => {
+    if (props.isMobile) {
+      return 'calc(100vh - 5rem)';
+    }
+    return props.hasOwnedAssets ? '100vh' : 'calc(100vh - 5rem)';
+  }};
   display: flex;
   flex-direction: column;
   visibility: ${props => (props.openUserInfos ? 'visible' : 'hidden')};
@@ -29,9 +41,28 @@ export const UserInfoContainer = styled.div<{
   overflow-y: auto;
   overflow-x: hidden;
   background-color: ${({ theme }) => (theme.dark ? '#12121b' : '#F8FAFC')};
-  border-radius: 1rem 0 0 1rem;
+  border-radius: ${props => (props.isMobile ? '1rem' : '1rem 0 0 1rem')};
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: opacity 0.1s linear;
+
+  ${props =>
+    !props.isMobile &&
+    `
+    animation: slideInRight 0.3s ease-out;
+    transform: ${props.openUserInfos ? 'translateX(0)' : 'translateX(100%)'};
+  `}
+
+  transition: 
+    opacity 0.1s linear,
+    transform 0.3s ease-out;
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     right: unset;
@@ -40,6 +71,12 @@ export const UserInfoContainer = styled.div<{
     transform: translate(-50%, -50%);
     font-size: 1.3rem;
   }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 `;
 
 export const HeaderInfo = styled.div`
@@ -91,8 +128,8 @@ export const MyProjectsContent = styled.div`
   gap: 1rem;
   padding: 0.5rem;
   color: ${props => props.theme.true.white};
-  background-color: #13131d;
-  border: 1px solid ${({ theme }) => (theme.dark ? '#181935' : '#4D4D4D')};
+  background-color: ${({ theme }) => (theme.dark ? '#13131D' : '#FFFFFF')};
+  border: 1px solid ${({ theme }) => (theme.dark ? '#181935' : '#E1E1E1')};
   border-radius: 8px;
 
   small {
@@ -301,7 +338,7 @@ export const SeeTokens = styled.div`
 
   svg {
     path {
-      stroke: ${props => (props.theme.dark ? '#FFFFFF' : '#1E1E1E')};
+      stroke: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#1E1E1E')};
     }
   }
 `;
@@ -310,7 +347,8 @@ export const Usage = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  color: #b7bdc6;
+  color: ${({ theme }) => (theme.dark ? '#B7BDC6' : '#1E1E1E')};
+
   font-size: 0.625rem;
   font-weight: 700;
 `;
@@ -325,9 +363,10 @@ export const OwnedItem = styled.div<{
   align-items: center;
   gap: 0.45rem;
   height: 2.5rem;
-  color: ${props => props.theme.true.white};
+  color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#1E1E1E')};
+
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 700;
   cursor: pointer;
   user-select: none;
 
@@ -369,22 +408,24 @@ export const TransactionContainer = styled.div`
   flex-direction: row;
   width: 100%;
   gap: 0.375rem;
-  color: ${props => props.theme.true.white};
 `;
 
-export const TransactionContent = styled.div`
+export const TransactionContent = styled.div<{ isActive?: boolean }>`
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 0.25rem;
   padding: 0.5rem;
-  color: ${props => props.theme.true.white};
-  background-color: #171723;
+  color: ${({ theme }) => (theme.dark ? '#171723' : '#F8FAFC')};
+  background-color: ${({ theme }) => (theme.dark ? '#171723' : '#F8FAFC')};
   border-radius: 0.5rem;
   font-size: 0.875rem;
   font-weight: 700;
+  border: ${({ theme }) => (theme.dark ? 'none' : '1px solid #E1E1E1')};
+  opacity: ${props => (props.isActive === false ? 0.5 : 1)};
 
   p {
+    color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#2D2D2D')};
     font-size: 0.625rem;
     font-weight: 400;
   }
@@ -392,19 +433,19 @@ export const TransactionContent = styled.div`
   h2 {
     font-size: 0.625rem;
     font-weight: 700;
-    color: ${props => props.theme.gray700};
+    color: ${({ theme }) => (theme.dark ? '#B7BDC6' : '#2D2D2D')};
   }
 
   h3 {
     font-size: 0.875rem;
     font-weight: 400;
-    color: ${props => props.theme.gray700};
+    color: ${({ theme }) => (theme.dark ? '#B7BDC6' : '#2D2D2D')};
   }
 
   h4 {
     font-size: 0.875rem;
     font-weight: 700;
-    color: ${props => props.theme.black};
+    color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#1E1E1E')};
   }
 `;
 
@@ -413,7 +454,7 @@ export const TotalTransactions = styled.div`
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
-  color: ${props => props.theme.true.white};
+  color: ${({ theme }) => (theme.dark ? '#FFFFFF' : '#2D2D2D')};
 
   span {
     color: #4ebc87;
@@ -425,7 +466,7 @@ export const TotalTransactions = styled.div`
 export const ProgressBarContainer = styled.div`
   width: 100%;
   height: 0.5rem;
-  background-color: #1e1e29;
+  background-color: ${({ theme }) => (theme.dark ? '#1E1E29' : '#6F6F6F')};
   border-radius: 0.5rem;
   overflow: hidden;
 `;
@@ -446,21 +487,58 @@ export const ProgressBarFill = styled.div<{
 `;
 
 export const Pill = styled.div<{
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'small';
   full?: boolean;
-  bgColor?: string;
-  borderColor?: string;
+  fontSize?: string;
+  fontWeight?: number;
+  padding?: string;
 }>`
   display: flex;
   align-items: center;
   justify-content: center;
   width: ${props => (props.full ? '100%' : 'fit-content')};
-  padding: 0.5rem 1rem;
-  color: ${props => props.theme.true.white};
-  background-color: ${props => props.bgColor};
-  border: 1px solid ${props => props.borderColor || '#222345'};
+  padding: ${props => props.padding || '0.5rem 1rem'};
+
+  color: ${props => {
+    switch (props.variant) {
+      case 'primary':
+        return 'white';
+      case 'secondary':
+      case 'tertiary':
+        return props.theme?.dark ? 'white' : '#0E0E0E';
+      case 'small':
+        return props.theme?.dark ? 'white' : '#1E1E1E';
+      default:
+        return 'white';
+    }
+  }};
+
+  background-color: ${props => {
+    if (props.variant === 'primary') {
+      return props.theme?.dark ? '#AA33B5' : '#0E0E0E';
+    }
+    return 'transparent';
+  }};
+
+  border: 1px solid
+    ${props => {
+      switch (props.variant) {
+        case 'primary':
+          return props.theme?.dark ? '#AA33B5' : '#0E0E0E';
+        case 'secondary':
+          return props.theme?.dark ? '#AA33B5' : '#0E0E0E';
+        case 'tertiary':
+          return props.theme?.dark ? '#404264' : '#0E0E0E';
+        case 'small':
+          return props.theme?.dark ? '#222345' : '#4D4D4D';
+        default:
+          return props.theme?.dark ? '#222345' : '#0E0E0E';
+      }
+    }};
+
   border-radius: 2rem;
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: ${props => props.fontSize || '0.85rem'};
+  font-weight: ${props => props.fontWeight || 700};
 `;
 
 export const ActionItem = styled.div<{

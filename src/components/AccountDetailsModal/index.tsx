@@ -87,9 +87,8 @@ export const AccountDetailsModal: React.FC<
   const [primaryAsset, setPrimaryAsset] = useState<IAssetBalance[]>([]);
   const [expandAssets, setExpandAssets] = useState<boolean>(false);
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
-  const [openNetworks, setOpenNetworks] = useState<boolean>(false);
   const [openWallet, setOpenWallet] = useState<boolean>(true);
-  const [openCategory, setOpenCategory] = useState<boolean>(false);
+  const [openCategory, setOpenCategory] = useState<boolean>(true);
 
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
   const { walletAddress, connectExtension, logoutExtension } = useExtension();
@@ -173,7 +172,8 @@ export const AccountDetailsModal: React.FC<
     }
 
     const { precision } = asset;
-    const { klvBalance, kdaBalance, fRatioKDA, fRatioKLV } = asset.poolData;
+    const { klvBalance, kdaBalance, fRatioKDA, fRatioKLV, active } =
+      asset.poolData;
 
     const parsedKLVBalance = klvBalance / 10 ** 6;
 
@@ -192,12 +192,17 @@ export const AccountDetailsModal: React.FC<
       quotient,
       totalKLVUsed,
       total,
+      active,
     };
   };
 
-  const [openAccordions, setOpenAccordions] = useState(
-    ownedAssets?.length ? [ownedAssets[0].assetId] : [],
-  );
+  const [openAccordions, setOpenAccordions] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (ownedAssets && ownedAssets.length > 0) {
+      setOpenAccordions([ownedAssets[0].assetId]);
+    }
+  }, [ownedAssets]);
 
   const toggleAccordion = (assetId: string) => {
     setOpenAccordions(prev =>
@@ -269,7 +274,11 @@ export const AccountDetailsModal: React.FC<
   }, [walletAddress]);
 
   return (
-    <UserInfoContainer openUserInfos={openUserInfos} isMobile={isMobile}>
+    <UserInfoContainer
+      openUserInfos={openUserInfos}
+      isMobile={isMobile}
+      hasOwnedAssets={!!ownedAssets?.length}
+    >
       <BodyContent>
         <SubSection active={openWallet}>
           <ActionItem
@@ -378,7 +387,7 @@ export const AccountDetailsModal: React.FC<
           )}
         </SubSection>
 
-        {ownedAssets?.length && (
+        {ownedAssets && ownedAssets.length > 0 && (
           <SubSection active={openCategory}>
             <ActionItem
               onClick={() => {
@@ -415,6 +424,15 @@ export const AccountDetailsModal: React.FC<
                       </OwnedItem>
                       {openAccordions.includes(asset.assetId) && (
                         <AccordionContent>
+                          <Pill
+                            full={false}
+                            fontSize="0.625rem"
+                            fontWeight={400}
+                            variant="small"
+                            padding="0.188rem 0.438rem"
+                          >
+                            {asset.assetType}
+                          </Pill>
                           {asset.transactionData &&
                             asset.transactionLastDay && (
                               <TransactionContainer>
@@ -435,19 +453,41 @@ export const AccountDetailsModal: React.FC<
                                 </TransactionContent>
                                 <TransactionContent>
                                   <p>Last 24h</p>
-                                  {asset.transactionLastDay &&
-                                  asset.transactionLastDay.totalRecords > 0
-                                    ? `+${asset.transactionLastDay.totalRecords}`
-                                    : asset.transactionLastDay?.totalRecords ||
-                                      0}
+                                  <h4>
+                                    {asset.transactionLastDay &&
+                                    asset.transactionLastDay.totalRecords > 0
+                                      ? `+${asset.transactionLastDay.totalRecords}`
+                                      : asset.transactionLastDay
+                                          ?.totalRecords || 0}
+                                  </h4>
                                 </TransactionContent>
                               </TransactionContainer>
                             )}
 
                           {poolMetrics && (
                             <TransactionContainer>
-                              <TransactionContent>
-                                <h2>KDA Fee Pool</h2>
+                              <TransactionContent isActive={poolMetrics.active}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  <h2>KDA Fee Pool</h2>
+                                  {!poolMetrics.active && (
+                                    <Pill
+                                      full={false}
+                                      fontSize="0.625rem"
+                                      fontWeight={400}
+                                      variant="small"
+                                      padding="0.188rem 0.438rem"
+                                    >
+                                      Inactive
+                                    </Pill>
+                                  )}
+                                </div>
                                 <h3>{poolMetrics.available} available KLV</h3>
                                 <h4>
                                   {poolMetrics.totalKLVUsed} /{' '}
@@ -455,15 +495,15 @@ export const AccountDetailsModal: React.FC<
                                 </h4>
 
                                 <Usage>
-                                  <p>Usage</p>
-                                  <p>
+                                  <h2>Usage</h2>
+                                  <h2>
                                     {(
                                       (poolMetrics.totalKLVUsed /
                                         poolMetrics.total) *
                                       100
                                     ).toFixed(2)}
                                     /100%
-                                  </p>
+                                  </h2>
                                 </Usage>
 
                                 <ProgressBarContainer>
@@ -484,11 +524,7 @@ export const AccountDetailsModal: React.FC<
                               <Link
                                 href={`create-transaction?contract=DepositContract&contractDetails=%7B"depositType"%3A1%2C"collection"%3A"${asset.assetId}"%7D`}
                               >
-                                <Pill
-                                  full={true}
-                                  bgColor="#AA33B5"
-                                  borderColor="#AA33B5"
-                                >
+                                <Pill full={true} variant="primary">
                                   Deposit to KDA Fee Pool
                                 </Pill>
                               </Link>
@@ -500,7 +536,7 @@ export const AccountDetailsModal: React.FC<
                               <Link
                                 href={`/asset/${asset.assetId}?card=KDA+Pool`}
                               >
-                                <Pill full={true} borderColor="#AA33B5">
+                                <Pill full={true} variant="secondary">
                                   Go to KDA Fee Pool Page
                                 </Pill>
                               </Link>
@@ -509,7 +545,9 @@ export const AccountDetailsModal: React.FC<
 
                           <div style={{ width: '100%' }}>
                             <Link href={`/asset/${asset.assetId}`}>
-                              <Pill full={true}>Go to Asset page</Pill>
+                              <Pill full={true} variant="tertiary">
+                                Go to Asset page
+                              </Pill>
                             </Link>
                           </div>
                         </AccordionContent>
@@ -521,69 +559,6 @@ export const AccountDetailsModal: React.FC<
             )}
           </SubSection>
         )}
-
-        {/* <Link
-          href={`/create-transaction`}
-          onClick={() => setOpenUserInfos(false)}
-        >
-          <ActionItem>
-            <IoCreateOutline size={'1.2rem'} />
-            <p>Create Transaction</p>
-            <RiArrowRightSLine size={'1.2em'} />
-          </ActionItem>
-        </Link> */}
-
-        {/* <SubSection active={openNetworks}>
-          <ActionItem
-            onClick={() => {
-              setOpenNetworks(!openNetworks);
-            }}
-            active={openNetworks}
-          >
-            <Plug size={'1.5rem'} />
-            <p>Change Network</p>
-            <RiArrowDownSLine size={'1.5rem'} />
-          </ActionItem>
-          {openNetworks && (
-            <>
-              <ActionItem
-                onClick={() => {
-                  if (network === 'Mainnet') {
-                    return;
-                  }
-                  router.push(getNetworkPath('mainnet'));
-                  setOpenUserInfos(false);
-                }}
-                secondary
-                disabled={network === 'Mainnet'}
-              >
-                <p>Mainnet</p>
-                {network === 'Mainnet' && <Check />}
-              </ActionItem>
-              <ActionItem
-                onClick={() => {
-                  if (network === 'Testnet') {
-                    return;
-                  }
-                  router.push(getNetworkPath('testnet'));
-                  setOpenUserInfos(false);
-                }}
-                secondary
-                disabled={network === 'Testnet'}
-              >
-                <p>Testnet</p>
-                {network === 'Testnet' && <Check />}
-              </ActionItem>
-            </>
-          )}
-        </SubSection> */}
-
-        {/* {network === 'Testnet' && (
-          <ActionItem onClick={requestKLV}>
-            <IoMdAddCircle size={'1.2rem'} />
-            <p>Request Test KLV</p>
-          </ActionItem>
-        )} */}
       </BodyContent>
     </UserInfoContainer>
   );

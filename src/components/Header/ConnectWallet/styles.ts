@@ -35,16 +35,13 @@ export const ConnectButton = styled.div<{
   span {
     white-space: nowrap;
   }
+
   label {
     cursor: pointer;
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     max-width: 100%;
-    svg {
-      width: 18px;
-      height: 18px;
-    }
   }
 
   &:hover {
@@ -190,54 +187,6 @@ export const LogoutContainer = styled.div`
   }
 `;
 
-export const CopyContainer = styled.div`
-  position: relative;
-  font-size: 0.9rem;
-  margin-left: 0.8rem;
-  margin-top: 0.41rem;
-
-  svg {
-    g {
-      fill: ${props => props.theme.navbar.text};
-    }
-  }
-
-  &:hover {
-    svg {
-      filter: brightness(1.5);
-    }
-  }
-
-  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    &:hover {
-      &::before {
-        content: '';
-        position: absolute;
-        top: 1.25rem;
-        left: 0.25rem;
-        width: 0;
-        height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 10px solid ${props => props.theme.card.background};
-        transform: translate(-25%, 100%);
-      }
-
-      &::after {
-        content: 'Copy address';
-        position: absolute;
-        top: 1rem;
-        left: 0;
-        background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.card.white};
-        padding: 0.5rem;
-        border-radius: 5px;
-        z-index: 1;
-        transform: translate(-50%, 40%);
-      }
-    }
-  }
-`;
 export const MenuTransaction = styled.ul`
   color: ${props => props.theme.navbar.text};
   border-radius: 10px;
@@ -325,6 +274,13 @@ export const ConnectedWallet = styled.div`
   border-radius: 0.5rem;
   padding: 0.75rem;
   gap: 0.5rem;
+
+  svg {
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.true.white : props.theme.true.black};
+    }
+  }
 `;
 
 export const GraySpan = styled.span`
@@ -334,7 +290,12 @@ export const GraySpan = styled.span`
   border-radius: 0.3rem;
   &:hover {
     filter: brightness(1.3);
-    background-color: ${props => props.theme.card.background};
+  }
+
+  svg {
+    path {
+      fill: ${props => props.theme.red};
+    }
   }
 `;
 

@@ -1,6 +1,4 @@
 import { transparentize } from 'polished';
-import { BiTransfer } from 'react-icons/bi';
-import { IoIosLogOut } from 'react-icons/io';
 import styled, { css, keyframes } from 'styled-components';
 
 export const ConnectButton = styled.div<{
@@ -140,53 +138,6 @@ export const NavBarOptionsItems = styled.div`
   }
 `;
 
-export const LogoutIcon = styled(IoIosLogOut)`
-  color: ${props => props.theme.borderLogo};
-  cursor: pointer;
-`;
-
-export const LogoutContainer = styled.div`
-  position: relative;
-  font-size: 0.75rem;
-  margin-left: 0.8rem;
-
-  &:hover {
-    svg {
-      filter: brightness(1.5);
-    }
-  }
-
-  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    &:hover {
-      &::before {
-        content: '';
-        position: absolute;
-        top: 2rem;
-        left: 0.25rem;
-        width: 0;
-        height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 10px solid ${props => props.theme.card.background};
-        transform: translate(-25%, 100%);
-      }
-
-      &::after {
-        content: 'Logout';
-        position: absolute;
-        top: 1rem;
-        left: 0;
-        background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.card.white};
-        padding: 0.5rem;
-        border-radius: 5px;
-        z-index: 1;
-        transform: translate(-25%, 100%);
-      }
-    }
-  }
-`;
-
 export const MenuTransaction = styled.ul`
   color: ${props => props.theme.navbar.text};
   border-radius: 10px;
@@ -203,18 +154,6 @@ export const MobileTransaction = styled.a`
   align-items: center;
   gap: 1rem;
   color: ${props => props.theme.navbar.text};
-`;
-
-export const MobileStyledTransfer = styled(BiTransfer)`
-  color: ${props => props.theme.navbar.text};
-  size: 20px;
-`;
-
-export const StyledTransfer = styled(BiTransfer)`
-  color: ${props => props.theme.navbar.text};
-
-  width: 25px;
-  height: 25px;
 `;
 
 export const FadeIn = keyframes`
@@ -277,7 +216,7 @@ export const ConnectedWallet = styled.div`
 
   svg {
     path {
-      fill: ${props =>
+      color: ${props =>
         props.theme.dark ? props.theme.true.white : props.theme.true.black};
     }
   }
@@ -294,7 +233,7 @@ export const GraySpan = styled.span`
 
   svg {
     path {
-      fill: ${props => props.theme.red};
+      color: ${props => props.theme.red};
     }
   }
 `;

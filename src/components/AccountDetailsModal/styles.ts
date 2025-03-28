@@ -568,7 +568,7 @@ export const ActionItem = styled.div<{
   svg {
     &:nth-child(1) {
       path {
-        fill: ${props =>
+        color: ${props =>
           props.theme.dark ? props.theme.true.white : props.theme.true.black};
       }
     }

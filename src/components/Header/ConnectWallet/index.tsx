@@ -19,7 +19,8 @@ import {
 } from './styles';
 import { useRouter } from 'next/router';
 import { useMobile } from '@/contexts/mobile';
-import { LogOut, Wallet } from '@/assets/icons';
+import { Wallet } from '@/assets/icons';
+import { HiOutlineLogout } from 'react-icons/hi';
 
 interface IConnectWallet {
   clickConnection: () => void;
@@ -151,7 +152,7 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
                     <Wallet />
                     <BlackSpan>{parseAddress(walletAddress, 12)}</BlackSpan>
                     <GraySpan onClick={handleLogout}>
-                      <LogOut />
+                      <HiOutlineLogout size={'1.3rem'} />
                     </GraySpan>
                   </ConnectedWallet>
                 )}

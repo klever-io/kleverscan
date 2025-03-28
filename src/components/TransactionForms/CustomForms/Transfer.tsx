@@ -27,7 +27,7 @@ const Transfer: React.FC<PropsWithChildren<IContractProps>> = ({
   const { setSelectedRoyaltiesFees, queue } = useMulticontract();
   const amount = watch('amount');
 
-  const collection = queue[formKey].collection;
+  const collection = queue[formKey]?.collection;
 
   useEffect(() => {
     if (collection?.royalties?.transferPercentage) {
@@ -78,7 +78,7 @@ const Transfer: React.FC<PropsWithChildren<IContractProps>> = ({
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
-      <KDASelect validateFields={['amount']} />
+      <KDASelect validateFields={['amount']} required />
       <FormSection>
         {!collection?.isNFT && (
           <FormInput

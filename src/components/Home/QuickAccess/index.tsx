@@ -48,7 +48,7 @@ const QuickAccess: React.FC<{
       openWiz: () => setWizard('NFT'),
       icon: <Token />,
     },
-    ...(network !== 'mainnet'
+    ...(network !== 'Mainnet'
       ? [
           {
             title: 'Create SFT',
@@ -96,7 +96,7 @@ const QuickAccess: React.FC<{
   };
 
   return (
-    <Container>
+    <Container id="quick-access">
       <TitleContainer>
         <small>{t('QuickAccess Description')}</small>
         <Title>What do you want to do?</Title>
@@ -106,7 +106,7 @@ const QuickAccess: React.FC<{
           <CardItem
             key={JSON.stringify(contract.title)}
             onClick={e => handleClick(contract, e)}
-            isMainNet={network !== 'mainnet'}
+            isMainNet={network !== 'Mainnet'}
           >
             <PlusIcon>{contract.icon}</PlusIcon>
             <p>{contract.title}</p>

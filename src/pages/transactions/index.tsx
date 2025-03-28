@@ -54,6 +54,7 @@ import React, { PropsWithChildren } from 'react';
 
 interface IRequestTxQuery {
   asset?: string;
+  address?: string;
 }
 export const toAddressSectionElement = (toAddress: string): JSX.Element => {
   if (toAddress === '--') {
@@ -162,7 +163,13 @@ export const requestTransactionsDefault = async (
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
-  const localQuery = { ...router.query, page, limit };
+  const localQuery: { [key: string]: any } = {
+    ...router.query,
+    page,
+    limit,
+  };
+  router.query.account && (localQuery['address'] = router.query.account);
+  delete localQuery.account;
 
   const transactionsResponse = await api.get({
     route: `transaction/list`,
@@ -369,9 +376,13 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     element: props => (
       <DoubleRow {...props} key={inOrOut}>
         <CenteredRow>
-          <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
-            {inOrOut}
-          </InOutSpan>
+          {contractType === 'TransferContractType' ? (
+            <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+              {inOrOut}
+            </InOutSpan>
+          ) : (
+            <InOutSpan status={'icon'}>- -</InOutSpan>
+          )}
         </CenteredRow>
       </DoubleRow>
     ),

@@ -1,37 +1,44 @@
-import { PropsWithChildren } from 'react';
-import { useRouter } from 'next/router';
-import React from 'react';
 import {
-  Background,
-  Button,
-  ButtonContainer,
-  Content,
-} from '../../views/notFound';
-import { Container, Message } from './styles';
+  LearnMore,
+  Main,
+  P1,
+  P2,
+  Title1,
+  Title3,
+  TextWrapper,
+  Picture,
+  Message,
+} from './styles';
 
-const Maintenance: React.FC<PropsWithChildren> = () => {
-  const router = useRouter();
-
-  const handleBack = () => {
-    router.push('/');
-  };
-
+const Maintenance = () => {
   return (
-    <>
-      <Container>
-        <Content>
-          <Message>
-            <span>Down for Maintenance</span>
-          </Message>
-          <ButtonContainer>
-            <Button hasBackground onClick={handleBack}>
-              <span>Back to homepage</span>
-            </Button>
-          </ButtonContainer>
-        </Content>
-      </Container>
-      <Background />
-    </>
+    <Main>
+      <Picture>
+        <source srcSet="/maintenance-desktop.png" media="(min-width: 768px)" />
+        <img src="/maintenance-mobile.png" alt="Responsive" />
+      </Picture>
+      <TextWrapper>
+        <Title1>Klever Blockchain Under Scheduled Maintenance</Title1>
+        <Message>
+          <P1>
+            We are upgrading the Klever Blockchain Testnet to integrate the
+            latest KVM enhancements and core updates for improved performance
+            and scalability.
+          </P1>
+          <Title3>February 7th, 5 PM UTC</Title3>
+          <P2>A new era for smart contracts is coming!</P2>
+        </Message>
+        <LearnMore>
+          <a
+            href="https://forum.klever.org/t/klever-blockchain-testnet-scheduled-maintenance-a-major-leap-for-kvm/3449"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn more
+          </a>
+        </LearnMore>
+      </TextWrapper>
+    </Main>
   );
 };
 

@@ -17,9 +17,9 @@ import { assetsTooltip as tooltip } from '../../utils/tooltips';
 import { SplitRoyaltiesSection } from '../SplitRoyaltiesSection';
 import { TransferPercentageSection } from '../TransferPercentageSection';
 
-export const RoyaltiesSection: React.FC<PropsWithChildren<ISectionProps>> = (
-  props
-) => {
+export const RoyaltiesSection: React.FC<
+  PropsWithChildren<ISectionProps>
+> = props => {
   const { isFungible } = props;
   const { walletAddress } = useExtension();
   let precision = 8;

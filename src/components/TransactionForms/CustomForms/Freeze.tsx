@@ -19,7 +19,7 @@ const Freeze: React.FC<PropsWithChildren<IContractProps>> = ({
   const { handleSubmit } = useFormContext<FormData>();
   const { queue } = useMulticontract();
 
-  const collection = queue[formKey].collection;
+  const collection = queue[formKey]?.collection;
 
   const onSubmit = async (data: FormData) => {
     await handleFormSubmit(data);

@@ -1,38 +1,133 @@
 import styled from 'styled-components';
 
-export const Container = styled.div`
-  padding: 10rem;
+export const Picture = styled.picture`
+  width: 500px;
+  aspect-ratio: 1/1;
 
-  display: flex;
-
-  flex-direction: row;
-  justify-content: center;
-
-  background-color: ${props => props.theme.background};
-
-  div div:last-child span {
-    color: white;
+  @media (max-width: 768px) {
+    max-width: 400px;
+    width: 100%;
   }
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    padding: 0 3rem;
-    align-items: center;
+  img {
+    width: 500px;
+    aspect-ratio: 1/1;
 
-    flex-direction: column-reverse;
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+`;
+
+export const Main = styled.main`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+`;
+
+export const TextWrapper = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 50rem;
+  top: -80px;
+
+  @media (max-width: 768px) {
+    gap: 2rem;
+
+    margin: 10px;
+  }
+`;
+
+export const Title1 = styled.h1`
+  text-align: center;
+  color: ${({ theme }) => theme.black};
+  font-family: 'Manrope';
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 32.8px;
+  @media (min-width: 768px) {
+    margin-top: 0;
+    font-size: 3.5rem;
+    line-height: 100%;
   }
 `;
 
 export const Message = styled.div`
-  span {
-    color: ${props => props.theme.black};
-    font-weight: 500;
-    font-size: 5rem;
-    font-family: Rubik, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
 
-    text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.25);
+export const P1 = styled.p`
+  text-align: center;
+  margin-bottom: 2rem;
+  color: ${({ theme }) => theme.black};
+  text-align: center;
+  font-family: 'Manrope';
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 110%;
+  @media (min-width: 768px) {
+    margin-block: 2rem;
+    font-size: 20px;
+    line-height: 150%;
+  }
+`;
 
-    @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-      font-size: min(4rem, 50vw);
-    }
+export const Title3 = styled.h3`
+  text-align: center;
+  color: ${({ theme }) => theme.black};
+  font-family: 'Montserrat';
+  font-weight: 500;
+  margin-bottom: 0;
+  font-size: 24px;
+  line-height: 110%;
+  @media (min-width: 768px) {
+    font-size: 30px;
+  }
+`;
+
+export const P2 = styled.p`
+  text-align: center;
+  color: ${({ theme }) => theme.black};
+  font-family: 'Manrope';
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+`;
+
+export const LearnMore = styled.button`
+  a {
+    text-decoration: none;
+    color: black;
+  }
+  width: 164px;
+  height: 43px;
+  padding: 24px 25px;
+  gap: 8px;
+  border-radius: 200px;
+  background-color: ${({ theme }) => theme.black};
+  color: black;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (min-width: 768px) {
+    margin-top: 1rem;
   }
 `;

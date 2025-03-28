@@ -116,6 +116,14 @@ export const TableRow = styled.div<TableRowProps>`
   }
 `;
 
+export const TableEmptyData = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+`;
+
 export const MobileCardItem = styled.div<{
   columnSpan?: number;
   isRightAligned?: boolean;
@@ -298,6 +306,7 @@ export const EmptyRow = styled.div`
 
   justify-content: center;
   align-items: center;
+  text-align: center;
 
   p {
     font-weight: 400;

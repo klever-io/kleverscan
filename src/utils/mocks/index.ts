@@ -17,7 +17,7 @@ const KFI: IAsset = {
     Wallet: 'https://klever.io/',
     Website: 'https://klever.org/',
     Whitepaper:
-      'https://klever.finance/wp-content/uploads/2021/10/Klever_Finance_Whitepaper_v1.1.pdf',
+      'https://klever.org/wp-content/uploads/2021/10/Klever_Finance_Whitepaper_v1.1.pdf',
   },
   precision: 6,
   initialSupply: 21000000000000,

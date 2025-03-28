@@ -307,7 +307,7 @@ const homeKlvChartCall = async (
 const homeKfiDataCall = async (): Promise<IGeckoResponse | undefined> => {
   try {
     const res = await api.get({
-      route: 'coins/klever-finance',
+      route: 'coins/klever.org',
       service: Service.GECKO,
     });
 
@@ -336,7 +336,7 @@ const homeKfiChartCall = async (
 ): Promise<IGeckoChartResponse | undefined> => {
   try {
     const res = await api.get({
-      route: `coins/klever-finance/market_chart?vs_currency=usd&days=${
+      route: `coins/klever.org/market_chart?vs_currency=usd&days=${
         days?.KFI || 1
       }`,
       service: Service.GECKO,

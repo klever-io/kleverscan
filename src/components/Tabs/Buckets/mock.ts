@@ -54,7 +54,7 @@ export const mockAssetKLVResponse = {
       name: 'KLEVER',
       ticker: 'KLV',
       ownerAddress: '',
-      logo: 'https://bc.klever.finance/logo_klv',
+      logo: 'https://bc.klever.org/logo_klv',
       uris: [
         {
           key: 'Github',
@@ -70,15 +70,15 @@ export const mockAssetKLVResponse = {
         },
         {
           key: 'Wallet',
-          value: 'https://klever.finance/wallet',
+          value: 'https://klever.org/wallet',
         },
         {
           key: 'Website',
-          value: 'https://klever.finance',
+          value: 'https://klever.org',
         },
         {
           key: 'Whitepaper',
-          value: 'https://bc.klever.finance/wp',
+          value: 'https://bc.klever.org/wp',
         },
         {
           key: 'Exchange',

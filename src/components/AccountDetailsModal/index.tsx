@@ -317,6 +317,7 @@ export const AccountDetailsModal: React.FC<
                             ticker={primaryAsset[0]?.assetId || ''}
                             name={primaryAsset[0]?.assetId || ''}
                             size={24}
+                            invertColors={true}
                           />
                         )}
                         <span>{primaryAsset[0].balance || '---'}</span>

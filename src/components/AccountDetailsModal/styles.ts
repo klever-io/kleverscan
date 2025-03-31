@@ -249,6 +249,10 @@ export const PrimaryAssetContent = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-size: 1.5rem;
+
+  & > div > div {
+    color: ${props => props.theme.true.white};
+  }
 `;
 
 export const ReloadContainer = styled.div`
@@ -566,11 +570,9 @@ export const ActionItem = styled.div<{
     `}
 
   svg {
-    &:nth-child(1) {
-      path {
-        color: ${props =>
-          props.theme.dark ? props.theme.true.white : props.theme.true.black};
-      }
+    path {
+      color: ${props =>
+        props.theme.dark ? props.theme.true.white : props.theme.true.black};
     }
 
     &:nth-child(3) {

@@ -79,6 +79,9 @@ import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
+import { useTranslation } from 'react-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 interface IRawTxTheme {
   base00: string;
@@ -884,7 +887,15 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
 
 export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   params,
+  locale = 'en',
 }) => {
+  const serverSideTranslationsProps = await serverSideTranslations(
+    locale,
+    ['common'],
+    nextI18nextConfig,
+    ['en'],
+  );
+
   const redirectProps: NotFound = {
     notFound: true,
   };
@@ -918,6 +929,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   });
 
   const props: ITransactionPage = {
+    ...serverSideTranslationsProps,
     transaction: tx,
     block: block?.data?.block || {},
   };

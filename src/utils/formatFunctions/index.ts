@@ -240,3 +240,28 @@ export const formatNumberDecimal = (value: string): string => {
 
   return formattedNumber;
 };
+
+export const displayBucketId = (
+  bucketId?: string,
+  assetID: string = 'KLV',
+): string => {
+  if (!bucketId) return '';
+
+  if (assetID !== 'KLV' && assetID !== 'KFI') {
+    try {
+      const hexString = bucketId.startsWith('0x')
+        ? bucketId.slice(2)
+        : bucketId;
+
+      const bytes = new Uint8Array(
+        hexString.match(/.{1,2}/g)?.map(byte => parseInt(byte, 16)) || [],
+      );
+      return new TextDecoder().decode(bytes);
+    } catch (error) {
+      console.error('Error converting bucket ID to UTF-8:', error);
+      return bucketId;
+    }
+  }
+
+  return bucketId;
+};

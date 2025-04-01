@@ -637,13 +637,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
               </ReceiveBackground>
               <SetAccountNameButton />
             </CenteredRow>
+            {IsTokenBurn(router.query.account as string) && (
+              <RowAlert>
+                <span>{t('accounts:SingleAccount.BlackHole')}</span>
+              </RowAlert>
+            )}
           </RowContent>
         </Row>
-        {IsTokenBurn(router.query.account as string) && (
-          <RowAlert>
-            <span>{t('accounts:SingleAccount.BlackHole')}</span>
-          </RowAlert>
-        )}
         <Row>
           <span>
             <strong>

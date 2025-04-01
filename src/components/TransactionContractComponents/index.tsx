@@ -58,7 +58,11 @@ import {
   findReceiptWithSender,
   findReceipts,
 } from '@/utils/findKey';
-import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import {
+  displayBucketId,
+  formatDate,
+  toLocaleFixed,
+} from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   PacksPrecision,
@@ -443,41 +447,37 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
                 </Link>
                 <Copy data={parameter.royalties?.address}></Copy>
               </CenteredRow>
-              {parameter.royalties?.transferFixed && (
+              <CenteredRow>
                 <span>
                   <strong>Transfer Fixed:&nbsp;</strong>
-                  {parameter?.royalties?.transferFixed / 1000000} KLV
+                  {parameter?.royalties?.transferFixed / 10 ** 6 || 0} KLV
                 </span>
-              )}
-              {parameter?.royalties?.marketFixed && (
+              </CenteredRow>
+              <CenteredRow>
                 <span>
                   <strong>Market Fixed:&nbsp;</strong>
-                  {parameter?.royalties?.marketFixed / 1000000} KLV
+                  {parameter?.royalties?.marketFixed / 10 ** 6 || 0} KLV
                 </span>
-              )}
-              {parameter?.royalties?.marketPercentage && (
+              </CenteredRow>
+              <CenteredRow>
                 <span>
                   <strong>Market Percent:&nbsp;</strong>
-                  {parameter?.royalties?.marketPercentage / 100}%
+                  {parameter?.royalties?.marketPercentage / 100 || 0}%
                 </span>
-              )}
-              <CenteredRow>
-                {parameter?.royalties?.itoFixed && (
-                  <>
-                    <strong>ITO Fixed:&nbsp;</strong>
-                    <span>{parameter?.royalties?.itoFixed / 1000000} KLV</span>
-                  </>
-                )}
               </CenteredRow>
               <CenteredRow>
-                {parameter?.royalties?.itoPercentage && (
-                  <>
-                    <strong>ITO Percentage:&nbsp;</strong>
-                    <span>{parameter?.royalties?.itoPercentage / 100}%</span>
-                  </>
-                )}
+                <span>
+                  <strong>ITO Fixed:&nbsp;</strong>
+                  {parameter?.royalties?.itoFixed / 10 ** 6 || 0} KLV
+                </span>
               </CenteredRow>
-              {parameter?.royalties?.transferPercentage && (
+              <CenteredRow>
+                <span>
+                  <strong>ITO Percentage:&nbsp;</strong>
+                  {parameter?.royalties?.itoPercentage / 100 || 0}%
+                </span>
+              </CenteredRow>
+              {parameter?.royalties?.transferPercentage?.length > 0 && (
                 <RoyaltiesTransferPercentage>
                   <strong>Transfer Percentage:&nbsp;</strong>
                   <div>
@@ -949,7 +949,7 @@ export const Freeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <span>
             <strong>Bucket Id</strong>
           </span>
-          <span>{freezeReceipt?.bucketId}</span>
+          <span>{displayBucketId(freezeReceipt?.bucketId, assetID)}</span>
         </Row>
       )}
       {renderMetadata()}
@@ -975,6 +975,7 @@ export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
     | IUnfreezeReceipt
     | undefined;
   const undelegateReceipt = findReceipt(filteredReceipts, 7);
+  const assetID = parameter?.assetId?.split('/')?.[0]?.toUpperCase() || 'KLV';
 
   return (
     <>
@@ -996,8 +997,11 @@ export const Unfreeze: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </span>
         <span>
           <CenteredRow>
-            <span>{parameter?.bucketID}</span>
-            <Copy data={parameter?.bucketID} info="Bucket Id"></Copy>
+            <span>{displayBucketId(unfreezeReceipt?.bucketId, assetID)}</span>
+            <Copy
+              data={displayBucketId(unfreezeReceipt?.bucketId, assetID)}
+              info="Bucket Id"
+            ></Copy>
           </CenteredRow>
         </span>
       </Row>

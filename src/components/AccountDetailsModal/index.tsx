@@ -2,7 +2,6 @@ import { KLV } from '@/assets/coins';
 import { Wallet, ArrowRight, CategoryTransparent } from '@/assets/icons';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
-import api from '@/services/api';
 import {
   IAccountBalance,
   getAccountBalanceRequest,
@@ -25,7 +24,7 @@ import {
 import { MdContentCopy } from 'react-icons/md';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import { useQuery } from 'react-query';
-import { toast } from 'react-toastify';
+
 import Copy from '../Copy';
 import {
   AccordionContent,
@@ -54,9 +53,10 @@ import {
   Usage,
   UserInfoContainer,
 } from './styles';
-import { getAssetsByOwner, getOwnedAssets } from '@/services/requests/asset';
+import { getOwnedAssets } from '@/services/requests/asset';
 
 import AssetLogo from '../Logo/AssetLogo';
+import { IAsset } from '@/types';
 
 export interface IAssetBalance {
   assetId: string;
@@ -91,10 +91,8 @@ export const AccountDetailsModal: React.FC<
   const [openCategory, setOpenCategory] = useState<boolean>(true);
 
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
-  const { walletAddress, connectExtension, logoutExtension } = useExtension();
+  const { walletAddress } = useExtension();
   const { isMobile } = useMobile();
-  const network = getNetwork();
-  const router = useRouter();
 
   const { data, refetch: getAccountBalance } = useQuery<IAccountBalance>({
     queryKey: ['accountBalance', walletAddress],
@@ -161,7 +159,7 @@ export const AccountDetailsModal: React.FC<
     enabled: !!walletAddress,
   });
 
-  const calculatePoolMetrics = asset => {
+  const calculatePoolMetrics = (asset: IAsset) => {
     if (!asset.poolData) {
       return {
         available: 0,
@@ -498,20 +496,18 @@ export const AccountDetailsModal: React.FC<
                                 <Usage>
                                   <h2>Usage</h2>
                                   <h2>
-                                    {(
-                                      (poolMetrics.totalKLVUsed /
-                                        poolMetrics.total) *
-                                      100
-                                    ).toFixed(2)}
-                                    /100%
+                                    {poolMetrics?.total &&
+                                    poolMetrics?.totalKLVUsed
+                                      ? `${((poolMetrics.totalKLVUsed / poolMetrics.total) * 100).toFixed(2)}%`
+                                      : 'N/A'}
                                   </h2>
                                 </Usage>
 
                                 <ProgressBarContainer>
                                   <ProgressBarFill
                                     percentage={
-                                      (poolMetrics.totalKLVUsed /
-                                        poolMetrics.total) *
+                                      ((poolMetrics.totalKLVUsed ?? 0) /
+                                        (poolMetrics.total ?? 1)) *
                                       100
                                     }
                                   />

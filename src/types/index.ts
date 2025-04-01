@@ -484,6 +484,20 @@ export interface IAsset {
   metadata?: string;
   mime?: string;
   stakingHolders: number;
+  poolData?: {
+    ownerAddress: string;
+    kda: string;
+    active: boolean;
+    klvBalance: number;
+    kdaBalance: number;
+    convertedFees: number;
+    adminAddress: string;
+    fRatioKLV: number;
+    fRatioKDA: number;
+    hidden: boolean;
+    verified: boolean;
+    ratio: number;
+  };
 }
 
 export interface IITO {

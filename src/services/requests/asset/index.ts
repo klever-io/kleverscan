@@ -176,7 +176,7 @@ export const getOwnedAssets = async (address: string) => {
 
   const poolData = await getSomeAssetsPool(assetIdsString);
 
-  const poolsByKda = {};
+  const poolsByKda = {} as Record<string, IAssetPool>;
 
   if (poolData && poolData.data && poolData.data.pools) {
     poolData.data.pools.forEach(pool => {

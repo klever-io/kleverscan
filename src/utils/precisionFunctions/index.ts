@@ -1,7 +1,18 @@
 import api from '@/services/api';
-import { IAsset, IFPR, IKDAFPR, IPrecisionResponse, Service } from '@/types';
+import {
+  IAsset,
+  IFPR,
+  IKDAFPR,
+  IPrecisionResponse,
+  ITransaction,
+  Service,
+} from '@/types';
 import { toast } from 'react-toastify';
 import { KLV_PRECISION } from '../globalVariables';
+import {
+  getAssetsAndCurrenciesList,
+  getTransactionPrecision,
+} from '@/pages/transactions';
 
 export function getPrecision<T extends string | string[]>(
   assetIds: T,
@@ -140,4 +151,47 @@ export const addPrecisionsToFPRDeposits = (
       kda.precision = precision;
     });
   });
+};
+
+interface ITransactionResponse {
+  data?: {
+    transactions?: ITransaction[];
+  };
+}
+
+export const getParsedTransactionPrecision = async (
+  transactionsResponse: ITransactionResponse,
+): Promise<ITransaction[] | undefined> => {
+  const assets: string[] = [];
+
+  transactionsResponse?.data?.transactions?.forEach(
+    (transaction: ITransaction) => {
+      if (transaction?.contract && transaction?.contract?.length) {
+        transaction?.contract?.forEach(contract => {
+          assets.push(...getAssetsAndCurrenciesList(contract, transaction));
+        });
+      }
+    },
+  );
+
+  const assetPrecisions = await getPrecision(assets);
+
+  const parsedTransactions = transactionsResponse.data?.transactions?.map(
+    (transaction: ITransaction) => {
+      if (transaction.contract && transaction.contract.length) {
+        transaction.contract.forEach(contract => {
+          if (contract.parameter === undefined) return;
+
+          transaction.precision = getTransactionPrecision(
+            contract,
+            transaction,
+            assetPrecisions,
+          );
+        });
+      }
+      return transaction;
+    },
+  );
+
+  return parsedTransactions;
 };

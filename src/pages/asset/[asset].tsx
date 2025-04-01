@@ -12,7 +12,7 @@ import Transactions from '@/components/Tabs/Transactions';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
-import { IAssetPage, IBalance } from '@/types/index';
+import { IAssetPage, IBalance, ITransaction } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { parseHolders } from '@/utils/parseValues';
 import { AssetCardContent, AssetPageContainer } from '@/views/assets';
@@ -23,6 +23,7 @@ import { useRouter } from 'next/router';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
+import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
 
 const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
@@ -90,10 +91,19 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
       ...router.query,
       asset: router.query.asset || '',
     };
-    return await api.get({
+    const transactionsResponse = await api.get({
       route: `transaction/list`,
       query: { ...newQuery, page, limit },
     });
+
+    const parsedTransactions =
+      await getParsedTransactionPrecision(transactionsResponse);
+
+    return {
+      data: {
+        transactions: parsedTransactions,
+      },
+    };
   };
 
   const requestAssetHolders = async (page: number, limit: number) => {

@@ -474,14 +474,13 @@ export const ProgressBarContainer = styled.div`
   border-radius: 0.5rem;
   overflow: hidden;
 `;
-
 export const ProgressBarFill = styled.div<{
   percentage?: number;
 }>`
-  width: ${props => props.percentage}%;
+  width: ${props => props.percentage ?? 0}%;
   height: 100%;
   background-color: ${props => {
-    const percentage = props.percentage;
+    const percentage = props.percentage ?? 0;
     if (percentage <= 50) return '#4EBC87';
     if (percentage <= 75) return '#AF9500';
     if (percentage <= 90) return '#FF8008';

@@ -104,6 +104,7 @@ import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { PropsWithChildren, useState } from 'react';
 import Tooltip from '../Tooltip';
+import { PermissionOperations } from '../AccountPermission';
 
 interface IAssetTriggerTypeData {
   parameter: IAssetTriggerContract;
@@ -2346,11 +2347,7 @@ export const UpdateAccountPermission: React.FC<
         </span>
         <RowContent>
           <BalanceContainer>
-            <FrozenContainer>
-              {operations.map(operation => (
-                <div key={operation}>{operation}</div>
-              ))}
-            </FrozenContainer>
+            <PermissionOperations {...permission} />
           </BalanceContainer>
         </RowContent>
       </Row>

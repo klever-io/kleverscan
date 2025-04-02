@@ -62,6 +62,7 @@ export interface IAssetBalance {
   assetId: string;
   assetName: string;
   balance: string;
+  logo: string;
 }
 
 interface IAccountDetailsModal {
@@ -339,7 +340,7 @@ export const AccountDetailsModal: React.FC<
                 </div>
               </MyWalletContent>
 
-              {otherAssets.firstFour.map((asset: any) => (
+              {otherAssets.firstFour.map(asset => (
                 <AssetItem
                   key={asset.assetId}
                   onClick={() => {

@@ -509,7 +509,7 @@ export interface IAccPermission {
   id: number;
   type: number;
   permissionName: string;
-  Threshold: number;
+  threshold: number;
   operations: string;
   signers: IAccKey[];
 }

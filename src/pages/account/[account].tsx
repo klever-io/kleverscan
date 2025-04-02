@@ -476,6 +476,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     those contracts explicitly authorized by the permission contract,
     based on the weight assigned to their signature. 
       `;
+
     return (
       <Container>
         {account?.permissions?.map(permission => {

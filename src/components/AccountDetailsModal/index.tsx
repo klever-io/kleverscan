@@ -62,7 +62,7 @@ export interface IAssetBalance {
   assetId: string;
   assetName: string;
   balance: string;
-  logo: string;
+  logo?: string;
 }
 
 interface IAccountDetailsModal {

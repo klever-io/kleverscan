@@ -2315,6 +2315,7 @@ export const UpdateAccountPermission: React.FC<
   const permission = parameter?.permissions[0];
   const operations = calculatePermissionOperations(permission?.operations);
   const signers = permission?.signers || [];
+
   return (
     <>
       <Row>
@@ -2339,7 +2340,7 @@ export const UpdateAccountPermission: React.FC<
         <span>
           <strong>Threshold</strong>
         </span>
-        <span>{permission?.Threshold ?? ''}</span>
+        <span>{permission?.threshold ?? ''}</span>
       </Row>
       <Row>
         <span>

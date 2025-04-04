@@ -35,6 +35,7 @@ import { ReactNode, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { IoIosInfinite } from 'react-icons/io';
 import nextI18nextConfig from '../../../next-i18next.config';
+import { useExtension } from '@/contexts/extension';
 
 export function getBestKLVRate(packData: IPackInfo[]): number | undefined {
   let bestKLVRate: number | undefined = undefined;
@@ -85,6 +86,7 @@ export const getITOrowSections =
       endTime,
       whitelistStartTime,
       whitelistEndTime,
+      whitelistInfo,
     } = asset;
 
     const bestKLVRate = getBestKLVRate(packData);
@@ -184,16 +186,25 @@ export const getITOrowSections =
         span: 1,
       },
       {
-        element: props => (
-          <ParticipateButton
-            onClick={() => {
-              setITO(asset);
-              setOpenParticipateModal(true);
-            }}
-          >
-            Participate
-          </ParticipateButton>
-        ),
+        element: props => {
+          const { walletAddress } = useExtension();
+          const isParticipateEnabled =
+            !whitelistInfo ||
+            (walletAddress &&
+              whitelistInfo.some(info => info.address === walletAddress));
+          return (
+            isParticipateEnabled && (
+              <ParticipateButton
+                onClick={() => {
+                  setITO(asset);
+                  setOpenParticipateModal(true);
+                }}
+              >
+                Participate
+              </ParticipateButton>
+            )
+          );
+        },
         span: 2,
       },
     ];
@@ -223,6 +234,7 @@ export const getITOTabletRowSections =
       endTime,
       whitelistStartTime,
       whitelistEndTime,
+      whitelistInfo,
     } = asset;
 
     const bestKLVRate = getBestKLVRate(packData);
@@ -317,16 +329,25 @@ export const getITOTabletRowSections =
         span: 1,
       },
       {
-        element: props => (
-          <ParticipateButton
-            onClick={() => {
-              setITO(asset);
-              setOpenParticipateModal(true);
-            }}
-          >
-            Participate
-          </ParticipateButton>
-        ),
+        element: props => {
+          const { walletAddress } = useExtension();
+          const isParticipateEnabled =
+            !whitelistInfo ||
+            (walletAddress &&
+              whitelistInfo.some(info => info.address === walletAddress));
+          return (
+            isParticipateEnabled && (
+              <ParticipateButton
+                onClick={() => {
+                  setITO(asset);
+                  setOpenParticipateModal(true);
+                }}
+              >
+                Participate
+              </ParticipateButton>
+            )
+          );
+        },
         span: 2,
       },
     ];

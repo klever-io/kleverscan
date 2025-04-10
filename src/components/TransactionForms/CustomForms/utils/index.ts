@@ -32,7 +32,7 @@ export const parseSplitRoyalties = (data: any): void => {
 
   splitRoyaltiesReference.forEach((item: any) => {
     const address = item?.address;
-    delete item.address;
+    delete item?.address;
     splitRoyalties[address] = item;
   });
   data.royalties.splitRoyalties = splitRoyalties;

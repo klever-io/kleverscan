@@ -373,6 +373,9 @@ export interface ISplitRoyalties {
   percentITOFixed: number;
   percentITOPercentage: number;
   percentTransferPercentage: number;
+  percentMarketFixed: number;
+  percentMarketPercentage: number;
+  percentTransferFixed: number;
 }
 
 export interface IRoyalties {

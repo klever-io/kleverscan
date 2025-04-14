@@ -9,7 +9,12 @@ import {
 } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { PropsWithChildren, default as React, useCallback } from 'react';
+import {
+  PropsWithChildren,
+  default as React,
+  useCallback,
+  Fragment,
+} from 'react';
 import { AssetProps } from './OverviewTab';
 
 interface StakingRoyaltiesTabProps extends AssetProps {
@@ -72,7 +77,7 @@ export const StakingRoyaltiesTab: React.FC<
         </span>
       </Row>
 
-      {asset?.staking.interestType === 'FPRI' && (
+      {asset?.staking?.interestType === 'FPRI' && (
         <Row>
           <strong>{t('assets:Staking.Current FPR Amount')}</strong>
 
@@ -172,6 +177,59 @@ export const StakingRoyaltiesTab: React.FC<
           <strong>ITO {t('assets:Staking.Fixed').toUpperCase()}</strong>
           <p>{`${asset.royalties.itoFixed / 10 ** KLV_PRECISION} KLV`}</p>
         </Row>
+      )}
+
+      {(asset?.royalties?.splitRoyalties ?? []).length > 0 && (
+        <>
+          <Row span={2}>
+            <SectionTitle>Split Royalties</SectionTitle>
+          </Row>
+          {asset?.royalties?.splitRoyalties?.map((split, index) => (
+            <Fragment key={index}>
+              <Row span={2}>Split Royalty {index + 1}</Row>
+              <Row>
+                <strong>{t('table:Address')}</strong>
+                <p>{split.address}</p>
+              </Row>
+              {split?.percentTransferPercentage && (
+                <Row>
+                  <strong>Percentage Over Transfer Percentage</strong>
+                  <p>{split?.percentTransferPercentage}</p>
+                </Row>
+              )}
+              {split?.percentITOFixed && (
+                <Row>
+                  <strong>Percentage Over ITO Fixed</strong>
+                  <p>{split?.percentITOFixed}</p>
+                </Row>
+              )}
+              {split?.percentITOPercentage && (
+                <Row>
+                  <strong>Percentage Over ITO Percentage</strong>
+                  <p>{split?.percentITOPercentage}</p>
+                </Row>
+              )}
+              {split?.percentMarketFixed && (
+                <Row>
+                  <strong>Percentage Over Market Fixed</strong>
+                  <p>{split.percentMarketFixed}</p>
+                </Row>
+              )}
+              {split?.percentMarketPercentage && (
+                <Row>
+                  <strong>Percentage Over Market Percentage</strong>
+                  <p>{split.percentMarketPercentage}</p>
+                </Row>
+              )}
+              {split?.percentTransferFixed && (
+                <Row>
+                  <strong>Percentage Over Transfer Fixed</strong>
+                  <p>{split.percentTransferFixed}</p>
+                </Row>
+              )}
+            </Fragment>
+          ))}
+        </>
       )}
     </>
   );

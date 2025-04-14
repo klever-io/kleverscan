@@ -9,7 +9,12 @@ import {
 } from '@/views/assets/detail';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { PropsWithChildren, default as React, useCallback } from 'react';
+import {
+  PropsWithChildren,
+  default as React,
+  useCallback,
+  Fragment,
+} from 'react';
 import { AssetProps } from './OverviewTab';
 
 interface StakingRoyaltiesTabProps extends AssetProps {
@@ -180,10 +185,8 @@ export const StakingRoyaltiesTab: React.FC<
             <SectionTitle>Split Royalties</SectionTitle>
           </Row>
           {asset?.royalties?.splitRoyalties?.map((split, index) => (
-            <>
-              <Row span={2} key={index}>
-                Split Royalty {index}
-              </Row>
+            <Fragment key={index}>
+              <Row span={2}>Split Royalty {index + 1}</Row>
               <Row>
                 <strong>{t('table:Address')}</strong>
                 <p>{split.address}</p>
@@ -224,7 +227,7 @@ export const StakingRoyaltiesTab: React.FC<
                   <p>{split.percentTransferFixed}</p>
                 </Row>
               )}
-            </>
+            </Fragment>
           ))}
         </>
       )}

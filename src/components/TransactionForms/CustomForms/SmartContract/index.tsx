@@ -81,6 +81,23 @@ const parseFunctionArguments = (
       setMetadata(contractBinaryAndParams);
     }
     return;
+  } else if (scType === 2) {
+    // Upgrade
+    if (metadata?.length === 0) {
+      return;
+    }
+    if (parsedArgsString?.length > 0) {
+      let contractBinaryAndParams = metadata.split('@').slice(0, 2).join('@');
+
+      let upgradeContract = contractBinaryAndParams.startsWith(
+        'upgradeContract@',
+      )
+        ? `${contractBinaryAndParams}@${parsedArgsString}`
+        : `upgradeContract@${contractBinaryAndParams}@${parsedArgsString}`;
+
+      setMetadata(upgradeContract);
+    }
+    return;
   } else {
     // Invoke
     if (parsedArgsString?.length === 0) {
@@ -307,7 +324,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
   const functions = useMemo(() => abi?.functions || undefined, [abi]);
 
   const func: ABIFunction | undefined =
-    scType === 1
+    scType !== 0
       ? abi?.constructor || {
           arguments: {},
         }
@@ -354,14 +371,14 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
     parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
   };
 
-  const showAddressCondition = scType === 0;
+  const showAddressCondition = scType !== 1;
   const showAbiAndArgumentsCondition =
-    scType === 0 || (scType === 1 && fileData?.length > 0);
+    scType === 0 || (scType !== 0 && fileData?.length > 0);
 
   const callValuesCondition =
     (scType === 0 && hasFunctions && func?.allowedAssets) ||
     !hasFunctions ||
-    (scType === 1 && fileData?.length > 0);
+    (scType !== 0 && fileData?.length > 0);
 
   const formInputProps: any = {
     name: 'function',
@@ -390,6 +407,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
           options={[
             { label: 'Deploy', value: 1 },
             { label: 'Invoke', value: 0 },
+            { label: 'Upgrade', value: 2 },
           ]}
           required
           disableCustom
@@ -399,13 +417,13 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
           <FormInput
             name="address"
             span={2}
-            title={scType === 0 ? 'Contract Address' : 'Contract Owner Address'}
-            tooltip={scType === 0 ? tooltip.address : tooltip.deployAddress}
+            title={scType !== 1 ? 'Contract Address' : 'Contract Owner Address'}
+            tooltip={scType !== 1 ? tooltip.address : tooltip.deployAddress}
             required
           />
         )}
 
-        {scType === 1 && (
+        {scType !== 0 && (
           <FormInput
             title="Contract Binary"
             type="file"
@@ -434,7 +452,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
             tooltip={tooltip.data}
           />
         )}
-        {scType === 1 && fileData?.length > 0 && (
+        {scType !== 0 && fileData?.length > 0 && (
           <PropertiesSection
             propertiesString={propertiesString}
             setPropertiesString={setPropertiesString}
@@ -458,7 +476,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
         {showAbiAndArgumentsCondition && (
           <ArgumentsSection
             arguments={
-              scType === 1
+              scType !== 0
                 ? abi?.construct?.arguments || undefined
                 : func?.arguments || undefined
             }
@@ -469,7 +487,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
         {callValuesCondition && (
           <CallValueSection
             allowedAssets={
-              scType === 1 ? abi?.construct?.allowedAssets : func?.allowedAssets
+              scType !== 0 ? abi?.construct?.allowedAssets : func?.allowedAssets
             }
           />
         )}

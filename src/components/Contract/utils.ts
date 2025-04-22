@@ -283,6 +283,38 @@ const precisionParse = async (
     case 'DepositContract':
       assetId = payload?.currencyId;
       await addFieldPrecision('amount', assetId);
+    case 'SmartContract':
+      if (payload.callValue) {
+        for (const assetId in payload.callValue) {
+          payload.callValue[assetId] = addPrecision(
+            payload.callValue[assetId],
+            await getPrecision(assetId),
+          );
+        }
+      }
+
+      // if (payload.amount) {
+      //   if (
+      //     typeof payload.amount === 'object' &&
+      //     !Array.isArray(payload.amount)
+      //   ) {
+      //     for (const assetId in payload.amount) {
+      //       payload.amount[assetId] = await addPrecision(
+      //         payload.amount[assetId],
+      //         await getPrecision(assetId),
+      //       );
+      //     }
+      //   } else {
+      //     const defaultAssetId = payload.assetId
+      //       ? payload.assetId
+      //       : payload.kda || 'KLV';
+      //     await addFieldPrecision('amount', defaultAssetId);
+      //   }
+      // }
+
+      parseSplitRoyaltiesPrecision(payload);
+
+      break;
   }
 
   return payload;

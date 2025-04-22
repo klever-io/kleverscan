@@ -293,25 +293,6 @@ const precisionParse = async (
         }
       }
 
-      // if (payload.amount) {
-      //   if (
-      //     typeof payload.amount === 'object' &&
-      //     !Array.isArray(payload.amount)
-      //   ) {
-      //     for (const assetId in payload.amount) {
-      //       payload.amount[assetId] = await addPrecision(
-      //         payload.amount[assetId],
-      //         await getPrecision(assetId),
-      //       );
-      //     }
-      //   } else {
-      //     const defaultAssetId = payload.assetId
-      //       ? payload.assetId
-      //       : payload.kda || 'KLV';
-      //     await addFieldPrecision('amount', defaultAssetId);
-      //   }
-      // }
-
       parseSplitRoyaltiesPrecision(payload);
 
       break;

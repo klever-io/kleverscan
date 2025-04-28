@@ -69,34 +69,38 @@ const parseFunctionArguments = (
   delete data.function;
 
   const parsedArgsString = getParsedArgumentsString(args, abi);
-
   if (scType === 1) {
     // Deploy
     if (metadata?.length === 0) {
       return;
     }
+
+    let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
+
     if (parsedArgsString?.length > 0) {
-      let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
       contractBinaryAndParams += `@${parsedArgsString}`;
-      setMetadata(contractBinaryAndParams);
     }
+
+    setMetadata(contractBinaryAndParams);
+
     return;
   } else if (scType === 2) {
     // Upgrade
     if (metadata?.length === 0) {
       return;
     }
-    if (parsedArgsString?.length > 0) {
-      let contractBinaryAndParams = metadata.split('@').slice(0, 2).join('@');
 
-      let upgradeContract = contractBinaryAndParams.startsWith(
+    let contractBinaryAndParams = metadata.split('@').slice(0, 2).join('@');
+
+    if (parsedArgsString?.length > 0) {
+      contractBinaryAndParams = contractBinaryAndParams.startsWith(
         'upgradeContract@',
       )
         ? `${contractBinaryAndParams}@${parsedArgsString}`
         : `upgradeContract@${contractBinaryAndParams}@${parsedArgsString}`;
-
-      setMetadata(upgradeContract);
     }
+
+    setMetadata(contractBinaryAndParams);
     return;
   } else {
     // Invoke
@@ -334,6 +338,9 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const onSubmit = async (dataRef: FormData) => {
     const data = JSON.parse(JSON.stringify(dataRef));
+    if (data.scType === 2) {
+      data.scType = 0;
+    }
 
     parseFunctionArguments(data, setMetadata, abi, scType, metadata);
     parseCallValue(data);

@@ -445,8 +445,11 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
                 const propertiesHex = parseInt(propertiesString, 2)
                   .toString(16)
                   .padStart(4, '0');
-
-                setMetadata(hex + '@0500@' + propertiesHex);
+                if (scType === 1) {
+                  setMetadata(hex + '@0500@' + propertiesHex);
+                } else {
+                  setMetadata(hex + '@' + propertiesHex);
+                }
                 setFileData(hex);
               };
               reader.readAsArrayBuffer(e.target.files[0]);

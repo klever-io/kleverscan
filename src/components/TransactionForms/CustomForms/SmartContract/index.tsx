@@ -90,14 +90,15 @@ const parseFunctionArguments = (
       return;
     }
 
-    let contractBinaryAndParams = metadata.split('@').slice(0, 2).join('@');
+    let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
 
+    contractBinaryAndParams = contractBinaryAndParams.startsWith(
+      'upgradeContract@',
+    )
+      ? (contractBinaryAndParams = `${contractBinaryAndParams}`)
+      : (contractBinaryAndParams = `upgradeContract@${contractBinaryAndParams}`);
     if (parsedArgsString?.length > 0) {
-      contractBinaryAndParams = contractBinaryAndParams.startsWith(
-        'upgradeContract@',
-      )
-        ? `${contractBinaryAndParams}@${parsedArgsString}`
-        : `upgradeContract@${contractBinaryAndParams}@${parsedArgsString}`;
+      contractBinaryAndParams += `@${parsedArgsString}`;
     }
 
     setMetadata(contractBinaryAndParams);
@@ -338,6 +339,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const onSubmit = async (dataRef: FormData) => {
     const data = JSON.parse(JSON.stringify(dataRef));
+
     if (data.scType === 2) {
       data.scType = 0;
     }
@@ -486,9 +488,11 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
         {showAbiAndArgumentsCondition && (
           <ArgumentsSection
             arguments={
-              scType !== 0
+              scType === 1
                 ? abi?.construct?.arguments || undefined
-                : func?.arguments || undefined
+                : scType === 2
+                  ? abi?.functions?.upgrade?.arguments || undefined
+                  : func?.arguments || undefined
             }
             types={abi?.types}
             handleInputChange={handleInputChange}

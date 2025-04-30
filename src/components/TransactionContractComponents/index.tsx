@@ -2671,7 +2671,6 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <Copy data={scAddress} info="address"></Copy>
         </CenteredRow>
       </Row>
-
       {Object.entries(parameter?.callValue || {}).length > 0 && (
         <Row>
           <span>
@@ -2680,14 +2679,26 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <RowContent>
             <BalanceContainer>
               <NetworkParamsContainer>
-                {parameter?.callValue?.map(value =>
-                  Object.entries(value).map(([key, value]) => (
-                    <div key={key}>
-                      <strong>{key}</strong>
-                      <span>{value}</span>
-                    </div>
-                  )),
-                )}
+                {parameter?.callValue?.map(value => {
+                  const assetPrecision = usePrecision(
+                    String(value?.asset || 'KLV'),
+                  );
+                  return Object.entries(value).map(([key, val]) => {
+                    const formattedValue =
+                      key === 'value'
+                        ? toLocaleFixed(
+                            Number(val) / 10 ** assetPrecision,
+                            assetPrecision,
+                          )
+                        : val;
+                    return (
+                      <div key={key}>
+                        <strong>{key}</strong>
+                        <span>{formattedValue}</span>
+                      </div>
+                    );
+                  });
+                })}
               </NetworkParamsContainer>
             </BalanceContainer>
           </RowContent>

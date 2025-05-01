@@ -329,11 +329,15 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
   const functions = useMemo(() => abi?.functions || undefined, [abi]);
 
   const func: ABIFunction | undefined =
-    scType !== 0
+    scType === 1
       ? abi?.constructor || {
           arguments: {},
         }
-      : functions?.[watch('function') || ''];
+      : scType === 2
+        ? abi?.functions?.upgrade || {
+            arguments: {},
+          }
+        : functions?.[watch('function') || ''];
 
   const hasFunctions = functions && Object.keys(functions)?.length > 0;
 
@@ -490,9 +494,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
             arguments={
               scType === 1
                 ? abi?.construct?.arguments || undefined
-                : scType === 2
-                  ? abi?.functions?.upgrade?.arguments || undefined
-                  : func?.arguments || undefined
+                : func?.arguments || undefined
             }
             types={abi?.types}
             handleInputChange={handleInputChange}
@@ -501,7 +503,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
         {callValuesCondition && (
           <CallValueSection
             allowedAssets={
-              scType !== 0 ? abi?.construct?.allowedAssets : func?.allowedAssets
+              scType === 1 ? abi?.construct?.allowedAssets : func?.allowedAssets
             }
           />
         )}

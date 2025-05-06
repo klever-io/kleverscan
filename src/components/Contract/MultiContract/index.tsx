@@ -146,7 +146,7 @@ const MultiContract: React.FC<PropsWithChildren> = () => {
                   onClick={() => editContract(item.elementId)}
                 >
                   <Title>
-                    #{item.elementId + 1} - {item.contractName}
+                    #{index + 1} - {item.contractName}
                   </Title>
 
                   {queue.length > 1 && (

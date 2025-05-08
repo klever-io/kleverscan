@@ -24,7 +24,7 @@ export const SplitRoyaltiesSection: React.FC<
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
-    name: 'splitRoyalties',
+    name: 'royalties.splitRoyalties',
   });
   return (
     <FormSection inner>
@@ -41,9 +41,9 @@ export const SplitRoyaltiesSection: React.FC<
         <FormSection key={field.id} inner>
           <SectionTitle>
             <HiTrash
-              onClick={() =>
-                removeWrapper({ index, remove, getValues, router })
-              }
+              onClick={() => {
+                removeWrapper({ index, remove, getValues, router });
+              }}
             />
             Split Royalties {index + 1}
           </SectionTitle>

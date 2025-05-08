@@ -23,7 +23,7 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import { useExtension } from '@/contexts/extension';
 import getAccount from '@/services/requests/searchBar/account';
-import { IAccountResponse, IDropdownItem } from '@/types';
+import { IAccountResponse, IDropdownItem, IPermissions } from '@/types';
 import { IAccPermission } from '@/types/contracts';
 import { filterPoolAssets } from '@/utils/create-transaction/parseFunctions';
 import { parseAddress } from '@/utils/parseValues';
@@ -65,7 +65,7 @@ const PermID: React.FC<PropsWithChildren> = () => {
 
   const parsedPermissions: IDropdownItem[] = [];
   if (res?.data?.account?.permissions)
-    res.data.account.permissions.map((permission: IAccPermission) => {
+    res.data.account.permissions.map((permission: IPermissions) => {
       parsedPermissions.push({
         label: `#${permission.id} - ${permission.permissionName} - Threshold: ${
           permission.Threshold

@@ -47,15 +47,13 @@ export const RoyaltiesSection: React.FC<
         dynamicInitialValue={walletAddress}
         required
       />
-      {!isFungible && (
-        <FormInput
-          name="royalties.transferFixed"
-          title="Transfer Fixed"
-          type="number"
-          precision={KLV_PRECISION}
-          tooltip={tooltip.royalties.transferFixed}
-        />
-      )}
+      <FormInput
+        name="royalties.transferFixed"
+        title="Transfer Fixed"
+        type="number"
+        precision={KLV_PRECISION}
+        tooltip={tooltip.royalties.transferFixed}
+      />
       {!isFungible && (
         <FormInput
           name="royalties.marketPercentage"

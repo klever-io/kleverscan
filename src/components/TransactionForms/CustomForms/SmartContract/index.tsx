@@ -69,17 +69,39 @@ const parseFunctionArguments = (
   delete data.function;
 
   const parsedArgsString = getParsedArgumentsString(args, abi);
-
   if (scType === 1) {
     // Deploy
     if (metadata?.length === 0) {
       return;
     }
+
+    let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
+
     if (parsedArgsString?.length > 0) {
-      let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
       contractBinaryAndParams += `@${parsedArgsString}`;
-      setMetadata(contractBinaryAndParams);
     }
+
+    setMetadata(contractBinaryAndParams);
+
+    return;
+  } else if (scType === 2) {
+    // Upgrade
+    if (metadata?.length === 0) {
+      return;
+    }
+
+    let contractBinaryAndParams = metadata.split('@').slice(0, 3).join('@');
+
+    contractBinaryAndParams = contractBinaryAndParams.startsWith(
+      'upgradeContract@',
+    )
+      ? (contractBinaryAndParams = `${contractBinaryAndParams}`)
+      : (contractBinaryAndParams = `upgradeContract@${contractBinaryAndParams}`);
+    if (parsedArgsString?.length > 0) {
+      contractBinaryAndParams += `@${parsedArgsString}`;
+    }
+
+    setMetadata(contractBinaryAndParams);
     return;
   } else {
     // Invoke
@@ -311,12 +333,20 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
       ? abi?.constructor || {
           arguments: {},
         }
-      : functions?.[watch('function') || ''];
+      : scType === 2
+        ? abi?.functions?.upgrade || {
+            arguments: {},
+          }
+        : functions?.[watch('function') || ''];
 
   const hasFunctions = functions && Object.keys(functions)?.length > 0;
 
   const onSubmit = async (dataRef: FormData) => {
     const data = JSON.parse(JSON.stringify(dataRef));
+
+    if (data.scType === 2) {
+      data.scType = 0;
+    }
 
     parseFunctionArguments(data, setMetadata, abi, scType, metadata);
     parseCallValue(data);
@@ -354,14 +384,14 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
     parseFunctionArguments(getValues(), setMetadata, abi, scType, metadata);
   };
 
-  const showAddressCondition = scType === 0;
+  const showAddressCondition = scType !== 1;
   const showAbiAndArgumentsCondition =
-    scType === 0 || (scType === 1 && fileData?.length > 0);
+    scType === 0 || (scType !== 0 && fileData?.length > 0);
 
   const callValuesCondition =
     (scType === 0 && hasFunctions && func?.allowedAssets) ||
     !hasFunctions ||
-    (scType === 1 && fileData?.length > 0);
+    (scType !== 0 && fileData?.length > 0);
 
   const formInputProps: any = {
     name: 'function',
@@ -390,6 +420,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
           options={[
             { label: 'Deploy', value: 1 },
             { label: 'Invoke', value: 0 },
+            { label: 'Upgrade', value: 2 },
           ]}
           required
           disableCustom
@@ -399,13 +430,13 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
           <FormInput
             name="address"
             span={2}
-            title={scType === 0 ? 'Contract Address' : 'Contract Owner Address'}
-            tooltip={scType === 0 ? tooltip.address : tooltip.deployAddress}
+            title={scType !== 1 ? 'Contract Address' : 'Contract Owner Address'}
+            tooltip={scType !== 1 ? tooltip.address : tooltip.deployAddress}
             required
           />
         )}
 
-        {scType === 1 && (
+        {scType !== 0 && (
           <FormInput
             title="Contract Binary"
             type="file"
@@ -420,8 +451,11 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
                 const propertiesHex = parseInt(propertiesString, 2)
                   .toString(16)
                   .padStart(4, '0');
-
-                setMetadata(hex + '@0500@' + propertiesHex);
+                if (scType === 1) {
+                  setMetadata(hex + '@0500@' + propertiesHex);
+                } else {
+                  setMetadata(hex + '@' + propertiesHex);
+                }
                 setFileData(hex);
               };
               reader.readAsArrayBuffer(e.target.files[0]);
@@ -434,7 +468,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
             tooltip={tooltip.data}
           />
         )}
-        {scType === 1 && fileData?.length > 0 && (
+        {scType !== 0 && fileData?.length > 0 && (
           <PropertiesSection
             propertiesString={propertiesString}
             setPropertiesString={setPropertiesString}

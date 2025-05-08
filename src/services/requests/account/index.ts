@@ -223,16 +223,23 @@ export const accountCall = async (
 
 export const pricesCall = async (): Promise<number | undefined> => {
   try {
-    const res = await api.post({
-      route: 'prices/prices',
-      service: Service.PROXY,
-      body: { names: ['KLV/USD'] },
-      useApiProxy: true,
+    const response = await api.post({
+      route: 'prices',
+      service: Service.KPRICES,
+      body: [
+        {
+          base: 'KLV',
+          quote: 'USD',
+        },
+      ],
+      useApiPrice: true,
     });
-    if (!res.error || res.error === '') {
-      return res?.data?.prices?.symbols[0]?.price;
+
+    if (!response.error || response.error === '') {
+      return response[0]?.price_usd;
     }
-    return Promise.reject(new Error(res?.error));
+
+    return Promise.reject(new Error(response?.error));
   } catch (error) {
     console.error(error);
   }

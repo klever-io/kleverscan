@@ -6,7 +6,31 @@ export default async function handler(
   res: NextApiResponse,
 ): Promise<void> {
   try {
+    if (!req.body) {
+      return res.status(400).json({
+        data: null,
+        error: 'Ivalid body request',
+        code: 'invalid_request',
+      });
+    }
+
     const { route, service, method, query, body } = req.body;
+
+    if (!route || !service || !method) {
+      return res.status(400).json({
+        data: null,
+        error: 'Required parameters are missing',
+        code: 'missing_parameters',
+      });
+    }
+
+    if (!process.env.DEFAULT_APIKEY_KPRICES) {
+      return res.status(500).json({
+        data: null,
+        error: 'Required environment variable is missing',
+        code: 'missing_api_key',
+      });
+    }
 
     const request: RequestInit = {
       method,

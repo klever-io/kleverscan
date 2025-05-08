@@ -479,9 +479,9 @@ const homeKfiPriceCall = async (): Promise<
 
     if (!response.error || response.error === '') {
       const kfiPriceData: HomeKFiPriceCallInterface = {
-        kfiVolume: response[0]['24h_vol'] ?? null,
-        kfiPricesTodaysPrice: response[0].price ?? null,
-        kfiPricesVariation: response[0]['24h_change'] / 100 || null,
+        kfiVolume: response[0]['24h_vol'],
+        kfiPricesTodaysPrice: response[0].price,
+        kfiPricesVariation: response[0]['24h_change'] / 100,
         kfipricesYesterdayPrice: null,
       };
 

@@ -24,6 +24,7 @@ export interface IProps {
   apiVersion?: string;
   service?: Service;
   useApiProxy?: boolean;
+  useApiPrice?: boolean;
   requestMode?: RequestMode;
   tries?: number;
 }
@@ -67,6 +68,9 @@ export const getHost = (
     [Service.EXPLORER]:
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
     [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',
+    [Service.KPRICES]:
+      process.env.DEFAULT_KPRICE_HOST ||
+      'https://apis.internal.klever.io/kprices',
   };
 
   let host = hostService[service || 0];
@@ -77,11 +81,10 @@ export const getHost = (
     host = host.substring(0, host.length - 1);
   }
 
-  if (service === Service.PROXY) {
+  if (service === Service.PROXY || service === Service.KPRICES) {
     if (port) {
       port = `:${port}`;
     }
-
     host = `${host}${port}/${apiVersion}`;
   }
 
@@ -189,6 +192,24 @@ export const withoutBody = async (
 
 export const withBody = async (props: IProps, method: Method): Promise<any> => {
   const request = async () => {
+    if (props.useApiPrice) {
+      try {
+        const response = await fetch('/api/get-prices', {
+          method: Method.POST,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...getProps(props),
+            method: method.toString(),
+          }),
+        });
+
+        return response.json();
+      } catch (error) {
+        return { data: null, error, code: 'internal_error', pagination };
+      }
+    }
     if (props.useApiProxy) {
       try {
         // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)

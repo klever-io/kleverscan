@@ -479,15 +479,15 @@ const homeKfiPriceCall = async (): Promise<
 
     if (!response.error || response.error === '') {
       const kfiPriceData: HomeKFiPriceCallInterface = {
-        kfiVolume: response[0]['24h_vol'],
-        kfiPricesTodaysPrice: response[0].price,
-        kfiPricesVariation: response[0]['24h_change'] / 100,
+        kfiVolume: response[0]?.['24h_vol'],
+        kfiPricesTodaysPrice: response[0]?.price,
+        kfiPricesVariation: response[0]?.['24h_change'] / 100,
         kfipricesYesterdayPrice: null,
       };
 
-      if (response[0].price && response[0]['24h_change']) {
+      if (response[0]?.price && response[0]?.['24h_change']) {
         kfiPriceData.kfipricesYesterdayPrice =
-          response[0].price - response[0]['24h_change'] / 100;
+          response[0]?.price - response[0]?.['24h_change'] / 100;
       }
 
       return kfiPriceData;

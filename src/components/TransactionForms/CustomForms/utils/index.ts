@@ -11,10 +11,6 @@ export const parseSplitRoyalties = (data: any): void => {
   if (data?.transferPercentage) {
     delete data.transferPercentage;
   }
-  if (!data.royalties) {
-    data.royalties = {};
-    return;
-  }
   if (
     data.royalties?.splitRoyalties === undefined ||
     !data.royalties?.splitRoyalties?.length
@@ -31,8 +27,8 @@ export const parseSplitRoyalties = (data: any): void => {
   } = {};
 
   splitRoyaltiesReference.forEach((item: any) => {
-    const address = item.address;
-    delete item.address;
+    const address = item?.address;
+    delete item?.address;
     splitRoyalties[address] = item;
   });
   data.royalties.splitRoyalties = splitRoyalties;

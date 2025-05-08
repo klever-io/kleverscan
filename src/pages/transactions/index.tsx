@@ -86,7 +86,7 @@ export const mobileAddressSectionElement = (toAddress: string): JSX.Element => {
   );
 };
 
-const getAssetsAndCurrenciesList = (
+export const getAssetsAndCurrenciesList = (
   contract: IContract,
   transaction: ITransaction,
 ): string[] => {
@@ -119,7 +119,7 @@ const getAssetsAndCurrenciesList = (
   return assets;
 };
 
-const getTransactionPrecision = (
+export const getTransactionPrecision = (
   contract: IContract,
   transaction: ITransaction,
   assetPrecisions: { [key: string]: number },
@@ -376,9 +376,13 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     element: props => (
       <DoubleRow {...props} key={inOrOut}>
         <CenteredRow>
-          <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
-            {inOrOut}
-          </InOutSpan>
+          {contractType === 'TransferContractType' ? (
+            <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+              {inOrOut}
+            </InOutSpan>
+          ) : (
+            <InOutSpan status={'icon'}>- -</InOutSpan>
+          )}
         </CenteredRow>
       </DoubleRow>
     ),

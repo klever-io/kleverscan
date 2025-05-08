@@ -283,6 +283,19 @@ const precisionParse = async (
     case 'DepositContract':
       assetId = payload?.currencyId;
       await addFieldPrecision('amount', assetId);
+    case 'SmartContract':
+      if (payload.callValue) {
+        for (const assetId in payload.callValue) {
+          payload.callValue[assetId] = addPrecision(
+            payload.callValue[assetId],
+            await getPrecision(assetId),
+          );
+        }
+      }
+
+      parseSplitRoyaltiesPrecision(payload);
+
+      break;
   }
 
   return payload;

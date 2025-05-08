@@ -465,37 +465,29 @@ const homeKfiPriceCall = async (): Promise<
   HomeKFiPriceCallInterface | undefined
 > => {
   try {
-    const res = await api.post({
-      route: `prices/coinstats`,
-      service: Service.PROXY,
-      body: {
-        ID: 'kfi',
-        Name: 'kfi',
-        Currency: 'USD',
-      },
-      useApiProxy: true,
+    const response = await api.post({
+      route: `prices`,
+      service: Service.KPRICES,
+      body: [
+        {
+          base: 'KFI',
+          quote: 'USD',
+        },
+      ],
+      useApiPrice: true,
     });
 
-    if (!res.error || res.error === '') {
-      const data =
-        res?.data?.prices?.Exchanges.find(
-          (exchange: any) => exchange.ExchangeName === 'Klever',
-        ) ||
-        res?.data?.prices?.Exchanges.find(
-          (exchange: any) => !!exchange.ExchangeName,
-        );
-
-      if (!data) return;
-
+    if (!response.error || response.error === '') {
       const kfiPriceData: HomeKFiPriceCallInterface = {
-        kfiVolume: data.Volume ?? null,
-        kfiPricesTodaysPrice: data.Price ?? null,
-        kfiPricesVariation: data.PriceVariation ?? null,
+        kfiVolume: response[0]?.['24h_vol'],
+        kfiPricesTodaysPrice: response[0]?.price,
+        kfiPricesVariation: response[0]?.['24h_change'] / 100,
         kfipricesYesterdayPrice: null,
       };
 
-      if (data.Price && data.PriceVariation) {
-        kfiPriceData.kfipricesYesterdayPrice = data.Price - data.PriceVariation;
+      if (response[0]?.price && response[0]?.['24h_change']) {
+        kfiPriceData.kfipricesYesterdayPrice =
+          response[0]?.price - response[0]?.['24h_change'] / 100;
       }
 
       return kfiPriceData;

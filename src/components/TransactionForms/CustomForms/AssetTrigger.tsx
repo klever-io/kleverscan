@@ -250,6 +250,7 @@ const getAssetTriggerForm = (
         <RoyaltiesSection
           isNFT={collection.isNFT}
           precision={collection.precision}
+          isFungible={collection.isFungible}
         />
       );
     case 15:

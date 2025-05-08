@@ -31,6 +31,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useState } from 'react';
 import Table, { ITable } from '../../Table';
+import api from '@/services/api';
+import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
 
 export const homeTransactionTableHeaders = [
   'Transaction Hash',
@@ -282,9 +284,16 @@ const HomeTransactions: React.FC<PropsWithChildren> = () => {
   ) => Promise<IPaginatedResponse> = useCallback(
     async (page = 1, limit = 10) => {
       const quantity = isTablet ? 5 : 10;
+      const transactionsResponse = await api.get({
+        route: `transaction/list`,
+      });
+
+      const parsedTransactions =
+        await getParsedTransactionPrecision(transactionsResponse);
+
       return {
         data: {
-          transactions: homeTransactions.slice(0, quantity),
+          transactions: parsedTransactions?.slice(0, quantity),
         },
         error: '',
         code: '',

@@ -22,6 +22,7 @@ export enum Service {
   EXPLORER,
   MULTISIGN,
   CDN,
+  KPRICES,
 }
 
 export interface IDropdownItem {

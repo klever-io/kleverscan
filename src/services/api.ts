@@ -69,7 +69,7 @@ export const getHost = (
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
     [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',
     [Service.KPRICES]:
-      process.env.DEFAULT_KPRICE_HOST ||
+      process.env.DEFAULT_KPRICES_HOST ||
       'https://apis.internal.klever.io/kprices',
   };
 

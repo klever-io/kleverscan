@@ -58,13 +58,13 @@ export const getHost = (
 ): string => {
   const hostService = {
     [Service.PROXY]:
-      process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance',
+      process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.org',
     [Service.NODE]:
-      process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.finance',
+      process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.org',
     [Service.GECKO]: 'https://api.coingecko.com/api/v3',
     [Service.MULTISIGN]:
       process.env.DEFAULT_API_MULTISIGN ||
-      'https://multisign.testnet.klever.finance',
+      'https://multisign.testnet.klever.org',
     [Service.EXPLORER]:
       process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
     [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',

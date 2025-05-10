@@ -24,7 +24,7 @@ export const broadcastTXSuccessful = async (hash: string): Promise<any> => {
     try {
       const fetchPromise = fetch(
         `${
-          process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.finance'
+          process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.org'
         }/transaction/${hash}`,
         {
           method: 'GET',

@@ -2873,42 +2873,133 @@ const renderAssetTriggerTypeData: React.FC<
   );
 
   const royaltiesReturn = () => (
-    <Row>
-      <strong>Royalties</strong>
-      <RowContent>
-        <BalanceContainer>
-          <FrozenContainer>
-            <RoleWrapper>
-              <RoleDiv>
-                <StrongWidth>Address</StrongWidth>
-                <span>{par.royalties.address || '--'}</span>
-                <Copy data={par.royalties.address} />
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>ITO Fixed</StrongWidth>
-                <span>{par.royalties.itoFixed || '--'}</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>ITO Percentage</StrongWidth>
-                <span>{par.royalties.itoPercentage / 100 || 0}%</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>Market Fixed</StrongWidth>
-                <span>{par.royalties.marketFixed || '--'}</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>Market Percentage</StrongWidth>
-                <span>{par.royalties.marketPercentage / 100 || 0}%</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>Transfer Fixed</StrongWidth>
-                <span>{par.royalties.transferFixed || '--'}</span>
-              </RoleDiv>
-            </RoleWrapper>
-          </FrozenContainer>
-        </BalanceContainer>
-      </RowContent>
-    </Row>
+    <>
+      <Row>
+        <strong>Royalties</strong>
+        <RowContent>
+          <BalanceContainer>
+            <FrozenContainer>
+              <RoleWrapper>
+                <RoleDiv>
+                  <StrongWidth>Address</StrongWidth>
+                  <span>{par.royalties.address || '--'}</span>
+                  <Copy data={par.royalties.address} />
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>ITO Fixed</StrongWidth>
+                  <span>
+                    {toLocaleFixed(par?.royalties.itoFixed / 10 ** 6, 6) ||
+                      '--'}
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>ITO Percentage</StrongWidth>
+                  <span>
+                    {toLocaleFixed(par.royalties.itoPercentage / 10 ** 2, 2) ||
+                      '--'}
+                    %
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>Market Fixed</StrongWidth>
+                  <span>
+                    {toLocaleFixed(par?.royalties.marketFixed / 10 ** 6, 6) ||
+                      '--'}
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>Market Percentage</StrongWidth>
+                  <span>
+                    {toLocaleFixed(
+                      par.royalties.marketPercentage / 10 ** 2,
+                      2,
+                    ) || '--'}
+                    %
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>Transfer Fixed</StrongWidth>
+                  <span>
+                    {toLocaleFixed(par?.royalties.transferFixed / 10 ** 6, 6) ||
+                      '--'}
+                  </span>
+                </RoleDiv>
+              </RoleWrapper>
+            </FrozenContainer>
+          </BalanceContainer>
+        </RowContent>
+      </Row>
+
+      {Array.isArray(par.royalties.splitRoyalties) &&
+        par.royalties.splitRoyalties.length > 0 && (
+          <Row>
+            <strong>Split Royalties</strong>
+            <RowContent>
+              <BalanceContainer>
+                {par.royalties.splitRoyalties.map((split, idx) => (
+                  <FrozenContainer key={idx}>
+                    <RoleWrapper>
+                      <RoleDiv>
+                        <StrongWidth>Address</StrongWidth>
+                        <span>{split.address || '--'}</span>
+                        <Copy data={split.address} />
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>ITO Fixed</StrongWidth>
+                        <span>
+                          {toLocaleFixed(split.percentITOFixed / 10 ** 2, 2) ||
+                            '--'}
+                          %
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>ITO Percentage</StrongWidth>
+                        <span>
+                          {toLocaleFixed(
+                            split.percentITOPercentage / 10 ** 2,
+                            2,
+                          ) || '--'}
+                          %
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>Market Fixed</StrongWidth>
+                        <span>
+                          {toLocaleFixed(
+                            split.percentMarketFixed / 10 ** 2,
+                            2,
+                          ) || '--'}
+                          %
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>Market Percentage</StrongWidth>
+                        <span>
+                          {toLocaleFixed(
+                            split.percentMarketPercentage / 10 ** 2,
+                            2,
+                          ) || '--'}
+                          %
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>Transfer Fixed</StrongWidth>
+                        <span>
+                          {toLocaleFixed(
+                            split.percentTransferFixed / 10 ** 2,
+                            2,
+                          ) || '--'}
+                          %
+                        </span>
+                      </RoleDiv>
+                    </RoleWrapper>
+                  </FrozenContainer>
+                ))}
+              </BalanceContainer>
+            </RowContent>
+          </Row>
+        )}
+    </>
   );
 
   const roleReturn = () => (

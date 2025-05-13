@@ -11,10 +11,13 @@ export const parseSplitRoyalties = (data: any): void => {
   if (data?.transferPercentage) {
     delete data.transferPercentage;
   }
-  if (
-    data.royalties?.splitRoyalties === undefined ||
-    !data.royalties?.splitRoyalties?.length
-  ) {
+
+  if (Array.isArray(data.royalties?.splitRoyalties)) {
+    if (data.royalties.splitRoyalties.length === 0) {
+      data.royalties.splitRoyalties = {};
+      return;
+    }
+  } else {
     return;
   }
 
@@ -22,15 +25,14 @@ export const parseSplitRoyalties = (data: any): void => {
 
   delete data.royalties.splitRoyalties;
 
-  const splitRoyalties: {
-    [key: string]: any;
-  } = {};
+  const splitRoyalties: { [key: string]: any } = {};
 
   splitRoyaltiesReference.forEach((item: any) => {
     const address = item?.address;
     delete item?.address;
     splitRoyalties[address] = item;
   });
+
   data.royalties.splitRoyalties = splitRoyalties;
 };
 

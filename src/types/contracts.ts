@@ -154,6 +154,7 @@ interface RoyaltySplit {
   percentMarketFixed: number;
   percentMarketPercentage: number;
   percentTransferFixed: number;
+  percentTransferPercentage: number;
 }
 
 export interface IRoyaltiesInfo {
@@ -162,7 +163,7 @@ export interface IRoyaltiesInfo {
   transferFixed: number;
   marketPercentage: number;
   marketFixed: number;
-  splitRoyalties?: RoyaltySplit[];
+  splitRoyalties: RoyaltySplit[];
   itoPercentage: number;
   itoFixed: number;
 }

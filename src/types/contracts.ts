@@ -147,12 +147,23 @@ export interface IRoyaltyInfo {
   percentage: number;
 }
 
+interface RoyaltySplit {
+  address: string;
+  percentITOFixed: number;
+  percentITOPercentage: number;
+  percentMarketFixed: number;
+  percentMarketPercentage: number;
+  percentTransferFixed: number;
+  percentTransferPercentage: number;
+}
+
 export interface IRoyaltiesInfo {
   address: string;
   transferPercentage: IRoyaltyInfo[];
   transferFixed: number;
   marketPercentage: number;
   marketFixed: number;
+  splitRoyalties: RoyaltySplit[];
   itoPercentage: number;
   itoFixed: number;
 }

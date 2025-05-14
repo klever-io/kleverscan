@@ -335,6 +335,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
 
   const [expand, setExpand] = useState({
     royalties: false,
+    splitRoyalties: false,
     staking: false,
     properties: false,
     attributes: false,
@@ -485,8 +486,17 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
                     {parameter?.royalties?.transferPercentage.map(
                       (data, index) => (
                         <span key={index}>
-                          <p>Amount: {data.amount}</p>
-                          <p>Percentage: {data.percentage / 100}%</p>
+                          <p>
+                            Amount:{' '}
+                            {toLocaleFixed(
+                              data.amount / 10 ** parameter.precision,
+                              parameter.precision,
+                            )}
+                          </p>
+                          <p>
+                            Percentage:{' '}
+                            {toLocaleFixed(data.percentage / 10 ** 2, 2)}%
+                          </p>
                         </span>
                       ),
                     )}
@@ -497,6 +507,92 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
           )}
         </ExpandRow>
       )}
+      {parameter.royalties?.splitRoyalties?.length > 0 && (
+        <ExpandRow expandVar={expand.splitRoyalties}>
+          <ExpandWrapper expandVar={expand.splitRoyalties}>
+            <span style={{ minWidth: '10rem' }}>
+              <strong>Split Royalties</strong>
+            </span>
+            <span>
+              <ButtonExpand
+                onClick={() =>
+                  setExpand({
+                    ...expand,
+                    splitRoyalties: !expand.splitRoyalties,
+                  })
+                }
+              >
+                {expand?.splitRoyalties ? 'Hide' : 'Expand'}
+              </ButtonExpand>
+            </span>
+          </ExpandWrapper>
+          {expand?.splitRoyalties && (
+            <Panel>
+              {parameter.royalties.splitRoyalties.map((royalty, index) => (
+                <div key={index}>
+                  <CenteredRow>
+                    <strong>Address:&nbsp;</strong>
+                    <Link href={`/account/${royalty.address}`} legacyBehavior>
+                      {royalty.address}
+                    </Link>
+                    <Copy data={royalty.address} />
+                  </CenteredRow>
+                  <CenteredRow>
+                    <span>
+                      <strong>Transfer Fixed:&nbsp;</strong>
+                      {royalty.percentTransferFixed != null
+                        ? `${toLocaleFixed(royalty.percentTransferFixed / 10 ** 2, 2)}%`
+                        : '--'}
+                    </span>
+                  </CenteredRow>
+                  <CenteredRow>
+                    <span>
+                      <strong>Market Fixed:&nbsp;</strong>
+                      {royalty.percentMarketFixed != null
+                        ? `${toLocaleFixed(royalty.percentMarketFixed / 10 ** 2, 2)}%`
+                        : '--'}
+                    </span>
+                  </CenteredRow>
+                  <CenteredRow>
+                    <span>
+                      <strong>Market Percent:&nbsp;</strong>
+                      {royalty.percentMarketPercentage != null
+                        ? `${toLocaleFixed(royalty.percentMarketPercentage / 10 ** 2, 2)}%`
+                        : '--'}
+                    </span>
+                  </CenteredRow>
+                  <CenteredRow>
+                    <span>
+                      <strong>ITO Fixed:&nbsp;</strong>
+                      {royalty.percentITOFixed != null
+                        ? `${toLocaleFixed(royalty.percentITOFixed / 10 ** 2, 2)}%`
+                        : '--'}
+                    </span>
+                  </CenteredRow>
+                  <CenteredRow>
+                    <span>
+                      <strong>ITO Percentage:&nbsp;</strong>
+                      {royalty.percentITOPercentage != null
+                        ? `${toLocaleFixed(royalty.percentITOPercentage / 10 ** 2, 2)}%`
+                        : '--'}
+                    </span>
+                  </CenteredRow>
+
+                  <CenteredRow>
+                    <span>
+                      <strong>Transfer Percentage:&nbsp;</strong>
+                      {royalty.percentITOPercentage != null
+                        ? `${toLocaleFixed(royalty.percentITOPercentage / 10 ** 2, 2)}%`
+                        : '--'}
+                    </span>
+                  </CenteredRow>
+                </div>
+              ))}
+            </Panel>
+          )}
+        </ExpandRow>
+      )}
+
       {parameter.staking && (
         <ExpandRow expandVar={expand.staking}>
           <ExpandWrapper expandVar={expand.staking}>
@@ -2873,42 +2969,162 @@ const renderAssetTriggerTypeData: React.FC<
   );
 
   const royaltiesReturn = () => (
-    <Row>
-      <strong>Royalties</strong>
-      <RowContent>
-        <BalanceContainer>
-          <FrozenContainer>
-            <RoleWrapper>
-              <RoleDiv>
-                <StrongWidth>Address</StrongWidth>
-                <span>{par.royalties.address || '--'}</span>
-                <Copy data={par.royalties.address} />
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>ITO Fixed</StrongWidth>
-                <span>{par.royalties.itoFixed || '--'}</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>ITO Percentage</StrongWidth>
-                <span>{par.royalties.itoPercentage / 100 || 0}%</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>Market Fixed</StrongWidth>
-                <span>{par.royalties.marketFixed || '--'}</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>Market Percentage</StrongWidth>
-                <span>{par.royalties.marketPercentage / 100 || 0}%</span>
-              </RoleDiv>
-              <RoleDiv>
-                <StrongWidth>Transfer Fixed</StrongWidth>
-                <span>{par.royalties.transferFixed || '--'}</span>
-              </RoleDiv>
-            </RoleWrapper>
-          </FrozenContainer>
-        </BalanceContainer>
-      </RowContent>
-    </Row>
+    <>
+      <Row>
+        <strong>Royalties</strong>
+        <RowContent>
+          <BalanceContainer>
+            <FrozenContainer>
+              <RoleWrapper>
+                <RoleDiv>
+                  <StrongWidth>Address</StrongWidth>
+                  <span>{par.royalties.address || '--'}</span>
+                  <Copy data={par.royalties.address} />
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>ITO Fixed</StrongWidth>
+                  <span>
+                    {par?.royalties?.itoFixed != null
+                      ? toLocaleFixed(par.royalties.itoFixed / 10 ** 6, 6)
+                      : '--'}
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>ITO Percentage</StrongWidth>
+                  <span>
+                    {par?.royalties?.itoPercentage != null
+                      ? `${toLocaleFixed(par.royalties.itoPercentage / 10 ** 2, 2)}%`
+                      : '--'}
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>Market Fixed</StrongWidth>
+                  <span>
+                    {par?.royalties?.marketFixed != null
+                      ? toLocaleFixed(par.royalties.marketFixed / 10 ** 6, 6)
+                      : '--'}
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>Market Percentage</StrongWidth>
+                  <span>
+                    {par?.royalties?.marketPercentage != null
+                      ? `${toLocaleFixed(par.royalties.marketPercentage / 10 ** 2, 2)}%`
+                      : '--'}
+                  </span>
+                </RoleDiv>
+                <RoleDiv>
+                  <StrongWidth>Transfer Fixed</StrongWidth>
+                  <span>
+                    {par?.royalties?.transferFixed != null
+                      ? toLocaleFixed(par.royalties.transferFixed / 10 ** 6, 6)
+                      : '--'}
+                  </span>
+                </RoleDiv>
+
+                {parameter?.royalties?.transferPercentage?.length > 0 ? (
+                  <RoleDiv style={{ overflowX: 'auto' }}>
+                    <StrongWidth>
+                      Transfer <br /> Percentage
+                    </StrongWidth>
+
+                    {parameter?.royalties?.transferPercentage.map(
+                      (data, index) => (
+                        <span key={index}>
+                          <p>
+                            Amount:{' '}
+                            {toLocaleFixed(
+                              data.amount / 10 ** precision,
+                              precision,
+                            )}
+                          </p>
+                          <p>Percentage: {data.percentage / 100}%</p>
+                        </span>
+                      ),
+                    )}
+                  </RoleDiv>
+                ) : (
+                  <RoleDiv>
+                    <StrongWidth>Transfer Percentage</StrongWidth>
+                    <span> - - </span>
+                  </RoleDiv>
+                )}
+              </RoleWrapper>
+            </FrozenContainer>
+          </BalanceContainer>
+        </RowContent>
+      </Row>
+
+      {Array.isArray(par.royalties.splitRoyalties) &&
+        par.royalties.splitRoyalties.length > 0 && (
+          <Row>
+            <strong>Split Royalties</strong>
+            <RowContent>
+              <BalanceContainer>
+                {par.royalties.splitRoyalties.map((split, idx) => (
+                  <FrozenContainer key={idx}>
+                    <RoleWrapper>
+                      <RoleDiv>
+                        <StrongWidth>Address</StrongWidth>
+                        <span>{split.address || '--'}</span>
+                        <Copy data={split.address} />
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>ITO Fixed</StrongWidth>
+                        <span>
+                          {split.percentITOFixed != null
+                            ? `${toLocaleFixed(split.percentITOFixed / 10 ** 2, 2)}%`
+                            : '- -'}
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>ITO Percentage</StrongWidth>
+                        <span>
+                          {split.percentITOPercentage != null
+                            ? `${toLocaleFixed(split.percentITOPercentage / 10 ** 2, 2)}%`
+                            : '- -'}
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>Market Fixed</StrongWidth>
+                        <span>
+                          {split.percentMarketFixed != null
+                            ? `${toLocaleFixed(split.percentMarketFixed / 10 ** 2, 2)}%`
+                            : '- -'}
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>Market Percentage</StrongWidth>
+                        <span>
+                          {split.percentMarketPercentage != null
+                            ? `${toLocaleFixed(split.percentMarketPercentage / 10 ** 2, 2)}%`
+                            : '- -'}
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>Transfer Fixed</StrongWidth>
+                        <span>
+                          {split.percentTransferFixed != null
+                            ? `${toLocaleFixed(split.percentTransferFixed / 10 ** 2, 2)}%`
+                            : '- -'}
+                        </span>
+                      </RoleDiv>
+                      <RoleDiv>
+                        <StrongWidth>Transfer Percentage</StrongWidth>
+                        <span>
+                          {split.percentTransferPercentage != null
+                            ? `${toLocaleFixed(split.percentTransferPercentage / 10 ** 2, 2)}%`
+                            : '- -'}
+                        </span>
+                      </RoleDiv>
+                    </RoleWrapper>
+                  </FrozenContainer>
+                ))}
+              </BalanceContainer>
+            </RowContent>
+          </Row>
+        )}
+    </>
   );
 
   const roleReturn = () => (

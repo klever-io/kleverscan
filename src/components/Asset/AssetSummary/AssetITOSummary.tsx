@@ -56,6 +56,15 @@ export const AssetITOSummary: React.FC<PropsWithChildren<AssetITOProps>> = ({
     setOpenParticipateModal(true);
   };
 
+  const handleIsInWhitelist = (address: string) => {
+    if (address) {
+      const isInWhitelist = ITO?.whitelistInfo?.some(
+        info => info.address === address,
+      );
+      return isInWhitelist;
+    }
+  };
+
   return (
     <>
       <CardContainer>
@@ -110,15 +119,16 @@ export const AssetITOSummary: React.FC<PropsWithChildren<AssetITOProps>> = ({
             </EndTime>
           )}
         </DetailsRow>
-
-        <ParticipateButton
-          type="button"
-          onClick={() => handleParticipate()}
-          disabled={!ITO}
-          secondary={!walletAddress}
-        >
-          Participate
-        </ParticipateButton>
+        {handleIsInWhitelist(walletAddress) === true && (
+          <ParticipateButton
+            type="button"
+            onClick={() => handleParticipate()}
+            disabled={!ITO}
+            secondary={!walletAddress}
+          >
+            Participate
+          </ParticipateButton>
+        )}
       </CardContainer>
     </>
   );

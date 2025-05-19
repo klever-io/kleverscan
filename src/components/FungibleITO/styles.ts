@@ -24,7 +24,7 @@ export const FungibleContainer = styled.div`
 `;
 
 export const Content = styled.div`
-  width: 50%;
+  width: 100%;
 
   &:first-child {
     display: flex;
@@ -88,10 +88,10 @@ export const TotalPrice = styled.div`
 export const PriceRange = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
+  gap: 0.5rem;
+  /* @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     padding: 2rem;
-  }
+  } */
 `;
 
 export const PriceRangeTitle = styled.span`
@@ -107,11 +107,12 @@ export const Row = styled.div<{ inPriceRange: boolean }>`
   justify-content: space-between;
   border: ${props => (props.inPriceRange ? props.theme.violet : 'none')} 2px
     solid;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 1rem;
   span {
     color: ${props => props.theme.black};
   }
+  background-color: #0b0b1e;
 `;
 
 export const LoaderWrapper = styled.div`
@@ -119,4 +120,12 @@ export const LoaderWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+export const ViewMoreButton = styled.div`
+  color: ${props => props.theme.violet};
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
 `;

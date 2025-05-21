@@ -27,6 +27,7 @@ import {
   InputRow,
   Label,
   NFTSelectContainer,
+  NoNFungileContentHeader,
   SelectContainer,
   SubmitButton,
   Title,
@@ -353,13 +354,7 @@ export const ParticipateModal: React.FC<
           ITO?.packData?.map((item: any, index) => {
             return (
               <PackContainer key={index + ITO.assetId}>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
+                <NoNFungileContentHeader>
                   <KeyLabel>{`${t('priceIn')} ${item.key}`}</KeyLabel>
                   <SelectContainer>
                     <ReactSelect
@@ -376,7 +371,7 @@ export const ParticipateModal: React.FC<
                       )}
                     />
                   </SelectContainer>
-                </div>
+                </NoNFungileContentHeader>
                 <ItemsContainer>
                   {item?.packs
                     .filter((pack: any, index: number) => {

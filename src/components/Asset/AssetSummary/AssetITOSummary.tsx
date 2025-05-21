@@ -20,7 +20,6 @@ import {
   TotalRaised,
   TotalRaisedValue,
 } from './styles';
-import { FaLessThanEqual } from 'react-icons/fa';
 
 interface AssetITOProps {
   ITO: IParsedITO | undefined;

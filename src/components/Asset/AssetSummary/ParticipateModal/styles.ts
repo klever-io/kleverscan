@@ -337,3 +337,9 @@ export const SubmitButton = styled.button<{
       color: ${theme.black};
     `}
 `;
+
+export const NoNFungileContentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;

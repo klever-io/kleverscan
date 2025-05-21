@@ -156,19 +156,19 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
 
   const handleGetRange = (value: number) => {
     for (let i = 0; i < packInfo?.packs?.length; i++) {
-      if (value <= packInfo?.packs[i].amount) {
-        const min = i === 0 ? 0 : packInfo?.packs[i - 1].amount + 1;
-        const max = packInfo?.packs[i].amount;
+      if (value <= packInfo?.packs[i]?.amount) {
+        const min = i === 0 ? 0 : packInfo?.packs[i - 1]?.amount + 1;
+        const max = packInfo?.packs[i]?.amount;
         const key = packInfo?.key;
-        return { min, max, price: packInfo?.packs[i].price, key };
+        return { min, max, price: packInfo?.packs[i]?.price, key };
       }
     }
     const range = {
       key: packInfo?.key,
-      min: packInfo?.packs[packInfo?.packs.length - 1].amount + 1,
-      max: packInfo?.packs[packInfo?.packs.length - 1].amount,
-      lastItem: packInfo?.packs.length - 1 ? true : false,
-      price: packInfo?.packs[packInfo?.packs.length - 1].price,
+      min: packInfo?.packs[packInfo?.packs.length - 1]?.amount + 1,
+      max: packInfo?.packs[packInfo?.packs.length - 1]?.amount,
+      lastItem: packInfo?.packs?.length - 1 ? true : false,
+      price: packInfo?.packs[packInfo?.packs?.length - 1]?.price,
     };
 
     return range;

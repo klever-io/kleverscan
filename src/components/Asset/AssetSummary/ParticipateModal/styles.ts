@@ -37,7 +37,7 @@ export const Content = styled.div`
   scrollbar-width: none;
 
   min-width: min(540px, 90%);
-  min-height: min(480px, 90%);
+  min-height: min(580px, 90%);
 
   background-color: ${({ theme }) => theme.true.newBlack};
 

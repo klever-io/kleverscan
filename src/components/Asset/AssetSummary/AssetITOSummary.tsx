@@ -20,6 +20,7 @@ import {
   TotalRaised,
   TotalRaisedValue,
 } from './styles';
+import { FaLessThanEqual } from 'react-icons/fa';
 
 interface AssetITOProps {
   ITO: IParsedITO | undefined;
@@ -61,6 +62,7 @@ export const AssetITOSummary: React.FC<PropsWithChildren<AssetITOProps>> = ({
       const isInWhitelist = ITO?.whitelistInfo?.some(
         info => info.address === address,
       );
+
       return isInWhitelist;
     }
   };
@@ -119,7 +121,7 @@ export const AssetITOSummary: React.FC<PropsWithChildren<AssetITOProps>> = ({
             </EndTime>
           )}
         </DetailsRow>
-        {handleIsInWhitelist(walletAddress) === true && (
+        {handleIsInWhitelist(walletAddress) !== false && (
           <ParticipateButton
             type="button"
             onClick={() => handleParticipate()}

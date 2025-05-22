@@ -76,6 +76,7 @@ export const ParticipateModal: React.FC<
       ITO?.packData?.flatMap(pack =>
         pack.packs.map((item: any, index: number) => ({
           label: `${item.price} ${pack.key}`,
+          key: pack.key,
           value: item.price,
           index: index,
         })),
@@ -369,6 +370,7 @@ export const ParticipateModal: React.FC<
                       }}
                       value={getPriceOptions().find(
                         option =>
+                          option.key === item.key &&
                           option.value === item.packs[selectedPrice].price,
                       )}
                     />
@@ -377,7 +379,12 @@ export const ParticipateModal: React.FC<
                 <ItemsContainer>
                   {item?.packs
                     .filter((pack: any, index: number) => {
-                      return index === selectedPrice;
+                      const selectedOption = getPriceOptions().find(
+                        option =>
+                          option.index === selectedPrice &&
+                          option.key === item.key,
+                      );
+                      return selectedOption && index === selectedOption.index;
                     })
                     .map((pack: any, index: number) => {
                       return (

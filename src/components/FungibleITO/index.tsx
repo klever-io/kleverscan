@@ -169,7 +169,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
       key: packInfo?.key,
       min: lastPack?.amount + 1,
       max: lastPack?.amount,
-      lastItem: packInfo?.packs?.length - 1 ? true : false,
+      lastItem: true,
       price: lastPack?.price,
     };
 
@@ -225,7 +225,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
           <PriceRange>
             <Row inPriceRange={true}>
               {'lastItem' in currentPriceRange &&
-              currentPriceRange?.lastItem === true ? (
+              currentPriceRange?.lastItem ? (
                 <span>{`> ${currentPriceRange.min}`}</span>
               ) : (
                 <span>{`${currentPriceRange.min} - ${currentPriceRange.max}`}</span>

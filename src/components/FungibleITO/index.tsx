@@ -168,7 +168,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
     const range = {
       key: packInfo?.key,
       min: lastPack?.amount + 1,
-      max: lastPack?.amount,
+      max: Infinity,
       lastItem: true,
       price: lastPack?.price,
     };

@@ -122,7 +122,7 @@ export const LoaderWrapper = styled.div`
   align-items: center;
 `;
 
-export const ViewMoreButton = styled.div`
+export const ViewMoreButton = styled.div.attrs({ role: 'button', tabIndex: 0 })`
   color: ${props => props.theme.violet};
   font-size: 1rem;
   font-weight: bold;

@@ -163,12 +163,14 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
         return { min, max, price: packInfo?.packs[i]?.price, key };
       }
     }
+
+    const lastPack = packInfo?.packs[packInfo?.packs.length - 1];
     const range = {
       key: packInfo?.key,
-      min: packInfo?.packs[packInfo?.packs.length - 1]?.amount + 1,
-      max: packInfo?.packs[packInfo?.packs.length - 1]?.amount,
+      min: lastPack?.amount + 1,
+      max: lastPack?.amount,
       lastItem: packInfo?.packs?.length - 1 ? true : false,
-      price: packInfo?.packs[packInfo?.packs?.length - 1]?.price,
+      price: lastPack?.price,
     };
 
     return range;

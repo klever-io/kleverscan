@@ -348,7 +348,9 @@ export const ParticipateModal: React.FC<
             packInfo={selectedPackData}
             ITO={ITO}
             setTxHash={setTxHash}
-            packInfoIndex={0}
+            packInfoIndex={ITO.packData.findIndex(
+              pack => pack.key === selectedPackCurrency,
+            )}
           />
         ) : (
           ITO?.packData?.map((item: any, index) => {

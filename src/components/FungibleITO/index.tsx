@@ -212,11 +212,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
 
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <PriceRangeTitle>{t('ITO.Price Range')}</PriceRangeTitle>
-          <ViewMoreButton
-            onClick={() => {
-              viewMore ? setViewMore(false) : setViewMore(true);
-            }}
-          >
+          <ViewMoreButton onClick={() => setViewMore(!viewMore)}>
             {viewMore ? 'Hidden All' : 'View More'}
           </ViewMoreButton>
         </div>

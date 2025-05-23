@@ -12,15 +12,13 @@ export const parseSplitRoyalties = (data: any): void => {
     delete data.transferPercentage;
   }
 
-  if (Array.isArray(data.royalties?.splitRoyalties)) {
-    if (data.royalties.splitRoyalties.length === 0) {
-      data.royalties.splitRoyalties = {};
-      return;
-    }
-  } else {
+  if (!Array.isArray(data.royalties?.splitRoyalties)) {
     return;
   }
-
+  if (data.royalties.splitRoyalties.length === 0) {
+    data.royalties.splitRoyalties = {};
+    return;
+  }
   const splitRoyaltiesReference = data.royalties.splitRoyalties;
 
   delete data.royalties.splitRoyalties;

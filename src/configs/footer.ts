@@ -71,7 +71,7 @@ const contents: IContent[] = [
       },
 
       { name: 'Klever.Org', href: 'https://klever.org/' },
-      { name: 'Klever Docs', href: 'https://docs.klever.finance/' },
+      { name: 'Klever Docs', href: 'https://docs.klever.org/' },
       { name: 'Klever News', href: 'https://klevernews.com/' },
       { name: 'Careers', href: 'https://klever.compleo.com.br/' },
       { name: 'Help Center', href: 'https://support.klever.org/' },

@@ -265,7 +265,6 @@ export const MobileContainer = styled.div<{ $openSearch: boolean }>`
   svg {
     path {
       color: ${props => props.theme.dark && props.theme.true.white};
-      fill: ${props => props.theme.dark && props.theme.true.white};
     }
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {

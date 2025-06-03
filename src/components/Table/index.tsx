@@ -58,7 +58,8 @@ export interface ITable {
     | 'validatorsList'
     | 'rewards'
     | 'marketplaces'
-    | 'launchPad';
+    | 'launchPad'
+    | 'smartContracts';
 
   header: string[];
   rowSections: (item: any) => IRowSection[];

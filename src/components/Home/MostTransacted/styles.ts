@@ -7,8 +7,9 @@ export const SectionContainer = styled.div`
   gap: 24px;
 
   @media (min-width: 768px) {
-    flex-direction: row;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* gap: 16px; */
   }
 `;
 
@@ -19,7 +20,7 @@ export const TableContainer = styled.div`
   width: 100%;
 
   @media (min-width: 768px) {
-    width: 50%;
+    margin-bottom: 20px;
   }
 `;
 
@@ -97,4 +98,23 @@ export const MostTransactedLink = styled.a`
   text-decoration: underline;
 
   cursor: pointer;
+`;
+
+export const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  a {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Monrope';
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 16px;
+    color: ${({ theme }) => theme.violet};
+  }
 `;

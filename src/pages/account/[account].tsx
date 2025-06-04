@@ -607,7 +607,9 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   <div>
                     <BalanceKLVValue>
                       {!isLoadingAccount ? (
-                        <span data-testid="klv-balance">{totalKLV}</span>
+                        <span data-testid="klv-balance">
+                          {totalKLV.toString().replace('.', ',')}
+                        </span>
                       ) : (
                         <Skeleton height={19} />
                       )}
@@ -636,7 +638,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   <span>
                     {!isLoadingAccount ? (
-                      availableBalance
+                      availableBalance.toString().replace('.', ',')
                     ) : (
                       <Skeleton height={19} />
                     )}

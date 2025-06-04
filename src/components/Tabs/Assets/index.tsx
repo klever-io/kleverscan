@@ -84,7 +84,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(balance / 10 ** precision).toLocaleString()} ${ticker}`}
+            msg={`${balance / 10 ** precision} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span>
@@ -99,10 +99,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(
-              frozenBalance /
-              10 ** precision
-            ).toLocaleString()} ${ticker}`}
+            msg={`${frozenBalance / 10 ** precision} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span key={frozenBalance}>
@@ -117,10 +114,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(
-              unfrozenBalance /
-              10 ** precision
-            ).toLocaleString()} ${ticker}`}
+            msg={`${unfrozenBalance / 10 ** precision} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span key={unfrozenBalance}>

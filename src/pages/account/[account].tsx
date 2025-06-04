@@ -607,9 +607,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   <div>
                     <BalanceKLVValue>
                       {!isLoadingAccount ? (
-                        <span data-testid="klv-balance">
-                          {totalKLV.toLocaleString()}
-                        </span>
+                        <span data-testid="klv-balance">{totalKLV}</span>
                       ) : (
                         <Skeleton height={19} />
                       )}
@@ -638,7 +636,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   <span>
                     {!isLoadingAccount ? (
-                      availableBalance.toLocaleString()
+                      availableBalance
                     ) : (
                       <Skeleton height={19} />
                     )}
@@ -650,7 +648,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   <span>
                     {!isLoadingAccount ? (
-                      getKLVfreezeBalance().toLocaleString()
+                      getKLVfreezeBalance()
                     ) : (
                       <Skeleton height={19} />
                     )}
@@ -662,7 +660,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   <span>
                     {!isLoadingAccount ? (
-                      getKLVunfreezeBalance().toLocaleString()
+                      getKLVunfreezeBalance()
                     ) : (
                       <Skeleton height={19} />
                     )}
@@ -694,7 +692,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   {!isLoadingKLVAllowance ? (
                     <>
-                      <span>{getKLVAllowance().toLocaleString()}</span>
+                      <span>{getKLVAllowance()}</span>
                       <AllowanceClaimButton />
                     </>
                   ) : (
@@ -710,7 +708,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   {!isLoadingKLVAllowance ? (
                     <>
-                      <span>{getKLVStaking().toLocaleString()}</span>
+                      <span>{getKLVStaking()}</span>
                       <KLVStakingClaimButton />
                     </>
                   ) : (

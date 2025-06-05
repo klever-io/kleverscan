@@ -712,9 +712,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   {!isLoadingKLVAllowance ? (
                     <>
-                      <span>
-                        {toLocaleFixed(getKLVStaking(), KLV_PRECISION)}
-                      </span>
+                      <span>{getKLVStaking()}</span>
                       <KLVStakingClaimButton />
                     </>
                   ) : (

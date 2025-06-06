@@ -8,7 +8,6 @@ import { StakingRoyaltiesTab } from '@/components/Asset/StakingRoyaltiesTab';
 import { UrisTab } from '@/components/Asset/URIsTab';
 import Tabs, { ITabs } from '@/components/NewTabs';
 import Holders from '@/components/Tabs/Holders';
-import Transactions from '@/components/Tabs/Transactions';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
@@ -148,12 +147,36 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     }
   };
 
+  const requestTransactions = async (page: number, limit: number) => {
+    const newQuery = {
+      ...router.query,
+      asset: router.query.asset || '',
+      page,
+      limit,
+    };
+
+    const transactionsResponse = await api.get({
+      route: `transaction/list`,
+      query: newQuery,
+    });
+
+    const parsedTransactions =
+      await getParsedTransactionPrecision(transactionsResponse);
+
+    return {
+      ...transactionsResponse,
+      data: {
+        transactions: parsedTransactions,
+      },
+    };
+  };
+
   const tableProps: ITable = {
     type: 'transactions',
     header: transactionTableHeaders,
     rowSections: transactionRowSections,
     dataName: 'transactions',
-    request: (page, limit) => requestTransactionsDefault(page, limit, router),
+    request: (page, limit) => requestTransactions(page, limit),
     Filters: TransactionsFilters,
   };
 

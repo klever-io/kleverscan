@@ -4,7 +4,7 @@ import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr } from '@/utils';
-import { formatAmount } from '@/utils/formatFunctions';
+import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { PropsWithChildren } from 'react';
@@ -84,7 +84,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(balance / 10 ** precision).toLocaleString()} ${ticker}`}
+            msg={`${toLocaleFixed(balance / 10 ** precision, precision)} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span>
@@ -99,10 +99,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(
-              frozenBalance /
-              10 ** precision
-            ).toLocaleString()} ${ticker}`}
+            msg={`${toLocaleFixed(frozenBalance / 10 ** precision, precision)} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span key={frozenBalance}>
@@ -117,10 +114,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       {
         element: props => (
           <Tooltip
-            msg={`${(
-              unfrozenBalance /
-              10 ** precision
-            ).toLocaleString()} ${ticker}`}
+            msg={`${toLocaleFixed(unfrozenBalance / 10 ** precision, precision)} ${ticker}`}
             Component={() => (
               <CustomFieldWrapper>
                 <span key={unfrozenBalance}>

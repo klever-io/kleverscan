@@ -33,9 +33,11 @@ export const Content = styled.div`
   inset: 50%;
   transform: translate(-50%, -50%);
   z-index: 7;
+  overflow-y: auto;
+  scrollbar-width: none;
 
   min-width: min(540px, 90%);
-  min-height: min(480px, 90%);
+  min-height: min(580px, 90%);
 
   background-color: ${({ theme }) => theme.true.newBlack};
 
@@ -55,6 +57,13 @@ export const ArrowContainer = styled.div`
 
 export const Header = styled.div`
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
 `;
@@ -327,4 +336,10 @@ export const SubmitButton = styled.button<{
       background-color: transparent;
       color: ${theme.black};
     `}
+`;
+
+export const NoNFungileContentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;

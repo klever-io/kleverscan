@@ -23,6 +23,11 @@ export const formatDate = (timestamp: number, reduced = false): string => {
     : format(new Date(timestamp || 0), 'MM/dd/yy HH:mm');
 };
 
+const toFixedDown = (number: number, decimals: number) => {
+  const factor = Math.pow(10, decimals);
+  return Math.floor(number * factor) / factor;
+};
+
 /**
  * Formats a number and returns it's string representation in short scale (Million, Billion...) with 2 decimals points when number is not integer.
  * Example: 8874165276.908615 --> "8.87 Bi"
@@ -51,9 +56,11 @@ export const formatAmount = (number: number): string => {
       .reverse()
       .find(i => number >= i.value) || lookup[0];
 
-  return `${(number / item.value).toFixed(2).replace(regex, '$1')} ${
-    item.symbol
-  }`;
+  const truncated = toFixedDown(number / item.value, 2)
+    .toString()
+    .replace(regex, '$1');
+
+  return `${truncated} ${item.symbol}`.trim();
 };
 
 /**

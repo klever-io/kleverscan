@@ -52,6 +52,7 @@ import {
   filterOperations,
   hexToBinary,
   invertBytes,
+  toLocaleFixed,
 } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
@@ -185,28 +186,29 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     return (available + frozen + unfrozen) / 10 ** KLV_PRECISION;
   }, [account?.balance, account?.assets, KLV_PRECISION]);
 
-  const getKLVfreezeBalance = useCallback((): number => {
-    return (account?.assets?.KLV?.frozenBalance || 0) / 10 ** KLV_PRECISION;
+  const getKLVfreezeBalance = useCallback((): string => {
+    const fronzenBalance = account?.assets?.KLV?.frozenBalance || 0;
+    return toLocaleFixed(fronzenBalance / 10 ** KLV_PRECISION, KLV_PRECISION);
   }, [account?.assets, KLV_PRECISION]);
 
-  const getKLVunfreezeBalance = (): number => {
-    return (account?.assets?.KLV?.unfrozenBalance || 0) / 10 ** KLV_PRECISION;
+  const getKLVunfreezeBalance = (): string => {
+    const unfrozenBalance = account?.assets?.KLV?.unfrozenBalance || 0;
+    return toLocaleFixed(unfrozenBalance / 10 ** KLV_PRECISION, KLV_PRECISION);
   };
 
-  const getKLVAllowance = (): number => {
-    return (KLVAllowance?.data?.result?.allowance || 0) / 10 ** KLV_PRECISION;
+  const getKLVAllowance = (): string => {
+    const allowance = KLVAllowance?.data?.result?.allowance || 0;
+    return toLocaleFixed(allowance / 10 ** KLV_PRECISION, KLV_PRECISION);
   };
 
-  const getKLVStaking = (): number => {
-    return (
-      (KLVAllowance?.data?.result?.stakingRewards || 0) / 10 ** KLV_PRECISION
-    );
+  const getKLVStaking = (): string => {
+    const stakingRewards = KLVAllowance?.data?.result?.stakingRewards || 0;
+    return toLocaleFixed(stakingRewards / 10 ** KLV_PRECISION, KLV_PRECISION);
   };
 
-  const getKFIStaking = (): number => {
-    return (
-      (KFIAllowance?.data?.result?.stakingRewards || 0) / 10 ** KLV_PRECISION
-    );
+  const getKFIStaking = (): string => {
+    const stakingRewards = KFIAllowance?.data?.result?.stakingRewards || 0;
+    return toLocaleFixed(stakingRewards / 10 ** KLV_PRECISION, KLV_PRECISION);
   };
 
   const filterFromTo = (op: number) => {
@@ -608,7 +610,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                     <BalanceKLVValue>
                       {!isLoadingAccount ? (
                         <span data-testid="klv-balance">
-                          {totalKLV.toLocaleString()}
+                          {toLocaleFixed(totalKLV, KLV_PRECISION)}
                         </span>
                       ) : (
                         <Skeleton height={19} />
@@ -638,7 +640,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   <span>
                     {!isLoadingAccount ? (
-                      availableBalance.toLocaleString()
+                      toLocaleFixed(availableBalance, KLV_PRECISION)
                     ) : (
                       <Skeleton height={19} />
                     )}
@@ -650,7 +652,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   <span>
                     {!isLoadingAccount ? (
-                      getKLVfreezeBalance().toLocaleString()
+                      getKLVfreezeBalance()
                     ) : (
                       <Skeleton height={19} />
                     )}
@@ -662,7 +664,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   <span>
                     {!isLoadingAccount ? (
-                      getKLVunfreezeBalance().toLocaleString()
+                      getKLVunfreezeBalance()
                     ) : (
                       <Skeleton height={19} />
                     )}
@@ -694,7 +696,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   {!isLoadingKLVAllowance ? (
                     <>
-                      <span>{getKLVAllowance().toLocaleString()}</span>
+                      <span>{getKLVAllowance()}</span>
                       <AllowanceClaimButton />
                     </>
                   ) : (
@@ -710,7 +712,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   {!isLoadingKLVAllowance ? (
                     <>
-                      <span>{getKLVStaking().toLocaleString()}</span>
+                      <span>{getKLVStaking()}</span>
                       <KLVStakingClaimButton />
                     </>
                   ) : (
@@ -726,7 +728,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   </strong>
                   {!isLoadingKFIAllowance ? (
                     <>
-                      <span>{getKFIStaking().toLocaleString()}</span>
+                      <span>{getKFIStaking()}</span>
                       <KFIStakingClaimButton />
                     </>
                   ) : (

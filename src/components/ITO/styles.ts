@@ -14,6 +14,26 @@ export const PackContainer = styled.div`
   }
 `;
 
+export const FungibleContainer = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+
+  @media (max-width: 900px) {
+    width: 100%;
+    flex-direction: column;
+  }
+`;
+
+export const FungibleItem = styled.div`
+  width: 49.5%;
+
+  @media (max-width: 900px) {
+    width: 100%;
+  }
+`;
+
 export const KeyLabel = styled.span`
   font-size: 1.5rem;
   user-select: text;

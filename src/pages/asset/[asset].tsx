@@ -8,7 +8,6 @@ import { StakingRoyaltiesTab } from '@/components/Asset/StakingRoyaltiesTab';
 import { UrisTab } from '@/components/Asset/URIsTab';
 import Tabs, { ITabs } from '@/components/NewTabs';
 import Holders from '@/components/Tabs/Holders';
-import Transactions from '@/components/Tabs/Transactions';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
@@ -24,6 +23,13 @@ import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
+import {
+  requestTransactionsDefault,
+  transactionRowSections,
+} from '../transactions';
+import Table, { ITable } from '@/components/Table';
+import { transactionTableHeaders } from '@/utils/contracts';
+import TransactionsFilters from '@/components/TransactionsFilters';
 
 const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
@@ -86,26 +92,6 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     }
   }, [holderQuery]);
 
-  const requestTransactions = async (page: number, limit: number) => {
-    const newQuery = {
-      ...router.query,
-      asset: router.query.asset || '',
-    };
-    const transactionsResponse = await api.get({
-      route: `transaction/list`,
-      query: { ...newQuery, page, limit },
-    });
-
-    const parsedTransactions =
-      await getParsedTransactionPrecision(transactionsResponse);
-
-    return {
-      data: {
-        transactions: parsedTransactions,
-      },
-    };
-  };
-
   const requestAssetHolders = async (page: number, limit: number) => {
     let newQuery = {
       ...router.query,
@@ -161,10 +147,37 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     }
   };
 
-  const transactionsTableProps = {
+  const requestTransactions = async (page: number, limit: number) => {
+    const newQuery = {
+      ...router.query,
+      asset: router.query.asset || '',
+      page,
+      limit,
+    };
+
+    const transactionsResponse = await api.get({
+      route: `transaction/list`,
+      query: newQuery,
+    });
+
+    const parsedTransactions =
+      await getParsedTransactionPrecision(transactionsResponse);
+
+    return {
+      ...transactionsResponse,
+      data: {
+        transactions: parsedTransactions,
+      },
+    };
+  };
+
+  const tableProps: ITable = {
+    type: 'transactions',
+    header: transactionTableHeaders,
+    rowSections: transactionRowSections,
     dataName: 'transactions',
-    request: (page: number, limit: number) => requestTransactions(page, limit),
-    query: router.query,
+    request: (page, limit) => requestTransactions(page, limit),
+    Filters: TransactionsFilters,
   };
 
   const holdersTableProps = {
@@ -176,7 +189,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
     switch (selectedTab) {
       case `${t('common:Titles.Transactions')}`:
-        return <Transactions transactionsTableProps={transactionsTableProps} />;
+        return <Table {...tableProps} />;
       case `${t('common:Tabs.Holders')}`:
         if (asset) {
           return (

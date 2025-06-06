@@ -206,7 +206,6 @@ export const requestTransactionsDefault = async (
       return transaction;
     },
   );
-
   return {
     ...transactionsResponse,
     data: {

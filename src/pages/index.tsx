@@ -11,7 +11,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const props = await serverSideTranslations(
     locale,
-    ['common', 'blocks', 'transactions', 'home', 'wizards'],
+    ['common', 'blocks', 'transactions', 'home', 'wizards', 'assets'],
     nextI18NextConfig,
     ['en'],
   );

@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import { isFloat } from '@/components/FungibleITO';
+import FungibleITO, { isFloat } from '@/components/FungibleITO';
 import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { useExtension } from '@/contexts/extension';
@@ -27,10 +27,18 @@ import {
   InputRow,
   Label,
   NFTSelectContainer,
+  NoNFungileContentHeader,
   SelectContainer,
   SubmitButton,
   Title,
+  TitleContainer,
 } from './styles';
+import NonFungibleITO from '@/components/NonFungileITO';
+import {
+  ItemsContainer,
+  KeyLabel,
+  PackContainer,
+} from '@/components/ITO/styles';
 
 const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
@@ -63,12 +71,28 @@ export const ParticipateModal: React.FC<
     );
   };
 
+  const getPriceOptions = () => {
+    return (
+      ITO?.packData?.flatMap(pack =>
+        pack.packs.map((item: any, index: number) => ({
+          label: `${item.price} ${pack.key}`,
+          key: pack.key,
+          value: item.price,
+          index: index,
+        })),
+      ) || []
+    );
+  };
+
   const [selectedPackCurrency, setSelectedPackCurrency] = useState<string>(
     getPackCurrencyOptions()[0]?.value || '',
   );
   const [selectedPack, setSelectedPack] = useState<number>(0);
   const [assetAmount, setAssetAmount] = useState<number>(0);
   const [currencyAmount, setCurrencyAmount] = useState<number>(0);
+  const [selectedPrice, setSelectedPrice] = useState<number>(
+    getPriceOptions()[0]?.index || 0,
+  );
   const {
     setOpenDrawer,
     extensionInstalled,
@@ -298,122 +322,87 @@ export const ParticipateModal: React.FC<
     <Container isOpenParticipateModal={isOpenParticipateModal}>
       <Content>
         <Header>
-          <ArrowContainer onClick={closeModal}>
-            <StyledArrow />
-          </ArrowContainer>
-          <Title>You&apos;re Buying</Title>
+          <TitleContainer>
+            <ArrowContainer onClick={closeModal}>
+              <StyledArrow />
+            </ArrowContainer>
+            <Title>You&apos;re Buying</Title>
+          </TitleContainer>
+          <SelectContainer>
+            <ReactSelect
+              classNamePrefix="react-select"
+              options={getPackCurrencyOptions()}
+              onChange={value => {
+                setSelectedPackCurrency(
+                  (value as { value: string })?.value || '',
+                );
+                setAssetAmount(calculateAmountFromCost(currencyAmount));
+              }}
+              value={getPackCurrencyOptions().find(
+                option => option.value === selectedPackCurrency,
+              )}
+            />
+          </SelectContainer>
         </Header>
-
-        <AssetVisualization>
-          <AssetLogo
-            logo={ITO?.logo || ''}
-            ticker={ITO?.ticker || ''}
-            name={ITO?.name || ''}
-            verified={ITO?.verified}
-            size={40}
+        {ITO.assetType === 'Fungible' ? (
+          <FungibleITO
+            packInfo={selectedPackData}
+            ITO={ITO}
+            setTxHash={setTxHash}
+            packInfoIndex={ITO.packData.findIndex(
+              pack => pack.key === selectedPackCurrency,
+            )}
           />
-          <AssetName>
-            {ITO?.name} ({ITO?.ticker})
-          </AssetName>
-        </AssetVisualization>
-
-        <BuyForm>
-          <InputRow>
-            <Label>Buy {ITO?.ticker} with</Label>
-            <InputContainer disabled={ITO.assetType === 'NonFungible'}>
-              <Input
-                value={currencyAmount}
-                disabled={ITO.assetType === 'NonFungible'}
-                onChange={e => {
-                  const value = Number(e.target.value);
-                  if (Number.isNaN(value)) return;
-
-                  setCurrencyAmount(value);
-                  setAssetAmount(calculateAmountFromCost(value));
-                }}
-              />
-              <SelectContainer>
-                <ReactSelect
-                  classNamePrefix="react-select"
-                  options={getPackCurrencyOptions()}
-                  onChange={value => {
-                    setSelectedPackCurrency(
-                      (value as { value: string })?.value || '',
-                    );
-                    setAssetAmount(calculateAmountFromCost(currencyAmount));
-                  }}
-                  value={getPackCurrencyOptions().find(
-                    option => option.value === selectedPackCurrency,
-                  )}
-                />
-              </SelectContainer>
-            </InputContainer>
-
-            {ITO.royalties.fixed ? (
-              <Fees>{ITO.royalties.fixed} KLV (Fixed Royalties)</Fees>
-            ) : (
-              ''
-            )}
-          </InputRow>
-
-          <InputRow>
-            <Label>Amount of {ITO?.ticker}</Label>
-            {ITO.assetType === 'Fungible' ? (
-              <InputContainer>
-                <Input
-                  value={assetAmount}
-                  onChange={e => {
-                    const { value } = e.target;
-
-                    const [_, decimalPart] = value.toString().split('.');
-                    if (decimalPart?.length > ITO.precision) return;
-
-                    const valueToNum = Number(value);
-                    if (Number.isNaN(valueToNum)) return;
-
-                    setAssetAmount(valueToNum);
-                    setCurrencyAmount(calculateCostFromAmount(valueToNum));
-                  }}
-                />
-                {ITO.assetType === 'Fungible' ? (
-                  <CurrencyTicker>{ITO.ticker}</CurrencyTicker>
-                ) : null}
-              </InputContainer>
-            ) : (
-              <NFTSelectContainer>
-                <ReactSelect
-                  classNamePrefix="react-select"
-                  options={getPackOptions()}
-                  onChange={(e: any) => {
-                    const value = Number(e.value as string);
-                    if (Number.isNaN(value)) return;
-
-                    setSelectedPack(value);
-                    setAssetAmount(value);
-                    setCurrencyAmount(calculateCostFromAmount(value));
-                  }}
-                  placeholder={
-                    getPackOptions().length === 0
-                      ? 'Select a currency first'
-                      : 'Select a pack'
-                  }
-                  isDisabled={getPackOptions().length === 0}
-                  value={getPackOptions()?.find(
-                    option => option.value === selectedPack,
-                  )}
-                />
-              </NFTSelectContainer>
-            )}
-          </InputRow>
-        </BuyForm>
-        <SubmitButton
-          type="button"
-          onClick={handleSubmit}
-          secondary={!extensionInstalled}
-          isDisabled={!currencyAmount || !selectedPackCurrency}
-        >
-          Buy now
-        </SubmitButton>
+        ) : (
+          ITO?.packData?.map((item: any, index) => {
+            return (
+              <PackContainer key={index + ITO.assetId}>
+                <NoNFungileContentHeader>
+                  <KeyLabel>{`${t('priceIn')} ${item.key}`}</KeyLabel>
+                  <SelectContainer>
+                    <ReactSelect
+                      classNamePrefix="react-select"
+                      options={getPriceOptions()}
+                      onChange={value => {
+                        setSelectedPrice(
+                          (value as { index: number })?.index || 0,
+                        );
+                      }}
+                      value={getPriceOptions().find(
+                        option =>
+                          option.key === item.key &&
+                          option.value === item.packs[selectedPrice].price,
+                      )}
+                    />
+                  </SelectContainer>
+                </NoNFungileContentHeader>
+                <ItemsContainer>
+                  {item?.packs
+                    .filter((pack: any, index: number) => {
+                      const selectedOption = getPriceOptions().find(
+                        option =>
+                          option.index === selectedPrice &&
+                          option.key === item.key,
+                      );
+                      return selectedOption && index === selectedOption.index;
+                    })
+                    .map((pack: any, index: number) => {
+                      return (
+                        <NonFungibleITO
+                          key={`${index}${item.assetId}`}
+                          pack={pack}
+                          currencyId={item.key}
+                          selectedITO={ITO}
+                          setTxHash={setTxHash}
+                          t={t}
+                        />
+                      );
+                    })}
+                </ItemsContainer>
+              </PackContainer>
+            );
+          })
+        )}
       </Content>
       <Background onClick={closeModal} />
     </Container>

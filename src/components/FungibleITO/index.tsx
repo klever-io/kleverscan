@@ -17,6 +17,7 @@ import {
   PriceRangeTitle,
   Row,
   TotalPrice,
+  ViewMoreButton,
 } from './styles';
 import { getPrecision } from '@/utils/precisionFunctions';
 
@@ -50,6 +51,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
   const { t } = useTranslation('assets');
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [viewMore, setViewMore] = useState(false);
 
   const calculateCost = (indexPackData: number, qtyPacks: number) => {
     const packs = ITO.packData[indexPackData].packs;
@@ -152,45 +154,85 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
     }
   };
 
+  const handleGetRange = (value: number) => {
+    for (let i = 0; i < packInfo?.packs?.length; i++) {
+      if (value <= packInfo?.packs[i]?.amount) {
+        const min = i === 0 ? 0 : packInfo?.packs[i - 1]?.amount + 1;
+        const max = packInfo?.packs[i]?.amount;
+        const key = packInfo?.key;
+        return { min, max, price: packInfo?.packs[i]?.price, key };
+      }
+    }
+
+    const lastPack = packInfo?.packs[packInfo?.packs.length - 1];
+    const range = {
+      key: packInfo?.key,
+      min: lastPack?.amount + 1,
+      max: Infinity,
+      lastItem: true,
+      price: lastPack?.price,
+    };
+
+    return range;
+  };
+
+  const currentPriceRange = handleGetRange(amount);
+
   return (
-    <Container>
-      <FungibleContainer key={packInfoIndex}>
-        <Content>
-          <AssetName>
-            {t('ITO.Price In', { asset: `${packInfo.key}` })}
-          </AssetName>
-          <Input
-            type="number"
-            min="0"
-            value={amount}
-            onChange={e => setAmount(Number(e.target.value))}
-            handleConfirmClick={() => undefined}
-          />
-          <TotalPrice>
-            {showcase ? (
-              <span>{t('ITO.It will cost')}</span>
-            ) : (
-              <span>{t('ITO.You will pay')}</span>
-            )}{' '}
-            <span>
-              {calculateCost(packInfoIndex, packInfo.packs.length)}{' '}
-              {packInfo.key}
-            </span>
-          </TotalPrice>
-          {!showcase && !loading && (
-            <Button onClick={() => handleSubmit(packInfo.key)}>
-              <span>{t('ITO.Buy Token')}</span>
-            </Button>
-          )}
-          {loading && (
-            <LoaderWrapper>
-              <Loader />
-            </LoaderWrapper>
-          )}
-        </Content>
-        <Content>
+    <FungibleContainer key={packInfoIndex}>
+      <Content>
+        <AssetName>{t('ITO.Price In', { asset: `${packInfo.key}` })}</AssetName>
+        <Input
+          type="number"
+          min="0"
+          value={amount}
+          onChange={e => setAmount(Number(e.target.value))}
+          handleConfirmClick={() => undefined}
+        />
+        <TotalPrice>
+          {showcase ? (
+            <span>{t('ITO.It will cost')}</span>
+          ) : (
+            <span>{t('ITO.You will pay')}</span>
+          )}{' '}
+          <span>
+            {calculateCost(packInfoIndex, packInfo.packs.length)} {packInfo.key}
+          </span>
+        </TotalPrice>
+        {!showcase && !loading && (
+          <Button onClick={() => handleSubmit(packInfo.key)}>
+            <span>{t('ITO.Buy Token')}</span>
+          </Button>
+        )}
+        {loading && (
+          <LoaderWrapper>
+            <Loader />
+          </LoaderWrapper>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <PriceRangeTitle>{t('ITO.Price Range')}</PriceRangeTitle>
+          <ViewMoreButton onClick={() => setViewMore(!viewMore)}>
+            {viewMore ? 'Hidden All' : 'View More'}
+          </ViewMoreButton>
+        </div>
+
+        {!viewMore && (
           <PriceRange>
-            <PriceRangeTitle>{t('ITO.Price Range')}</PriceRangeTitle>
+            <Row inPriceRange={true}>
+              {'lastItem' in currentPriceRange &&
+              currentPriceRange?.lastItem ? (
+                <span>{`> ${currentPriceRange.min}`}</span>
+              ) : (
+                <span>{`${currentPriceRange.min} - ${currentPriceRange.max}`}</span>
+              )}
+              <span>{`${currentPriceRange.price} ${currentPriceRange.key} / ${ITO.ticker}`}</span>
+            </Row>
+          </PriceRange>
+        )}
+
+        {viewMore && (
+          <PriceRange>
             {packInfo.packs.map(
               (packItem: IPackItem, packItemIndex: number) => {
                 const isLastElement =
@@ -256,9 +298,9 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
               },
             )}
           </PriceRange>
-        </Content>
-      </FungibleContainer>
-    </Container>
+        )}
+      </Content>
+    </FungibleContainer>
   );
 };
 

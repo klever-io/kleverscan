@@ -14,10 +14,11 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const titleFormatted = () => {
     const klever = 'Klever Explorer';
     const pathName = pathname;
-    const pathNameArray = (asPath &&
+    const cleanAsPath = asPath ? asPath.split('?')[0] : '';
+    const pathNameArray = (cleanAsPath &&
       (
-        asPath.replace(/[[\]]/g, '').substring(1).charAt(0).toUpperCase() +
-        asPath.slice(2)
+        cleanAsPath.replace(/[[\]]/g, '').substring(1).charAt(0).toUpperCase() +
+        cleanAsPath.slice(2)
       ).split('/')) || [''];
     if (pathName.length === 1) {
       return klever;

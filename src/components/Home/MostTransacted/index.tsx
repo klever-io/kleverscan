@@ -9,13 +9,68 @@ import {
   Table,
   TableContainer,
   Title,
+  TitleContainer,
 } from './styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
+import { PurpleArrowRight } from '@/assets/icons';
 
 const MostTransacted: React.FC<PropsWithChildren> = () => {
   const { mostTransactedTokens, mostTransactedNFTs, mostTransactedKDAFee } =
     useHomeData();
+
+  const hotContracts = [
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+    {
+      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
+      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
+      transactions: 100,
+    },
+  ];
 
   const tables = [
     {
@@ -33,13 +88,32 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
       data: mostTransactedKDAFee,
       header: ['Rank', 'Token', 'Total Txn'],
     },
+    {
+      title: 'Hot Contracts',
+      data: hotContracts,
+      header: ['#', 'Contract Adress', 'Owner', 'Transactions'],
+    },
   ];
 
   return (
     <SectionContainer>
       {tables.map((table, index) => (
         <TableContainer key={index}>
-          <Title>{table.title}</Title>
+          {table.title !== 'Hot Contracts' ? (
+            <Title>{table.title}</Title>
+          ) : (
+            <TitleContainer>
+              <Title>{table.title}</Title>
+              <Link
+                href={{
+                  pathname: '/smart-contracts',
+                }}
+              >
+                View Smart Contracts
+                <PurpleArrowRight />
+              </Link>
+            </TitleContainer>
+          )}
           <Table>
             <thead>
               <Row>
@@ -52,19 +126,29 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
               {table?.data?.map((item, index) => (
                 <Row key={index}>
                   <Cell>{index + 1}</Cell>
-                  <Cell>
-                    <Link href={`/asset/${item?.key}`} legacyBehavior>
-                      <MostTransactedLink href={`/asset/${item?.key}`}>
-                        <AssetLogo
-                          logo={item?.logo}
-                          ticker={item?.key}
-                          name={item?.key}
-                        />
-                        {item?.key}
-                      </MostTransactedLink>
-                    </Link>
-                  </Cell>
-                  <Cell>{item?.doc_count?.toLocaleString()}</Cell>
+                  {table.title !== 'Hot Contracts' ? (
+                    <>
+                      <Cell>
+                        <Link href={`/asset/${item?.key}`} legacyBehavior>
+                          <MostTransactedLink href={`/asset/${item?.key}`}>
+                            <AssetLogo
+                              logo={item?.logo}
+                              ticker={item?.key}
+                              name={item?.key}
+                            />
+                            {item?.key}
+                          </MostTransactedLink>
+                        </Link>
+                      </Cell>
+                      <Cell>{item?.doc_count?.toLocaleString()}</Cell>
+                    </>
+                  ) : (
+                    <>
+                      <Cell>{item?.contractAddress}</Cell>
+                      <Cell>{item?.owner}</Cell>
+                      <Cell>{item?.transactions?.toLocaleString()}</Cell>
+                    </>
+                  )}
                 </Row>
               ))}
             </tbody>

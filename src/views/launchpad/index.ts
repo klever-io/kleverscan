@@ -114,38 +114,3 @@ export const ParticipateButton = styled.button<{ secondary?: boolean }>`
     padding: 14px 30px;
   }
 `;
-
-// export const ViewAssetButton = styled.button<{ secondary?: boolean }>`
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   gap: 8px;
-
-//   padding: 14px 0;
-//   border-radius: 24px;
-
-//   border-radius: 24px;
-//   border: 1px solid ${({ theme }) => theme.violet};
-
-//   background-color: ${({ theme }) => theme.violet};
-//   color: ${({ theme }) => theme.true.white} !important;
-
-//   font-weight: 700;
-//   font-size: 0.875rem;
-//   line-height: 1;
-//   text-decoration: none;
-
-//   cursor: pointer;
-//   transition: 0.2s;
-
-//   &:hover {
-//     filter: brightness(1.2);
-//   }
-
-//   ${({ theme, secondary }) =>
-//     secondary &&
-//     css`
-//       background-color: transparent;
-//       color: ${theme.black} !important;
-//     `}
-// `;

@@ -64,6 +64,30 @@ export const requestITOSQuery = async (
   return dataITOs;
 };
 
+interface RenderViewAssetButtonProps {
+  assetId: string;
+  reference?: string;
+}
+
+export const renderViewAssetButton = ({
+  assetId,
+  reference,
+}: RenderViewAssetButtonProps): JSX.Element => {
+  const router = useRouter();
+  return (
+    <ParticipateButton
+      onClick={() =>
+        router.push(
+          `/asset/${assetId}${reference ? `?reference=${reference}` : ''}`,
+        )
+      }
+      secondary={true}
+    >
+      View Asset
+    </ParticipateButton>
+  );
+};
+
 export const getITOrowSections =
   (
     setITO: (asset: IParsedITO) => void,
@@ -71,7 +95,6 @@ export const getITOrowSections =
     reference?: string,
   ) =>
   (asset: IParsedITO): IRowSection[] => {
-    const router = useRouter();
     const {
       ticker,
       name,
@@ -203,16 +226,7 @@ export const getITOrowSections =
               Participate
             </ParticipateButton>
           ) : (
-            <ParticipateButton
-              onClick={() =>
-                router.push(
-                  `/asset/${assetId}${reference ? `?reference=${reference}` : ''}`,
-                )
-              }
-              secondary={true}
-            >
-              View Asset
-            </ParticipateButton>
+            renderViewAssetButton({ assetId, reference })
           );
         },
         span: 2,
@@ -345,17 +359,17 @@ export const getITOTabletRowSections =
             !whitelistInfo ||
             (walletAddress &&
               whitelistInfo.some(info => info.address === walletAddress));
-          return (
-            isParticipateEnabled && (
-              <ParticipateButton
-                onClick={() => {
-                  setITO(asset);
-                  setOpenParticipateModal(true);
-                }}
-              >
-                Participate
-              </ParticipateButton>
-            )
+          return isParticipateEnabled ? (
+            <ParticipateButton
+              onClick={() => {
+                setITO(asset);
+                setOpenParticipateModal(true);
+              }}
+            >
+              Participate
+            </ParticipateButton>
+          ) : (
+            renderViewAssetButton({ assetId, reference })
           );
         },
         span: 2,

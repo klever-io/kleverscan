@@ -71,6 +71,7 @@ export const getITOrowSections =
     reference?: string,
   ) =>
   (asset: IParsedITO): IRowSection[] => {
+    const router = useRouter();
     const {
       ticker,
       name,
@@ -192,17 +193,26 @@ export const getITOrowSections =
             !whitelistInfo ||
             (walletAddress &&
               whitelistInfo.some(info => info.address === walletAddress));
-          return (
-            isParticipateEnabled && (
-              <ParticipateButton
-                onClick={() => {
-                  setITO(asset);
-                  setOpenParticipateModal(true);
-                }}
-              >
-                Participate
-              </ParticipateButton>
-            )
+          return isParticipateEnabled ? (
+            <ParticipateButton
+              onClick={() => {
+                setITO(asset);
+                setOpenParticipateModal(true);
+              }}
+            >
+              Participate
+            </ParticipateButton>
+          ) : (
+            <ParticipateButton
+              onClick={() =>
+                router.push(
+                  `/asset/${assetId}${reference ? `?reference=${reference}` : ''}`,
+                )
+              }
+              secondary={true}
+            >
+              View Asset
+            </ParticipateButton>
           );
         },
         span: 2,

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 interface IAsset {
   selected?: boolean;
@@ -79,7 +79,7 @@ export const LaunchpadLink = styled.a`
   }
 `;
 
-export const ParticipateButton = styled.button`
+export const ParticipateButton = styled.button<{ secondary?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,6 +97,14 @@ export const ParticipateButton = styled.button`
 
   cursor: pointer;
   transition: 0.2s;
+
+  ${({ theme, secondary }) =>
+    secondary &&
+    css`
+      border: 1px solid ${theme.violet};
+      background-color: transparent;
+      color: ${theme.black} !important;
+    `};
 
   &:hover {
     filter: brightness(1.2);

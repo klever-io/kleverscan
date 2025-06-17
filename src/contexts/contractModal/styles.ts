@@ -1,6 +1,13 @@
 import { lighten } from 'polished';
 import styled, { css } from 'styled-components';
 
+export const TitleIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+`;
+
 export const ButtonModal = styled.button<{
   isLocked?: boolean;
   buttonStyle?: 'primary' | 'secondary' | 'contextModal';

@@ -156,13 +156,28 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
   });
   const { data: params } = useQuery('paramsList', dataNetworkParams);
   const { getInteractionsButtons } = useContractModal();
-  const [VoteButton] = getInteractionsButtons([
+
+  const [VoteForButton] = getInteractionsButtons([
     {
-      title: `${t('Vote Contract')}`,
+      title: `${t('Vote For')}`,
       contractType: 'VoteContract',
+      icon: 'success',
       defaultValues: {
         proposalId: parseInt(router?.query?.number as string),
         type: 0,
+      },
+      buttonStyle: 'primary',
+    },
+  ]);
+
+  const [VoteAgainstButton] = getInteractionsButtons([
+    {
+      title: `${t('Vote Against')}`,
+      contractType: 'VoteContract',
+      icon: 'fail',
+      defaultValues: {
+        proposalId: parseInt(router?.query?.number as string),
+        type: 1,
       },
     },
   ]);
@@ -461,11 +476,12 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                 )}
               </RowDescription>
               {proposal && proposal.proposalStatus === 'ActiveProposal' && (
-                <Row>
+                <Row style={{ gap: 8 }}>
                   <span>
                     <strong>Vote Now</strong>
                   </span>
-                  <VoteButton />
+                  <VoteForButton />
+                  <VoteAgainstButton />
                 </Row>
               )}
             </CardContent>

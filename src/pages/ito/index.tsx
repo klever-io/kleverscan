@@ -267,7 +267,7 @@ export const getITOTabletRowSections =
       return (
         <strong>
           {!(maxAmount === 0 || Number.isNaN(maxAmount)) ? (
-            formatAmount(maxAmount / 10 ** precision)
+            formatAmount(maxAmount)
           ) : (
             <IoIosInfinite />
           )}
@@ -277,9 +277,7 @@ export const getITOTabletRowSections =
     const renderSoldAmount = (): ReactNode => {
       return (
         <strong>
-          {mintedAmount && mintedAmount !== 0
-            ? formatAmount(mintedAmount / 10 ** precision)
-            : 0}
+          {mintedAmount && mintedAmount !== 0 ? formatAmount(mintedAmount) : 0}
         </strong>
       );
     };

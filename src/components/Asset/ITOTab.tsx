@@ -4,7 +4,7 @@ import Copy from '@/components/Copy';
 import { displayITOpacks } from '@/components/ITO';
 import { useExtension } from '@/contexts/extension';
 import { IParsedITO } from '@/types';
-import { formatDate } from '@/utils/formatFunctions';
+import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import {
   EllipsisSpan,
   ExpandableRow,
@@ -46,7 +46,7 @@ export const ITOTab: React.FC<PropsWithChildren<ITOTabProps>> = ({ ITO }) => {
               <span>
                 <strong>{t('assets:ITO.Max Amount')}</strong>
               </span>
-              <span>{ITO.maxAmount}</span>
+              <span>{toLocaleFixed(ITO.maxAmount, ITO.precision)}</span>
             </Row>
           ) : null}
           <Row span={2}>

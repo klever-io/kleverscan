@@ -12,6 +12,7 @@ import {
   dataProposalCall,
 } from '@/services/requests/proposals';
 import {
+  ButtonVote,
   CardContent,
   CardHeader,
   CardHeaderItem,
@@ -82,6 +83,13 @@ import React, {
 import { AiFillCheckCircle } from 'react-icons/ai';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
+import getAccount from '@/services/requests/searchBar/account';
+import { useExtension } from '@/contexts/extension';
+import { getType, buildTransaction } from '@/components/Contract/utils';
+import { web } from '@klever/sdk-web';
+import { gtagEvent } from '@/utils/gtag';
+import { toast } from 'react-toastify';
+import { HashComponent } from '@/components/Contract';
 
 const ProposalVoters = (props: IProposalVoters) => {
   const rowSections = (props: IParsedVote): IRowSection[] => {
@@ -139,6 +147,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
   );
   const [votesPercentage, setVotesPercentage] = useState('');
   const [expandDescription, setExpandDescription] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
   const [isSkeleton, setLoading] = useSkeleton();
   const router = useRouter();
   const filter = [
@@ -157,30 +166,33 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
   const { data: params } = useQuery('paramsList', dataNetworkParams);
   const { getInteractionsButtons } = useContractModal();
 
-  const [VoteForButton] = getInteractionsButtons([
-    {
-      title: `${t('Vote For')}`,
-      contractType: 'VoteContract',
-      icon: 'success',
-      defaultValues: {
-        proposalId: parseInt(router?.query?.number as string),
-        type: 0,
-      },
-      buttonStyle: 'primary',
-    },
-  ]);
+  const { walletAddress } = useExtension();
+  const [totalFrozenBalance, setTotalFrozenBalance] = useState<number>(0);
 
-  const [VoteAgainstButton] = getInteractionsButtons([
-    {
-      title: `${t('Vote Against')}`,
-      contractType: 'VoteContract',
-      icon: 'fail',
-      defaultValues: {
-        proposalId: parseInt(router?.query?.number as string),
-        type: 1,
-      },
-    },
-  ]);
+  const getAccountAddress = useCallback(async () => {
+    try {
+      if (walletAddress) {
+        const account = await getAccount(walletAddress);
+
+        const res = JSON.parse(JSON.stringify(account));
+
+        const kfiStaked = res?.data?.account?.assets['KFI'];
+
+        if (kfiStaked) {
+          setTotalFrozenBalance(kfiStaked?.frozenBalance);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching account address:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchAccountAddress = async () => {
+      await getAccountAddress();
+    };
+    fetchAccountAddress();
+  }, [getAccountAddress]);
 
   useEffect(() => {
     if (proposal) {
@@ -194,6 +206,63 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
       setLoading(false);
     }
   }, [proposal]);
+
+  useEffect(() => {
+    if (txHash) {
+      window.scrollTo(0, 0);
+    }
+  }, [txHash]);
+
+  const handleVoteProposal = async (type: number) => {
+    const payload = {
+      contractType: 'VoteContract',
+      amount: totalFrozenBalance,
+      proposalId: parseInt(router?.query?.number as string),
+      type: type,
+    };
+
+    const payloadText = JSON.stringify(payload, null, '\t');
+
+    try {
+      const voteTransaction = await web.buildTransaction([
+        {
+          type: getType('VoteContract'),
+          payload: JSON.parse(payloadText),
+        },
+      ]);
+
+      const signedTx = await window.kleverWeb.signTransaction(voteTransaction);
+      const response = await web.broadcastTransactions([signedTx]);
+
+      setTxHash(response.data.txsHashes[0]);
+
+      if (response.error) {
+        const messageError = response.error;
+        if (messageError.includes('no signatures provided')) {
+          throw new Error(messageError.split(': ')[2]);
+        } else {
+          throw new Error(messageError);
+        }
+      }
+      toast.success('Transaction broadcast successfully');
+    } catch (e) {
+      console.warn(`%c ${e}`, 'color: red');
+
+      const errorMessage =
+        typeof e === 'object' && e !== null && 'message' in e
+          ? (e as { message: string }).message
+          : String(e);
+
+      if (
+        errorMessage.includes('invalid signature threshold') ||
+        errorMessage.includes('no contract permission')
+      ) {
+        toast.error(errorMessage.split(': ')[3]);
+      } else {
+        toast.error(errorMessage);
+      }
+    }
+  };
 
   const getProposalNetworkParams = (
     params: IProposalParams,
@@ -349,6 +418,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
               title={t('common:Titles.Proposal Details')}
             />
           </Header>
+          {txHash && <HashComponent hash={txHash} setHash={setTxHash} />}
           <CardTabContainer>
             <CardHeader>
               <CardHeaderItem selected={true}>
@@ -475,13 +545,41 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                   </DescriptionContainer>
                 )}
               </RowDescription>
+
+              <Row>
+                <span>
+                  <strong>Your Total Staked</strong>
+                </span>
+                <span>
+                  {toLocaleFixed(
+                    totalFrozenBalance / 10 ** KLV_PRECISION,
+                    KLV_PRECISION,
+                  )}{' '}
+                  KFI
+                </span>
+              </Row>
               {proposal && proposal.proposalStatus === 'ActiveProposal' && (
                 <Row style={{ gap: 8 }}>
                   <span>
                     <strong>Vote Now</strong>
                   </span>
-                  <VoteForButton />
-                  <VoteAgainstButton />
+                  <ButtonVote
+                    buttonStyle={'primary'}
+                    onClick={() => {
+                      handleVoteProposal(0);
+                    }}
+                  >
+                    <span>Vote for</span>
+                  </ButtonVote>
+
+                  <ButtonVote
+                    buttonStyle={'secondary'}
+                    onClick={() => {
+                      handleVoteProposal(1);
+                    }}
+                  >
+                    <span>Vote Against</span>
+                  </ButtonVote>
                 </Row>
               )}
             </CardContent>

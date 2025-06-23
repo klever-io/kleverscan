@@ -168,6 +168,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
 
   const { walletAddress } = useExtension();
   const [totalFrozenBalance, setTotalFrozenBalance] = useState<number>(0);
+  const buttonVoteTooltip = 'You need more KFI in staking to vote.';
 
   const getAccountAddress = useCallback(async () => {
     try {
@@ -564,19 +565,27 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                     <strong>Vote Now</strong>
                   </span>
                   <ButtonVote
+                    title={
+                      totalFrozenBalance < 1 ? buttonVoteTooltip : undefined
+                    }
                     buttonStyle={'primary'}
                     onClick={() => {
                       handleVoteProposal(0);
                     }}
+                    disabled={totalFrozenBalance < 1 && true}
                   >
                     <span>Vote for</span>
                   </ButtonVote>
 
                   <ButtonVote
+                    title={
+                      totalFrozenBalance < 1 ? buttonVoteTooltip : undefined
+                    }
                     buttonStyle={'secondary'}
                     onClick={() => {
                       handleVoteProposal(1);
                     }}
+                    disabled={totalFrozenBalance < 1 && true}
                   >
                     <span>Vote Against</span>
                   </ButtonVote>

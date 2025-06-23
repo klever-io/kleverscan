@@ -560,11 +560,13 @@ export const CustomLink = styled.a<{
 `;
 
 export const ButtonVote = styled.button<{
+  disabled?: boolean;
   buttonStyle?: 'primary' | 'secondary';
 }>`
   color: ${props => props.theme.black};
   background-color: transparent;
-  border: 1px solid ${props => props.theme.violet};
+  border: 1px solid
+    ${props => (!props.disabled ? props.theme.violet : props.theme.darkGray)};
 
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -589,6 +591,16 @@ export const ButtonVote = styled.button<{
     color: ${props => props.theme.black} !important;
   }
 
+  &:active {
+    transform: ${props => (!props.disabled ? 'translateY(0.1rem)' : 'none')};
+  }
+
+  &:hover {
+    background-color: ${props =>
+      props.disabled ? props.theme.darkGray : props.theme.violet};
+    cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  }
+
   ${props =>
     props.buttonStyle === 'primary' &&
     css`
@@ -600,8 +612,8 @@ export const ButtonVote = styled.button<{
       }
     `}
 
-  opacity: 1;
-  cursor: pointer;
+  opacity: ${props => (props.disabled ? '0.3' : '1')};
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
 
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: 100%;

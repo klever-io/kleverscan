@@ -1,5 +1,5 @@
 import { TableRowElementProps } from '@/types';
-import { transparentize } from 'polished';
+import { transparentize, lighten } from 'polished';
 import styled, { css } from 'styled-components';
 
 export const SpanBold = styled.span`
@@ -556,5 +556,67 @@ export const CustomLink = styled.a<{
     display: flex;
     justify-content: center;
     width: 100%;
+  }
+`;
+
+export const ButtonVote = styled.button<{
+  disabled?: boolean;
+  buttonStyle?: 'primary' | 'secondary';
+}>`
+  color: ${props => props.theme.black};
+  background-color: transparent;
+  border: 1px solid
+    ${props => (!props.disabled ? props.theme.violet : props.theme.darkGray)};
+
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+
+  align-self: end;
+
+  min-width: 8rem;
+  width: 100%;
+  max-width: 15rem;
+
+  padding: 4px 16px;
+  border-radius: 24px;
+
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+
+  transition: all 0.1s ease;
+
+  > span {
+    color: ${props => props.theme.black} !important;
+  }
+
+  &:active {
+    transform: ${props => (!props.disabled ? 'translateY(0.1rem)' : 'none')};
+  }
+
+  &:hover {
+    background-color: ${props =>
+      props.disabled ? props.theme.darkGray : props.theme.violet};
+    cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  }
+
+  ${props =>
+    props.buttonStyle === 'primary' &&
+    css`
+      background-color: ${props.theme.violet};
+      border: 1px solid ${props.theme.violet};
+
+      &:hover {
+        background-color: ${lighten(0.1, props.theme.violet)};
+      }
+    `}
+
+  opacity: ${props => (props.disabled ? '0.3' : '1')};
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    width: 100%;
+    max-width: 100%;
   }
 `;

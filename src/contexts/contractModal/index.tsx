@@ -14,6 +14,7 @@ import {
 import ReactDOM from 'react-dom';
 import { MdSend } from 'react-icons/md';
 import { ActionItem, ButtonModal } from './styles';
+import { getStatusIcon } from '@/assets/status';
 
 interface IContractModal {
   getInteractionsButtons: (

@@ -13,7 +13,7 @@ import {
 } from 'react';
 import ReactDOM from 'react-dom';
 import { MdSend } from 'react-icons/md';
-import { ActionItem, ButtonModal, TitleIcon } from './styles';
+import { ActionItem, ButtonModal } from './styles';
 import { getStatusIcon } from '@/assets/status';
 
 interface IContractModal {
@@ -29,7 +29,6 @@ export interface IUseInteractionButton {
   contractType: string;
   defaultValues?: any;
   buttonStyle?: 'primary' | 'secondary' | 'contextModal';
-  icon?: string;
 }
 
 export const ContractModal = createContext({} as IContractModal);
@@ -75,7 +74,7 @@ export const ContractModalProvider: React.FC<PropsWithChildren> = ({
         const interactionButton: React.FC<PropsWithChildren> = ({
           children,
         }) => {
-          const { title, contractType, defaultValues, icon } = param;
+          const { title, contractType, defaultValues } = param;
 
           const buttonStyle = param?.buttonStyle
             ? param.buttonStyle
@@ -102,8 +101,6 @@ export const ContractModalProvider: React.FC<PropsWithChildren> = ({
             );
           }
 
-          const StatusIcon = getStatusIcon(icon || '');
-
           return (
             <ButtonModal
               isLocked={contractType === '--' && true}
@@ -111,14 +108,7 @@ export const ContractModalProvider: React.FC<PropsWithChildren> = ({
               buttonStyle={buttonStyle}
             >
               {children}
-              {icon ? (
-                <TitleIcon>
-                  {title}
-                  <StatusIcon />
-                </TitleIcon>
-              ) : (
-                <span>{title}</span>
-              )}
+              <span>{title}</span>
             </ButtonModal>
           );
         };

@@ -64,6 +64,30 @@ export const requestITOSQuery = async (
   return dataITOs;
 };
 
+interface RenderViewAssetButtonProps {
+  assetId: string;
+  reference?: string;
+}
+
+export const renderViewAssetButton = ({
+  assetId,
+  reference,
+}: RenderViewAssetButtonProps): JSX.Element => {
+  const router = useRouter();
+  return (
+    <ParticipateButton
+      onClick={() =>
+        router.push(
+          `/asset/${assetId}${reference ? `?reference=${reference}` : ''}`,
+        )
+      }
+      secondary={true}
+    >
+      View Asset
+    </ParticipateButton>
+  );
+};
+
 export const getITOrowSections =
   (
     setITO: (asset: IParsedITO) => void,
@@ -97,7 +121,7 @@ export const getITOrowSections =
       return (
         <strong>
           {!(maxAmount === 0 || Number.isNaN(maxAmount)) ? (
-            formatAmount(maxAmount / 10 ** precision)
+            formatAmount(maxAmount)
           ) : (
             <IoIosInfinite />
           )}
@@ -107,9 +131,7 @@ export const getITOrowSections =
     const renderSoldAmount = (): ReactNode => {
       return (
         <strong>
-          {mintedAmount && mintedAmount !== 0
-            ? formatAmount(mintedAmount / 10 ** precision)
-            : 0}
+          {mintedAmount && mintedAmount !== 0 ? formatAmount(mintedAmount) : 0}
         </strong>
       );
     };
@@ -192,17 +214,17 @@ export const getITOrowSections =
             !whitelistInfo ||
             (walletAddress &&
               whitelistInfo.some(info => info.address === walletAddress));
-          return (
-            isParticipateEnabled && (
-              <ParticipateButton
-                onClick={() => {
-                  setITO(asset);
-                  setOpenParticipateModal(true);
-                }}
-              >
-                Participate
-              </ParticipateButton>
-            )
+          return isParticipateEnabled ? (
+            <ParticipateButton
+              onClick={() => {
+                setITO(asset);
+                setOpenParticipateModal(true);
+              }}
+            >
+              Participate
+            </ParticipateButton>
+          ) : (
+            renderViewAssetButton({ assetId, reference })
           );
         },
         span: 2,
@@ -245,7 +267,7 @@ export const getITOTabletRowSections =
       return (
         <strong>
           {!(maxAmount === 0 || Number.isNaN(maxAmount)) ? (
-            formatAmount(maxAmount / 10 ** precision)
+            formatAmount(maxAmount)
           ) : (
             <IoIosInfinite />
           )}
@@ -255,9 +277,7 @@ export const getITOTabletRowSections =
     const renderSoldAmount = (): ReactNode => {
       return (
         <strong>
-          {mintedAmount && mintedAmount !== 0
-            ? formatAmount(mintedAmount / 10 ** precision)
-            : 0}
+          {mintedAmount && mintedAmount !== 0 ? formatAmount(mintedAmount) : 0}
         </strong>
       );
     };
@@ -335,17 +355,17 @@ export const getITOTabletRowSections =
             !whitelistInfo ||
             (walletAddress &&
               whitelistInfo.some(info => info.address === walletAddress));
-          return (
-            isParticipateEnabled && (
-              <ParticipateButton
-                onClick={() => {
-                  setITO(asset);
-                  setOpenParticipateModal(true);
-                }}
-              >
-                Participate
-              </ParticipateButton>
-            )
+          return isParticipateEnabled ? (
+            <ParticipateButton
+              onClick={() => {
+                setITO(asset);
+                setOpenParticipateModal(true);
+              }}
+            >
+              Participate
+            </ParticipateButton>
+          ) : (
+            renderViewAssetButton({ assetId, reference })
           );
         },
         span: 2,

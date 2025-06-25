@@ -19,7 +19,6 @@ import { HomeDataProvider } from '@/contexts/mainPage';
 import { ChartDailyTransactions } from '@/components/Home/HomeTransactions/ChartDailyTransactions';
 import { DataCardsContainer } from '@/views/home';
 import { useMobile } from '@/contexts/mobile';
-import { Search } from '@/assets/icons';
 import MostUsedApplications from '@/components/SmartContracts/MostUsedApplications';
 import BrowseAllDeployedContracts from '@/components/SmartContracts/BrowseAllDeployedContracts';
 
@@ -35,10 +34,6 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
           <Title title={`${'SmartContracts'}`} Icon={Icon} />
         </Header>
         <SearchInputContainer>
-          <InputContractContainer>
-            <input type="text" placeholder="Search for contract" />
-            <Search />
-          </InputContractContainer>
           <span>Sponsored:</span>
           <TitleSection>
             <span>Next crypto project to explode on KleverChain</span>

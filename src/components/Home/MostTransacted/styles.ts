@@ -48,13 +48,15 @@ export const Row = styled.tr`
   }
 `;
 
-export const HeaderItem = styled.th`
+export const HeaderItem = styled.th<{
+  hotContracts?: boolean;
+}>`
   font-size: 14px;
   font-weight: 500;
   color: ${({ theme }) => theme.black};
   text-align: left;
 
-  padding: 4px 16px;
+  padding: ${props => (!props.hotContracts ? '4px 16px' : '4px 1px')};
   width: 100%;
 
   &:first-child {
@@ -67,10 +69,15 @@ export const HeaderItem = styled.th`
   }
 `;
 
-export const Cell = styled.td`
+export const Cell = styled.td<{
+  hotContracts?: boolean;
+  justifyContent?: string;
+}>`
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: ${props =>
+    props.hotContracts === true && props.justifyContent};
 
   font-size: 14px;
   font-weight: 400;
@@ -113,8 +120,25 @@ export const TitleContainer = styled.div`
     gap: 4px;
     font-family: 'Monrope';
     font-weight: 700;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 16px;
     color: ${({ theme }) => theme.violet};
+  }
+`;
+
+export const HeaderItemHotContractsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  div:first-child {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+  }
+
+  div:last-child {
+    display: flex;
+    flex-direction: row;
   }
 `;

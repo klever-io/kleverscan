@@ -3,6 +3,7 @@ import { useHomeData } from '@/contexts/mainPage';
 import {
   Cell,
   HeaderItem,
+  HeaderItemHotContractsContainer,
   MostTransactedLink,
   Row,
   SectionContainer,
@@ -14,63 +15,15 @@ import {
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
 import { PurpleArrowRight } from '@/assets/icons';
+import { parseAddress } from '@/utils/parseValues';
 
 const MostTransacted: React.FC<PropsWithChildren> = () => {
-  const { mostTransactedTokens, mostTransactedNFTs, mostTransactedKDAFee } =
-    useHomeData();
-
-  const hotContracts = [
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-    {
-      contractAddress: 'k:2a1e3f4g5h6i7j8k9l0m',
-      owner: 'k:1a2b3c4d5e6f7g8h9i0j',
-      transactions: 100,
-    },
-  ];
+  const {
+    mostTransactedTokens,
+    mostTransactedNFTs,
+    mostTransactedKDAFee,
+    hotContracts,
+  } = useHomeData();
 
   const tables = [
     {
@@ -109,7 +62,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
                   pathname: '/smart-contracts',
                 }}
               >
-                View Smart Contracts
+                <span>View Smart Contracts</span>
                 <PurpleArrowRight />
               </Link>
             </TitleContainer>
@@ -117,17 +70,30 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
           <Table>
             <thead>
               <Row>
-                {table.header.map((item, index: number) => (
-                  <HeaderItem key={index}>{item}</HeaderItem>
-                ))}
+                {table.title !== 'Hot Contracts' ? (
+                  table.header.map((item, index: number) => (
+                    <HeaderItem key={index}>{item}</HeaderItem>
+                  ))
+                ) : (
+                  <HeaderItemHotContractsContainer>
+                    <div>
+                      <HeaderItem hotContracts>Rank</HeaderItem>
+                      <HeaderItem hotContracts>Contract Address</HeaderItem>
+                    </div>
+                    <div>
+                      <HeaderItem>Owner</HeaderItem>
+                      <HeaderItem>Transactions</HeaderItem>
+                    </div>
+                  </HeaderItemHotContractsContainer>
+                )}
               </Row>
             </thead>
             <tbody>
               {table?.data?.map((item, index) => (
                 <Row key={index}>
-                  <Cell>{index + 1}</Cell>
                   {table.title !== 'Hot Contracts' ? (
                     <>
+                      <Cell>{index + 1}</Cell>
                       <Cell>
                         <Link href={`/asset/${item?.key}`} legacyBehavior>
                           <MostTransactedLink href={`/asset/${item?.key}`}>
@@ -144,9 +110,16 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
                     </>
                   ) : (
                     <>
-                      <Cell>{item?.contractAddress}</Cell>
-                      <Cell>{item?.owner}</Cell>
-                      <Cell>{item?.transactions?.toLocaleString()}</Cell>
+                      <Cell hotContracts>{index + 1}</Cell>
+                      <Cell hotContracts justifyContent={'flex-start'}>
+                        {parseAddress(item?.address, 16)}
+                      </Cell>
+                      <Cell hotContracts justifyContent={'flex-end'}>
+                        {parseAddress(item?.ownerAddress, 16)}
+                      </Cell>
+                      <Cell hotContracts justifyContent={'flex-end'}>
+                        {item?.count}
+                      </Cell>
                     </>
                   )}
                 </Row>

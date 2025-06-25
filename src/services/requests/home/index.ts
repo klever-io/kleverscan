@@ -14,6 +14,7 @@ import {
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
 import { IProposal, MostTransferredToken } from '@/types/proposals';
+import { HotContracts } from '@/types/smart-contract';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 import { toLocaleFixed } from '@/utils/formatFunctions';
@@ -625,6 +626,22 @@ const homeMostTransactedKDAFee = async (): Promise<
   }
 };
 
+const homeHotContracts = async (): Promise<
+  { hotContracts: HotContracts[] } | undefined
+> => {
+  try {
+    const hotContractsRes = await api.get({
+      route: 'sc/statistics',
+    });
+
+    if (!hotContractsRes.error || hotContractsRes.error === '') {
+      return { hotContracts: hotContractsRes.data };
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   defaultAggregateData,
   homeAccountsCall,
@@ -649,4 +666,5 @@ export {
   homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
+  homeHotContracts,
 };

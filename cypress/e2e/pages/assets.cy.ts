@@ -1,44 +1,31 @@
 /// <reference types="cypress" />
 
-import { contracts } from '../../../src/configs/transactions';
-import { ContractsIndex } from '../../../src/types/contracts';
+const assetsTypes = ['Fungible', 'NonFungible'];
 
-const transaction_links: { name: string; link: string }[] = [];
+const assets_links: { name: string; link: string }[] = [];
 
-describe('Transactions Page', () => {
+describe('Assets Page', () => {
   beforeEach(() => {
-    cy.visit('/transactions');
+    cy.visit('/assets');
   });
 
-  it('should load the transactions page', () => {
-    cy.get('h1', { timeout: 10000 })
-      .contains('Transactions')
-      .should('be.visible');
+  it('should load the assets page', () => {
+    cy.get('h1', { timeout: 10000 }).contains('Assets').should('be.visible');
   });
 
-  Object.values(contracts).forEach(type => {
+  assetsTypes.forEach(type => {
     if (typeof type !== 'string') return;
 
-    it(`should filter transactions by type - ${type}`, () => {
+    it(`should filter Assets by type - ${type}`, () => {
       cy.wait(5000);
-      const statusFilter = cy
-        .get(':nth-child(2) > [data-testid="selector"]', { timeout: 10000 })
-        .click();
 
-      cy.wait(1000);
-
-      statusFilter.contains('Success', { timeout: 10000 }).click();
-
-      const typeFilter = cy.get(':nth-child(3) > [data-testid="selector"]', {
+      const typeFilter = cy.get(':nth-child(2) > [data-testid="selector"]', {
         timeout: 10000,
       });
 
       cy.wait(1000);
 
       typeFilter.click();
-
-      cy.wait(1000);
-      typeFilter.type(type, { delay: 300 });
 
       cy.wait(1000);
 
@@ -49,8 +36,7 @@ describe('Transactions Page', () => {
       cy.url().then(currentUrl => {
         const url = new URL(currentUrl);
         const typeParam = url.searchParams.get('type');
-        const typeIndex = ContractsIndex[type];
-        expect(Number(typeParam)).to.eq(typeIndex);
+        expect(typeParam).to.eq(type);
       });
 
       cy.get('body').then($body => {
@@ -62,7 +48,7 @@ describe('Transactions Page', () => {
               .find('a')
               .invoke('attr', 'href')
               .then(href => {
-                href && transaction_links.push({ name: type, link: href });
+                href && assets_links.push({ name: type, link: href });
               });
           } else {
             cy.get('[data-testid="table-empty"]', { timeout: 5000 }).should(
@@ -75,12 +61,12 @@ describe('Transactions Page', () => {
   });
 });
 
-describe('Transaction Details Page', () => {
-  Object.values(contracts).forEach(type => {
+describe('Asset Details Page', () => {
+  assetsTypes.forEach(type => {
     if (typeof type !== 'string') return;
 
     it(`should load the transaction details page - ${type}`, () => {
-      const findType = transaction_links.find(
+      const findType = assets_links.find(
         transaction => transaction.name === type,
       );
 
@@ -95,10 +81,10 @@ describe('Transaction Details Page', () => {
         cy.wait(5000);
 
         cy.get('h1', { timeout: 60000 })
-          .contains('Transaction Details', { timeout: 60000 })
+          .contains('Asset', { timeout: 60000 })
           .should('be.visible');
       } else {
-        cy.log('No transaction found');
+        cy.log('No asset found');
       }
     });
   });

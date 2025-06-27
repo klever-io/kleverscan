@@ -5,13 +5,20 @@ import { ContractsIndex } from '../../../src/types/contracts';
 
 const transaction_links: { name: string; link: string }[] = [];
 
+const PAGE_TITLE_SELECTOR = 'h1';
+const STATUS_FILTER_SELECTOR = ':nth-child(2) > [data-testid="selector"]';
+const TYPE_FILTER_SELECTOR = ':nth-child(3) > [data-testid="selector"]';
+const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
+const TABLE_ROW_0_LINK_SELECTOR = '[data-testid="table-row-0"] a';
+const TABLE_EMPTY_SELECTOR = '[data-testid="table-empty"]';
+
 describe('Transactions Page', () => {
   beforeEach(() => {
     cy.visit('/transactions');
   });
 
   it('should load the transactions page', () => {
-    cy.get('h1', { timeout: 10000 })
+    cy.get(PAGE_TITLE_SELECTOR, { timeout: 10000 })
       .contains('Transactions')
       .should('be.visible');
   });
@@ -22,29 +29,20 @@ describe('Transactions Page', () => {
     it(`should filter transactions by type - ${type}`, () => {
       cy.wait(5000);
       const statusFilter = cy
-        .get(':nth-child(2) > [data-testid="selector"]', { timeout: 10000 })
+        .get(STATUS_FILTER_SELECTOR, { timeout: 10000 })
         .click();
-
-      cy.wait(1000);
 
       statusFilter.contains('Success', { timeout: 10000 }).click();
 
-      const typeFilter = cy.get(':nth-child(3) > [data-testid="selector"]', {
+      const typeFilter = cy.get(TYPE_FILTER_SELECTOR, {
         timeout: 10000,
       });
 
-      cy.wait(1000);
-
       typeFilter.click();
 
-      cy.wait(1000);
       typeFilter.type(type, { delay: 300 });
 
-      cy.wait(1000);
-
-      typeFilter.contains(type, { timeout: 60000 }).click();
-
-      cy.wait(5000);
+      typeFilter.contains(type, { timeout: 50000 }).click();
 
       cy.url().then(currentUrl => {
         const url = new URL(currentUrl);
@@ -53,19 +51,20 @@ describe('Transactions Page', () => {
         expect(Number(typeParam)).to.eq(typeIndex);
       });
 
+      cy.wait(5000);
+
       cy.get('body').then($body => {
         if ($body.length > 0) {
-          const hasRow = $body.find('[data-testid^="table-row-"]').length > 0;
+          const hasRow = $body.find(TABLE_ROW_SELECTOR).length > 0;
           if (hasRow) {
-            cy.get('[data-testid="table-row-0"]', { timeout: 5000 })
+            cy.get(TABLE_ROW_0_LINK_SELECTOR, { timeout: 5000 })
               .first()
-              .find('a')
               .invoke('attr', 'href')
               .then(href => {
                 href && transaction_links.push({ name: type, link: href });
               });
           } else {
-            cy.get('[data-testid="table-empty"]', { timeout: 5000 }).should(
+            cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should(
               'be.visible',
             );
           }
@@ -84,17 +83,13 @@ describe('Transaction Details Page', () => {
         transaction => transaction.name === type,
       );
 
-      cy.wait(5000);
-
       if (findType) {
         cy.visit({
           url: findType.link,
           timeout: 60000,
         });
 
-        cy.wait(5000);
-
-        cy.get('h1', { timeout: 60000 })
+        cy.get(PAGE_TITLE_SELECTOR, { timeout: 60000 })
           .contains('Transaction Details', { timeout: 60000 })
           .should('be.visible');
       } else {

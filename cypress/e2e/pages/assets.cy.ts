@@ -65,10 +65,8 @@ describe('Asset Details Page', () => {
   assetsTypes.forEach(type => {
     if (typeof type !== 'string') return;
 
-    it(`should load the transaction details page - ${type}`, () => {
-      const findType = assets_links.find(
-        transaction => transaction.name === type,
-      );
+    it(`should load the asset details page - ${type}`, () => {
+      const findType = assets_links.find(asset => asset.name === type);
 
       cy.wait(5000);
 

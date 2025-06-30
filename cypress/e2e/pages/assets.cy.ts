@@ -1,9 +1,7 @@
 /// <reference types="cypress" />
 
 const assetsTypes = ['Fungible', 'NonFungible'];
-
 const assetsLinks: { name: string; link: string }[] = [];
-
 const PAGE_TITLE_SELECTOR = 'h1';
 const TYPE_FILTER_SELECTOR = ':nth-child(2) > [data-testid="selector"]';
 const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';

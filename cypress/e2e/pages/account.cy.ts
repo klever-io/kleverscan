@@ -5,21 +5,20 @@ const transactionsTypes = ['Transactions Out', 'Transactions In'];
 const address =
   'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
 
-const transaction_links: { name: string; link: string }[] = [];
-
-const PAGE_TITLE_SELECTOR = 'h1';
-const TYPE_FILTER_SELECTOR = ':nth-child(1) > [data-testid="selector"]';
-const TAB_SELECTOR = '[data-testid="tab"]';
-const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
-const TABLE_ROW_0_LINK_SELECTOR = '[data-testid="table-row-0"] a';
-const TABLE_EMPTY_SELECTOR = '[data-testid="table-empty"]';
-
 describe('Account Page', () => {
   beforeEach(() => {
     cy.visit(
       '/account/klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl',
     );
   });
+
+  const transaction_links: { name: string; link: string }[] = [];
+  const PAGE_TITLE_SELECTOR = 'h1';
+  const TYPE_FILTER_SELECTOR = '[data-testid="selector"]';
+  const TAB_SELECTOR = '[data-testid="tab"]';
+  const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
+  const TABLE_ROW_0_LINK_SELECTOR = '[data-testid="table-row-0"] a';
+  const TABLE_EMPTY_SELECTOR = '[data-testid="table-empty"]';
 
   it('should load the account page', () => {
     cy.get(PAGE_TITLE_SELECTOR, { timeout: 10000 })
@@ -30,7 +29,7 @@ describe('Account Page', () => {
   transactionsTypes.forEach(type => {
     if (typeof type !== 'string') return;
 
-    it(`should filter Assets by type - ${type}`, () => {
+    it(`should filter Transactions by type - ${type}`, () => {
       cy.scrollTo(0, 500);
 
       cy.get(TAB_SELECTOR).contains('Transactions', { timeout: 10000 }).click();
@@ -41,7 +40,7 @@ describe('Account Page', () => {
         expect(tabParam).to.eq('Transactions');
       });
 
-      const typeFilter = cy.get('[data-testid="selector"]').first();
+      const typeFilter = cy.get(TYPE_FILTER_SELECTOR).first();
 
       typeFilter.click();
 

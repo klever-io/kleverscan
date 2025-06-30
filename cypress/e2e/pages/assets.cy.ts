@@ -2,9 +2,8 @@
 
 const assetsTypes = ['Fungible', 'NonFungible'];
 
-const assets_links: { name: string; link: string }[] = [];
+const assetsLinks: { name: string; link: string }[] = [];
 
-// DOM Selectors
 const PAGE_TITLE_SELECTOR = 'h1';
 const TYPE_FILTER_SELECTOR = ':nth-child(2) > [data-testid="selector"]';
 const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
@@ -50,7 +49,7 @@ describe('Assets Page', () => {
               .first()
               .invoke('attr', 'href')
               .then(href => {
-                href && assets_links.push({ name: type, link: href });
+                href && assetsLinks.push({ name: type, link: href });
               });
           } else {
             cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should(
@@ -68,7 +67,7 @@ describe('Asset Details Page', () => {
     if (typeof type !== 'string') return;
 
     it(`should load the asset details page - ${type}`, () => {
-      const findType = assets_links.find(asset => asset.name === type);
+      const findType = assetsLinks.find(asset => asset.name === type);
 
       if (findType) {
         cy.visit({

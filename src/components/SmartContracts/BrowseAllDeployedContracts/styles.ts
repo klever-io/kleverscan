@@ -28,6 +28,7 @@ export const InputContractContainer = styled.div`
   padding: 10px 12px;
   border-radius: 200px;
   border: 1px solid #ffffff;
+  margin-bottom: 20px;
   gap: 8px;
 
   display: flex;
@@ -35,6 +36,7 @@ export const InputContractContainer = styled.div`
   align-items: center;
 
   input {
+    width: 100%;
     font-family: 'Manrope';
     font-weight: 400;
     font-size: 14px;
@@ -68,60 +70,4 @@ export const CellTableContractName = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-`;
-
-export const SmartContractDataWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-export const SmartContractDataCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  max-width: 1028px;
-  min-width: 328px;
-  border-radius: 16px;
-  border: 1px solid #848495;
-  padding: 16px;
-  gap: 16px;
-  font-family: 'Manrope';
-  font-weight: 700;
-  font-size: 12px;
-  line-height: 16px;
-  color: #ffffff;
-`;
-
-export const SmartContractDataCardHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-export const SmartContractDataCardHeaderItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-
-  span {
-    color: #bababa;
-  }
-`;
-
-export const SmartContractDataCardInfo = styled.div`
-  display: flex;
-  gap: 40%;
-`;
-
-export const SmartContractDataCardInfoColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  span:first-of-type {
-    color: #bababa;
-  }
 `;

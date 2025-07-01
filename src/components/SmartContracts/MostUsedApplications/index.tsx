@@ -8,62 +8,11 @@ import {
   CardsTitleWrapper,
 } from './styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
+import { useSmartContractData } from '@/contexts/smartContractPage';
 import { parseAddress } from '@/utils/parseValues';
 
-const ContractApps = [
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-  {
-    constract: '000000',
-    name: 'Contract Name',
-    address: 'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-  },
-];
-
 const MostUsedApplications = () => {
+  const { smartContractsStatistic } = useSmartContractData();
   return (
     <>
       <CardsTitleWrapper>
@@ -72,13 +21,13 @@ const MostUsedApplications = () => {
       </CardsTitleWrapper>
 
       <CardsContainerWrapper>
-        {ContractApps.map((app, index) => (
+        {smartContractsStatistic?.map((app, index) => (
           <CardContainer key={index}>
             <CardHeader>
               <h4>#{index + 1}</h4>
               <CardContractInfo>
                 <span>Transactions</span>
-                <span>{app?.constract}</span>
+                <span>{app?.count}</span>
               </CardContractInfo>
             </CardHeader>
             <CardContractName>
@@ -87,8 +36,8 @@ const MostUsedApplications = () => {
                 ticker={'KLV'}
                 name={'KLV'}
               />
-              <span>{app.name}</span>
-              <small>{parseAddress(app.address, 25)}</small>
+              <span>{app.name || 'Contract Name'}</span>
+              <small>{parseAddress(app.ownerAddress, 25)}</small>
             </CardContractName>
           </CardContainer>
         ))}

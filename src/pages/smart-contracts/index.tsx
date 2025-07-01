@@ -14,21 +14,18 @@ import {
   TitleSection,
 } from './style';
 
-import HomeDataCards from '@/components/Home/CardDataFetcher/HomeDataCards';
-import { HomeDataProvider } from '@/contexts/mainPage';
+import { SmartContractDataProvider } from '@/contexts/smartContractPage';
 import { ChartDailyTransactions } from '@/components/Home/HomeTransactions/ChartDailyTransactions';
 import { DataCardsContainer } from '@/views/home';
-import { useMobile } from '@/contexts/mobile';
 import MostUsedApplications from '@/components/SmartContracts/MostUsedApplications';
 import BrowseAllDeployedContracts from '@/components/SmartContracts/BrowseAllDeployedContracts';
+import SmartContractTopCard from '@/components/SmartContracts/SmartContractTopCard';
 
 const SmartContracts: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('smartContracts');
-  const router = useRouter();
-  const { isMobile, isTablet } = useMobile();
 
   return (
-    <HomeDataProvider>
+    <SmartContractDataProvider>
       <Container>
         <Header>
           <Title title={`${'SmartContracts'}`} Icon={Icon} />
@@ -41,8 +38,8 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
         </SearchInputContainer>
         <div>
           <DataCardsContainer>
-            <HomeDataCards />
-            <ChartDailyTransactions />
+            <SmartContractTopCard />
+            <ChartDailyTransactions isSmartContract={true} />
           </DataCardsContainer>
         </div>
 
@@ -50,7 +47,7 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
 
         <BrowseAllDeployedContracts />
       </Container>
-    </HomeDataProvider>
+    </SmartContractDataProvider>
   );
 };
 

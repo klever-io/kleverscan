@@ -4,3 +4,13 @@ export interface HotContracts {
   ownerAddress: string;
   count: number;
 }
+
+export interface SmartContractsList {
+  name: string;
+  deployTxHash: string;
+  deployer: string;
+  timestamp: number;
+  upgrades: string[];
+  totalTransactions: number;
+  contractAddress: string;
+}

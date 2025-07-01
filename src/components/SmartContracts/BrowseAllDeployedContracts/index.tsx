@@ -1,190 +1,134 @@
-import React, { useEffect, useState } from 'react';
-import { useMobile } from '@/contexts/mobile';
-import { Search } from '@/assets/icons';
-import {
-  Cell,
-  HeaderItem,
-  Row,
-  Table,
-} from '@/components/Home/MostTransacted/styles';
-import Copy from '@/components/Copy';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import { SmartContractsList } from '@/types/smart-contract';
 import { smartContractsTableHeaders } from '@/utils/contracts';
+import { IRowSection } from '@/types';
+import { Search } from '@/assets/icons';
+import Copy from '@/components/Copy';
+import api from '@/services/api';
+import Table, { ITable } from '@/components/Table';
 import {
   CardsTitleWrapper,
   CellTableContractName,
   CellTableContractNameWrapper,
   InputContractContainer,
-  SmartContractDataCard,
-  SmartContractDataCardHeader,
-  SmartContractDataCardHeaderItem,
-  SmartContractDataCardInfo,
-  SmartContractDataCardInfoColumn,
-  SmartContractDataWrapper,
 } from './styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { parseAddress } from '@/utils/parseValues';
+import { Cell } from '@/components/Home/MostTransacted/styles';
+import { formatDate } from '@/utils/formatFunctions';
 
-const smartContractsData = [
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15000,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name2',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0000000',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-  {
-    contractName: 'Contract Name',
-    contractAddress:
-      'klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc',
-    rewards: '0',
-    balance: '0000000',
-    logo: '/assets/klv-logo.png?w=1920',
-    ticker: 'KLV',
-    totalTransactions: 1,
-    firstDeployed: 15,
-    lastDeployed: 15,
-  },
-];
+const smartContractsListRowSections = (
+  smartContracts: SmartContractsList,
+): IRowSection[] => {
+  const {
+    name,
+    deployTxHash,
+    deployer,
+    timestamp,
+    upgrades,
+    totalTransactions,
+    contractAddress,
+  } = smartContracts;
 
-interface SmartContract {
-  contractName: string;
-  contractAddress: string;
-  rewards: string;
-  balance: string;
-  logo: string;
-  ticker: string;
-  totalTransactions: number;
-  firstDeployed: number;
-  lastDeployed: number;
-}
+  return [
+    {
+      element: props => (
+        <CellTableContractNameWrapper>
+          <AssetLogo
+            logo={'/assets/klv-logo.png?w=1920'}
+            ticker={'KLV'}
+            name={name}
+          />
+          <CellTableContractName>
+            {name || '- -'}
+            <small
+              style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+            >
+              {parseAddress(contractAddress, 25)}
+              <Copy data={contractAddress} info="contractAddress" />
+            </small>
+          </CellTableContractName>
+        </CellTableContractNameWrapper>
+      ),
+      span: 1,
+    },
 
-const BrowseAllDeployedContracts = () => {
-  const { isMobile, isTablet } = useMobile();
+    {
+      element: props => <Cell>{totalTransactions}</Cell>,
+      span: 1,
+    },
+
+    {
+      element: props => (
+        <Cell>
+          <small style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            {parseAddress(deployer, 25)}
+            <Copy data={deployer} info="deployer" />
+          </small>
+        </Cell>
+      ),
+      span: 1,
+    },
+
+    {
+      element: props => (
+        <Cell
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            flexDirection: 'column',
+          }}
+        >
+          <small style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            {parseAddress(deployTxHash, 25)}
+            <Copy data={deployTxHash} info="deployTxHash" />
+          </small>
+          {formatDate(timestamp)}
+        </Cell>
+      ),
+      span: 1,
+    },
+  ];
+};
+
+const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const [contractNameValue, setContractNameValue] = useState<string>('');
-  const [filteredData, setFilteredData] =
-    useState<SmartContract[]>(smartContractsData);
+  const [filteredSmartContracts, setFilteredSmartContracts] = useState<
+    SmartContractsList[]
+  >([]);
 
-  useEffect(() => {
-    if (smartContractsData.length > 0) {
-      const filtered = smartContractsData?.filter(item =>
-        item?.contractName.includes(contractNameValue),
-      );
-      setFilteredData(filtered);
+  const requestSmartContractsList = async (
+    page: number,
+    limit: number,
+    filter: string,
+  ) => {
+    const localQuery = { page, limit };
+    const smartContractsListRes = await api.get({
+      route: 'sc/list',
+      query: localQuery,
+    });
+    if (!smartContractsListRes.error) {
+      return {
+        ...smartContractsListRes,
+        data: { smartContracts: smartContractsListRes.data.sc },
+      };
     }
-  }, [contractNameValue, smartContractsData]);
+  };
+
+  const tableProps: ITable = {
+    type: 'smartContracts',
+    header: smartContractsTableHeaders,
+    rowSections: smartContractsListRowSections,
+    request: (page, limit) =>
+      requestSmartContractsList(page, limit, contractNameValue),
+    dataName: 'smartContracts',
+    showLimit: false,
+  };
 
   return (
     <>
@@ -200,119 +144,8 @@ const BrowseAllDeployedContracts = () => {
           onChange={e => setContractNameValue(e.target.value)}
         />
         <Search />
-        {/* <Input
-                        type="text"
-                        placeholder='Search for contract'
-                        value=""
-                        onChange={() => { }}
-                        handleConfirmClick={() => { }}
-                    /> */}
       </InputContractContainer>
-
-      {/* <Table {...tableProps} /> */}
-
-      <div style={{ marginTop: '20px' }}>
-        {!isMobile && !isTablet ? (
-          <Table>
-            <thead>
-              <Row>
-                <HeaderItem key={0}>#</HeaderItem>
-                {smartContractsTableHeaders.map((item, index) => (
-                  <HeaderItem key={index}>{item}</HeaderItem>
-                ))}
-              </Row>
-            </thead>
-            <tbody>
-              {filteredData.map((item, index) => (
-                <Row key={index}>
-                  <Cell>{index}</Cell>
-                  <CellTableContractNameWrapper>
-                    <AssetLogo
-                      logo={item?.logo}
-                      ticker={item?.ticker}
-                      name={item?.contractName}
-                    />
-                    <CellTableContractName>
-                      {item?.contractName}
-                      <small>{parseAddress(item?.contractAddress, 25)}</small>
-                    </CellTableContractName>
-                  </CellTableContractNameWrapper>
-                  <Cell>
-                    {item?.rewards}
-                    {item?.ticker}
-                  </Cell>
-                  <Cell>
-                    {item?.balance}
-                    {item?.ticker}
-                  </Cell>
-                  <Cell>
-                    {item?.totalTransactions}
-                    {item?.ticker}
-                  </Cell>
-                  <Cell>
-                    {item?.firstDeployed}
-                    {item?.ticker}
-                  </Cell>
-                  <Cell>
-                    {item?.lastDeployed}
-                    {item?.ticker}
-                  </Cell>
-                </Row>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          <SmartContractDataWrapper>
-            {filteredData?.map((item, index) => (
-              <SmartContractDataCard key={index}>
-                <SmartContractDataCardHeader>
-                  <SmartContractDataCardHeaderItem>
-                    <AssetLogo
-                      logo={item?.logo}
-                      ticker={item?.ticker}
-                      name={item?.contractName}
-                    />
-                    <span>{item?.contractName}</span>
-                  </SmartContractDataCardHeaderItem>
-                  <span>02/12/2024 15:27</span>
-                </SmartContractDataCardHeader>
-                <SmartContractDataCardHeader>
-                  <small>{parseAddress(item?.contractAddress, 25)}</small>
-                  <Copy data={item?.contractAddress} info="contractAddress" />
-                </SmartContractDataCardHeader>
-                <SmartContractDataCardInfo>
-                  <SmartContractDataCardInfoColumn>
-                    <span>Balance</span>
-                    <span>
-                      {item?.balance} {item?.ticker}
-                    </span>
-                  </SmartContractDataCardInfoColumn>
-                  <SmartContractDataCardInfoColumn>
-                    <span>Total Transactions</span>
-                    <span>
-                      {item?.totalTransactions} {item?.ticker}
-                    </span>
-                  </SmartContractDataCardInfoColumn>
-                </SmartContractDataCardInfo>
-                <SmartContractDataCardInfo>
-                  <SmartContractDataCardInfoColumn>
-                    <span>First Deployed</span>
-                    <span>
-                      {item?.firstDeployed} {item?.ticker}
-                    </span>
-                  </SmartContractDataCardInfoColumn>
-                  <SmartContractDataCardInfoColumn>
-                    <span>Last Deployed</span>
-                    <span>
-                      {item?.lastDeployed} {item?.ticker}
-                    </span>
-                  </SmartContractDataCardInfoColumn>
-                </SmartContractDataCardInfo>
-              </SmartContractDataCard>
-            ))}
-          </SmartContractDataWrapper>
-        )}
-      </div>
+      <Table {...tableProps} />
     </>
   );
 };

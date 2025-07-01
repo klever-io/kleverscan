@@ -59,7 +59,7 @@ const smartContractsListRowSections = (
     },
 
     {
-      element: props => <Cell>{totalTransactions}</Cell>,
+      element: props => <Cell>{totalTransactions || '- -'}</Cell>,
       span: 1,
     },
 
@@ -97,26 +97,32 @@ const smartContractsListRowSections = (
 };
 
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
-  const [contractNameValue, setContractNameValue] = useState<string>('');
-  const [filteredSmartContracts, setFilteredSmartContracts] = useState<
-    SmartContractsList[]
-  >([]);
+  const [search, setSearch] = useState<string>('');
+  const [refreshKey, setRefreshKey] = useState<number>(0);
 
-  const requestSmartContractsList = async (
-    page: number,
-    limit: number,
-    filter: string,
-  ) => {
+  const requestSmartContractsList = async (page: number, limit: number) => {
     const localQuery = { page, limit };
     const smartContractsListRes = await api.get({
       route: 'sc/list',
       query: localQuery,
     });
     if (!smartContractsListRes.error) {
-      return {
+      let smartContracts = smartContractsListRes.data.sc;
+
+      const searchTerm = search.toLowerCase();
+      smartContracts = smartContracts.filter(
+        (sc: SmartContractsList) =>
+          sc.contractAddress?.toLowerCase().includes(searchTerm) ||
+          sc.deployTxHash?.toLowerCase().includes(searchTerm) ||
+          sc.deployer?.toLowerCase().includes(searchTerm) ||
+          sc.name?.toLowerCase().includes(searchTerm),
+      );
+
+      const data = {
         ...smartContractsListRes,
-        data: { smartContracts: smartContractsListRes.data.sc },
+        data: { smartContracts },
       };
+      return data;
     }
   };
 
@@ -124,10 +130,14 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
     type: 'smartContracts',
     header: smartContractsTableHeaders,
     rowSections: smartContractsListRowSections,
-    request: (page, limit) =>
-      requestSmartContractsList(page, limit, contractNameValue),
+    request: (page, limit) => requestSmartContractsList(page, limit),
     dataName: 'smartContracts',
     showLimit: false,
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setRefreshKey(prev => prev + 1);
   };
 
   return (
@@ -140,12 +150,12 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
         <input
           type="text"
           placeholder="Search for contract"
-          value={contractNameValue}
-          onChange={e => setContractNameValue(e.target.value)}
+          value={search}
+          onChange={handleSearchChange}
         />
         <Search />
       </InputContractContainer>
-      <Table {...tableProps} />
+      <Table key={refreshKey} {...tableProps} />
     </>
   );
 };

@@ -2,15 +2,17 @@
 
 import { contracts } from '../../../src/configs/transactions';
 import { ContractsIndex } from '../../../src/types/contracts';
+
 const transaction_links: { name: string; link: string }[] = [];
 const PAGE_TITLE_SELECTOR = 'h1';
-const STATUS_FILTER_SELECTOR = ':nth-child(2) > [data-testid="selector"]';
-const TYPE_FILTER_SELECTOR = ':nth-child(3) > [data-testid="selector"]';
-const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
-const TABLE_ROW_0_LINK_SELECTOR = '[data-testid="table-row-0"] a';
-const TABLE_EMPTY_SELECTOR = '[data-testid="table-empty"]';
 
 describe('Transactions Page', () => {
+  const STATUS_FILTER_SELECTOR = ':nth-child(2) > [data-testid="selector"]';
+  const TYPE_FILTER_SELECTOR = ':nth-child(3) > [data-testid="selector"]';
+  const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
+  const TABLE_ROW_0_LINK_SELECTOR = '[data-testid="table-row-0"] a';
+  const TABLE_EMPTY_SELECTOR = '[data-testid="table-empty"]';
+
   beforeEach(() => {
     cy.visit('/transactions');
   });

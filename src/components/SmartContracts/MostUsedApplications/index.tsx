@@ -22,7 +22,7 @@ const MostUsedApplications = () => {
 
       <CardsContainerWrapper>
         {smartContractsStatistic?.map((app, index) => (
-          <CardContainer key={index}>
+          <CardContainer key={app.address || index}>
             <CardHeader>
               <h4>#{index + 1}</h4>
               <CardContractInfo>

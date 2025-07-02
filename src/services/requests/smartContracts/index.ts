@@ -33,7 +33,7 @@ const smartContractsStatisticCall = async (): Promise<
   }
 };
 
-const smartContractsTotalContractstCall = async () => {
+const smartContractsTotalContractsCall = async () => {
   try {
     const res = await api.get({
       route: 'sc/list',
@@ -78,10 +78,10 @@ const smartContractsBeforeYesterdayTransactionsCall = async (): Promise<
     if (!res.error || res.error === '') {
       const data = {
         newTransactions: 0,
-        beforeYesterdayTxs: res.data?.number_by_day[1]?.doc_count,
+        beforeYesterdayTxs: res.data?.number_by_day[1]?.doc_count || 0,
       };
       if (res.data?.number_by_day?.length > 0) {
-        data.newTransactions = res.data?.number_by_day[0]?.doc_count;
+        data.newTransactions = res.data?.number_by_day[0]?.doc_count || 0;
       }
       return data;
     }
@@ -93,7 +93,7 @@ const smartContractsBeforeYesterdayTransactionsCall = async (): Promise<
 export {
   smartContractsListCall,
   smartContractsStatisticCall,
-  smartContractsTotalContractstCall,
+  smartContractsTotalContractsCall,
   smartContractTotalTransactionsListCall,
   smartContractsBeforeYesterdayTransactionsCall,
 };

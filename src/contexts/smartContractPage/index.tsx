@@ -1,7 +1,7 @@
 import {
   smartContractsListCall,
   smartContractsStatisticCall,
-  smartContractsTotalContractstCall,
+  smartContractsTotalContractsCall,
   smartContractTotalTransactionsListCall,
   smartContractsBeforeYesterdayTransactionsCall,
 } from '@/services/requests/smartContracts';
@@ -45,7 +45,7 @@ export const SmartContractDataProvider: React.FC<PropsWithChildren> = ({
     },
     {
       queryKey: ['smartContractsTotalContracts'],
-      queryFn: smartContractsTotalContractstCall,
+      queryFn: smartContractsTotalContractsCall,
       refetchInterval: watcherTimeout,
     },
     {

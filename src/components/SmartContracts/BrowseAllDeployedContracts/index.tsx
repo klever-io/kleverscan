@@ -159,6 +159,8 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
           placeholder="Search for contract"
           value={search}
           onChange={handleSearchChange}
+          aria-label="Search for Smart Contracts"
+          id="smart-contract-search"
         />
         <Search />
       </InputContractContainer>

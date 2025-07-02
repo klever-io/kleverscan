@@ -77,7 +77,7 @@ export const Cell = styled.td<{
   gap: 8px;
   align-items: center;
   justify-content: ${props =>
-    props.hotContracts === true && props.justifyContent};
+    props.hotContracts === true ? props.justifyContent : 'flex-start'};
 
   font-size: 14px;
   font-weight: 400;

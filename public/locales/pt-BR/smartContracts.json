@@ -1,3 +1,12 @@
 {
-  "SmartContracts": "Contratos Inteligentes"
+  "Titles": {
+    "Most Used Applications": "Aplicações Mais Utilizadas",
+    "Daily": "Diariamente",
+    "Transactions": "Transações"
+  },
+  "Cards": {
+    "Deployer": "Implantador",
+    "Deployer Hash": "Hash do Implantador",
+    "Total Transactions": "Total de Transações"
+  }
 }

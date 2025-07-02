@@ -22,13 +22,13 @@ import BrowseAllDeployedContracts from '@/components/SmartContracts/BrowseAllDep
 import SmartContractTopCard from '@/components/SmartContracts/SmartContractTopCard';
 
 const SmartContracts: React.FC<PropsWithChildren> = () => {
-  const { t } = useTranslation('smartContracts');
+  const { t } = useTranslation(['common', 'smartContracts']);
 
   return (
     <SmartContractDataProvider>
       <Container>
         <Header>
-          <Title title={`${'SmartContracts'}`} Icon={Icon} />
+          <Title title={t('common:Titles.Smart Contracts')} Icon={Icon} />
         </Header>
         <SearchInputContainer>
           <span>Sponsored:</span>
@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const props = await serverSideTranslations(
     locale,
-    ['smartContracts'],
+    ['common', 'smartContracts'],
     nextI18nextConfig,
     ['en'],
   );

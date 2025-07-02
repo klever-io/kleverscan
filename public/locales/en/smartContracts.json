@@ -1,3 +1,12 @@
 {
-  "SmartContracts": "Smart Contracts"
+  "Titles": {
+    "Most Used Applications": "Most Used Applications",
+    "Daily": "Daily",
+    "Transactions": "Transactions"
+  },
+  "Cards": {
+    "Deployer": "Deployer",
+    "Deployer Hash": "Deployer Hash",
+    "Total Transactions": "Total Transactions"
+  }
 }

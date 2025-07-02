@@ -10,14 +10,16 @@ import {
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { useSmartContractData } from '@/contexts/smartContractPage';
 import { parseAddress } from '@/utils/parseValues';
+import { useTranslation } from 'react-i18next';
 
 const MostUsedApplications = () => {
+  const { t } = useTranslation(['smartContracts']);
   const { smartContractsStatistic } = useSmartContractData();
   return (
     <>
       <CardsTitleWrapper>
-        <h3>Most Used Applications</h3>
-        <span>Daily</span>
+        <h3>{t('smartContracts:Titles.Most Used Applications')}</h3>
+        <span>{t('smartContracts:Titles.Daily')}</span>
       </CardsTitleWrapper>
 
       <CardsContainerWrapper>
@@ -26,7 +28,7 @@ const MostUsedApplications = () => {
             <CardHeader>
               <h4>#{index + 1}</h4>
               <CardContractInfo>
-                <span>Transactions</span>
+                <span>{t('smartContracts:Titles.Transactions')}</span>
                 <span>{app?.count}</span>
               </CardContractInfo>
             </CardHeader>

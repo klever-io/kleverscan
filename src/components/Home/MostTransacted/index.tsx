@@ -110,9 +110,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
                 ) : (
                   <Row key={index}>
                     <Cell hotContracts>{index + 1}</Cell>
-                    <Cell hotContracts justifyContent={'flex-start'}>
-                      {parseAddress(item?.address, 16)}
-                    </Cell>
+                    <Cell hotContracts>{parseAddress(item?.address, 16)}</Cell>
                     <Cell hotContracts justifyContent={'flex-end'}>
                       {parseAddress(item?.ownerAddress, 16)}
                     </Cell>

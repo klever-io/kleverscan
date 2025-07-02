@@ -10,6 +10,7 @@ import {
 import { formatDate } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Copy from '@/components/Copy';
+import { useTranslation } from 'react-i18next';
 
 interface SmartContractCardProps {
   name: string;
@@ -28,6 +29,7 @@ const SmartContractCard = ({
   deployTxHash,
   totalTransactions,
 }: SmartContractCardProps): JSX.Element => {
+  const { t } = useTranslation(['smartContracts']);
   return (
     <SmartContractDataWrapper>
       <SmartContractDataCard>
@@ -48,17 +50,17 @@ const SmartContractCard = ({
         </SmartContractDataCardHeader>
         <SmartContractDataCardInfo>
           <SmartContractDataCardInfoColumn>
-            <span>Deployer</span>
+            <span>{t('smartContracts:Cards.Deployer')}</span>
             <span>{parseAddress(deployer, 12)}</span>
           </SmartContractDataCardInfoColumn>
           <SmartContractDataCardInfoColumn>
-            <span>Deploy Hash</span>
+            <span>{t('smartContracts:Cards.Deploy Hash')}</span>
             <span>{parseAddress(deployTxHash, 12)}</span>
           </SmartContractDataCardInfoColumn>
         </SmartContractDataCardInfo>
         <SmartContractDataCardInfo>
           <SmartContractDataCardInfoColumn>
-            <span>Total Transactions</span>
+            <span>{t('smartContracts:Cards.Total Transactions')}</span>
             <span>{totalTransactions}</span>
           </SmartContractDataCardInfoColumn>
         </SmartContractDataCardInfo>

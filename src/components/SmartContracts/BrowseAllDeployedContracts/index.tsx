@@ -39,11 +39,6 @@ const smartContractsListRowSections = (
     {
       element: props => (
         <CellTableContractNameWrapper>
-          <AssetLogo
-            logo={'/assets/klv-logo.png?w=1920'}
-            ticker={'KLV'}
-            name={name}
-          />
           <CellTableContractName>
             {name || '- -'}
             <small

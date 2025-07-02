@@ -291,6 +291,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
 
               return type === 'smartContracts' && (isMobile || isTablet) ? (
                 <SmartContractCard
+                  key={index}
                   name={item?.name}
                   timestamp={item?.timestamp}
                   contractAddress={item?.contractAddress}

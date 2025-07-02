@@ -101,28 +101,35 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const requestSmartContractsList = async (page: number, limit: number) => {
-    const localQuery = { page, limit };
-    const smartContractsListRes = await api.get({
-      route: 'sc/list',
-      query: localQuery,
-    });
-    if (!smartContractsListRes.error) {
-      let smartContracts = smartContractsListRes.data.sc;
+    try {
+      const localQuery = { page, limit };
+      const smartContractsListRes = await api.get({
+        route: 'sc/list',
+        query: localQuery,
+      });
+      if (!smartContractsListRes.error || smartContractsListRes.error === '') {
+        let smartContracts = smartContractsListRes.data.sc;
 
-      const searchTerm = search.toLowerCase();
-      smartContracts = smartContracts.filter(
-        (sc: SmartContractsList) =>
-          sc.contractAddress?.toLowerCase().includes(searchTerm) ||
-          sc.deployTxHash?.toLowerCase().includes(searchTerm) ||
-          sc.deployer?.toLowerCase().includes(searchTerm) ||
-          sc.name?.toLowerCase().includes(searchTerm),
-      );
+        const searchTerm = search.toLowerCase();
+        smartContracts = smartContracts.filter(
+          (sc: SmartContractsList) =>
+            sc.contractAddress?.toLowerCase().includes(searchTerm) ||
+            sc.deployTxHash?.toLowerCase().includes(searchTerm) ||
+            sc.deployer?.toLowerCase().includes(searchTerm) ||
+            sc.name?.toLowerCase().includes(searchTerm),
+        );
 
-      const data = {
-        ...smartContractsListRes,
-        data: { smartContracts },
-      };
-      return data;
+        const data = {
+          ...smartContractsListRes,
+          data: { smartContracts },
+        };
+        return data;
+      } else {
+        throw new Error(smartContractsListRes.error);
+      }
+    } catch (error) {
+      console.error('Error fetching smart contracts list:', error);
+      throw error;
     }
   };
 

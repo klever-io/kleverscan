@@ -12,12 +12,12 @@ export const CardsTitleWrapper = styled.div`
   font-size: 24px;
   line-height: 32px;
   font-weight: 700;
-  color: #ffffff;
+  color: ${({ theme }) => theme.true.white};
 
   span {
     font-size: 12px;
     line-height: 16px;
-    color: #b7bdc6;
+    color: ${({ theme }) => theme.gray600};
   }
 `;
 
@@ -29,22 +29,41 @@ export const CardsContainerWrapper = styled.div`
   height: 100%;
   padding: 16px;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${({ theme }) => theme.gray200};
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({ theme }) => theme.gray400};
+    border-radius: 3px;
+  }
 `;
 
 export const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 216px;
-  height: 184px;
+  min-width: 216px;
+  min-height: 184px;
+  flex: 1;
   border-radius: 16px;
   padding: 16px;
   gap: 16px;
-  background-color: #0b0b10;
+  background-color: ${({ theme }) => theme.darkCard};
 
   font-family: 'Manrope';
-  color: #ffffff;
+  color: ${({ theme }) => theme.true.white};
+
+  @media (max-width: 768px) {
+    min-width: 180px;
+    height: 160px;
+  }
 `;
 
 export const CardHeader = styled.div`

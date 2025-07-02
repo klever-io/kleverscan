@@ -39,7 +39,7 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
         <div>
           <DataCardsContainer>
             <SmartContractTopCard />
-            <ChartDailyTransactions isSmartContract={true} />
+            <ChartDailyTransactions />
           </DataCardsContainer>
         </div>
 

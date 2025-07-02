@@ -89,41 +89,39 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
               </Row>
             </thead>
             <tbody>
-              {table?.data?.map((item, index) => (
-                <Row key={index}>
-                  {table.title !== 'Hot Contracts' ? (
-                    <>
-                      <Cell>{index + 1}</Cell>
-                      <Cell>
-                        <Link href={`/asset/${item?.key}`} legacyBehavior>
-                          <MostTransactedLink href={`/asset/${item?.key}`}>
-                            <AssetLogo
-                              logo={item?.logo}
-                              ticker={item?.key}
-                              name={item?.key}
-                            />
-                            {item?.key}
-                          </MostTransactedLink>
-                        </Link>
-                      </Cell>
-                      <Cell>{item?.doc_count?.toLocaleString()}</Cell>
-                    </>
-                  ) : (
-                    <>
-                      <Cell hotContracts>{index + 1}</Cell>
-                      <Cell hotContracts justifyContent={'flex-start'}>
-                        {parseAddress(item?.address, 16)}
-                      </Cell>
-                      <Cell hotContracts justifyContent={'flex-end'}>
-                        {parseAddress(item?.ownerAddress, 16)}
-                      </Cell>
-                      <Cell hotContracts justifyContent={'flex-end'}>
-                        {item?.count}
-                      </Cell>
-                    </>
-                  )}
-                </Row>
-              ))}
+              {table?.data?.map((item, index) =>
+                table.title !== 'Hot Contracts' ? (
+                  <Row key={index}>
+                    <Cell>{index + 1}</Cell>
+                    <Cell>
+                      <Link href={`/asset/${item?.key}`} legacyBehavior>
+                        <MostTransactedLink href={`/asset/${item?.key}`}>
+                          <AssetLogo
+                            logo={item?.logo}
+                            ticker={item?.key}
+                            name={item?.key}
+                          />
+                          {item?.key}
+                        </MostTransactedLink>
+                      </Link>
+                    </Cell>
+                    <Cell>{item?.doc_count?.toLocaleString()}</Cell>
+                  </Row>
+                ) : (
+                  <Row key={index}>
+                    <Cell hotContracts>{index + 1}</Cell>
+                    <Cell hotContracts justifyContent={'flex-start'}>
+                      {parseAddress(item?.address, 16)}
+                    </Cell>
+                    <Cell hotContracts justifyContent={'flex-end'}>
+                      {parseAddress(item?.ownerAddress, 16)}
+                    </Cell>
+                    <Cell hotContracts justifyContent={'flex-end'}>
+                      {item?.count}
+                    </Cell>
+                  </Row>
+                ),
+              )}
             </tbody>
           </Table>
         </TableContainer>

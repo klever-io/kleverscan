@@ -56,7 +56,7 @@ export const HeaderItem = styled.th<{
   color: ${({ theme }) => theme.black};
   text-align: left;
 
-  padding: ${props => (!props.hotContracts ? '4px 16px' : '4px 1px')};
+  padding: ${props => (!props.hotContracts ? '4px 16px' : '4px 14px')};
   width: 100%;
 
   &:first-child {
@@ -64,8 +64,13 @@ export const HeaderItem = styled.th<{
     width: 60px;
   }
 
+  &:nth-child(3) {
+    width: ${props => props.hotContracts && '50%'};
+    text-align: ${props => props.hotContracts && 'right'};
+  }
+
   &:last-child {
-    width: 50%;
+    width: ${props => (props.hotContracts ? '40%' : '50%')};
   }
 `;
 
@@ -123,22 +128,5 @@ export const TitleContainer = styled.div`
     font-size: 14px;
     line-height: 16px;
     color: ${({ theme }) => theme.violet};
-  }
-`;
-
-export const HeaderItemHotContractsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-
-  div:first-child {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-  }
-
-  div:last-child {
-    display: flex;
-    flex-direction: row;
   }
 `;

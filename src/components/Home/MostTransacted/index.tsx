@@ -3,7 +3,6 @@ import { useHomeData } from '@/contexts/mainPage';
 import {
   Cell,
   HeaderItem,
-  HeaderItemHotContractsContainer,
   MostTransactedLink,
   Row,
   SectionContainer,
@@ -44,7 +43,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
     {
       title: 'Hot Contracts',
       data: hotContracts,
-      header: ['#', 'Contract Adress', 'Owner', 'Transactions'],
+      header: ['Rank', 'Contract Adress', 'Owner', 'Transactions'],
     },
   ];
 
@@ -70,21 +69,14 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
           <Table>
             <thead>
               <Row>
-                {table.title !== 'Hot Contracts' ? (
-                  table.header.map((item, index: number) => (
+                {table.header.map((item, index: number) =>
+                  table.title !== 'Hot Contracts' ? (
                     <HeaderItem key={index}>{item}</HeaderItem>
-                  ))
-                ) : (
-                  <HeaderItemHotContractsContainer>
-                    <div>
-                      <HeaderItem hotContracts>Rank</HeaderItem>
-                      <HeaderItem hotContracts>Contract Address</HeaderItem>
-                    </div>
-                    <div>
-                      <HeaderItem>Owner</HeaderItem>
-                      <HeaderItem>Transactions</HeaderItem>
-                    </div>
-                  </HeaderItemHotContractsContainer>
+                  ) : (
+                    <HeaderItem hotContracts={true} key={index}>
+                      {item}
+                    </HeaderItem>
+                  ),
                 )}
               </Row>
             </thead>

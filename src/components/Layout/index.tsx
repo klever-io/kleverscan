@@ -4,7 +4,7 @@ import { LayoutContainer, Main } from '@/views/home';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
-import Banner from '../Banner';
+// import Banner from '../Banner';
 import Footer from '../Footer';
 import { MobileNavBar } from '../Footer/MobileNavBar';
 import Navbar from '../Header';
@@ -53,7 +53,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
       </Head>
 
       <Navbar />
-      <Banner />
+      {/* <Banner /> */}
       <Main>{children}</Main>
 
       <Footer />

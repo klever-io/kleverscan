@@ -14,7 +14,6 @@ import {
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
 import { IProposal, MostTransferredToken } from '@/types/proposals';
-import { HotContracts } from '@/types/smart-contract';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 import { toLocaleFixed } from '@/utils/formatFunctions';
@@ -627,7 +626,7 @@ const homeMostTransactedKDAFee = async (): Promise<
 };
 
 const homeHotContracts = async (): Promise<
-  { hotContracts: HotContracts[] } | undefined
+  { hotContracts: MostTransferredToken[] } | undefined
 > => {
   try {
     const hotContractsRes = await api.get({

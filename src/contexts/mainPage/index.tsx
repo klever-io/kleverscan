@@ -16,7 +16,6 @@ import {
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IProposal, MostTransferredToken } from '@/types/proposals';
-import { HotContracts } from '@/types/smart-contract';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
 
@@ -47,8 +46,8 @@ export interface IHomeData {
   mostTransactedTokens: MostTransferredToken[];
   mostTransactedNFTs: MostTransferredToken[];
   mostTransactedKDAFee: MostTransferredToken[];
+  hotContracts: MostTransferredToken[];
   epoch?: number;
-  hotContracts: HotContracts[];
 }
 
 export const HomeData = createContext({} as IHomeData);

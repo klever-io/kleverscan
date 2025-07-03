@@ -170,10 +170,13 @@ const AccountSelect: React.FC<PropsWithChildren> = () => {
 };
 
 const MultiSigSelect: React.FC<PropsWithChildren> = () => {
-  const { isMultisig, signTxMultiSign } = useContract();
+  const { isMultisig, signTxMultiSign, downloadJSON } = useContract();
 
   const [multiSig, setMultiSig] = useState<boolean>(isMultisig.current);
   const [signTx, setSignTx] = useState<boolean>(isMultisig.current);
+  const [downloadJSONState, setDownloadJSON] = useState<boolean>(
+    downloadJSON.current,
+  );
 
   return (
     <>
@@ -224,6 +227,27 @@ const MultiSigSelect: React.FC<PropsWithChildren> = () => {
                     }}
                   />
                   <Slider active={String(signTx)} />
+                </Toggle>
+                Yes
+              </ToggleContainer>
+            </FieldContainer>
+            <FieldContainer>
+              <InputLabel>
+                <span>Download JSON instead of using multisign service?</span>
+              </InputLabel>
+              <ToggleContainer>
+                No
+                <Toggle>
+                  <StyledInput
+                    type="checkbox"
+                    defaultChecked={false}
+                    value={String(downloadJSON.current)}
+                    onClick={() => {
+                      downloadJSON.current = !downloadJSON.current;
+                      setDownloadJSON(downloadJSON.current);
+                    }}
+                  />
+                  <Slider active={String(downloadJSONState)} />
                 </Toggle>
                 Yes
               </ToggleContainer>

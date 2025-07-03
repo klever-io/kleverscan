@@ -22,7 +22,7 @@ import { ITransaction, web } from '@klever/sdk-web';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { IMultisignData } from '.';
+import { IMultisignData, IMultisignRawData } from '.';
 import {
   ButtonContainer,
   ButtonsContainerApi,
@@ -56,6 +56,7 @@ interface IMultisignOverview {
 interface IMultisignButtons {
   setSignBcastTransaction: React.Dispatch<React.SetStateAction<boolean>>;
   multiSignData: IMultisignData;
+  multiSignDataRef: IMultisignData[];
   setTxHash: React.Dispatch<React.SetStateAction<string | null>>;
   draggingOverlayCount: number;
   setDragginOverlayCount: React.Dispatch<React.SetStateAction<number>>;
@@ -89,12 +90,13 @@ const processFile = (
   event: any,
   isDrop: boolean,
   setSelectedHash: React.Dispatch<React.SetStateAction<string>>,
+  multiSignDataRef?: IMultisignData[],
 ) => {
   preventEvent(event);
 
   const files = isDrop ? event.dataTransfer.files : event.target.files;
 
-  readFile(files, setSelectedHash);
+  readFile(files, setSelectedHash, multiSignDataRef);
 };
 
 const handleDragEnter = (
@@ -126,6 +128,7 @@ const handleDragLeave = (
 const handleDecodeRequest = async (
   value: string,
   setSelectedHash: React.Dispatch<React.SetStateAction<string>>,
+  multiSignDataRef?: IMultisignData[],
 ) => {
   const parsedValue = JSON.parse(value);
   try {
@@ -135,7 +138,20 @@ const handleDecodeRequest = async (
       service: Service.NODE,
     });
     if (!res.error) {
-      setSelectedHash(res.data.tx.hash);
+      const tx = res.data.tx;
+      setSelectedHash(tx.hash);
+      multiSignDataRef &&
+        multiSignDataRef.push({
+          decodedTx: tx,
+          raw: parsedValue as unknown as IMultisignRawData,
+          hash: tx.hash,
+          address: tx.sender,
+          signers: [],
+          Threshold: 0,
+          error: null,
+          fromJSON: true,
+        });
+
       toast.success('Decode successful!');
     }
   } catch (e) {
@@ -166,6 +182,7 @@ const validateJson = (jsonFile: string) => {
 const readFile = (
   files: FileList,
   setSelectedHash: React.Dispatch<React.SetStateAction<string>>,
+  multiSignDataRef?: IMultisignData[],
 ) => {
   if (files && files.length > 0) {
     const file = files[0];
@@ -186,7 +203,7 @@ const readFile = (
       if (!validation) {
         toast.error('The JSON data is malformed or incorrect');
       } else {
-        handleDecodeRequest(result, setSelectedHash);
+        handleDecodeRequest(result, setSelectedHash, multiSignDataRef);
       }
     };
     reader.readAsText(file);
@@ -291,7 +308,8 @@ export const OverviewInfo: React.FC<PropsWithChildren<IMultisignOverview>> = ({
       kda: multiSignData?.decodedTx?.kdaFee?.kda || 'KLV',
     },
     signature: multiSignData?.raw?.Signature,
-    ThresholdComponent,
+    ThresholdComponent:
+      multisignTotalWeight > 0 ? ThresholdComponent : undefined,
     precisionTransaction: precision,
     loading: loading,
     MultiSignList: () => <MultiSignList {...multiSignListProps} />,
@@ -342,6 +360,7 @@ export const ButtonsComponent: React.FC<
   draggingOverlayCount,
   setDragginOverlayCount,
   setSelectedHash,
+  multiSignDataRef,
   refetchMultisignData,
 }) => {
   const multisignTotalWeight =
@@ -363,20 +382,36 @@ export const ButtonsComponent: React.FC<
           raw: parsedWithSignatures,
         };
 
-        const multiSignRes: any = await api.post({
-          route: 'transaction',
-          service: Service.MULTISIGN,
-          body: parseMultisignTransaction,
-        });
+        if (multiSignData?.fromJSON) {
+          const decodedTxRes = await api.post({
+            route: 'transaction/decode',
+            body: parsedWithSignatures,
+            service: Service.NODE,
+          });
 
-        if (multiSignRes.error) {
-          toast.error(multiSignData?.error);
-          return;
+          multiSignDataRef.map((data: IMultisignData) => {
+            if (data.hash === multiSignData?.hash) {
+              data.raw = parsedWithSignatures as unknown as IMultisignRawData;
+              data.decodedTx = decodedTxRes.data.tx;
+            }
+            return data;
+          });
+        } else {
+          const multiSignRes: any = await api.post({
+            route: 'transaction',
+            service: Service.MULTISIGN,
+            body: parseMultisignTransaction,
+          });
+
+          if (multiSignRes.error) {
+            toast.error(multiSignData?.error);
+            return;
+          }
+
+          refetchMultisignData();
         }
 
         toast.success('Transaction signed successfully');
-
-        refetchMultisignData();
       }
     } catch (error) {
       toast.error('Something went wrong, please try again');
@@ -389,13 +424,20 @@ export const ButtonsComponent: React.FC<
     setSignBcastTransaction(true);
     try {
       if (multiSignData?.raw) {
-        const multiSignRes = await api.post({
-          route: `broadcast/${multiSignData.hash}`,
-          service: Service.MULTISIGN,
-        });
+        let broadcastRes;
+        if (multiSignData?.fromJSON) {
+          broadcastRes = await web.broadcastTransactions([
+            multiSignData?.raw as ITransaction,
+          ]);
+        } else {
+          broadcastRes = await api.post({
+            route: `broadcast/${multiSignData.hash}`,
+            service: Service.MULTISIGN,
+          });
+        }
 
-        if (multiSignRes.error) {
-          toast.error(multiSignRes.error);
+        if (broadcastRes.error) {
+          toast.error(broadcastRes.error);
           return;
         }
         toast.success('Transaction broadcast successfully');
@@ -428,27 +470,35 @@ export const ButtonsComponent: React.FC<
   return (
     <>
       <ButtonsContainerApi>
+        {multiSignData.hash && (
+          <ButtonContainer>
+            <MultisignButton onClick={handleSign} type="button">
+              Sign Transaction
+            </MultisignButton>
+            <MultisignButton
+              onClick={handleBroadcast}
+              disabled={multisignTotalWeight < (multiSignData?.Threshold ?? 0)}
+              type="button"
+            >
+              Broadcast Transaction
+            </MultisignButton>
+          </ButtonContainer>
+        )}
         <ButtonContainer>
-          <MultisignButton onClick={handleSign} type="button">
-            Sign Transaction
-          </MultisignButton>
-          <MultisignButton
-            onClick={handleBroadcast}
-            disabled={multisignTotalWeight < (multiSignData?.Threshold ?? 0)}
-            type="button"
-          >
-            Broadcast Transaction
-          </MultisignButton>
-        </ButtonContainer>
-        <ButtonContainer>
-          <MultisignButton isJsonButton type="button" onClick={handleDownload}>
-            Download JSON file
-          </MultisignButton>
+          {multiSignData.hash && (
+            <MultisignButton
+              isJsonButton
+              type="button"
+              onClick={handleDownload}
+            >
+              Download JSON file
+            </MultisignButton>
+          )}
           <DragContainer
             onDragOver={preventEvent}
             onDrop={(event: any) => processFile(event, true, setSelectedHash)}
             onChange={(event: any) =>
-              processFile(event, false, setSelectedHash)
+              processFile(event, false, setSelectedHash, multiSignDataRef)
             }
             onDragEnter={event => {
               handleDragEnter(

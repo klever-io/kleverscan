@@ -28,7 +28,8 @@ interface IMultisignSigenrers {
   signed: boolean;
 }
 
-interface IMultisignRawData extends Omit<ITransaction, 'RawData.PermissionID'> {
+export interface IMultisignRawData
+  extends Omit<ITransaction, 'RawData.PermissionID'> {
   hash: string;
 }
 export interface IMultisignData {
@@ -39,6 +40,7 @@ export interface IMultisignData {
   raw: IMultisignRawData;
   decodedTx: ITransactionDecoded;
   error?: any;
+  fromJSON?: boolean;
 }
 
 const MultisignComponent: React.FC<{
@@ -107,6 +109,7 @@ const MultisignComponent: React.FC<{
         multiSignData[0]),
       decodedTx: decodedData,
     },
+    multiSignDataRef: multiSignData,
     refetchMultisignData,
     setTxHash,
     draggingOverlayCount,
@@ -152,10 +155,10 @@ const MultisignComponent: React.FC<{
           window.document.body,
         )}
       <RenderMultisignComponent />
-      {!!walletAddress && multiSignData.length ? (
+      {!!walletAddress ? (
         <>
           <ButtonsComponent {...buttonsProps} />
-          <DecodedRawData {...decodedRawProps} />
+          {selectedHash && <DecodedRawData {...decodedRawProps} />}
         </>
       ) : null}
     </Content>

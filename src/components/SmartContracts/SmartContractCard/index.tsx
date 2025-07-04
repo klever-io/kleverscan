@@ -54,14 +54,14 @@ const SmartContractCard = ({
             <span>{parseAddress(deployer, 12)}</span>
           </SmartContractDataCardInfoColumn>
           <SmartContractDataCardInfoColumn>
-            <span>{t('smartContracts:Cards.Deploy Hash')}</span>
+            <span>{t('smartContracts:Cards.Deployer Hash')}</span>
             <span>{parseAddress(deployTxHash, 12)}</span>
           </SmartContractDataCardInfoColumn>
         </SmartContractDataCardInfo>
         <SmartContractDataCardInfo>
           <SmartContractDataCardInfoColumn>
             <span>{t('smartContracts:Cards.Total Transactions')}</span>
-            <span>{totalTransactions}</span>
+            <span>{totalTransactions || 0}</span>
           </SmartContractDataCardInfoColumn>
         </SmartContractDataCardInfo>
       </SmartContractDataCard>

@@ -43,7 +43,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
     {
       title: 'Hot Contracts',
       data: hotContracts,
-      header: ['Rank', 'Contract Adress', 'Owner', 'Transactions'],
+      header: ['Rank', 'Contract Address', 'Owner', 'Transactions'],
     },
   ];
 

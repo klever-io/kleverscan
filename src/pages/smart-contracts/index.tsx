@@ -58,7 +58,6 @@ export const getServerSideProps: GetServerSideProps = async ({
     nextI18nextConfig,
     ['en'],
   );
-
   return { props };
 };
 

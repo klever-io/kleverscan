@@ -11,16 +11,13 @@ import { Search } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import api from '@/services/api';
 import Table, { ITable } from '@/components/Table';
-import {
-  CardsTitleWrapper,
-  CellTableContractName,
-  CellTableContractNameWrapper,
-  InputContractContainer,
-} from './styles';
+import { CardsTitleWrapper, InputContractContainer } from './styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { parseAddress } from '@/utils/parseValues';
 import { Cell } from '@/components/Home/MostTransacted/styles';
 import { formatDate } from '@/utils/formatFunctions';
+import Link from 'next/link';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 
 const smartContractsListRowSections = (
   smartContracts: SmartContractsList,
@@ -38,53 +35,55 @@ const smartContractsListRowSections = (
   return [
     {
       element: props => (
-        <CellTableContractNameWrapper>
-          <CellTableContractName>
-            {name || '- -'}
-            <small
-              style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
-            >
-              {parseAddress(contractAddress, 25)}
-              <Copy data={contractAddress} info="contractAddress" />
-            </small>
-          </CellTableContractName>
-        </CellTableContractNameWrapper>
+        <DoubleRow>
+          <CenteredRow>
+            <span>{name || '- -'}</span>
+          </CenteredRow>
+          <CenteredRow>
+            <Link href={''}>
+              <Mono>{parseAddress(contractAddress, 25)}</Mono>
+            </Link>
+            <Copy data={contractAddress} info="contractAddress" />
+          </CenteredRow>
+        </DoubleRow>
       ),
-      span: 1,
-    },
-
-    {
-      element: props => <Cell>{totalTransactions || '- -'}</Cell>,
-      span: 1,
+      span: 2,
     },
 
     {
       element: props => (
-        <Cell>
-          <small style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            {parseAddress(deployer, 25)}
-            <Copy data={deployer} info="deployer" />
-          </small>
-        </Cell>
+        <CenteredRow>
+          <span>{totalTransactions || '- -'}</span>
+        </CenteredRow>
       ),
       span: 1,
     },
 
     {
       element: props => (
-        <Cell
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            flexDirection: 'column',
-          }}
-        >
-          <small style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            {parseAddress(deployTxHash, 25)}
+        <CenteredRow>
+          <Link href={''}>
+            <Mono>{parseAddress(deployer, 25)}</Mono>
+          </Link>
+          <Copy data={deployer} info="deployer" />
+        </CenteredRow>
+      ),
+      span: 1,
+    },
+
+    {
+      element: props => (
+        <DoubleRow>
+          <CenteredRow>
+            <Link href={''}>
+              <Mono>{parseAddress(deployTxHash, 25)}</Mono>
+            </Link>
             <Copy data={deployTxHash} info="deployTxHash" />
-          </small>
-          {formatDate(timestamp)}
-        </Cell>
+          </CenteredRow>
+          <CenteredRow>
+            <span>{formatDate(timestamp)}</span>
+          </CenteredRow>
+        </DoubleRow>
       ),
       span: 1,
     },

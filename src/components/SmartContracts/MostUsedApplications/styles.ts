@@ -21,6 +21,12 @@ export const CardsTitleWrapper = styled.div`
   }
 `;
 
+export const CarouselContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+`;
+
 export const CardsContainerWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -28,8 +34,8 @@ export const CardsContainerWrapper = styled.div`
   width: 100%;
   height: 100%;
   padding: 16px;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  overflow-x: auto;
+  scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
     height: 6px;

@@ -472,7 +472,7 @@ export const smartContractsTableHeaders = [
   'Contract',
   'Total Transactions',
   'Deployer',
-  'Deploy Hash',
+  'Deploy Hash / Time',
 ];
 
 export enum contractTableHeaders {

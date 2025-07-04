@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   CardContainer,
   CardContractInfo,
@@ -6,15 +6,35 @@ import {
   CardHeader,
   CardsContainerWrapper,
   CardsTitleWrapper,
+  CarouselContainer,
 } from './styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { useSmartContractData } from '@/contexts/smartContractPage';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft, ArrowRight } from '@/assets/pagination';
+import { ArrowContainer } from '@/components/Pagination/styles';
 
 const MostUsedApplications = () => {
   const { t } = useTranslation(['smartContracts']);
   const { smartContractsStatistic } = useSmartContractData();
+
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const goToPrevious = (event: any) => {
+    event.preventDefault();
+    if (carouselRef.current) {
+      carouselRef.current.scrollLeft -= carouselRef.current.offsetWidth;
+    }
+  };
+
+  const goToNext = (event: any) => {
+    event.preventDefault();
+    if (carouselRef.current) {
+      carouselRef.current.scrollLeft += carouselRef.current.offsetWidth;
+    }
+  };
+
   return (
     <>
       <CardsTitleWrapper>
@@ -22,28 +42,38 @@ const MostUsedApplications = () => {
         <span>{t('smartContracts:Titles.Daily')}</span>
       </CardsTitleWrapper>
 
-      <CardsContainerWrapper>
-        {smartContractsStatistic?.map((app, index) => (
-          <CardContainer key={app.address || index}>
-            <CardHeader>
-              <h4>#{index + 1}</h4>
-              <CardContractInfo>
-                <span>{t('smartContracts:Titles.Transactions')}</span>
-                <span>{app?.count}</span>
-              </CardContractInfo>
-            </CardHeader>
-            <CardContractName>
-              <AssetLogo
-                logo={'/assets/klv-logo.png?w=1920'}
-                ticker={'KLV'}
-                name={'KLV'}
-              />
-              <span>{app.name || 'Contract Name'}</span>
-              <small>{parseAddress(app.ownerAddress, 25)}</small>
-            </CardContractName>
-          </CardContainer>
-        ))}
-      </CardsContainerWrapper>
+      <CarouselContainer>
+        <ArrowContainer onClick={goToPrevious} active={true}>
+          <ArrowLeft />
+        </ArrowContainer>
+
+        <CardsContainerWrapper ref={carouselRef}>
+          {smartContractsStatistic?.map((app, index) => (
+            <CardContainer key={app.address || index}>
+              <CardHeader>
+                <h4>#{index + 1}</h4>
+                <CardContractInfo>
+                  <span>{t('smartContracts:Titles.Transactions')}</span>
+                  <span>{app?.count}</span>
+                </CardContractInfo>
+              </CardHeader>
+              <CardContractName>
+                <AssetLogo
+                  logo={'/assets/klv-logo.png?w=1920'}
+                  ticker={'KLV'}
+                  name={'KLV'}
+                />
+                <span>{app.name || 'Contract Name'}</span>
+                <small>{parseAddress(app.ownerAddress, 25)}</small>
+              </CardContractName>
+            </CardContainer>
+          ))}
+        </CardsContainerWrapper>
+
+        <ArrowContainer onClick={goToNext} active={true}>
+          <ArrowRight />
+        </ArrowContainer>
+      </CarouselContainer>
     </>
   );
 };

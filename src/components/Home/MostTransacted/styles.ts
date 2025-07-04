@@ -128,5 +128,9 @@ export const TitleContainer = styled.div`
     font-size: 14px;
     line-height: 16px;
     color: ${({ theme }) => theme.violet};
+
+    span:hover {
+      color: ${({ theme }) => theme.true.white};
+    }
   }
 `;

@@ -620,3 +620,28 @@ export const ButtonVote = styled.button<{
     max-width: 100%;
   }
 `;
+
+export const SponsoredContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 20px 0 20px 0;
+  gap: 8px;
+
+  span {
+    font-family: 'Manrope';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #c6c7eb;
+  }
+`;
+
+export const SponsoredTitleSection = styled.div`
+  width: 100%;
+  height: 44px;
+  border-radius: 200px;
+  padding: 10px 12px;
+  gap: 8px;
+  background-color: #1f1f24;
+`;

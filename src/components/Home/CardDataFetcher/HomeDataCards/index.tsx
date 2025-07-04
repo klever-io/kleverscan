@@ -31,7 +31,7 @@ const icons = [
   ['/homeCards/tpsIcon.svg', '/homeCards/tpsBackground.svg'],
 ];
 
-const DefaultCards: React.FC<PropsWithChildren<{ index: number }>> = ({
+export const DefaultCards: React.FC<PropsWithChildren<{ index: number }>> = ({
   index,
 }) => {
   return (

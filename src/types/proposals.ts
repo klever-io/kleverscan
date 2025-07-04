@@ -260,4 +260,8 @@ export interface MostTransferredToken {
   doc_count: number;
   key: string;
   logo: string;
+  name: string;
+  address: string;
+  ownerAddress: string;
+  count: number;
 }

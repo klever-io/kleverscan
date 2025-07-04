@@ -44,8 +44,8 @@ const navbarItems: INavbarItem[] = [
     Icon: Graph,
   },
   {
-    name: 'Validators',
-    pathTo: '/validators',
+    name: 'Smart Contracts',
+    pathTo: '/smart-contracts',
     Icon: TickSquare,
   },
   {
@@ -58,6 +58,11 @@ const navbarItems: INavbarItem[] = [
       //   pathTo: '/nodes',
       //   Icon: Compass,
       // },
+      {
+        name: 'Validators',
+        pathTo: '/validators',
+        Icon: TickSquare,
+      },
       {
         name: 'Proposals',
         pathTo: '/proposals',

@@ -16,6 +16,7 @@ const theme = {
   gray900: '#181818',
   gray800: '#848495',
   gray700: '#aaaaaa',
+  gray600: '#b7bdc6',
   black2: 'rgba(0, 0, 0, 0.02)',
   black10: 'rgba(0, 0, 0, 0.1)',
   black20: 'rgba(0, 0, 0, 0.2)',
@@ -35,6 +36,7 @@ const theme = {
   darkBlue300: '#181818',
   blue: '#151515',
 
+  darkCard: '#0b0b10',
   darkText: '#515395',
   secondaryText: '#595C98',
   shadow: '#DDDEE7',

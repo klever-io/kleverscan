@@ -64,6 +64,7 @@ export interface IContractContext {
   txHash: string | null;
   showPayload: React.MutableRefObject<boolean>;
   isMultisig: React.MutableRefObject<boolean>;
+  downloadJSON: React.MutableRefObject<boolean>;
   signTxMultiSign: React.MutableRefObject<boolean>;
   payload: any;
   contractOptions: IContractOption[];
@@ -102,6 +103,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const showPayload = useRef(false);
   const isMultisig = useRef(false);
+  const downloadJSON = useRef(false);
   const signTxMultiSign = useRef(false);
   const formsData = useRef<IFormPayload[]>([] as IFormPayload[]);
   const ignoreCheckAmount = useRef(false);
@@ -463,19 +465,43 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
           };
         }
 
-        const multiSignRes: any = await api.post({
-          route: 'transaction',
-          service: Service.MULTISIGN,
-          body: parseMultisignTransaction,
-        });
+        if (downloadJSON.current === true) {
+          const formattedRawData = {
+            RawData: {
+              ...parseMultisignTransaction.raw.rawData,
+            },
+            Signature: parseMultisignTransaction.raw.Signature,
+          };
 
-        if (multiSignRes.error) {
-          toast.error('Something went wrong, please try again');
-          return;
+          const blob = new Blob([JSON.stringify(formattedRawData, null, 2)], {
+            type: 'application/json',
+          });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `multisign-${parseMultisignTransaction.hash}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          setTxLoading(false);
+          toast.success('Transaction built and saved');
+        } else if (downloadJSON.current === false) {
+          const multiSignRes: any = await api.post({
+            route: 'transaction',
+            service: Service.MULTISIGN,
+            body: parseMultisignTransaction,
+          });
+
+          if (multiSignRes.error) {
+            toast.error('Something went wrong, please try again');
+            return;
+          }
+
+          setTxLoading(false);
+          toast.success('Transaction built and signed');
         }
-
-        setTxLoading(false);
-        toast.success('Transaction built and signed');
       } else {
         const signedTx = await window.kleverWeb.signTransaction(
           unsignedTx.result,
@@ -581,6 +607,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
     getKAssets,
     showPayload,
     isMultisig,
+    downloadJSON,
     signTxMultiSign,
     contractOptions,
     setContractOptions,

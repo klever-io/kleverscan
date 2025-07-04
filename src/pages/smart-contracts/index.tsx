@@ -11,7 +11,7 @@ import Title from '@/components/Layout/Title';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 import { SmartContractDataProvider } from '@/contexts/smartContractPage';
 import { ChartDailyTransactions } from '@/components/Home/HomeTransactions/ChartDailyTransactions';
 import { DataCardsContainer } from '@/views/home';

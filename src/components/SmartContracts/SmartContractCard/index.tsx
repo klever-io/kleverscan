@@ -10,7 +10,7 @@ import {
 import { formatDate } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Copy from '@/components/Copy';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 interface SmartContractCardProps {
   name: string;

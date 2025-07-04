@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import {
   CardContainer,
   CardContractInfo,
@@ -11,12 +11,12 @@ import {
 import AssetLogo from '@/components/Logo/AssetLogo';
 import { useSmartContractData } from '@/contexts/smartContractPage';
 import { parseAddress } from '@/utils/parseValues';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 import { ArrowLeft, ArrowRight } from '@/assets/pagination';
 import { ArrowContainer } from '@/components/Pagination/styles';
 
 const MostUsedApplications = () => {
-  const { t } = useTranslation(['smartContracts']);
+  const { t } = useTranslation('smartContracts');
   const { smartContractsStatistic } = useSmartContractData();
 
   const carouselRef = useRef<HTMLDivElement>(null);

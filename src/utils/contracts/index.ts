@@ -468,6 +468,13 @@ export const transactionTableHeaders = [
   'Misc',
 ];
 
+export const smartContractsTableHeaders = [
+  'Contract',
+  'Total Transactions',
+  'Deployer',
+  'Deploy Hash / Time',
+];
+
 export enum contractTableHeaders {
   'Asset Id',
   'Amount',

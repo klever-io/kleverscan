@@ -11,6 +11,7 @@ import {
   homeProposalsCall,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
+  homeHotContracts,
 } from '@/services/requests/home';
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
@@ -45,6 +46,7 @@ export interface IHomeData {
   mostTransactedTokens: MostTransferredToken[];
   mostTransactedNFTs: MostTransferredToken[];
   mostTransactedKDAFee: MostTransferredToken[];
+  hotContracts: MostTransferredToken[];
   epoch?: number;
 }
 
@@ -65,6 +67,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     mostTransactedTokens,
     mostTransactedNFTs,
     mostTransactedKDAFee,
+    hotContracts,
   ] = useQueries([
     {
       queryKey: 'aggregateData',
@@ -121,6 +124,11 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
       queryFn: homeMostTransactedKDAFee,
       refetchInterval: watcherTimeout,
     },
+    {
+      queryKey: 'hotContracts',
+      queryFn: homeHotContracts,
+      refetchInterval: watcherTimeout,
+    },
   ]);
 
   const prevValuesRef = useRef({
@@ -169,6 +177,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     mostTransactedNFTs: mostTransactedNFTs.data || [],
     mostTransactedKDAFee: mostTransactedKDAFee.data || [],
     epoch: aggregateResult.data?.overview?.epochNumber,
+    hotContracts: hotContracts.data?.hotContracts || [],
   };
 
   prevValuesRef.current = {

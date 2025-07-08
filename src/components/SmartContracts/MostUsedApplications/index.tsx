@@ -8,7 +8,6 @@ import {
   CardsTitleWrapper,
   CarouselContainer,
 } from './styles';
-import AssetLogo from '@/components/Logo/AssetLogo';
 import { useSmartContractData } from '@/contexts/smartContractPage';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
@@ -58,12 +57,7 @@ const MostUsedApplications = () => {
                 </CardContractInfo>
               </CardHeader>
               <CardContractName>
-                <AssetLogo
-                  logo={'/assets/klv-logo.png?w=1920'}
-                  ticker={'KLV'}
-                  name={'KLV'}
-                />
-                <span>{app.name || 'Contract Name'}</span>
+                <span>{app.name || '- -'}</span>
                 <small>{parseAddress(app.ownerAddress, 25)}</small>
               </CardContractName>
             </CardContainer>

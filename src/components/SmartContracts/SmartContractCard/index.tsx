@@ -1,4 +1,3 @@
-import AssetLogo from '@/components/Logo/AssetLogo';
 import {
   SmartContractDataCard,
   SmartContractDataCardHeader,
@@ -35,11 +34,6 @@ const SmartContractCard = ({
       <SmartContractDataCard>
         <SmartContractDataCardHeader>
           <SmartContractDataCardHeaderItem>
-            <AssetLogo
-              logo={'/assets/klv-logo.png?w=1920'}
-              ticker={'KLV'}
-              name={name}
-            />
             <span>{name || '- -'}</span>
           </SmartContractDataCardHeaderItem>
           <span>{formatDate(timestamp)}</span>

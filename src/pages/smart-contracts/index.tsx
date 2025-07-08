@@ -29,10 +29,10 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
           <Title title={t('common:Titles.Smart Contracts')} Icon={Icon} />
         </Header>
         <SponsoredContainer>
-          <span>Sponsored:</span>
+          {/* <span>Sponsored:</span>
           <SponsoredTitleSection>
             <span>Next crypto project to explode on KleverChain</span>
-          </SponsoredTitleSection>
+          </SponsoredTitleSection> */}
         </SponsoredContainer>
         <div>
           <DataCardsContainer>

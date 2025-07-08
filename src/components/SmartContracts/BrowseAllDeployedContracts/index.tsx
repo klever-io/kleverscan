@@ -18,6 +18,11 @@ import { Cell } from '@/components/Home/MostTransacted/styles';
 import { formatDate } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
+import { NextRouter, useRouter } from 'next/router';
+
+interface IRequestQuery {
+  deployer?: string;
+}
 
 const smartContractsListRowSections = (
   smartContracts: SmartContractsList,
@@ -93,29 +98,32 @@ const smartContractsListRowSections = (
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const [search, setSearch] = useState<string>('');
   const [refreshKey, setRefreshKey] = useState<number>(0);
+  const router = useRouter();
 
-  const requestSmartContractsList = async (page: number, limit: number) => {
+  const requestSmartContractsList = async (
+    page: number,
+    limit: number,
+    router: NextRouter,
+    query?: IRequestQuery,
+  ) => {
     try {
-      const localQuery = { page, limit };
+      const localQuery: { [key: string]: any } = {
+        ...router.query,
+        page,
+        limit,
+      };
+      const searchTerm = search.toLowerCase();
+      if (searchTerm) {
+        query = { ...query, deployer: searchTerm };
+      }
       const smartContractsListRes = await api.get({
         route: 'sc/list',
-        query: localQuery,
+        query: query ?? localQuery,
       });
       if (!smartContractsListRes.error || smartContractsListRes.error === '') {
-        let smartContracts = smartContractsListRes.data.sc;
-
-        const searchTerm = search.toLowerCase();
-        smartContracts = smartContracts.filter(
-          (sc: SmartContractsList) =>
-            sc.contractAddress?.toLowerCase().includes(searchTerm) ||
-            sc.deployTxHash?.toLowerCase().includes(searchTerm) ||
-            sc.deployer?.toLowerCase().includes(searchTerm) ||
-            sc.name?.toLowerCase().includes(searchTerm),
-        );
-
         const data = {
           ...smartContractsListRes,
-          data: { smartContracts },
+          data: { smartContracts: smartContractsListRes.data.sc },
         };
         return data;
       } else {
@@ -131,7 +139,7 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
     type: 'smartContracts',
     header: smartContractsTableHeaders,
     rowSections: smartContractsListRowSections,
-    request: (page, limit) => requestSmartContractsList(page, limit),
+    request: (page, limit) => requestSmartContractsList(page, limit, router),
     dataName: 'smartContracts',
     showLimit: false,
   };
@@ -150,7 +158,7 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
       <InputContractContainer>
         <input
           type="text"
-          placeholder="Search for contract"
+          placeholder="Search for Deployed"
           value={search}
           onChange={handleSearchChange}
           aria-label="Search for Smart Contracts"

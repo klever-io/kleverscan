@@ -29,7 +29,13 @@ const TIME_SERIES_CHG_VALUE = {
   percent: '',
 };
 
-export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
+interface ChartDailyTransactionsProps extends PropsWithChildren {
+  smartContract?: boolean;
+}
+
+export const ChartDailyTransactions: React.FC<ChartDailyTransactionsProps> = ({
+  smartContract,
+}) => {
   const [isLoadingDailyTxs, setIsLoadingDailyTxs] = useState(false);
   const [filterPeriod, setFilterPeriod] = useState(16);
   const [transactionTimeSeriesChgValue, setTransactionTimeSeriesChgValue] =
@@ -48,6 +54,9 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
 
         const res = await api.get({
           route: `transaction/list/count/${filterPeriod * 2}`,
+          query: {
+            ...(smartContract ? { type: 63 } : {}),
+          },
         });
         if (res?.error?.length) return;
 

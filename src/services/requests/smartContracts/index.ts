@@ -64,6 +64,20 @@ const smartContractTotalTransactionsListCall = async () => {
   }
 };
 
+const scInvokesTotalRecordsCall = async (address: string) => {
+  try {
+    const res = await api.get({
+      route: `sc/invokes/${address}`,
+    });
+
+    if (!res.error || res.error === '') {
+      return res.pagination.totalRecords;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const smartContractsBeforeYesterdayTransactionsCall = async (): Promise<
   { newTransactions: number; beforeYesterdayTxs: number } | undefined
 > => {
@@ -95,5 +109,6 @@ export {
   smartContractsStatisticCall,
   smartContractsTotalContractsCall,
   smartContractTotalTransactionsListCall,
+  scInvokesTotalRecordsCall,
   smartContractsBeforeYesterdayTransactionsCall,
 };

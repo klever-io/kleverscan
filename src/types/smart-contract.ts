@@ -14,3 +14,19 @@ export interface SmartContractsList {
   totalTransactions: number;
   contractAddress: string;
 }
+
+export interface InvokesList {
+  hash: string;
+  blockNumber: number;
+  sender: string;
+  nonce: number;
+  timestamp: number;
+  kAppFee: number;
+  bandwidthFee: number;
+  status: string;
+  resultCode: string;
+  version: number;
+  chainID: string;
+  signature: string[] | [];
+  searchOrder: number;
+}

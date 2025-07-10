@@ -15,6 +15,8 @@ import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
 import { PurpleArrowRight } from '@/assets/icons';
 import { parseAddress } from '@/utils/parseValues';
+import { getNetwork } from '@/utils/networkFunctions';
+const network = getNetwork();
 
 const MostTransacted: React.FC<PropsWithChildren> = () => {
   const {
@@ -40,15 +42,19 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
       data: mostTransactedKDAFee,
       header: ['Rank', 'Token', 'Total Txn'],
     },
-    {
-      title: 'Hot Contracts',
-      data: hotContracts,
-      header: ['Rank', 'Contract Address', 'Owner', 'Transactions'],
-    },
+    ...(network === 'Devnet'
+      ? [
+          {
+            title: 'Hot Contracts',
+            data: hotContracts,
+            header: ['Rank', 'Contract Address', 'Owner', 'Transactions'],
+          },
+        ]
+      : []),
   ];
 
   return (
-    <SectionContainer>
+    <SectionContainer network={network}>
       {tables.map((table, index) => (
         <TableContainer key={index}>
           {table.title !== 'Hot Contracts' ? (

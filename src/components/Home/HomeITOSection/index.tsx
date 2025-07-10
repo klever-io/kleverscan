@@ -75,7 +75,8 @@ export const HomeITOSection: React.FC<PropsWithChildren> = () => {
 
         <Table {...tableProps} />
       </TableContainer>
-      {ITO &&
+      {ITO?.packData &&
+        ITO.packData.length > 0 &&
         ReactDOM.createPortal(
           <ParticipateModal
             key={ITO.assetId}

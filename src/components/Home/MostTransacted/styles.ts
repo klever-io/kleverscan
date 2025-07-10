@@ -1,14 +1,17 @@
 import { TableGradientBorder } from '@/components/Table/styles';
 import styled from 'styled-components';
 
-export const SectionContainer = styled.div`
+export const SectionContainer = styled.div<{
+  network?: string;
+}>`
   display: flex;
   flex-direction: column;
   gap: 24px;
 
   @media (min-width: 768px) {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: ${props =>
+      props.network === 'Devnet' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'};
     /* gap: 16px; */
   }
 `;

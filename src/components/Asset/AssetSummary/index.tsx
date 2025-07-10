@@ -265,7 +265,8 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
           window.document.body,
         )}
 
-      {ITO &&
+      {ITO?.packData &&
+        ITO.packData.length > 0 &&
         ReactDOM.createPortal(
           <ParticipateModal
             isOpenParticipateModal={openParticipateModal}

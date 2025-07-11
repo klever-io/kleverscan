@@ -136,7 +136,12 @@ export const ButtonsComponent: React.FC<
   ) => {
     if (files && files.length > 0) {
       const file = files[0];
-      const fileExtension = /[^.]+$/.exec(file.name)![0];
+      const extensionMatch = /[^.]+$/.exec(file.name);
+      if (!extensionMatch) {
+        toast.error('Invalid file format.');
+        return;
+      }
+      const fileExtension = extensionMatch[0];
 
       if (fileExtension !== 'json') {
         toast.error('Invalid file format.');
@@ -272,7 +277,8 @@ export const ButtonsComponent: React.FC<
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${multiSignData?.address} - Nonce: ${multiSignData?.raw.RawData.Nonce}.json`;
+    link.download = `${multiSignData?.address} - Nonce: ${multiSignData?.raw?.RawData?.Nonce ?? 'unknown'}.json`;
+
     link.click();
     window.URL.revokeObjectURL(url);
     toast.success(

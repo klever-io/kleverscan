@@ -441,7 +441,8 @@ const ITOsPage: React.FC<PropsWithChildren> = () => {
         <LaunchPadFAQ />
       </ITOContainer>
 
-      {ITO &&
+      {ITO?.packData &&
+        ITO.packData.length > 0 &&
         ReactDOM.createPortal(
           <ParticipateModal
             key={ITO.assetId}

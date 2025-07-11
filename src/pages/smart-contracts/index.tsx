@@ -52,6 +52,11 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
 export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return {
+      notFound: true,
+    };
+  }
   const props = await serverSideTranslations(
     locale,
     ['common', 'smartContracts'],

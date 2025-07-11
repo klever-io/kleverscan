@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { IMultisignData, IMultisignRawData } from '..';
 import { ITransaction, web } from '@klever/sdk-web';
-import { addNewSignatures } from '../components';
 import api from '@/services/api';
 import { Service } from '@/types';
 import { toast } from 'react-toastify';
@@ -37,6 +36,18 @@ export const ButtonsComponent: React.FC<
 }) => {
   const multisignTotalWeight =
     multiSignData?.signers?.filter(e => e.signed)?.length || 0;
+
+  const addNewSignatures = (
+    signedTx: ITransaction,
+    raw: ITransaction,
+  ): ITransaction => {
+    const JSONContractFile = raw;
+    if (JSONContractFile?.Signature?.[0]) {
+      JSONContractFile?.Signature.push(signedTx?.Signature[0]);
+      return JSONContractFile;
+    }
+    return signedTx;
+  };
 
   const handleDragEnter = (
     event: React.DragEvent<HTMLDivElement>,

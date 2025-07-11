@@ -14,11 +14,12 @@ import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useQuery } from 'react-query';
 import { Content } from '../styles';
-import { EmptyTransaction } from './components';
+
 import { MultiSignList } from './MultiSignList';
 import { DecodedRawData } from './DecodedRawData';
 import { OverviewInfo } from './OverviewInfo';
 import { ButtonsComponent } from './ButtonsComponent';
+import { EmptyTransaction } from './EmptyTransaction';
 
 interface IMultisignSigenrers {
   address: string;

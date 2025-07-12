@@ -7,6 +7,8 @@ import {
   CardHeader,
   CardHeaderItem,
   CardTabContainer,
+  CenteredRow,
+  Badge,
 } from '@/styles/common';
 import Title from '@/components/Layout/Title';
 import React, { useEffect, useRef, useState } from 'react';
@@ -20,97 +22,43 @@ import {
   DataCardValue,
 } from '@/views/home';
 import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
-import {
-  SmartContractDataProvider,
-  useSmartContractData,
-} from '@/contexts/smartContractPage';
-import Table, { ITable } from '@/components/Table';
-import { smartContractInvokesTransactionsTableHeaders } from '@/utils/contracts';
+import { useSmartContractData } from '@/contexts/smartContractPage';
 import api from '@/services/api';
-import { InvokesList } from '@/types/smart-contract';
-import { IRowSection } from '@/types';
+import { SmartContractData } from '@/types/smart-contract';
 import { parseAddress } from '@/utils/parseValues';
-import { formatDate } from '@/utils/formatFunctions';
-import { getAge } from '@/utils/timeFunctions';
-import { useTranslation } from 'next-i18next';
-import { fromUnixTime } from 'date-fns';
-
-const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
-  const { t: commonT } = useTranslation('common');
-  const {
-    hash,
-    blockNumber,
-    sender,
-    nonce,
-    timestamp,
-    kAppFee,
-    bandwidthFee,
-    status,
-    resultCode,
-    version,
-    chainID,
-    signature,
-  } = invokes;
-
-  return [
-    {
-      // tx hash
-      element: props => (
-        <Row>
-          <span>{parseAddress(hash, 12)}</span>
-        </Row>
-      ),
-      span: 1,
-    },
-    {
-      // age
-      element: props => (
-        <Row>
-          <span>{getAge(fromUnixTime(timestamp), commonT)}</span>
-        </Row>
-      ),
-      span: 1,
-    },
-    {
-      // from
-      element: props => (
-        <Row>
-          <span>{parseAddress(sender, 12)}</span>
-        </Row>
-      ),
-      span: 1,
-    },
-  ];
-};
+import Copy from '@/components/Copy';
+import SmartContractsTransactions from '@/components/SmartContracts/SmartContractsTransactions';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import nextI18nextConfig from '../../../next-i18next.config';
+import { WhiteTick, RedFailed } from '@/assets/icons';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
-  const tabHeaders = [
-    { label: 'Transactions', value: 'transactions' },
-    { label: 'Logs', value: 'logs' },
-  ];
+  const tabHeaders = [{ label: 'Transactions', value: 'transactions' }];
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
+  const [scData, setScData] = useState<SmartContractData>();
   const dataCardsRef = useRef<HTMLDivElement>(null);
+  const contractAddress = router.query.address as string;
 
   const { beforeYesterdayTransactions, smartContractsTotalTransactions } =
     useSmartContractData();
 
-  const requestInvokesList = async (page: number, limit: number) => {
+  const requestSmartContractData = async () => {
     try {
       const res = await api.get({
-        route: `sc/invokes/${router.query.address}`,
+        route: `sc/${contractAddress}`,
       });
 
       if (!res.error || res.error === '') {
         const data = {
           ...res,
-          data: { invokes: res.data.invokes },
+          data: { sc: res.data.sc },
         };
-        return data;
+        setScData(data.data.sc);
       }
     } catch (error) {
-      console.error('Error fetching invokes list:', error);
-      return [];
+      console.error('Error fetching smart contract data:', error);
     }
   };
 
@@ -124,33 +72,27 @@ const SmartContractInvoke: React.FC = () => {
   ];
 
   useEffect(() => {
+    requestSmartContractData();
     setSelectedTab(tabHeaders[0].label);
   }, []);
-
-  const tableProps: ITable = {
-    type: 'smartContractsInvokes',
-    header: smartContractInvokesTransactionsTableHeaders,
-    rowSections: invokesListRowSections,
-    request: (page, limit) => requestInvokesList(page, limit),
-    dataName: 'invokes',
-    showLimit: false,
-  };
 
   const SelectedComponent = () => {
     switch (selectedTab) {
       case 'Transactions':
-        return <Table {...tableProps} />;
-      case 'Logs':
-        return <h1 style={{ color: 'white' }}>FAço nada</h1>;
+        return <SmartContractsTransactions contractAddress={contractAddress} />;
       default:
         return <div />;
     }
   };
 
+  const formatKey = (str: string) => {
+    return str.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
+  };
+
   return (
     <Container>
       <Header>
-        <Title title={parseAddress(router.query.address, 25)} />
+        <Title title={parseAddress(contractAddress, 25)} />
       </Header>
       <CardContainer>
         <CardContent>
@@ -159,7 +101,10 @@ const SmartContractInvoke: React.FC = () => {
               <strong>Owner</strong>
             </span>
             <strong>
-              klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc
+              <CenteredRow>
+                {scData?.deployer}
+                <Copy data={scData?.deployer} info="Owner" />
+              </CenteredRow>
             </strong>
           </Row>
           <Row>
@@ -167,14 +112,27 @@ const SmartContractInvoke: React.FC = () => {
               <strong>Address</strong>
             </span>
             <strong>
-              klv1fr724pjdjp3l8unuvgda0k6vt06d875hj7t5ggrxymzcg3jcveysejzljc
+              <CenteredRow>
+                {contractAddress}
+                <Copy data={contractAddress} info="contractAddress" />
+              </CenteredRow>
             </strong>
           </Row>
           <Row>
             <span>
               <strong>Properties</strong>
             </span>
-            <strong></strong>
+            <strong>
+              <CenteredRow>
+                {Object.entries(scData?.properties || {}).map(
+                  ([key, value]) => (
+                    <Badge key={key} active={value}>
+                      {value ? <WhiteTick /> : <RedFailed />} {formatKey(key)}
+                    </Badge>
+                  ),
+                )}
+              </CenteredRow>
+            </strong>
           </Row>
         </CardContent>
       </CardContainer>
@@ -218,5 +176,22 @@ const SmartContractInvoke: React.FC = () => {
     </Container>
   );
 };
+
+// export const getServerSideProps: GetServerSideProps = async ({
+//   locale = 'en',
+// }) => {
+//   if (process.env.NODE_ENV !== 'development') {
+//     return {
+//       notFound: true,
+//     };
+//   }
+//   const props = await serverSideTranslations(
+//     locale,
+//     ['common'],
+//     nextI18nextConfig,
+//     ['en'],
+//   );
+//   return { props };
+// };
 
 export default SmartContractInvoke;

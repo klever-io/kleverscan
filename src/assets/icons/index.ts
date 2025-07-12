@@ -34,6 +34,7 @@ import Proposal from './proposal.svg';
 import PurpleArrowRight from './purple-arrow-right.svg';
 import QRCode from './qr-code.svg';
 import Receive from './receive.svg';
+import RedFailed from './red-failed.svg';
 import Redirect from './redirect.svg';
 import Refresh from './refresh.svg';
 import Search from './search.svg';
@@ -88,6 +89,7 @@ export {
   WizardFailSquare,
   WizardTxSuccess,
   WhiteTick,
+  RedFailed,
   Redirect,
   ArrowUpRightSquare,
   ArrowUpSquare,

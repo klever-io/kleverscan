@@ -478,7 +478,9 @@ export const smartContractsTableHeaders = [
 export const smartContractInvokesTransactionsTableHeaders = [
   'Tx Hash',
   'Age',
-  'From',
+  'Status',
+  'Fee',
+  'Bandwidth Fee',
 ];
 
 export enum contractTableHeaders {

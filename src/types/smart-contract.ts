@@ -30,3 +30,18 @@ export interface InvokesList {
   signature: string[] | [];
   searchOrder: number;
 }
+
+export interface SmartContractData {
+  name?: string;
+  deployer: string;
+  deployTxHash: string;
+  timestamp: number;
+  upgrades?: string[];
+  properties?: {
+    payable?: boolean;
+    payableBySC?: boolean;
+    upgradeable?: boolean;
+    readable?: boolean;
+  };
+  createdAt: number;
+}

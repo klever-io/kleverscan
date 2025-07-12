@@ -475,6 +475,14 @@ export const smartContractsTableHeaders = [
   'Deploy Hash / Time',
 ];
 
+export const smartContractInvokesTransactionsTableHeaders = [
+  'Tx Hash',
+  'Age',
+  'Status',
+  'Fee',
+  'Bandwidth Fee',
+];
+
 export enum contractTableHeaders {
   'Asset Id',
   'Amount',

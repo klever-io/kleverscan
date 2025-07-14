@@ -29,6 +29,7 @@ export interface InvokesList {
   chainID: string;
   signature: string[] | [];
   searchOrder: number;
+  method: string;
 }
 
 export interface SmartContractData {

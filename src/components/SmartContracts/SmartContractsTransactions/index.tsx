@@ -1,7 +1,13 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { IRowSection } from '@/types';
-import { CenteredRow, DoubleRow, Mono, Row } from '@/styles/common';
+import {
+  CenteredRow,
+  DoubleRow,
+  InvokeMethodBagde,
+  Mono,
+} from '@/styles/common';
+import { Status } from '@/components/Table/styles';
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { fromUnixTime } from 'date-fns';
@@ -12,6 +18,7 @@ import { useTranslation } from 'next-i18next';
 import { InvokesList } from '@/types/smart-contract';
 import Link from 'next/link';
 import Copy from '@/components/Copy';
+import { capitalizeString } from '@/utils/convertString';
 
 const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
   const { t: commonT } = useTranslation('common');
@@ -28,6 +35,7 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
     version,
     chainID,
     signature,
+    method,
   } = invokes;
 
   return [
@@ -58,7 +66,9 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       // Status
       element: props => (
         <DoubleRow>
-          <span>{status}</span>
+          <Status status={status}>
+            <span>{capitalizeString(status)}</span>
+          </Status>
         </DoubleRow>
       ),
       span: 1,
@@ -77,6 +87,15 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       element: props => (
         <DoubleRow>
           <span>{bandwidthFee.toLocaleString()} KLV</span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      // Method
+      element: props => (
+        <DoubleRow>
+          <InvokeMethodBagde>{method}</InvokeMethodBagde>
         </DoubleRow>
       ),
       span: 1,

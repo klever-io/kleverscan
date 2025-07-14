@@ -9,6 +9,7 @@ import {
   CardTabContainer,
   CenteredRow,
   Badge,
+  BadgeContainer,
 } from '@/styles/common';
 import Title from '@/components/Layout/Title';
 import React, { useEffect, useRef, useState } from 'react';
@@ -32,17 +33,34 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { WhiteTick, RedFailed } from '@/assets/icons';
+import { useMobile } from '@/contexts/mobile';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
+  const { isMobile } = useMobile();
   const tabHeaders = [{ label: 'Transactions', value: 'transactions' }];
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
+  const [invokesTotalRecords, setInvokesTotalRecords] = useState<number>(0);
   const [scData, setScData] = useState<SmartContractData>();
   const dataCardsRef = useRef<HTMLDivElement>(null);
   const contractAddress = router.query.address as string;
 
-  const { beforeYesterdayTransactions, smartContractsTotalTransactions } =
-    useSmartContractData();
+  const { beforeYesterdayTransactions } = useSmartContractData();
+
+  const requestInvokesTotalRecords = async () => {
+    try {
+      const res = await api.get({
+        route: `sc/invokes/${contractAddress}`,
+      });
+
+      if (!res.error || res.error === '') {
+        setInvokesTotalRecords(res.pagination.totalRecords);
+      }
+    } catch (error) {
+      console.error('Error fetching invokes list:', error);
+      return [];
+    }
+  };
 
   const requestSmartContractData = async () => {
     try {
@@ -54,6 +72,7 @@ const SmartContractInvoke: React.FC = () => {
         const data = {
           ...res,
           data: { sc: res.data.sc },
+          pagination: res.pagination,
         };
         setScData(data.data.sc);
       }
@@ -66,13 +85,14 @@ const SmartContractInvoke: React.FC = () => {
     {
       Icon: Transactions,
       title: 'Total Transactions',
-      value: smartContractsTotalTransactions,
+      value: invokesTotalRecords,
       variation: `+ ${(beforeYesterdayTransactions ?? 0).toLocaleString()}`,
     },
   ];
 
   useEffect(() => {
     requestSmartContractData();
+    requestInvokesTotalRecords();
     setSelectedTab(tabHeaders[0].label);
   }, []);
 
@@ -100,44 +120,46 @@ const SmartContractInvoke: React.FC = () => {
             <span>
               <strong>Owner</strong>
             </span>
-            <strong>
+            <span>
               <CenteredRow>
-                {scData?.deployer}
+                {parseAddress(scData?.deployer || '', isMobile ? 35 : 0)}
                 <Copy data={scData?.deployer} info="Owner" />
               </CenteredRow>
-            </strong>
+            </span>
           </Row>
           <Row>
             <span>
               <strong>Address</strong>
             </span>
-            <strong>
+            <span>
               <CenteredRow>
-                {contractAddress}
+                {parseAddress(contractAddress, isMobile ? 35 : 0)}
                 <Copy data={contractAddress} info="contractAddress" />
               </CenteredRow>
-            </strong>
+            </span>
           </Row>
           <Row>
             <span>
               <strong>Properties</strong>
             </span>
-            <strong>
+            <span>
               <CenteredRow>
-                {Object.entries(scData?.properties || {}).map(
-                  ([key, value]) => (
-                    <Badge key={key} active={value}>
-                      {value ? <WhiteTick /> : <RedFailed />} {formatKey(key)}
-                    </Badge>
-                  ),
-                )}
+                <BadgeContainer>
+                  {Object.entries(scData?.properties || {}).map(
+                    ([key, value]) => (
+                      <Badge key={key} active={value}>
+                        {value ? <WhiteTick /> : <RedFailed />} {formatKey(key)}
+                      </Badge>
+                    ),
+                  )}
+                </BadgeContainer>
               </CenteredRow>
-            </strong>
+            </span>
           </Row>
         </CardContent>
       </CardContainer>
       <CardContainer>
-        <div style={{ width: '100%' }} ref={dataCardsRef}>
+        <div ref={dataCardsRef}>
           {dataCards.map(({ title, value, variation }, index) => (
             <DataCard key={String(index)}>
               <DefaultCards index={index} />
@@ -187,8 +209,6 @@ const SmartContractInvoke: React.FC = () => {
 //   }
 //   const props = await serverSideTranslations(
 //     locale,
-//     ['common'],
-//     nextI18nextConfig,
 //     ['en'],
 //   );
 //   return { props };

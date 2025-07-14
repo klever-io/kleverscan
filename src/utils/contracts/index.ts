@@ -481,6 +481,7 @@ export const smartContractInvokesTransactionsTableHeaders = [
   'Status',
   'Fee',
   'Bandwidth Fee',
+  'Method',
 ];
 
 export enum contractTableHeaders {

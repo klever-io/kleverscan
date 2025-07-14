@@ -19,6 +19,8 @@ import { InvokesList } from '@/types/smart-contract';
 import Link from 'next/link';
 import Copy from '@/components/Copy';
 import { capitalizeString } from '@/utils/convertString';
+import { formatAmount } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 
 const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
   const { t: commonT } = useTranslation('common');
@@ -36,6 +38,7 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
     chainID,
     signature,
     method,
+    contract,
   } = invokes;
 
   return [
@@ -77,7 +80,7 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       // Fee
       element: props => (
         <DoubleRow>
-          <span>{kAppFee.toLocaleString()} KLV</span>
+          <span>{formatAmount(kAppFee / 10 ** KLV_PRECISION)} KLV</span>
         </DoubleRow>
       ),
       span: 1,
@@ -86,7 +89,7 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       // Bandwidth Fee
       element: props => (
         <DoubleRow>
-          <span>{bandwidthFee.toLocaleString()} KLV</span>
+          <span>{formatAmount(bandwidthFee / 10 ** KLV_PRECISION)} KLV</span>
         </DoubleRow>
       ),
       span: 1,
@@ -96,6 +99,19 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       element: props => (
         <DoubleRow>
           <InvokeMethodBagde>{method}</InvokeMethodBagde>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      // Type
+      element: props => (
+        <DoubleRow>
+          {contract?.map(item => (
+            <InvokeMethodBagde>
+              {(item?.parameter?.type).slice(2)}
+            </InvokeMethodBagde>
+          ))}
         </DoubleRow>
       ),
       span: 1,

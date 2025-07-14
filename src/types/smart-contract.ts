@@ -30,6 +30,13 @@ export interface InvokesList {
   signature: string[] | [];
   searchOrder: number;
   method: string;
+  contract?: [
+    {
+      parameter: {
+        type: string;
+      };
+    },
+  ];
 }
 
 export interface SmartContractData {

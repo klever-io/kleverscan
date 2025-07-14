@@ -23,8 +23,8 @@ import {
   DataCardValue,
 } from '@/views/home';
 import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
-import { useSmartContractData } from '@/contexts/smartContractPage';
 import api from '@/services/api';
+import { smartContractBeforeYesterdayTransactionsCall } from '@/services/requests/smartContracts';
 import { SmartContractData } from '@/types/smart-contract';
 import { parseAddress } from '@/utils/parseValues';
 import Copy from '@/components/Copy';
@@ -42,10 +42,23 @@ const SmartContractInvoke: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
   const [invokesTotalRecords, setInvokesTotalRecords] = useState<number>(0);
   const [scData, setScData] = useState<SmartContractData>();
+  const [beforeYesterdayTransactions, setBeforeYesterdayTransactions] =
+    useState<number>(0);
   const dataCardsRef = useRef<HTMLDivElement>(null);
   const contractAddress = router.query.address as string;
 
-  const { beforeYesterdayTransactions } = useSmartContractData();
+  const requestBeforeYesterdayTransactions = async () => {
+    try {
+      const res =
+        await smartContractBeforeYesterdayTransactionsCall(contractAddress);
+
+      if (res) {
+        setBeforeYesterdayTransactions(res.beforeYesterdayTxs);
+      }
+    } catch (error) {
+      console.error('Error fetching before yesterday transactions:', error);
+    }
+  };
 
   const requestInvokesTotalRecords = async () => {
     try {
@@ -91,6 +104,7 @@ const SmartContractInvoke: React.FC = () => {
   ];
 
   useEffect(() => {
+    requestBeforeYesterdayTransactions();
     requestSmartContractData();
     requestInvokesTotalRecords();
     setSelectedTab(tabHeaders[0].label);

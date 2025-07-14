@@ -104,6 +104,35 @@ const smartContractsBeforeYesterdayTransactionsCall = async (): Promise<
   }
 };
 
+const smartContractBeforeYesterdayTransactionsCall = async (
+  scAddress: string,
+): Promise<
+  { newTransactions: number; beforeYesterdayTxs: number } | undefined
+> => {
+  try {
+    const res = await api.get({
+      route: 'transaction/list/',
+      query: {
+        scAddress: scAddress,
+        startDate: '-24h',
+      },
+    });
+
+    if (!res.error || res.error === '') {
+      const data = {
+        newTransactions: 0,
+        beforeYesterdayTxs: res.data?.number_by_day[1]?.doc_count || 0,
+      };
+      if (res.data?.number_by_day?.length > 0) {
+        data.newTransactions = res.data?.number_by_day[0]?.doc_count || 0;
+      }
+      return data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   smartContractsListCall,
   smartContractsStatisticCall,
@@ -111,4 +140,5 @@ export {
   smartContractTotalTransactionsListCall,
   scInvokesTotalRecordsCall,
   smartContractsBeforeYesterdayTransactionsCall,
+  smartContractBeforeYesterdayTransactionsCall,
 };

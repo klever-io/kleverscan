@@ -20,6 +20,7 @@ import {
   DataCard,
   DataCardContent,
   DataCardLatest,
+  DataCardsContent,
   DataCardValue,
 } from '@/views/home';
 import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
@@ -34,6 +35,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { WhiteTick, RedFailed } from '@/assets/icons';
 import { useMobile } from '@/contexts/mobile';
+import { timestampToDate } from '@/utils/timeFunctions';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
@@ -173,7 +175,7 @@ const SmartContractInvoke: React.FC = () => {
         </CardContent>
       </CardContainer>
       <CardContainer>
-        <div ref={dataCardsRef}>
+        <DataCardsContent ref={dataCardsRef}>
           {dataCards.map(({ title, value, variation }, index) => (
             <DataCard key={String(index)}>
               <DefaultCards index={index} />
@@ -191,7 +193,17 @@ const SmartContractInvoke: React.FC = () => {
               </DataCardContent>
             </DataCard>
           ))}
-        </div>
+          <DataCard>
+            <DataCardContent>
+              <span>Created At</span>
+              <DataCardValue>
+                <p>
+                  {scData?.createdAt ? timestampToDate(scData.createdAt) : '--'}
+                </p>
+              </DataCardValue>
+            </DataCardContent>
+          </DataCard>
+        </DataCardsContent>
       </CardContainer>
       <CardTabContainer>
         <CardHeader>

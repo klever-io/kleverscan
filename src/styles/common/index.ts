@@ -645,3 +645,45 @@ export const SponsoredTitleSection = styled.div`
   gap: 8px;
   background-color: #1f1f24;
 `;
+
+export const Badge = styled.span<{
+  active: boolean;
+}>`
+  display: flex;
+  align-items: center;
+  border-radius: 24px;
+  border: 1px solid ${props => (props.active ? '#7D3FF1' : '#C81B3B')};
+  background-color: ${props => (props.active ? '#7D3FF166' : '#C81B3B66')};
+  padding: 4px 8px;
+  gap: 4px;
+
+  font-family: 'Manrope';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${props => props.theme.darkText};
+`;
+
+export const BadgeContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+export const InvokeMethodBagde = styled.div`
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #4ebc87;
+  background-color: #296b4b80;
+  padding: 4px 8px;
+
+  font-family: 'Manrope';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 16px;
+  color: #4ebc87;
+`;

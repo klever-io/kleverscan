@@ -45,7 +45,10 @@ const smartContractsListRowSections = (
             <span>{name || '- -'}</span>
           </CenteredRow>
           <CenteredRow>
-            <Link href={''}>
+            <Link
+              href={`/smart-contract/${contractAddress}`}
+              key={contractAddress}
+            >
               <Mono>{parseAddress(contractAddress, 25)}</Mono>
             </Link>
             <Copy data={contractAddress} info="contractAddress" />
@@ -67,7 +70,10 @@ const smartContractsListRowSections = (
     {
       element: props => (
         <CenteredRow>
-          <Link href={''}>
+          <Link
+            href={`/smart-contract/${contractAddress}`}
+            key={contractAddress}
+          >
             <Mono>{parseAddress(deployer, 25)}</Mono>
           </Link>
           <Copy data={deployer} info="deployer" />

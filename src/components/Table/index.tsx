@@ -60,7 +60,8 @@ export interface ITable {
     | 'rewards'
     | 'marketplaces'
     | 'launchPad'
-    | 'smartContracts';
+    | 'smartContracts'
+    | 'smartContractsInvokes';
 
   header: string[];
   rowSections: (item: any) => IRowSection[];

@@ -107,9 +107,9 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       // Type
       element: props => (
         <DoubleRow>
-          {contract?.map(item => (
-            <InvokeMethodBagde>
-              {(item?.parameter?.type).slice(2)}
+          {contract?.map((item, index) => (
+            <InvokeMethodBagde key={index}>
+              {item?.parameter?.type ? item.parameter.type.slice(2) : ''}
             </InvokeMethodBagde>
           ))}
         </DoubleRow>
@@ -145,7 +145,7 @@ const SmartContractsTransactions: React.FC<SmartContractsTransactionsProps> = ({
       }
     } catch (error) {
       console.error('Error fetching invokes list:', error);
-      return [];
+      return { data: { invokes: [] }, pagination: { totalRecords: 0 } };
     }
   };
 

@@ -39,7 +39,7 @@ export interface InvokesList {
   ];
 }
 
-export interface SmartContractData {
+export interface SmartContractDetailsData {
   name?: string;
   deployer: string;
   deployTxHash: string;

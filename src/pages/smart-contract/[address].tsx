@@ -26,7 +26,7 @@ import {
 import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
 import api from '@/services/api';
 import { smartContractBeforeYesterdayTransactionsCall } from '@/services/requests/smartContracts';
-import { SmartContractData } from '@/types/smart-contract';
+import { SmartContractDetailsData } from '@/types/smart-contract';
 import { parseAddress } from '@/utils/parseValues';
 import Copy from '@/components/Copy';
 import SmartContractsTransactions from '@/components/SmartContracts/SmartContractsTransactions';
@@ -40,14 +40,14 @@ import { timestampToDate } from '@/utils/timeFunctions';
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
   const { isMobile } = useMobile();
+  const contractAddress = router.query.address as string;
   const tabHeaders = [{ label: 'Transactions', value: 'transactions' }];
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
   const [invokesTotalRecords, setInvokesTotalRecords] = useState<number>(0);
-  const [scData, setScData] = useState<SmartContractData>();
+  const [scData, setScData] = useState<SmartContractDetailsData>();
   const [beforeYesterdayTransactions, setBeforeYesterdayTransactions] =
     useState<number>(0);
   const dataCardsRef = useRef<HTMLDivElement>(null);
-  const contractAddress = router.query.address as string;
 
   const requestBeforeYesterdayTransactions = async () => {
     try {
@@ -106,11 +106,12 @@ const SmartContractInvoke: React.FC = () => {
   ];
 
   useEffect(() => {
+    if (!contractAddress) return;
     requestBeforeYesterdayTransactions();
     requestSmartContractData();
     requestInvokesTotalRecords();
     setSelectedTab(tabHeaders[0].label);
-  }, []);
+  }, [contractAddress]);
 
   const SelectedComponent = () => {
     switch (selectedTab) {

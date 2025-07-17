@@ -36,6 +36,7 @@ import nextI18nextConfig from '../../../next-i18next.config';
 import { WhiteTick, RedFailed } from '@/assets/icons';
 import { useMobile } from '@/contexts/mobile';
 import { timestampToDate } from '@/utils/timeFunctions';
+import { getNetwork } from '@/utils/networkFunctions';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
@@ -105,14 +106,6 @@ const SmartContractInvoke: React.FC = () => {
     },
   ];
 
-  useEffect(() => {
-    if (!contractAddress) return;
-    requestBeforeYesterdayTransactions();
-    requestSmartContractData();
-    requestInvokesTotalRecords();
-    setSelectedTab(tabHeaders[0].label);
-  }, [contractAddress]);
-
   const SelectedComponent = () => {
     switch (selectedTab) {
       case 'Transactions':
@@ -125,6 +118,15 @@ const SmartContractInvoke: React.FC = () => {
   const formatKey = (str: string) => {
     return str.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
   };
+
+  useEffect(() => {
+    if (contractAddress) {
+      requestBeforeYesterdayTransactions();
+      requestSmartContractData();
+      requestInvokesTotalRecords();
+      setSelectedTab(tabHeaders[0].label);
+    }
+  }, [contractAddress]);
 
   return (
     <Container>
@@ -226,19 +228,17 @@ const SmartContractInvoke: React.FC = () => {
   );
 };
 
-// export const getServerSideProps: GetServerSideProps = async ({
-//   locale = 'en',
-// }) => {
-//   if (process.env.NODE_ENV !== 'development') {
-//     return {
-//       notFound: true,
-//     };
-//   }
-//   const props = await serverSideTranslations(
-//     locale,
-//     ['en'],
-//   );
-//   return { props };
-// };
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
+  const network = getNetwork();
+  if (network !== 'Devnet') {
+    return {
+      notFound: true,
+    };
+  }
+  const props = await serverSideTranslations(locale, ['en']);
+  return { props };
+};
 
 export default SmartContractInvoke;

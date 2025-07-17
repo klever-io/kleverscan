@@ -18,6 +18,7 @@ import { DataCardsContainer } from '@/views/home';
 import MostUsedApplications from '@/components/SmartContracts/MostUsedApplications';
 import BrowseAllDeployedContracts from '@/components/SmartContracts/BrowseAllDeployedContracts';
 import SmartContractTopCard from '@/components/SmartContracts/SmartContractTopCard';
+import { getNetwork } from '@/utils/networkFunctions';
 
 const SmartContracts: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'smartContracts']);
@@ -52,7 +53,8 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
 export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
-  if (process.env.NODE_ENV !== 'development') {
+  const network = getNetwork();
+  if (network !== 'Devnet') {
     return {
       notFound: true,
     };

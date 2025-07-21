@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import api from '@/services/api';
-import { CardContent, CardHeader, CardHeaderItem, CardTabContainer, CenteredRow, InvokeMethodBagde, Row, Status } from '@/styles/common';
-import { capitalizeString } from '@/utils/convertString';
-import { getStatusIcon } from '@/assets/status';
-import { getAge } from '@/utils/timeFunctions';
-import { fromUnixTime } from 'date-fns';
-import { formatDate } from '@/utils/formatFunctions';
+import { CardContent, CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
+import { CardRaw } from '@/views/transactions/detail';
+import ReactJson from 'react-json-view';
+import { getRawTxTheme } from '../transaction/[hash]';
+import { useTheme } from '@/contexts/theme';
+import SCTransactionDetails from '@/components/SmartContracts/SmartContractTransaction';
+import { SmartContractTransactionData } from '@/types/smart-contract';
+import { pricesCall } from '@/services/requests/account';
+import { useQuery } from 'react-query';
 
-const SmartContractTransaction: React.FC = () => {
+const SmartContractTransaction: React.FC<SmartContractTransactionData> = () => {
     const router = useRouter();
     const hashUrl = router.query.hash;
-    const [transactionData, setTransactionData] = useState<[]>([]);
+    const { isDarkTheme } = useTheme();
+    const [transactionData, setTransactionData] = useState<SmartContractTransactionData | null>(null);
+
+    const { data: priceCall } = useQuery(
+        ['pricesCall'],
+        pricesCall,
+    );
 
     const requestTransactionData = async () => {
         try {
             const res = await api.get({
-                route: `transaction/${hash}`,
+                route: `transaction/${hashUrl}`,
             });
 
             if (!res.error || res.error === '') {
@@ -31,119 +40,43 @@ const SmartContractTransaction: React.FC = () => {
     }
 
     useEffect(() => {
-        if (hashUrl) {
-            requestTransactionData();
-        }
-    }, [hashUrl]);
-
-    console.log('Transaction Data:', transactionData);
-
-    const {
-        hash,
-        blockNum,
-        sender,
-        nonce,
-        timestamp,
-        kAppFee,
-        bandwidthFee,
-        status,
-        contract
-    } = transactionData;
-
-    const StatusIcon = getStatusIcon(status);
+        requestTransactionData();
+    }, []);
 
     return (
-        <CardTabContainer>
-            <CardHeader>
-                <CardHeaderItem selected={true}>
-                    <span>Transaction</span>
-                </CardHeaderItem>
-            </CardHeader>
-            <CardContent>
-                <Row>
-                    <span>Status</span>
-                    <CenteredRow>
-                        <Status status={status}>
-                            <StatusIcon />
-                            <span>{capitalizeString(status)}</span>
-                        </Status>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>Age</span>
-                    <CenteredRow>
-                        <span>
-                            {getAge(fromUnixTime(timestamp), undefined)}
-                            ({formatDate(timestamp)})
-                        </span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>Block</span>
-                    <CenteredRow>
-                        <span>{transactionData?.blockNum}</span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>From</span>
-                    <CenteredRow>
-                        <span></span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>To</span>
-                    <CenteredRow>
-                        <span></span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>Value</span>
-                    <CenteredRow>
-                        <span></span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>Method</span>
-                    <CenteredRow>
-                        {contract?.map((item, index) => (
-                            <InvokeMethodBagde key={index}>
-                                {item?.parameter?.type ? item.parameter.type.slice(2) : ''}
-                            </InvokeMethodBagde>
-                        ))}
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>Transaction Fee</span>
-                    <CenteredRow>
-                        <span></span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>KLV Price</span>
-                    <CenteredRow>
-                        <span></span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>KApp Fee</span>
-                    <CenteredRow>
-                        <span></span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>Nonce</span>
-                    <CenteredRow>
-                        <span>{nonce}</span>
-                    </CenteredRow>
-                </Row>
-                <Row>
-                    <span>Metadata</span>
-                    <CenteredRow>
-                        <span></span>
-                    </CenteredRow>
-                </Row>
-            </CardContent>
-        </CardTabContainer>
+        <>
+            <SCTransactionDetails
+                blockNum={transactionData?.blockNum || 0}
+                sender={transactionData?.sender || ''}
+                nonce={transactionData?.nonce || 0}
+                timestamp={transactionData?.timestamp || 0}
+                kAppFee={transactionData?.kAppFee || 0}
+                bandwidthFee={transactionData?.bandwidthFee || 0}
+                status={transactionData?.status || ''}
+                contract={transactionData?.contract || []}
+                price={priceCall || 0}
+                data={transactionData?.data || []}
+            />
+            <CardTabContainer>
+                <CardHeader>
+                    <CardHeaderItem selected={true}>
+                        <span>Raw Tx</span>
+                    </CardHeaderItem>
+                </CardHeader>
+                <CardContent>
+                    <CardRaw>
+                        <ReactJson
+                            src={transactionData || {}}
+                            name={false}
+                            displayObjectSize={false}
+                            enableClipboard={true}
+                            displayDataTypes={false}
+                            theme={getRawTxTheme(isDarkTheme)}
+                        />
+                    </CardRaw>
+                </CardContent>
+            </CardTabContainer>
+        </>
     )
 }
 

@@ -1,5 +1,9 @@
 import api from '@/services/api';
-import { HotContracts, SmartContractsList } from '@/types/smart-contract';
+import {
+  HotContracts,
+  SmartContractsList,
+  SmartContractTransactionData,
+} from '@/types/smart-contract';
 
 const smartContractsListCall = async (): Promise<
   { smartContracts: SmartContractsList[] } | undefined
@@ -133,6 +137,22 @@ const smartContractBeforeYesterdayTransactionsCall = async (
   }
 };
 
+const smartContractTransactionDetailsCall = async (
+  txHash: string,
+): Promise<{ transaction: SmartContractTransactionData } | undefined> => {
+  try {
+    const res = await api.get({
+      route: `transaction/${txHash}`,
+    });
+
+    if (!res.error || res.error === '') {
+      return { transaction: res.data.transaction };
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   smartContractsListCall,
   smartContractsStatisticCall,
@@ -141,4 +161,5 @@ export {
   scInvokesTotalRecordsCall,
   smartContractsBeforeYesterdayTransactionsCall,
   smartContractBeforeYesterdayTransactionsCall,
+  smartContractTransactionDetailsCall,
 };

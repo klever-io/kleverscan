@@ -25,18 +25,27 @@ import ReactJson from 'react-json-view';
 import { getRawTxTheme } from '@/pages/transaction/[hash]';
 import dynamic from 'next/dynamic';
 
-const SCTransactionDetails: React.FC<SmartContractTransactionData> = ({
-  blockNum,
-  sender,
-  nonce,
-  timestamp,
-  kAppFee,
-  bandwidthFee,
-  status,
-  contract,
-  price,
-  data,
+interface SCTransactionDetailsProps {
+  transactionData: SmartContractTransactionData;
+  priceCall: number;
+}
+
+const SCTransactionDetails: React.FC<SCTransactionDetailsProps> = ({
+  transactionData,
+  priceCall,
 }) => {
+  const {
+    blockNum,
+    sender,
+    nonce,
+    timestamp,
+    kAppFee,
+    bandwidthFee,
+    status,
+    contract = [],
+    data = [],
+  } = transactionData || {};
+  const price = priceCall || 0;
   const { isMobile } = useMobile();
   const ReactJson = dynamic(
     () => import('react-json-view').then(mod => mod.default),

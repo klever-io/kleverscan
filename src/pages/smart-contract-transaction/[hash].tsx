@@ -53,16 +53,8 @@ const SmartContractTransaction: React.FC = () => {
   return (
     <Container>
       <SCTransactionDetails
-        blockNum={transactionData?.blockNum || 0}
-        sender={transactionData?.sender || ''}
-        nonce={transactionData?.nonce || 0}
-        timestamp={transactionData?.timestamp || 0}
-        kAppFee={transactionData?.kAppFee || 0}
-        bandwidthFee={transactionData?.bandwidthFee || 0}
-        status={transactionData?.status || ''}
-        contract={transactionData?.contract || []}
-        price={priceCall || 0}
-        data={transactionData?.data || []}
+        transactionData={transactionData || {}}
+        priceCall={priceCall || 0}
       />
 
       <CardTabContainer>

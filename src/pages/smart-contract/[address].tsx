@@ -141,7 +141,7 @@ const SmartContractInvoke: React.FC = () => {
             </span>
             <span>
               <CenteredRow>
-                {parseAddress(scData?.deployer || '', isMobile ? 35 : 0)}
+                {parseAddress(scData?.deployer || '', isMobile ? 35 : NaN)}
                 <Copy data={scData?.deployer} info="Owner" />
               </CenteredRow>
             </span>
@@ -152,8 +152,8 @@ const SmartContractInvoke: React.FC = () => {
             </span>
             <span>
               <CenteredRow>
-                {parseAddress(contractAddress, isMobile ? 35 : 0)}
-                <Copy data={contractAddress} info="contractAddress" />
+                {parseAddress(contractAddress, isMobile ? 35 : NaN)}
+                <Copy data={contractAddress} info="Contract Address" />
               </CenteredRow>
             </span>
           </Row>

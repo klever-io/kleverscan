@@ -53,3 +53,21 @@ export interface SmartContractDetailsData {
   };
   createdAt: number;
 }
+
+export interface SmartContractTransactionData {
+  blockNum?: number;
+  sender?: string;
+  nonce?: number;
+  timestamp?: number;
+  kAppFee?: number;
+  bandwidthFee?: number;
+  status?: string;
+  contract?: Array<{
+    parameter?: {
+      address?: string;
+      type?: string;
+    };
+  }>;
+  price?: number;
+  data?: string[];
+}

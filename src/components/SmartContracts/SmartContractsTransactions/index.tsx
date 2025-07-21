@@ -47,7 +47,7 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       element: props => (
         <DoubleRow>
           <CenteredRow>
-            <Link href={``} key={hash}>
+            <Link href={`/smart-contract-transaction/${hash}`} key={hash}>
               <Mono>{parseAddress(hash, 30)}</Mono>
             </Link>
             <Copy data={hash} info="txHash" />

@@ -26,12 +26,11 @@ import { IMultisignData, IMultisignRawData } from '.';
 import {
   ButtonContainer,
   ButtonsContainerApi,
-  DragContainer,
   EmptyMultisign,
-  ImportJsonButton,
   MultiSigList,
   MultisignButton,
 } from '../styles';
+import DropFileCard from '@/components/DropFileCard';
 
 const ReactJson = dynamic(
   () => import('react-json-view').then(mod => mod.default),
@@ -486,41 +485,56 @@ export const ButtonsComponent: React.FC<
         )}
         <ButtonContainer>
           {multiSignData.hash && (
-            <MultisignButton
-              isJsonButton
-              type="button"
-              onClick={handleDownload}
-            >
-              Download JSON file
-            </MultisignButton>
+            <>
+              <MultisignButton
+                isJsonButton
+                type="button"
+                onClick={handleDownload}
+              >
+                Download JSON file
+              </MultisignButton>
+              <MultisignButton
+                isJsonButton
+                type="button"
+                onClick={() => {
+                  setSignBcastTransaction(false);
+                  setTxHash(null);
+                  setSelectedHash('');
+                  setDragginOverlayCount(0);
+                  multiSignDataRef.pop();
+                }}
+              >
+                Remove JSON file
+              </MultisignButton>
+            </>
           )}
-          <DragContainer
-            onDragOver={preventEvent}
-            onDrop={(event: any) => processFile(event, true, setSelectedHash)}
-            onChange={(event: any) =>
-              processFile(event, false, setSelectedHash, multiSignDataRef)
-            }
-            onDragEnter={event => {
-              handleDragEnter(
-                event,
-                draggingOverlayCount,
-                setDragginOverlayCount,
-              );
-            }}
-            onDragLeave={event => {
-              handleDragLeave(
-                event,
-                draggingOverlayCount,
-                setDragginOverlayCount,
-              );
-            }}
-            isHidden
-          >
-            <input type="file" accept=".json" id="import-json" />
-          </DragContainer>
-          <ImportJsonButton htmlFor="import-json">
-            Import Signed JSON file
-          </ImportJsonButton>
+
+          {multiSignDataRef.length === 0 && (
+            <DropFileCard
+              title="Import Signed JSON file"
+              message="Drag and drop a file here, or click to browse"
+              accept=".json"
+              onDragOver={preventEvent}
+              onDrop={(event: any) => processFile(event, true, setSelectedHash)}
+              onDragEnter={event => {
+                handleDragEnter(
+                  event,
+                  draggingOverlayCount,
+                  setDragginOverlayCount,
+                );
+              }}
+              onDragLeave={event => {
+                handleDragLeave(
+                  event,
+                  draggingOverlayCount,
+                  setDragginOverlayCount,
+                );
+              }}
+              onChange={(event: any) =>
+                processFile(event, false, setSelectedHash, multiSignDataRef)
+              }
+            />
+          )}
         </ButtonContainer>
       </ButtonsContainerApi>
     </>

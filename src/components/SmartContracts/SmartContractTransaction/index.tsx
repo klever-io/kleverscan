@@ -24,15 +24,14 @@ import { ExpandCenteredRow, DivDataJson } from '@/views/transactions/detail';
 import ReactJson from 'react-json-view';
 import { getRawTxTheme } from '@/pages/transaction/[hash]';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 interface SCTransactionDetailsProps {
   transactionData: SmartContractTransactionData;
-  priceCall: number;
 }
 
 const SCTransactionDetails: React.FC<SCTransactionDetailsProps> = ({
   transactionData,
-  priceCall,
 }) => {
   const {
     blockNum,
@@ -45,7 +44,6 @@ const SCTransactionDetails: React.FC<SCTransactionDetailsProps> = ({
     contract = [],
     data = [],
   } = transactionData || {};
-  const price = priceCall || 0;
   const { isMobile } = useMobile();
   const ReactJson = dynamic(
     () => import('react-json-view').then(mod => mod.default),
@@ -120,7 +118,9 @@ const SCTransactionDetails: React.FC<SCTransactionDetailsProps> = ({
           <CenteredRow>
             {sender && (
               <>
-                <span>{parseAddress(sender, isMobile ? 35 : NaN)}</span>
+                <Link href={`/account/${sender}`}>
+                  <span>{parseAddress(sender, isMobile ? 35 : NaN)}</span>
+                </Link>
                 <Copy data={sender} info="sender" />
               </>
             )}
@@ -133,19 +133,21 @@ const SCTransactionDetails: React.FC<SCTransactionDetailsProps> = ({
               contract.length > 0 &&
               contract[0].parameter?.address && (
                 <>
-                  <span>
-                    {parseAddress(
-                      contract[0].parameter?.address,
-                      isMobile ? 35 : NaN,
-                    )}
-                  </span>
+                  <Link href={`/account/${contract[0].parameter?.address}`}>
+                    <span>
+                      {parseAddress(
+                        contract[0].parameter?.address,
+                        isMobile ? 35 : NaN,
+                      )}
+                    </span>
+                  </Link>
                   <Copy data={contract[0].parameter?.address} info="address" />
                 </>
               )}
           </CenteredRow>
         </Row>
         <Row>
-          <span>Method</span>
+          <span>SC Type</span>
           <CenteredRow>
             {contract &&
               contract.length > 0 &&
@@ -165,12 +167,6 @@ const SCTransactionDetails: React.FC<SCTransactionDetailsProps> = ({
                 {formatAmount(bandwidthFee / 10 ** KLV_PRECISION)} KLV
               </span>
             )}
-          </CenteredRow>
-        </Row>
-        <Row>
-          <span>KLV Price</span>
-          <CenteredRow>
-            <span>{price} USD</span>
           </CenteredRow>
         </Row>
         <Row>

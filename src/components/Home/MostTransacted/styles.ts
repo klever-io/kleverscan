@@ -59,7 +59,7 @@ export const HeaderItem = styled.th<{
   color: ${({ theme }) => theme.black};
   text-align: left;
 
-  padding: ${props => (!props.hotContracts ? '4px 16px' : '4px 14px')};
+  padding: 4px 16px;
   width: 100%;
 
   &:first-child {
@@ -67,13 +67,8 @@ export const HeaderItem = styled.th<{
     width: 60px;
   }
 
-  &:nth-child(3) {
-    width: ${props => props.hotContracts && '50%'};
-    text-align: ${props => props.hotContracts && 'right'};
-  }
-
   &:last-child {
-    width: ${props => (props.hotContracts ? '40%' : '50%')};
+    width: 50%;
   }
 `;
 
@@ -84,8 +79,7 @@ export const Cell = styled.td<{
   display: flex;
   gap: 8px;
   align-items: center;
-  justify-content: ${props =>
-    props.hotContracts === true ? props.justifyContent : 'flex-start'};
+  justify-content: flex-start;
 
   font-size: 14px;
   font-weight: 400;
@@ -136,4 +130,10 @@ export const TitleContainer = styled.div`
       color: ${({ theme }) => theme.true.white};
     }
   }
+`;
+
+export const MostTransactedDoubleRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 `;

@@ -677,7 +677,8 @@ export const InvokeMethodBagde = styled.div`
   align-items: center;
   border-radius: 8px;
   border: 1px solid #4ebc87;
-  background-color: #296b4b80;
+  background-color: ${({ theme }) =>
+    theme.dark ? '#296b4b80' : transparentize(0.8, theme.table['success'])};
   padding: 4px 8px;
 
   font-family: 'Manrope';

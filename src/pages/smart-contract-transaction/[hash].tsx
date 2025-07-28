@@ -12,7 +12,6 @@ import { getRawTxTheme } from '../transaction/[hash]';
 import { useTheme } from '@/contexts/theme';
 import SCTransactionDetails from '@/components/SmartContracts/SmartContractTransaction';
 import { SmartContractTransactionData } from '@/types/smart-contract';
-import { pricesCall } from '@/services/requests/account';
 import { useQuery } from 'react-query';
 import { getNetwork } from '@/utils/networkFunctions';
 import { GetServerSideProps } from 'next';
@@ -30,8 +29,6 @@ const SmartContractTransaction: React.FC = () => {
   const { isDarkTheme } = useTheme();
   const [transactionData, setTransactionData] =
     useState<SmartContractTransactionData>();
-
-  const { data: priceCall } = useQuery(['pricesCall'], pricesCall);
 
   const requestTransactionData = async () => {
     try {
@@ -52,10 +49,7 @@ const SmartContractTransaction: React.FC = () => {
 
   return (
     <Container>
-      <SCTransactionDetails
-        transactionData={transactionData || {}}
-        priceCall={priceCall || 0}
-      />
+      <SCTransactionDetails transactionData={transactionData || {}} />
 
       <CardTabContainer>
         <CardHeader>

@@ -23,7 +23,6 @@ import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 
 const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
-  const { t: commonT } = useTranslation('common');
   const {
     hash,
     blockNumber,
@@ -155,7 +154,7 @@ const SmartContractsTransactions: React.FC<SmartContractsTransactionsProps> = ({
     rowSections: invokesListRowSections,
     request: (page, limit) => requestInvokesList(page, limit),
     dataName: 'invokes',
-    showLimit: false,
+    // showLimit: true,
   };
 
   return <Table {...tableProps} />;

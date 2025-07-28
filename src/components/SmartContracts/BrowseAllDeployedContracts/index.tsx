@@ -127,9 +127,14 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
         query: query ?? localQuery,
       });
       if (!smartContractsListRes.error || smartContractsListRes.error === '') {
+        const sortedSmartContracts = smartContractsListRes.data.sc.sort(
+          (a: any, b: any) =>
+            (b.totalTransactions || 0) - (a.totalTransactions || 0),
+        );
+
         const data = {
           ...smartContractsListRes,
-          data: { smartContracts: smartContractsListRes.data.sc },
+          data: { smartContracts: sortedSmartContracts },
         };
         return data;
       } else {
@@ -147,7 +152,7 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
     rowSections: smartContractsListRowSections,
     request: (page, limit) => requestSmartContractsList(page, limit, router),
     dataName: 'smartContracts',
-    showLimit: false,
+    showLimit: true,
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,7 +166,7 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
         <h3>Browse all deployed contracts</h3>
       </CardsTitleWrapper>
 
-      <InputContractContainer>
+      {/* <InputContractContainer>
         <input
           type="text"
           placeholder="Search for Deployed"
@@ -171,7 +176,7 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
           id="smart-contract-search"
         />
         <Search />
-      </InputContractContainer>
+      </InputContractContainer> */}
       <Table key={refreshKey} {...tableProps} />
     </>
   );

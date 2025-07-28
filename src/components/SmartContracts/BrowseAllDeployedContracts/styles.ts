@@ -5,7 +5,7 @@ export const CardsTitleWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 40px;
   margin-bottom: 20px;
   gap: 10px;
 
@@ -13,7 +13,7 @@ export const CardsTitleWrapper = styled.div`
   font-size: 24px;
   line-height: 32px;
   font-weight: 700;
-  color: #ffffff;
+  color: ${props => props.theme.black};
 
   span {
     font-size: 12px;

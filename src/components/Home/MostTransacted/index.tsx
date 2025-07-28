@@ -3,6 +3,7 @@ import { useHomeData } from '@/contexts/mainPage';
 import {
   Cell,
   HeaderItem,
+  MostTransactedDoubleRow,
   MostTransactedLink,
   Row,
   SectionContainer,
@@ -47,7 +48,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
           {
             title: 'Hot Contracts',
             data: hotContracts,
-            header: ['Rank', 'Contract Address', 'Owner', 'Transactions'],
+            header: ['Rank', 'Contract', 'Owner', 'Transactions'],
           },
         ]
       : []),
@@ -75,15 +76,9 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
           <Table>
             <thead>
               <Row>
-                {table.header.map((item, index: number) =>
-                  table.title !== 'Hot Contracts' ? (
-                    <HeaderItem key={index}>{item}</HeaderItem>
-                  ) : (
-                    <HeaderItem hotContracts={true} key={index}>
-                      {item}
-                    </HeaderItem>
-                  ),
-                )}
+                {table.header.map((item, index: number) => (
+                  <HeaderItem key={index}>{item}</HeaderItem>
+                ))}
               </Row>
             </thead>
             <tbody>
@@ -107,14 +102,19 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
                   </Row>
                 ) : (
                   <Row key={index}>
-                    <Cell hotContracts>{index + 1}</Cell>
-                    <Cell hotContracts>{parseAddress(item?.address, 16)}</Cell>
-                    <Cell hotContracts justifyContent={'flex-end'}>
-                      {parseAddress(item?.ownerAddress, 16)}
+                    <Cell>{index + 1}</Cell>
+                    <Cell>
+                      <MostTransactedDoubleRow>
+                        <span>{item?.name || '- -'}</span>
+                        <MostTransactedLink
+                          href={`/smart-contract/${item?.address}`}
+                        >
+                          <span>{parseAddress(item?.address, 16)}</span>
+                        </MostTransactedLink>
+                      </MostTransactedDoubleRow>
                     </Cell>
-                    <Cell hotContracts justifyContent={'flex-end'}>
-                      {item?.count}
-                    </Cell>
+                    <Cell>{parseAddress(item?.ownerAddress, 16)}</Cell>
+                    <Cell>{item?.count}</Cell>
                   </Row>
                 ),
               )}

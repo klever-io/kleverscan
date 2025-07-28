@@ -37,6 +37,7 @@ import { WhiteTick, RedFailed } from '@/assets/icons';
 import { useMobile } from '@/contexts/mobile';
 import { timestampToDate } from '@/utils/timeFunctions';
 import { getNetwork } from '@/utils/networkFunctions';
+import Link from 'next/link';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
@@ -131,7 +132,10 @@ const SmartContractInvoke: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title title={parseAddress(contractAddress, 25)} />
+        <Title
+          title={parseAddress(contractAddress, 25)}
+          route={`/smart-contracts`}
+        />
       </Header>
       <CardContainer>
         <CardContent>
@@ -141,7 +145,9 @@ const SmartContractInvoke: React.FC = () => {
             </span>
             <span>
               <CenteredRow>
-                {parseAddress(scData?.deployer || '', isMobile ? 35 : NaN)}
+                <Link href={`/account/${scData?.deployer}`}>
+                  {parseAddress(scData?.deployer || '', isMobile ? 35 : NaN)}
+                </Link>
                 <Copy data={scData?.deployer} info="Owner" />
               </CenteredRow>
             </span>
@@ -152,7 +158,9 @@ const SmartContractInvoke: React.FC = () => {
             </span>
             <span>
               <CenteredRow>
-                {parseAddress(contractAddress, isMobile ? 35 : NaN)}
+                <Link href={`/account/${contractAddress}`}>
+                  {parseAddress(contractAddress, isMobile ? 35 : NaN)}
+                </Link>
                 <Copy data={contractAddress} info="Contract Address" />
               </CenteredRow>
             </span>
@@ -220,9 +228,7 @@ const SmartContractInvoke: React.FC = () => {
             </CardHeaderItem>
           ))}
         </CardHeader>
-        <CardContent>
-          <SelectedComponent />
-        </CardContent>
+        <SelectedComponent />
       </CardTabContainer>
     </Container>
   );

@@ -4,7 +4,7 @@ export const CardsTitleWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 40px;
   margin-bottom: 20px;
   gap: 10px;
 
@@ -12,7 +12,7 @@ export const CardsTitleWrapper = styled.div`
   font-size: 24px;
   line-height: 32px;
   font-weight: 700;
-  color: ${({ theme }) => theme.true.white};
+  color: ${props => props.theme.black};
 
   span {
     font-size: 12px;
@@ -59,12 +59,19 @@ export const CardContainer = styled.div`
   min-height: 184px;
   flex: 1;
   border-radius: 16px;
+  border: ${({ theme }) => !theme.dark && '1px solid' + theme.violet};
   padding: 16px;
   gap: 16px;
-  background-color: ${({ theme }) => theme.darkCard};
+  background-color: ${({ theme }) =>
+    !theme.dark && theme.true.white} !important;
 
   font-family: 'Manrope';
-  color: ${({ theme }) => theme.true.white};
+  color: ${props => props.theme.black};
+
+  &:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
+  }
 
   @media (max-width: 768px) {
     min-width: 180px;

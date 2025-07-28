@@ -132,7 +132,10 @@ const SmartContractInvoke: React.FC = () => {
   return (
     <Container>
       <Header>
-        <Title title={parseAddress(contractAddress, 25)} />
+        <Title
+          title={parseAddress(contractAddress, 25)}
+          route={`/smart-contracts`}
+        />
       </Header>
       <CardContainer>
         <CardContent>

@@ -33,12 +33,14 @@ export const AssetHeaderContainer = styled.div`
   &:hover {
     cursor: default;
   }
-  h1 {
+  h1,
+  h2 {
     width: 100%;
     white-space: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
+
   p {
     margin-top: 0.25rem;
     color: ${props => props.theme.darkText} !important;

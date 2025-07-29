@@ -14,8 +14,11 @@ export const UrisTab: React.FC<PropsWithChildren<AssetProps>> = ({ asset }) => {
                 <strong>{key}</strong>
               </span>
               <div>
-                <a href={`${value}`} target="blank">
-                  {value}
+                <a
+                  href={value.includes('http') ? value : `https://${value}`}
+                  target="blank"
+                >
+                  {value.includes('http') ? value : `https://${value}`}
                 </a>
               </div>
             </Row>

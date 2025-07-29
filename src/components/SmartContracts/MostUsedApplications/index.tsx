@@ -40,7 +40,6 @@ const MostUsedApplications = () => {
     <>
       <CardsTitleWrapper>
         <h3>{t('smartContracts:Titles.Most Used Applications')}</h3>
-        <span>{t('smartContracts:Titles.Daily')}</span>
       </CardsTitleWrapper>
 
       <CarouselContainer>

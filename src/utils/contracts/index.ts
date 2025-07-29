@@ -478,6 +478,7 @@ export const smartContractsTableHeaders = [
 export const smartContractInvokesTransactionsTableHeaders = [
   'Tx Hash',
   'Age',
+  'Deployer',
   'Status',
   'Fee',
   'Bandwidth Fee',

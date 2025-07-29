@@ -69,7 +69,7 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       element: props => (
         <DoubleRow>
           <CenteredRow>
-            <Link href={`/smart-contract-transaction/${hash}`} key={sender}>
+            <Link href={`/account/${sender}`} key={sender}>
               <Mono>{parseAddress(sender, 15)}</Mono>
             </Link>
             <Copy data={sender} info="Deployer" />

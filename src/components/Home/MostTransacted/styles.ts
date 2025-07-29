@@ -1,14 +1,18 @@
 import { TableGradientBorder } from '@/components/Table/styles';
 import styled from 'styled-components';
 
-export const SectionContainer = styled.div`
+export const SectionContainer = styled.div<{
+  network?: string;
+}>`
   display: flex;
   flex-direction: column;
   gap: 24px;
 
   @media (min-width: 768px) {
-    flex-direction: row;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: ${props =>
+      props.network === 'Devnet' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'};
+    /* gap: 16px; */
   }
 `;
 
@@ -19,7 +23,7 @@ export const TableContainer = styled.div`
   width: 100%;
 
   @media (min-width: 768px) {
-    width: 50%;
+    margin-bottom: 20px;
   }
 `;
 
@@ -47,7 +51,9 @@ export const Row = styled.tr`
   }
 `;
 
-export const HeaderItem = styled.th`
+export const HeaderItem = styled.th<{
+  hotContracts?: boolean;
+}>`
   font-size: 14px;
   font-weight: 500;
   color: ${({ theme }) => theme.black};
@@ -66,10 +72,14 @@ export const HeaderItem = styled.th`
   }
 `;
 
-export const Cell = styled.td`
+export const Cell = styled.td<{
+  hotContracts?: boolean;
+  justifyContent?: string;
+}>`
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: flex-start;
 
   font-size: 14px;
   font-weight: 400;
@@ -97,4 +107,33 @@ export const MostTransactedLink = styled.a`
   text-decoration: underline;
 
   cursor: pointer;
+`;
+
+export const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  a {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Monrope';
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    color: ${({ theme }) => theme.violet};
+
+    span:hover {
+      color: ${({ theme }) => theme.true.white};
+    }
+  }
+`;
+
+export const MostTransactedDoubleRow = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 `;

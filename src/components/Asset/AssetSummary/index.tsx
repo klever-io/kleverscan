@@ -151,7 +151,16 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
               )}
               <AssetHeaderContainer>
                 {asset ? (
-                  <h1>{asset?.name}</h1>
+                  <Title
+                    key={asset?.name}
+                    Component={() =>
+                      asset?.name.length > 20 ? (
+                        <h2>{asset?.name}</h2>
+                      ) : (
+                        <h1>{asset?.name}</h1>
+                      )
+                    }
+                  />
                 ) : (
                   <Skeleton width={200} height={40} />
                 )}

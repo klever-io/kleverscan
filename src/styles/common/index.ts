@@ -620,3 +620,71 @@ export const ButtonVote = styled.button<{
     max-width: 100%;
   }
 `;
+
+export const SponsoredContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 20px 0 20px 0;
+  gap: 8px;
+
+  span {
+    font-family: 'Manrope';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #c6c7eb;
+  }
+`;
+
+export const SponsoredTitleSection = styled.div`
+  width: 100%;
+  height: 44px;
+  border-radius: 200px;
+  padding: 10px 12px;
+  gap: 8px;
+  background-color: #1f1f24;
+`;
+
+export const Badge = styled.span<{
+  active: boolean;
+}>`
+  display: flex;
+  align-items: center;
+  border-radius: 24px;
+  border: 1px solid ${props => (props.active ? '#7D3FF1' : '#C81B3B')};
+  background-color: ${props => (props.active ? '#7D3FF166' : '#C81B3B66')};
+  padding: 4px 8px;
+  gap: 4px;
+
+  font-family: 'Manrope';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 16px;
+  color: ${props => props.theme.darkText};
+`;
+
+export const BadgeContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+`;
+
+export const InvokeMethodBagde = styled.div`
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid #4ebc87;
+  background-color: ${({ theme }) =>
+    theme.dark ? '#296b4b80' : transparentize(0.8, theme.table['success'])};
+  padding: 4px 8px;
+
+  font-family: 'Manrope';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 12px;
+  line-height: 16px;
+  color: #4ebc87;
+`;

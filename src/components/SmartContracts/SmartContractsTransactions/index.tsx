@@ -47,7 +47,7 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
         <DoubleRow>
           <CenteredRow>
             <Link href={`/smart-contract-transaction/${hash}`} key={hash}>
-              <Mono>{parseAddress(hash, 30)}</Mono>
+              <Mono>{parseAddress(hash, 15)}</Mono>
             </Link>
             <Copy data={hash} info="txHash" />
           </CenteredRow>
@@ -60,6 +60,20 @@ const invokesListRowSections = (invokes: InvokesList): IRowSection[] => {
       element: props => (
         <DoubleRow>
           <span>{getAge(fromUnixTime(timestamp), undefined)}</span>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    {
+      // Deploy
+      element: props => (
+        <DoubleRow>
+          <CenteredRow>
+            <Link href={`/account/${sender}`} key={sender}>
+              <Mono>{parseAddress(sender, 15)}</Mono>
+            </Link>
+            <Copy data={sender} info="Deployer" />
+          </CenteredRow>
         </DoubleRow>
       ),
       span: 1,

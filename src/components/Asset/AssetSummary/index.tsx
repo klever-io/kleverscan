@@ -65,7 +65,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
     loading,
     setLoading,
   } = useParticipate();
-  const { isTablet } = useMobile();
+  const { isTablet, isMobile } = useMobile();
   const router = useRouter();
   const { walletAddress, connectExtension, extensionInstalled } =
     useExtension();
@@ -154,8 +154,8 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
                   <Title
                     key={asset?.name}
                     Component={() =>
-                      asset?.name.length > 20 ? (
-                        <h2>{asset?.name}</h2>
+                      isMobile ? (
+                        <span>{asset?.name}</span>
                       ) : (
                         <h1>{asset?.name}</h1>
                       )

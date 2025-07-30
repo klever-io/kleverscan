@@ -7,7 +7,6 @@ import React, {
 import { SmartContractsList } from '@/types/smart-contract';
 import { smartContractsTableHeaders } from '@/utils/contracts';
 import { IRowSection } from '@/types';
-import { Search } from '@/assets/icons';
 import Copy from '@/components/Copy';
 import api from '@/services/api';
 import Table, { ITable } from '@/components/Table';
@@ -19,6 +18,8 @@ import { formatDate } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { NextRouter, useRouter } from 'next/router';
+import TransactionsFilters from '@/components/TransactionsFilters';
+import Filter from '@/components/Filter';
 
 interface IRequestQuery {
   deployer?: string;
@@ -46,7 +47,10 @@ const smartContractsListRowSections = (
           </CenteredRow>
           <CenteredRow>
             <Link
-              href={`/smart-contract/${contractAddress}`}
+              href={
+                `/smart-contract/${contractAddress}` +
+                (name ? `?name=${name}` : '')
+              }
               key={contractAddress}
             >
               <Mono>{parseAddress(contractAddress, 25)}</Mono>
@@ -71,7 +75,10 @@ const smartContractsListRowSections = (
       element: props => (
         <CenteredRow>
           <Link
-            href={`/smart-contract/${contractAddress}`}
+            href={
+              `/smart-contract/${contractAddress}` +
+              (name ? `?name=${name}` : '')
+            }
             key={contractAddress}
           >
             <Mono>{parseAddress(deployer, 25)}</Mono>
@@ -102,48 +109,97 @@ const smartContractsListRowSections = (
 };
 
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
-  const [search, setSearch] = useState<string>('');
   const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [orderBy, setOrderBy] = useState<string>('Most Transactioned');
   const router = useRouter();
 
-  const requestSmartContractsList = async (
-    page: number,
-    limit: number,
-    router: NextRouter,
-    query?: IRequestQuery,
-  ) => {
-    try {
-      const localQuery: { [key: string]: any } = {
-        ...router.query,
-        page,
-        limit,
-      };
-      const searchTerm = search.toLowerCase();
-      if (searchTerm) {
-        query = { ...query, deployer: searchTerm };
-      }
-      const smartContractsListRes = await api.get({
-        route: 'sc/list',
-        query: query ?? localQuery,
-      });
-      if (!smartContractsListRes.error || smartContractsListRes.error === '') {
-        const sortedSmartContracts = smartContractsListRes.data.sc.sort(
-          (a: any, b: any) =>
-            (b.totalTransactions || 0) - (a.totalTransactions || 0),
-        );
-
-        const data = {
-          ...smartContractsListRes,
-          data: { smartContracts: sortedSmartContracts },
+  const requestSmartContractsList = useCallback(
+    async (
+      page: number,
+      limit: number,
+      router: NextRouter,
+      query?: IRequestQuery,
+    ) => {
+      try {
+        const localQuery: { [key: string]: any } = {
+          ...router.query,
+          page,
+          limit,
+          orderBy,
         };
-        return data;
-      } else {
-        throw new Error(smartContractsListRes.error);
+
+        const smartContractsListRes = await api.get({
+          route: 'sc/list',
+          query: query ?? localQuery,
+        });
+        if (
+          !smartContractsListRes.error ||
+          smartContractsListRes.error === ''
+        ) {
+          const sortedSmartContracts = smartContractsListRes.data.sc.sort(
+            (a: any, b: any) => {
+              switch (orderBy) {
+                case 'Last Date':
+                  return (b.timestamp || 0) - (a.timestamp || 0);
+                case 'First Date':
+                  return (a.timestamp || 0) - (b.timestamp || 0);
+                case 'Most Transactioned':
+                  return (
+                    (b.totalTransactions || 0) - (a.totalTransactions || 0)
+                  );
+                case 'Least Transactioned':
+                  return (
+                    (a.totalTransactions || 0) - (b.totalTransactions || 0)
+                  );
+                default:
+                  return (
+                    (b.totalTransactions || 0) - (a.totalTransactions || 0)
+                  );
+              }
+            },
+          );
+
+          const data = {
+            ...smartContractsListRes,
+            data: { smartContracts: sortedSmartContracts },
+          };
+          return data;
+        } else {
+          throw new Error(smartContractsListRes.error);
+        }
+      } catch (error) {
+        console.error('Error fetching smart contracts list:', error);
+        throw error;
       }
-    } catch (error) {
-      console.error('Error fetching smart contracts list:', error);
-      throw error;
-    }
+    },
+    [orderBy],
+  );
+
+  const handleFilters = () => {
+    const filters = [
+      {
+        title: 'Order By',
+        current: orderBy,
+        data: [
+          'Last Date',
+          'First Date',
+          'Most Transactioned',
+          'Least Transactioned',
+        ],
+        onClick: (selected: string) => {
+          setOrderBy(selected);
+          setRefreshKey((prev: number) => prev + 1);
+        },
+      },
+    ];
+
+    return (
+      <>
+        {filters?.map((filter: any) => (
+          <Filter key={`${filter?.title}-${filter?.current}`} {...filter} />
+        ))}
+      </>
+    );
   };
 
   const tableProps: ITable = {
@@ -153,30 +209,14 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
     request: (page, limit) => requestSmartContractsList(page, limit, router),
     dataName: 'smartContracts',
     showLimit: true,
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    setRefreshKey(prev => prev + 1);
+    Filters: handleFilters,
   };
 
   return (
     <>
       <CardsTitleWrapper>
-        <h3>Browse all deployed contracts</h3>
+        <h3>Browse All Deployed Contracts</h3>
       </CardsTitleWrapper>
-
-      {/* <InputContractContainer>
-        <input
-          type="text"
-          placeholder="Search for Deployed"
-          value={search}
-          onChange={handleSearchChange}
-          aria-label="Search for Smart Contracts"
-          id="smart-contract-search"
-        />
-        <Search />
-      </InputContractContainer> */}
       <Table key={refreshKey} {...tableProps} />
     </>
   );

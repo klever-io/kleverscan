@@ -63,7 +63,7 @@ export const CardContainer = styled.div`
   padding: 16px;
   gap: 16px;
   background-color: ${({ theme }) =>
-    !theme.dark && theme.true.white} !important;
+    !theme.dark ? theme.true.white : theme.darkCard};
 
   font-family: 'Manrope';
   color: ${props => props.theme.black};

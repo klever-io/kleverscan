@@ -154,7 +154,11 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
                   <Title
                     key={asset?.name}
                     Component={() =>
-                      isMobile ? <h3>{asset?.name}</h3> : <h1>{asset?.name}</h1>
+                      isMobile ? (
+                        <span>{asset?.name}</span>
+                      ) : (
+                        <h1>{asset?.name}</h1>
+                      )
                     }
                   />
                 ) : (

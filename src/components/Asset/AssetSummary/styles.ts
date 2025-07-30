@@ -257,8 +257,6 @@ export const LeftSide = styled.div`
   flex-direction: column;
 
   gap: 12px;
-
-  max-width: 565px;
 `;
 
 export const Description = styled.p`

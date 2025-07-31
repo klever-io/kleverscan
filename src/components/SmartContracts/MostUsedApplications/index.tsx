@@ -15,6 +15,7 @@ import { ArrowLeft, ArrowRight } from '@/assets/pagination';
 import { ArrowContainer } from '@/components/Pagination/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
+import Image from 'next/legacy/image';
 
 const MostUsedApplications = () => {
   const { t } = useTranslation('smartContracts');
@@ -62,12 +63,12 @@ const MostUsedApplications = () => {
                   </CardContractInfo>
                 </CardHeader>
                 <CardContractName>
-                  <AssetLogo
-                    logo={'/assets/klv-logo.png'}
-                    ticker={'KLV'}
-                    name={'Klever'}
-                    invertColors={true}
-                    size={30}
+                  <Image
+                    src={'/Smart-contract.svg'}
+                    alt="Smart Contract Logo"
+                    width="29"
+                    height="29"
+                    loader={({ src, width }) => `${src}?w=${width}`}
                   />
                   <span>{app.name || '- -'}</span>
                   <small>{parseAddress(app.ownerAddress, 25)}</small>

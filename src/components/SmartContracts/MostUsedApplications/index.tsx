@@ -65,10 +65,9 @@ const MostUsedApplications = () => {
                 <CardContractName>
                   <Image
                     src={'/Smart-contract.svg'}
-                    alt="Smart Contract Logo"
+                    alt="Logo"
                     width="29"
                     height="29"
-                    loader={({ src, width }) => `${src}?w=${width}`}
                   />
                   <span>{app.name || '- -'}</span>
                   <small>{parseAddress(app.ownerAddress, 25)}</small>

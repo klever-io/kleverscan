@@ -8,15 +8,19 @@ interface ISkeletonTableProps {
 }
 
 const SkeletonTable: React.FC<ISkeletonTableProps> = ({ items, columns }) => {
-  return Array.from({ length: items }).map((_, index) => (
-    <Row key={index}>
-      {Array.from({ length: columns }).map((_, index) => (
-        <Cell key={index}>
-          <Skeleton />
-        </Cell>
+  return (
+    <>
+      {Array.from({ length: items }).map((_, index) => (
+        <Row key={index}>
+          {Array.from({ length: columns }).map((_, colIndex) => (
+            <Cell key={colIndex}>
+              <Skeleton />
+            </Cell>
+          ))}
+        </Row>
       ))}
-    </Row>
-  ));
+    </>
+  );
 };
 
 export default SkeletonTable;

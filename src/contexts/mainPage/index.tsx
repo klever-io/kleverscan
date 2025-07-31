@@ -33,6 +33,7 @@ export interface IHomeData {
   newAccounts?: number;
   totalAccounts?: number;
   transactions: ITransaction[];
+  loadingTransactions?: boolean;
   totalTransactions?: number;
   loadingCards: boolean;
   loadingBlocks: boolean;
@@ -48,6 +49,7 @@ export interface IHomeData {
   mostTransactedKDAFee: MostTransferredToken[];
   hotContracts: MostTransferredToken[];
   epoch?: number;
+  loadingMostTransacted?: boolean;
 }
 
 export const HomeData = createContext({} as IHomeData);
@@ -159,6 +161,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
         ? accountResult.data?.totalAccounts
         : prevValuesRef.current.totalAccounts,
     transactions: aggregateResult.data?.transactions || [],
+    loadingTransactions: transactionsResult.isLoading,
     totalTransactions:
       (transactionsResult.data?.totalTransactions || 0) >
       prevValuesRef.current.totalTransactions
@@ -178,6 +181,11 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     mostTransactedKDAFee: mostTransactedKDAFee.data || [],
     epoch: aggregateResult.data?.overview?.epochNumber,
     hotContracts: hotContracts.data?.hotContracts || [],
+    loadingMostTransacted:
+      mostTransactedTokens.isLoading ||
+      mostTransactedNFTs.isLoading ||
+      mostTransactedKDAFee.isLoading ||
+      hotContracts.isLoading,
   };
 
   prevValuesRef.current = {

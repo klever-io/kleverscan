@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { PurpleArrowRight } from '@/assets/icons';
 import { parseAddress } from '@/utils/parseValues';
 import { getNetwork } from '@/utils/networkFunctions';
+import SkeletonTable from '@/components/SkeletonTable';
 const network = getNetwork();
 
 const MostTransacted: React.FC<PropsWithChildren> = () => {
@@ -25,6 +26,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
     mostTransactedNFTs,
     mostTransactedKDAFee,
     hotContracts,
+    loadingMostTransacted,
   } = useHomeData();
 
   const tables = [
@@ -82,41 +84,45 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
               </Row>
             </thead>
             <tbody>
-              {table?.data?.map((item, index) =>
-                table.title !== 'Hot Contracts' ? (
-                  <Row key={index}>
-                    <Cell>{index + 1}</Cell>
-                    <Cell>
-                      <Link href={`/asset/${item?.key}`} legacyBehavior>
-                        <MostTransactedLink href={`/asset/${item?.key}`}>
-                          <AssetLogo
-                            logo={item?.logo}
-                            ticker={item?.key}
-                            name={item?.key}
-                          />
-                          {item?.key}
-                        </MostTransactedLink>
-                      </Link>
-                    </Cell>
-                    <Cell>{item?.doc_count?.toLocaleString()}</Cell>
-                  </Row>
-                ) : (
-                  <Row key={index}>
-                    <Cell>{index + 1}</Cell>
-                    <Cell>
-                      <MostTransactedDoubleRow>
-                        <span>{item?.name || '- -'}</span>
-                        <MostTransactedLink
-                          href={`/smart-contract/${item?.address}`}
-                        >
-                          <span>{parseAddress(item?.address, 16)}</span>
-                        </MostTransactedLink>
-                      </MostTransactedDoubleRow>
-                    </Cell>
-                    <Cell>{parseAddress(item?.ownerAddress, 16)}</Cell>
-                    <Cell>{item?.count}</Cell>
-                  </Row>
-                ),
+              {loadingMostTransacted ? (
+                <SkeletonTable items={10} columns={table.header.length} />
+              ) : (
+                table?.data?.map((item, index) =>
+                  table.title !== 'Hot Contracts' ? (
+                    <Row key={index}>
+                      <Cell>{index + 1}</Cell>
+                      <Cell>
+                        <Link href={`/asset/${item?.key}`} legacyBehavior>
+                          <MostTransactedLink href={`/asset/${item?.key}`}>
+                            <AssetLogo
+                              logo={item?.logo}
+                              ticker={item?.key}
+                              name={item?.key}
+                            />
+                            {item?.key}
+                          </MostTransactedLink>
+                        </Link>
+                      </Cell>
+                      <Cell>{item?.doc_count?.toLocaleString()}</Cell>
+                    </Row>
+                  ) : (
+                    <Row key={index}>
+                      <Cell>{index + 1}</Cell>
+                      <Cell>
+                        <MostTransactedDoubleRow>
+                          <span>{item?.name || '- -'}</span>
+                          <MostTransactedLink
+                            href={`/smart-contract/${item?.address}`}
+                          >
+                            <span>{parseAddress(item?.address, 16)}</span>
+                          </MostTransactedLink>
+                        </MostTransactedDoubleRow>
+                      </Cell>
+                      <Cell>{parseAddress(item?.ownerAddress, 16)}</Cell>
+                      <Cell>{item?.count}</Cell>
+                    </Row>
+                  ),
+                )
               )}
             </tbody>
           </Table>

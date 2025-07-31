@@ -21,6 +21,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import { ValidatorName } from './style';
+import SkeletonTable from '@/components/SkeletonTable';
 
 export const blocksHeader = [
   '',
@@ -220,7 +221,7 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
 };
 
 const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
-  const { blocks } = useHomeData();
+  const { blocks, loadingBlocks } = useHomeData();
   const { t: commonT } = useTranslation('common');
   const { t } = useTranslation('blocks');
   const [hideMenu, setHideMenu] = useState(false);
@@ -273,10 +274,19 @@ const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
           </div>
         ) : null}
       </ContainerHide>
-
-      <TransactionContainer>
-        {!hideMenu && <Table {...tableProps} />}
-      </TransactionContainer>
+      {!loadingBlocks ? (
+        <TransactionContainer>
+          {!hideMenu && <Table {...tableProps} />}
+        </TransactionContainer>
+      ) : (
+        <TransactionContainer>
+          <table>
+            <tbody>
+              <SkeletonTable items={10} columns={4} />
+            </tbody>
+          </table>
+        </TransactionContainer>
+      )}
     </SectionCards>
   );
 };

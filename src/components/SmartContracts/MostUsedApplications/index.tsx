@@ -74,8 +74,8 @@ const MostUsedApplications = () => {
                           : '/Smart-contract-black.svg'
                       }
                       alt="Logo"
-                      width="16"
-                      height="16"
+                      width={16}
+                      height={16}
                     />
                   </LogoContainer>
                   <span>{app.name || '- -'}</span>

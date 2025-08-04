@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardHeaderItem,
   CardTabContainer,
+  CommonContainer,
   Container,
 } from '@/styles/common';
 import { CardRaw } from '@/views/transactions/detail';
@@ -51,25 +52,27 @@ const SmartContractTransaction: React.FC = () => {
     <Container>
       <SCTransactionDetails transactionData={transactionData || {}} />
 
-      <CardTabContainer>
-        <CardHeader>
-          <CardHeaderItem selected={true}>
-            <span>Raw Tx</span>
-          </CardHeaderItem>
-        </CardHeader>
-        <CardContent>
-          <CardRaw>
-            <ReactJson
-              src={transactionData || {}}
-              name={false}
-              displayObjectSize={false}
-              enableClipboard={true}
-              displayDataTypes={false}
-              theme={getRawTxTheme(isDarkTheme)}
-            />
-          </CardRaw>
-        </CardContent>
-      </CardTabContainer>
+      <CommonContainer>
+        <CardTabContainer>
+          <CardHeader>
+            <CardHeaderItem selected={true}>
+              <span>Raw Tx</span>
+            </CardHeaderItem>
+          </CardHeader>
+          <CardContent>
+            <CardRaw>
+              <ReactJson
+                src={transactionData || {}}
+                name={false}
+                displayObjectSize={false}
+                enableClipboard={true}
+                displayDataTypes={false}
+                theme={getRawTxTheme(isDarkTheme)}
+              />
+            </CardRaw>
+          </CardContent>
+        </CardTabContainer>
+      </CommonContainer>
     </Container>
   );
 };

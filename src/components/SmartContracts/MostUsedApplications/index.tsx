@@ -79,7 +79,7 @@ const MostUsedApplications = () => {
                     />
                   </LogoContainer>
                   <span>{app.name || '- -'}</span>
-                  <small>{parseAddress(app.ownerAddress, 25)}</small>
+                  <small>{parseAddress(app.ownerAddress, 15)}</small>
                 </CardContractName>
               </CardContainer>
             </Link>

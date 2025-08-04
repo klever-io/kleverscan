@@ -5,7 +5,7 @@ export const CardsTitleWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   margin-top: 40px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   gap: 10px;
 
   font-family: 'Manrope';

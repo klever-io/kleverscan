@@ -65,7 +65,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
     loading,
     setLoading,
   } = useParticipate();
-  const { isTablet } = useMobile();
+  const { isTablet, isMobile } = useMobile();
   const router = useRouter();
   const { walletAddress, connectExtension, extensionInstalled } =
     useExtension();
@@ -151,7 +151,16 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
               )}
               <AssetHeaderContainer>
                 {asset ? (
-                  <h1>{asset?.name}</h1>
+                  <Title
+                    key={asset?.name}
+                    Component={() =>
+                      isMobile ? (
+                        <span>{asset?.name}</span>
+                      ) : (
+                        <h1>{asset?.name}</h1>
+                      )
+                    }
+                  />
                 ) : (
                   <Skeleton width={200} height={40} />
                 )}

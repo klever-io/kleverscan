@@ -35,6 +35,7 @@ import {
   TableRowProps,
   TableEmptyData,
 } from './styles';
+import SmartContractCard from '../SmartContracts/SmartContractCard';
 
 export interface ITable {
   type:
@@ -58,7 +59,9 @@ export interface ITable {
     | 'validatorsList'
     | 'rewards'
     | 'marketplaces'
-    | 'launchPad';
+    | 'launchPad'
+    | 'smartContracts'
+    | 'smartContractsInvokes';
 
   header: string[];
   rowSections: (item: any) => IRowSection[];
@@ -287,7 +290,17 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
               let spanCount = 0;
               const isLastRow = index === response?.items?.length - 1;
 
-              return (
+              return type === 'smartContracts' && (isMobile || isTablet) ? (
+                <SmartContractCard
+                  key={index}
+                  name={item?.name}
+                  timestamp={item?.timestamp}
+                  contractAddress={item?.contractAddress}
+                  deployer={item?.deployer}
+                  deployTxHash={item?.deployTxHash}
+                  totalTransactions={item?.totalTransactions}
+                />
+              ) : (
                 <TableRow
                   key={JSON.stringify(item)}
                   {...props}

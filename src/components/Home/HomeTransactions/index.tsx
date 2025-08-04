@@ -33,6 +33,7 @@ import React, { useCallback, useState } from 'react';
 import Table, { ITable } from '../../Table';
 import api from '@/services/api';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
+import SkeletonTable from '@/components/SkeletonTable';
 
 export const homeTransactionTableHeaders = [
   'Transaction Hash',
@@ -273,7 +274,10 @@ export const homeTransactionsTabletRowSections = (
 
 const HomeTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
-  const { transactions: homeTransactions } = useHomeData();
+  const {
+    transactions: homeTransactions,
+    loadingTransactions: loadingTransactions,
+  } = useHomeData();
   const [hideMenu, setHideMenu] = useState(false);
 
   const { isTablet } = useMobile();
@@ -339,9 +343,19 @@ const HomeTransactions: React.FC<PropsWithChildren> = () => {
           </div>
         ) : null}
       </ContainerHide>
-      <TransactionContainer>
-        {!hideMenu && <Table {...tableProps} />}
-      </TransactionContainer>
+      {!loadingTransactions ? (
+        <TransactionContainer>
+          {!hideMenu && <Table {...tableProps} />}
+        </TransactionContainer>
+      ) : (
+        <TransactionContainer>
+          <table>
+            <tbody>
+              <SkeletonTable items={10} columns={4} />
+            </tbody>
+          </table>
+        </TransactionContainer>
+      )}
     </SectionCards>
   );
 };

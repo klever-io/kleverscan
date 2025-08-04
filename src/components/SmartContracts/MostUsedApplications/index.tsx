@@ -7,6 +7,7 @@ import {
   CardsContainerWrapper,
   CardsTitleWrapper,
   CarouselContainer,
+  LogoContainer,
 } from './styles';
 import { useSmartContractData } from '@/contexts/smartContractPage';
 import { parseAddress } from '@/utils/parseValues';
@@ -15,9 +16,12 @@ import { ArrowLeft, ArrowRight } from '@/assets/pagination';
 import { ArrowContainer } from '@/components/Pagination/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
+import Image from 'next/legacy/image';
+import { useTheme } from '@/contexts/theme';
 
 const MostUsedApplications = () => {
   const { t } = useTranslation('smartContracts');
+  const { isDarkTheme } = useTheme();
   const { smartContractsStatistic } = useSmartContractData();
 
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -62,15 +66,20 @@ const MostUsedApplications = () => {
                   </CardContractInfo>
                 </CardHeader>
                 <CardContractName>
-                  <AssetLogo
-                    logo={'/assets/klv-logo.png'}
-                    ticker={'KLV'}
-                    name={'Klever'}
-                    invertColors={true}
-                    size={30}
-                  />
+                  <LogoContainer>
+                    <Image
+                      src={
+                        isDarkTheme
+                          ? '/Smart-contract.svg'
+                          : '/Smart-contract-black.svg'
+                      }
+                      alt="Logo"
+                      width={16}
+                      height={16}
+                    />
+                  </LogoContainer>
                   <span>{app.name || '- -'}</span>
-                  <small>{parseAddress(app.ownerAddress, 25)}</small>
+                  <small>{parseAddress(app.ownerAddress, 15)}</small>
                 </CardContractName>
               </CardContainer>
             </Link>

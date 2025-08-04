@@ -688,3 +688,7 @@ export const InvokeMethodBagde = styled.div`
   line-height: 16px;
   color: #4ebc87;
 `;
+
+export const CommonContainer = styled.div`
+  margin-top: 60px;
+`;

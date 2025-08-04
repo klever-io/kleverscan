@@ -168,7 +168,6 @@ const SmartContractsTransactions: React.FC<SmartContractsTransactionsProps> = ({
     rowSections: invokesListRowSections,
     request: (page, limit) => requestInvokesList(page, limit),
     dataName: 'invokes',
-    // showLimit: true,
   };
 
   return <Table {...tableProps} />;

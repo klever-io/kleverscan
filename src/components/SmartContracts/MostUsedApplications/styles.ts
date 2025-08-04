@@ -5,7 +5,7 @@ export const CardsTitleWrapper = styled.div`
   flex-direction: row;
   align-items: center;
   margin-top: 40px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   gap: 10px;
 
   font-family: 'Manrope';
@@ -121,4 +121,15 @@ export const CardContractName = styled.div`
     font-weight: 700;
     line-height: 16px;
   }
+`;
+
+export const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: ${({ theme }) =>
+    theme.dark ? theme.black10 : theme.background};
 `;

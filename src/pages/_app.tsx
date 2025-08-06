@@ -38,8 +38,16 @@ const LayoutWrapper: React.FC<PropsWithChildren> = ({ children }) => {
 const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
   const router = useRouter();
   useEffect(() => {
-    const handleRouteChange = (url: URL) => {
-      gtag.pageview(url);
+    const handleRouteChange = (url: string) => {
+      if (url === '/') {
+        gtag.pageview(url);
+      } else {
+        const cleanUrl = url.split(/[?#]/)[0];
+        const splitUrl: string[] = cleanUrl.split('/').filter(Boolean);
+        const slicedUrl = splitUrl.slice(0, 1);
+        const newUrl = '/' + slicedUrl.join('/') + '/';
+        gtag.pageview(newUrl);
+      }
     };
     router.events.on('routeChangeComplete', handleRouteChange);
     return () => {

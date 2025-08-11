@@ -11,7 +11,7 @@ export const SectionContainer = styled.div<{
   @media (min-width: 768px) {
     display: grid;
     grid-template-columns: ${props =>
-      props.network === 'Devnet' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'};
+      props.network !== 'Mainnet' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'};
     /* gap: 16px; */
   }
 `;

@@ -45,7 +45,7 @@ const navbarItems: INavbarItem[] = [
     pathTo: '/assets',
     Icon: Graph,
   },
-  ...(network === 'Devnet'
+  ...(network !== 'Mainnet'
     ? [
         {
           name: 'Smart Contracts',
@@ -70,7 +70,7 @@ const navbarItems: INavbarItem[] = [
       //   pathTo: '/nodes',
       //   Icon: Compass,
       // },
-      ...(network === 'Devnet'
+      ...(network !== 'Mainnet'
         ? [
             {
               name: 'Validators',

@@ -45,7 +45,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
       data: mostTransactedKDAFee,
       header: ['Rank', 'Token', 'Total Txn'],
     },
-    ...(network === 'Devnet'
+    ...(network !== 'Mainnet'
       ? [
           {
             title: 'Hot Contracts',

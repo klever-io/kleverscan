@@ -37,6 +37,50 @@ const LayoutWrapper: React.FC<PropsWithChildren> = ({ children }) => {
 
 const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
   const router = useRouter();
+  const extensions = ['kleverWeb', 'tronlink', 'metamask', 'trust'];
+
+  useEffect(() => {
+    const getWalletExtensions = (extensions: string[]) => {
+      const detected: string[] = [];
+
+      const w = window as any;
+
+      for (const extension of extensions) {
+        switch (extension) {
+          case 'kleverWeb':
+            if (w.kleverWeb.isKlever) {
+              detected.push(extension);
+            }
+            break;
+          case 'tronlink':
+            if (w.tronLink || w.tronWeb) {
+              detected.push(extension);
+            }
+            break;
+          case 'metamask':
+            if (w.ethereum.isMetaMask) {
+              detected.push(extension);
+            }
+            break;
+          case 'trust':
+            if (w.trustWallet.isTrust) {
+              detected.push(extension);
+            }
+            break;
+          default:
+            break;
+        }
+      }
+
+      return Array.from(new Set(detected));
+    };
+    const detectedExtensions = getWalletExtensions(extensions);
+
+    if (detectedExtensions.length > 0) {
+      gtag.cryptoWalletDetected(detectedExtensions, detectedExtensions.length);
+    }
+  }, [extensions]);
+
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       if (url === '/') {

@@ -57,7 +57,10 @@ const MostUsedApplications = () => {
             <CardsContainerWrapper ref={carouselRef}>
               {smartContractsStatistic?.map((app, index) => (
                 <Link
-                  href={`/smart-contract/${app.address}`}
+                  href={
+                    `/smart-contract/${app.address}` +
+                    (app.name ? `?name=${app.name}` : '')
+                  }
                   key={app.address || index}
                 >
                   <CardContainer key={app.address || index}>

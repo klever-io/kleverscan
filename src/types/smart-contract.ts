@@ -1,3 +1,4 @@
+import { IPagination, IResponse } from '.';
 export interface HotContracts {
   name: string;
   address: string;
@@ -70,4 +71,21 @@ export interface SmartContractTransactionData {
   }>;
   price?: number;
   data?: string[];
+}
+
+export interface ISmartContractResponse extends IResponse {
+  pagination: IPagination;
+  data: {
+    sc: {
+      contractAddress: string;
+      properties: {
+        payable?: boolean;
+        payableBySC?: boolean;
+        upgradeable?: boolean;
+        readable?: boolean;
+      };
+      upgrades: string[];
+      timestamp: number;
+    };
+  };
 }

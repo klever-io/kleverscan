@@ -520,17 +520,11 @@ export const SmartContractRowSections = (
             </span>
             <CenteredRow>
               <PropertiesWrapper>
-                {Object.entries(sc?.properties || {}).map(([key, value]) =>
-                  value ? (
-                    <SpanWrapper>
-                      {key} <WhiteTick />
-                    </SpanWrapper>
-                  ) : (
-                    <SpanWrapper>
-                      {key} <RedFailed />
-                    </SpanWrapper>
-                  ),
-                )}
+                {Object.entries(sc?.properties || {}).map(([key, value]) => (
+                  <SpanWrapper key={key}>
+                    {key} {value ? <WhiteTick /> : <RedFailed />}
+                  </SpanWrapper>
+                ))}
               </PropertiesWrapper>
             </CenteredRow>
           </HashSpan>

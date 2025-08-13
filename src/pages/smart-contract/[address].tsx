@@ -118,7 +118,9 @@ const SmartContractInvoke: React.FC = () => {
   };
 
   const formatKey = (str: string) => {
-    return str.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
+    return str
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/(^\w|\s\w)/g, m => m.toUpperCase());
   };
 
   useEffect(() => {

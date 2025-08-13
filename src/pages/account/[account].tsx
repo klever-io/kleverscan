@@ -761,7 +761,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
             account?.name ? account?.name : t('accounts:SingleAccount.Title')
           }
           Icon={AccountIcon}
-          route={'/accounts'}
+          route={-1}
           isAccountOwner={!!account?.name}
         />
       </Header>

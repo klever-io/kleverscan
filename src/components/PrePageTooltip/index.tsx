@@ -5,6 +5,7 @@ import { getAssetByPartialSymbol } from '@/services/requests/asset';
 import getAccount from '@/services/requests/searchBar/account';
 import getBlock from '@/services/requests/searchBar/block';
 import getTransaction from '@/services/requests/transaction';
+import getSmartContract from '@/services/requests/searchBar/smartContract';
 import {
   IAccountResponse,
   IAssetResponse,
@@ -24,6 +25,7 @@ import {
   AccountRowSections,
   AssetRowSections,
   BlockRowSections,
+  SmartContractRowSections,
   TransactionRowSections,
 } from './RowSections';
 import {
@@ -38,6 +40,7 @@ import {
   TooltipBody,
   TooltipWrapper,
 } from './styles';
+import { ISmartContractResponse } from '@/types/smart-contract';
 
 export interface IPrePageTooltip {
   search: string;
@@ -53,11 +56,15 @@ const getInputType = (value: string) => {
     return 'block';
   }
 
+  if (value.includes('qqqqqqqqqqqqq')) {
+    return 'smartContract';
+  }
+
   if (value.length === txLength) {
     return 'transaction';
   }
 
-  if (value.length === addressLength) {
+  if (value.length === addressLength && !value.includes('qqqqqqqqqqqqq')) {
     return 'account';
   }
   if (value.toUpperCase() === 'KLV' || value.toUpperCase() === 'KFI') {
@@ -115,6 +122,12 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
     }
   };
 
+  const isSmartContract = () => {
+    if (type === 'smartContract') {
+      return true;
+    }
+  };
+
   const getCorrectQueryFn = (): Promise<SearchRequest> | undefined => {
     if (isAsset()) {
       return getAssetByPartialSymbol(trimmedSearch);
@@ -130,6 +143,10 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
 
     if (isBlock()) {
       return getBlock(trimmedSearch);
+    }
+
+    if (isSmartContract()) {
+      return getSmartContract(trimmedSearch);
     }
   };
 
@@ -176,6 +193,18 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
         setShowTooltip,
       );
     }
+
+    if (isSmartContract()) {
+      setSearchValue(
+        `/smart-contract/${(data as ISmartContractResponse)?.data?.sc?.contractAddress}`,
+      );
+      return SmartContractRowSections(
+        data as ISmartContractResponse,
+        precision,
+        setShowTooltip,
+      );
+    }
+
     return [];
   };
 

@@ -58,8 +58,12 @@ const MostUsedApplications = () => {
               {smartContractsStatistic?.map((app, index) => (
                 <Link
                   href={
-                    `/smart-contract/${app.address}` +
-                    (app.name ? `?name=${app.name}` : '')
+                    app.name
+                      ? {
+                          pathname: `/smart-contract/${app.address}`,
+                          query: { name: app.name },
+                        }
+                      : `/smart-contract/${app.address}`
                   }
                   key={app.address || index}
                 >

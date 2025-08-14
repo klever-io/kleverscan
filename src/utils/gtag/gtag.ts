@@ -23,9 +23,8 @@ export const event = ({ action, category, label, value }: GTagEvent): void => {
   });
 };
 
-export const cryptoWalletDetected = (extensions: string[], total: number) => {
-  window.gtag('event', 'crypto_wallet_detected', {
-    extensions: extensions.join(','),
-    total_detected: total,
+export const hasExtensionWalletAccess = (hasAccess: boolean) => {
+  window.gtag('event', 'has_extension_wallet_access', {
+    has_access: hasAccess,
   });
 };

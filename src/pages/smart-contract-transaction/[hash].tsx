@@ -81,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
   const network = getNetwork();
-  if (network !== 'Devnet') {
+  if (network === 'Mainnet') {
     return {
       notFound: true,
     };

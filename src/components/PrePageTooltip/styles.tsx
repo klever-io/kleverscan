@@ -278,3 +278,10 @@ export const QuerySpan = styled.span`
   line-height: 1.5;
   font-weight: 700;
 `;
+
+export const PropertiesWrapper = styled.div`
+  display: grid;
+  justify-content: space-between;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+`;

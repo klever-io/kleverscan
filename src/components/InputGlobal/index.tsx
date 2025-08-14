@@ -25,7 +25,9 @@ const Input: React.FC<PropsWithChildren<InputGlobal>> = ({
   const { searchValue } = useInputSearch();
   const { t } = useTranslation('common');
 
-  const placeholder = t('Search Address, Block, Transaction, Asset');
+  const placeholder = t(
+    'Search Address, Smart Contracts, Block, Transaction, Asset',
+  );
   const router = useRouter();
 
   useEffect(() => {

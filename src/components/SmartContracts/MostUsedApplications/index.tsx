@@ -8,6 +8,7 @@ import {
   CardsTitleWrapper,
   CarouselContainer,
   LogoContainer,
+  NoDataContainer,
 } from './styles';
 import { useSmartContractData } from '@/contexts/smartContractPage';
 import { parseAddress } from '@/utils/parseValues';
@@ -47,48 +48,64 @@ const MostUsedApplications = () => {
       </CardsTitleWrapper>
 
       <CarouselContainer>
-        <ArrowContainer onClick={goToPrevious} active={true}>
-          <ArrowLeft />
-        </ArrowContainer>
+        {smartContractsStatistic && smartContractsStatistic?.length > 0 ? (
+          <>
+            <ArrowContainer onClick={goToPrevious} active={true}>
+              <ArrowLeft />
+            </ArrowContainer>
 
-        <CardsContainerWrapper ref={carouselRef}>
-          {smartContractsStatistic?.map((app, index) => (
-            <Link
-              href={`/smart-contract/${app.address}`}
-              key={app.address || index}
-            >
-              <CardContainer key={app.address || index}>
-                <CardHeader>
-                  <h4>#{index + 1}</h4>
-                  <CardContractInfo>
-                    <span>{t('smartContracts:Titles.Transactions')}</span>
-                    <span>{app?.count}</span>
-                  </CardContractInfo>
-                </CardHeader>
-                <CardContractName>
-                  <LogoContainer>
-                    <Image
-                      src={
-                        isDarkTheme
-                          ? '/Smart-contract.svg'
-                          : '/Smart-contract-black.svg'
-                      }
-                      alt="Logo"
-                      width={16}
-                      height={16}
-                    />
-                  </LogoContainer>
-                  <span>{app.name || '- -'}</span>
-                  <small>{parseAddress(app.ownerAddress, 15)}</small>
-                </CardContractName>
-              </CardContainer>
-            </Link>
-          ))}
-        </CardsContainerWrapper>
+            <CardsContainerWrapper ref={carouselRef}>
+              {smartContractsStatistic?.map((app, index) => (
+                <Link
+                  href={
+                    app.name
+                      ? {
+                          pathname: `/smart-contract/${app.address}`,
+                          query: { name: app.name },
+                        }
+                      : `/smart-contract/${app.address}`
+                  }
+                  key={app.address || index}
+                >
+                  <CardContainer key={app.address || index}>
+                    <CardHeader>
+                      <h4>#{index + 1}</h4>
+                      <CardContractInfo>
+                        <span>{t('smartContracts:Titles.Transactions')}</span>
+                        <span>{app?.count}</span>
+                      </CardContractInfo>
+                    </CardHeader>
+                    <CardContractName>
+                      <LogoContainer>
+                        <Image
+                          src={
+                            isDarkTheme
+                              ? '/Smart-contract.svg'
+                              : '/Smart-contract-black.svg'
+                          }
+                          alt="Logo"
+                          width={16}
+                          height={16}
+                        />
+                      </LogoContainer>
+                      <span>{app.name || '- -'}</span>
+                      <small>{parseAddress(app.ownerAddress, 15)}</small>
+                    </CardContractName>
+                  </CardContainer>
+                </Link>
+              ))}
+            </CardsContainerWrapper>
 
-        <ArrowContainer onClick={goToNext} active={true}>
-          <ArrowRight />
-        </ArrowContainer>
+            <ArrowContainer onClick={goToNext} active={true}>
+              <ArrowRight />
+            </ArrowContainer>
+          </>
+        ) : (
+          <NoDataContainer>
+            <span>No activity recorded today.</span>
+            <span> Check back soon to see the most active applications.</span>
+          </NoDataContainer>
+        )}
       </CarouselContainer>
     </>
   );

@@ -133,3 +133,22 @@ export const LogoContainer = styled.div`
   background-color: ${({ theme }) =>
     theme.dark ? theme.black10 : theme.background};
 `;
+
+export const NoDataContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 172px;
+  gap: 8px;
+  color: ${props => props.theme.black};
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 24px;
+
+  span:last-child {
+    font-size: 12px;
+    color: ${({ theme }) => theme.gray600};
+  }
+`;

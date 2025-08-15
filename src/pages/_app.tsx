@@ -39,12 +39,10 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
   const router = useRouter();
 
   useEffect(() => {
-    const w = window as any;
-
-    if (w.kleverWeb.isKlever) {
+    if (typeof window !== 'undefined' && window.kleverWeb?.isKlever) {
       gtag.hasExtensionWalletAccess(true);
     }
-  }, [gtag]);
+  }, []);
 
   useEffect(() => {
     const handleRouteChange = (url: string) => {

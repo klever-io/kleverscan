@@ -37,6 +37,13 @@ const LayoutWrapper: React.FC<PropsWithChildren> = ({ children }) => {
 
 const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.kleverWeb?.isKlever) {
+      gtag.hasExtensionWalletAccess(true);
+    }
+  }, []);
+
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       if (url === '/') {

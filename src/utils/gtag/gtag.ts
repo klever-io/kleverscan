@@ -22,3 +22,9 @@ export const event = ({ action, category, label, value }: GTagEvent): void => {
     value: value,
   });
 };
+
+export const hasExtensionWalletAccess = (hasAccess: boolean) => {
+  window.gtag('event', 'has_extension_wallet_access', {
+    has_access: hasAccess,
+  });
+};

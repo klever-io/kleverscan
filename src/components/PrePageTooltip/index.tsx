@@ -41,6 +41,7 @@ import {
   TooltipWrapper,
 } from './styles';
 import { ISmartContractResponse } from '@/types/smart-contract';
+import * as gtag from '@/utils/gtag/gtag';
 
 export interface IPrePageTooltip {
   search: string;
@@ -149,6 +150,15 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
       return getSmartContract(trimmedSearch);
     }
   };
+
+  useEffect(() => {
+    if (type && type.length > 0) {
+      setTimeout(() => {
+        console.log('data type', type);
+        gtag.searchEvent(type);
+      }, 2000);
+    }
+  }, [type]);
 
   const getCorrectRowSections = (data: SearchRequest): IRowSection[] => {
     if (isAsset()) {

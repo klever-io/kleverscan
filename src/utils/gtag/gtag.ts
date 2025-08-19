@@ -28,3 +28,9 @@ export const hasExtensionWalletAccess = (hasAccess: boolean) => {
     has_access: hasAccess,
   });
 };
+
+export const searchEvent = (type: string) => {
+  window.gtag('event', 'search_type_event', {
+    search_type: type,
+  });
+};

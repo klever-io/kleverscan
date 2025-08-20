@@ -68,9 +68,11 @@ const getInputType = (value: string) => {
   if (value.length === addressLength && !value.includes('qqqqqqqqqqqqq')) {
     return 'account';
   }
+
   if (value.toUpperCase() === 'KLV' || value.toUpperCase() === 'KFI') {
     return 'asset';
   }
+  
   if (value.length <= 15) {
     return 'asset';
   }
@@ -152,13 +154,14 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
   };
 
   useEffect(() => {
-    if (type && type.length > 0) {
-      setTimeout(() => {
-        console.log('data type', type);
+    if (type && type.length > 0 && canSearchResult) {
+      const timeoutId = setTimeout(() => {
         gtag.searchEvent(type);
       }, 2000);
+      
+      return () => clearTimeout(timeoutId);
     }
-  }, [type]);
+  }, [type, canSearchResult]);
 
   const getCorrectRowSections = (data: SearchRequest): IRowSection[] => {
     if (isAsset()) {

@@ -15,7 +15,8 @@ export const ToolbarStyle = styled.div`
 
   background-color: transparent;
 
-  border-bottom: 1px solid #f9fafb;
+  border-bottom: 1px solid
+    ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
 
   min-width: 100%;
   max-width: 100%;
@@ -27,7 +28,7 @@ export const ToolbarButton = styled.button<ToolbarButtonProps>`
   justify-content: center;
   border-radius: 8px;
   padding: 2px;
-  color: ${({ theme }) => theme.true.white};
+  color: ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
 
   @media (min-width: 321px) and (max-width: 768px) {
     padding: 3px;

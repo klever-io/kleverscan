@@ -112,7 +112,7 @@ export const Row = styled.div<{ inPriceRange: boolean }>`
   span {
     color: ${props => props.theme.black};
   }
-  background-color: #0b0b1e;
+  background-color: ${props => (props.theme.dark ? '#0b0b1e' : 'white')};
 `;
 
 export const LoaderWrapper = styled.div`

@@ -91,7 +91,7 @@ export const Header = styled.div`
 export const Title = styled.h1`
   font-size: 1.5rem;
   font-weight: 600;
-  color: ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
+  color: ${({ theme }) => theme.black};
 `;
 
 export const AssetVisualization = styled.div`
@@ -110,7 +110,7 @@ export const AssetVisualization = styled.div`
 export const AssetName = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
+  color: ${({ theme }) => theme.black};
 `;
 
 export const BuyForm = styled.form`
@@ -133,7 +133,7 @@ export const InputRow = styled.div`
 export const Label = styled.label`
   font-size: 0.85rem;
   font-weight: 600;
-  color: ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
+  color: ${({ theme }) => theme.black};
 
   display: flex;
   justify-content: space-between;
@@ -147,8 +147,7 @@ export const Input = styled.textarea`
 
   outline: none;
 
-  border: 1px solid
-    ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
+  border: 1px solid ${({ theme }) => theme.black};
 
   padding: 10px;
 
@@ -189,8 +188,7 @@ export const RTEArea = styled(EditorContent)`
     }
   }
 
-  border: 1px solid
-    ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
+  border: 1px solid ${({ theme }) => theme.black};
   border-radius: 8px;
   .ProseMirror {
     ${RTEStyles}

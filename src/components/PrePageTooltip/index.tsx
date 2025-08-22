@@ -41,6 +41,7 @@ import {
   TooltipWrapper,
 } from './styles';
 import { ISmartContractResponse } from '@/types/smart-contract';
+import * as gtag from '@/utils/gtag/gtag';
 
 export interface IPrePageTooltip {
   search: string;
@@ -67,9 +68,11 @@ const getInputType = (value: string) => {
   if (value.length === addressLength && !value.includes('qqqqqqqqqqqqq')) {
     return 'account';
   }
+
   if (value.toUpperCase() === 'KLV' || value.toUpperCase() === 'KFI') {
     return 'asset';
   }
+  
   if (value.length <= 15) {
     return 'asset';
   }
@@ -149,6 +152,16 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
       return getSmartContract(trimmedSearch);
     }
   };
+
+  useEffect(() => {
+    if (type && type.length > 0 && canSearchResult) {
+      const timeoutId = setTimeout(() => {
+        gtag.searchEvent(type);
+      }, 2000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [type, canSearchResult]);
 
   const getCorrectRowSections = (data: SearchRequest): IRowSection[] => {
     if (isAsset()) {

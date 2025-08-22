@@ -91,7 +91,7 @@ export const Header = styled.div`
 export const Title = styled.h1`
   font-size: 1.5rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.true.white};
+  color: ${({ theme }) => theme.black};
 `;
 
 export const AssetVisualization = styled.div`
@@ -104,13 +104,13 @@ export const AssetVisualization = styled.div`
   padding: 16px;
   border-radius: 8px;
 
-  background-color: #181818;
+  background-color: ${({ theme }) => (theme.dark ? '#181818' : theme.gray)};
 `;
 
 export const AssetName = styled.h2`
   font-size: 1.5rem;
   font-weight: 700;
-  color: ${({ theme }) => theme.true.white};
+  color: ${({ theme }) => theme.black};
 `;
 
 export const BuyForm = styled.form`
@@ -133,21 +133,21 @@ export const InputRow = styled.div`
 export const Label = styled.label`
   font-size: 0.85rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.true.white};
+  color: ${({ theme }) => theme.black};
 
   display: flex;
   justify-content: space-between;
 `;
 
 export const Input = styled.textarea`
-  color: ${({ theme }) => theme.true.white};
+  color: ${({ theme }) => (theme.dark ? theme.true.white : theme.black)};
   background-color: transparent;
 
   border-radius: 8px;
 
   outline: none;
 
-  border: 1px solid ${({ theme }) => theme.true.white};
+  border: 1px solid ${({ theme }) => theme.black};
 
   padding: 10px;
 
@@ -166,7 +166,7 @@ export const RTEArea = styled(EditorContent)`
   height: 100%;
   overflow: hidden;
   .tiptap {
-    color: ${({ theme }) => theme.darkText};
+    color: ${({ theme }) => (theme.dark ? theme.darkText : theme.white)};
 
     background-color: transparent;
 
@@ -188,7 +188,7 @@ export const RTEArea = styled(EditorContent)`
     }
   }
 
-  border: 1px solid ${({ theme }) => theme.true.white};
+  border: 1px solid ${({ theme }) => theme.black};
   border-radius: 8px;
   .ProseMirror {
     ${RTEStyles}

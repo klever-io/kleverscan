@@ -145,14 +145,13 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
 const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
-  const { data: blocksStatsToday } = useQuery(
-    'statisticsCall',
-    totalStatisticsCall,
-  );
-  const { data: blocksStatsYesterday, refetch } = useQuery(
-    'yesterdayStatisticsCall',
-    yesterdayStatisticsCall,
-  );
+  const { data: blocksStatsToday, isLoading: isLoadingBlocksStatsToday } =
+    useQuery('statisticsCall', totalStatisticsCall);
+  const {
+    data: blocksStatsYesterday,
+    refetch,
+    isLoading: isLoadingBlocksStatsYesterday,
+  } = useQuery('yesterdayStatisticsCall', yesterdayStatisticsCall);
 
   const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(!!blocksInterval);
@@ -186,13 +185,13 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
       title: 'Number of Blocks',
       headers: ['Blocks 24h', 'Cumulative Number'],
       values: [
-        blocksStatsYesterday?.totalBlocks ? (
-          toLocaleFixed(blocksStatsYesterday?.totalBlocks, 0)
+        !isLoadingBlocksStatsYesterday ? (
+          toLocaleFixed(blocksStatsYesterday?.totalBlocks || 0, 0)
         ) : (
           <Skeleton />
         ),
-        blocksStatsToday?.totalBlocks ? (
-          toLocaleFixed(blocksStatsToday?.totalBlocks, 0)
+        !isLoadingBlocksStatsToday ? (
+          toLocaleFixed(blocksStatsToday?.totalBlocks || 0, 0)
         ) : (
           <Skeleton />
         ),
@@ -202,7 +201,7 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
       title: 'Block Reward',
       headers: ['Rewards 24h', 'Cumulative Revenue'],
       values: [
-        blocksStatsYesterday ? (
+        !isLoadingBlocksStatsYesterday ? (
           `${formatAmount(
             (blocksStatsYesterday?.totalBlockRewards || 0) /
               10 ** KLV_PRECISION,
@@ -210,7 +209,7 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
         ) : (
           <Skeleton />
         ),
-        blocksStatsToday ? (
+        !isLoadingBlocksStatsToday ? (
           `${formatAmount(
             (blocksStatsToday?.totalBlockRewards || 0) / 10 ** KLV_PRECISION,
           )} KLV`
@@ -223,14 +222,14 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
       title: 'Stats on Burned KLV',
       headers: ['Burned 24h', 'Burned in Total'],
       values: [
-        blocksStatsYesterday ? (
+        !isLoadingBlocksStatsYesterday ? (
           `${formatAmount(
             (blocksStatsYesterday?.totalBurned || 0) / 10 ** KLV_PRECISION,
           )} KLV`
         ) : (
           <Skeleton />
         ),
-        blocksStatsToday ? (
+        !isLoadingBlocksStatsToday ? (
           `${formatAmount(
             (blocksStatsToday?.totalBurned || 0) / 10 ** KLV_PRECISION,
           )} KLV`

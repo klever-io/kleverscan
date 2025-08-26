@@ -23,6 +23,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   const [isTablet, setIsTablet] = useState(false);
   const [address, setAddress] = useState<null | string>(null);
   const [collection, setCollection] = useState<null | string>(null);
+  const [metadata, setMetadata] = useState<null | string>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -42,6 +43,22 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
       route: `address/${address}/collection/${collection}?page=${page}&limit=${limit}`,
     });
 
+  const requestMetadata = async () => {
+    const assetId = router.query.collection as string;
+    const response = await api.get({
+      route: `assets/${assetId}`,
+    });
+    const uris = response.data.asset.uris;
+    const metadataUri = uris.find((uri: { key: string; value: string }) => uri.key === 'metadata');
+    const nftMetadata = metadataUri ? metadataUri.value : null;
+    console.log('nftMetadata', nftMetadata);
+    setMetadata(nftMetadata);
+  };
+
+  useEffect(() => {
+    requestMetadata();
+  }, [router.query.collection]);
+
   const { isMobile } = useMobile();
 
   const rowSections = (nft: INfts): IRowSection[] => {
@@ -51,6 +68,10 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     const nftId = assetId?.split('/')[1];
     const sections: IRowSection[] = address
       ? [
+        {
+          element: props => <img src={`${metadata}/${nftId}/image`} alt="NFT Metadata" />,
+          span: 1,
+        },
           {
             element: props => <span key={assetId}>#{nftId}</span>,
             span: 1,

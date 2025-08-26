@@ -91,6 +91,7 @@ import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { requestTransactionsDefault } from '../transactions';
 import { PermissionOperations } from '@/components/AccountPermission';
+import NFTs from '@/components/Tabs/NFTs';
 
 export interface IStakingRewards {
   label: string;
@@ -119,6 +120,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     t('common:Titles.Transactions'),
     t('accounts:SingleAccount.Tabs.Buckets'),
     t('accounts:SingleAccount.Tabs.Rewards'),
+    t('accounts:SingleAccount.Tabs.NFTs'),
   ];
   const tabHeaders = [t('common:Tabs.Overview')];
   const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
@@ -354,6 +356,8 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         );
       case t('accounts:SingleAccount.Tabs.Rewards'):
         return <Rewards rewardsTableProps={rewardsTableProps} />;
+      case t('accounts:SingleAccount.Tabs.NFTs'):
+        return <NFTs />;
       default:
         return <div />;
     }

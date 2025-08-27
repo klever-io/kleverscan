@@ -43,7 +43,6 @@ const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
   const { isMobile } = useMobile();
   const contractAddress = router.query.address as string;
-  const contractName = router.query.name as string;
   const tabHeaders = [{ label: 'Transactions', value: 'transactions' }];
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
   const [invokesTotalRecords, setInvokesTotalRecords] = useState<number>(0);
@@ -137,7 +136,7 @@ const SmartContractInvoke: React.FC = () => {
       <Header>
         <Title
           title={
-            contractName ? contractName : parseAddress(contractAddress, 25)
+            scData?.name ? scData?.name : parseAddress(contractAddress, 25)
           }
           route={`/smart-contracts`}
         />

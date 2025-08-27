@@ -23,6 +23,8 @@ import Filter from '@/components/Filter';
 
 interface IRequestQuery {
   deployer?: string;
+  orderBy?: 'desc' | 'asc';
+  sortBy?: 'timestamp' | 'totalTransactions';
 }
 
 const smartContractsListRowSections = (
@@ -47,10 +49,7 @@ const smartContractsListRowSections = (
           </CenteredRow>
           <CenteredRow>
             <Link
-              href={
-                `/smart-contract/${contractAddress}` +
-                (name ? `?name=${name}` : '')
-              }
+              href={`/smart-contract/${contractAddress}`}
               key={contractAddress}
             >
               <Mono>{parseAddress(contractAddress, 25)}</Mono>
@@ -65,7 +64,7 @@ const smartContractsListRowSections = (
     {
       element: props => (
         <CenteredRow>
-          <span>{totalTransactions || '- -'}</span>
+          <span>{totalTransactions}</span>
         </CenteredRow>
       ),
       span: 1,
@@ -75,10 +74,7 @@ const smartContractsListRowSections = (
       element: props => (
         <CenteredRow>
           <Link
-            href={
-              `/smart-contract/${contractAddress}` +
-              (name ? `?name=${name}` : '')
-            }
+            href={`/smart-contract/${contractAddress}`}
             key={contractAddress}
           >
             <Mono>{parseAddress(deployer, 25)}</Mono>
@@ -110,8 +106,23 @@ const smartContractsListRowSections = (
 
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [orderBy, setOrderBy] = useState<string>('Most Transactioned');
+  const [orderBy, setOrderBy] = useState<string>('All');
   const router = useRouter();
+
+  const getSortParams = (filterOption: string) => {
+    switch (filterOption) {
+      case 'Recent Transactions':
+        return { sortBy: 'timestamp', orderBy: 'desc' };
+      case 'Old Transactions':
+        return { sortBy: 'timestamp', orderBy: 'asc' };
+      case 'Most Transactioned':
+        return { sortBy: 'totalTransactions', orderBy: 'desc' };
+      case 'Least Transactioned':
+        return { sortBy: 'totalTransactions', orderBy: 'asc' };
+      default:
+        return { sortBy: 'totalTransactions', orderBy: 'desc' };
+    }
+  };
 
   const requestSmartContractsList = useCallback(
     async (
@@ -121,11 +132,12 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
       query?: IRequestQuery,
     ) => {
       try {
+        const sortParams = getSortParams(orderBy);
         const localQuery: { [key: string]: any } = {
           ...router.query,
           page,
           limit,
-          orderBy,
+          ...sortParams,
         };
 
         const smartContractsListRes = await api.get({
@@ -136,32 +148,9 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
           !smartContractsListRes.error ||
           smartContractsListRes.error === ''
         ) {
-          const sortedSmartContracts = smartContractsListRes.data.sc.sort(
-            (a: any, b: any) => {
-              switch (orderBy) {
-                case 'Last Date':
-                  return (b.timestamp || 0) - (a.timestamp || 0);
-                case 'First Date':
-                  return (a.timestamp || 0) - (b.timestamp || 0);
-                case 'Most Transactioned':
-                  return (
-                    (b.totalTransactions || 0) - (a.totalTransactions || 0)
-                  );
-                case 'Least Transactioned':
-                  return (
-                    (a.totalTransactions || 0) - (b.totalTransactions || 0)
-                  );
-                default:
-                  return (
-                    (b.totalTransactions || 0) - (a.totalTransactions || 0)
-                  );
-              }
-            },
-          );
-
           const data = {
             ...smartContractsListRes,
-            data: { smartContracts: sortedSmartContracts },
+            data: { smartContracts: smartContractsListRes.data.sc },
           };
           return data;
         } else {
@@ -181,8 +170,8 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
         title: 'Order By',
         current: orderBy,
         data: [
-          'Last Date',
-          'First Date',
+          'Recent Transactions',
+          'Old Transactions',
           'Most Transactioned',
           'Least Transactioned',
         ],

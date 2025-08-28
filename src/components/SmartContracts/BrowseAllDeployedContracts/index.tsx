@@ -106,7 +106,7 @@ const smartContractsListRowSections = (
 
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [orderBy, setOrderBy] = useState<string>('All');
+  const [orderBy, setOrderBy] = useState<string>('Recent Transactions');
   const router = useRouter();
 
   const getSortParams = (filterOption: string) => {
@@ -120,7 +120,7 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
       case 'Least Transactioned':
         return { sortBy: 'totalTransactions', orderBy: 'asc' };
       default:
-        return { sortBy: 'totalTransactions', orderBy: 'desc' };
+        return { sortBy: 'timestamp', orderBy: 'desc' };
     }
   };
 

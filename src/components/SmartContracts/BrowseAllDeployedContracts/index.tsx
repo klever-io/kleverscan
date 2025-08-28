@@ -20,6 +20,7 @@ import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { NextRouter, useRouter } from 'next/router';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import Filter from '@/components/Filter';
+import { getNetwork } from '@/utils/networkFunctions';
 
 interface IRequestQuery {
   deployer?: string;
@@ -106,8 +107,21 @@ const smartContractsListRowSections = (
 
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [orderBy, setOrderBy] = useState<string>('All');
+  const [orderBy, setOrderBy] = useState<string>('Recent Transactions');
   const router = useRouter();
+
+  useEffect(() => {
+    const currentNetwork = getNetwork();
+    const isDevnet = currentNetwork === 'Devnet';
+
+    if (
+      !isDevnet &&
+      (orderBy === 'Most Transacted' || orderBy === 'Least Transacted')
+    ) {
+      setOrderBy('Recent Transactions');
+      setRefreshKey(prev => prev + 1);
+    }
+  }, [orderBy]);
 
   const getSortParams = (filterOption: string) => {
     switch (filterOption) {
@@ -115,12 +129,12 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
         return { sortBy: 'timestamp', orderBy: 'desc' };
       case 'Old Transactions':
         return { sortBy: 'timestamp', orderBy: 'asc' };
-      case 'Most Transactioned':
+      case 'Most Transacted':
         return { sortBy: 'totalTransactions', orderBy: 'desc' };
-      case 'Least Transactioned':
+      case 'Least Transacted':
         return { sortBy: 'totalTransactions', orderBy: 'asc' };
       default:
-        return { sortBy: 'totalTransactions', orderBy: 'desc' };
+        return { sortBy: 'timestamp', orderBy: 'desc' };
     }
   };
 
@@ -165,16 +179,22 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   );
 
   const handleFilters = () => {
+    const currentNetwork = getNetwork();
+    const isDevnet = currentNetwork === 'Devnet';
+
+    const baseOptions = ['Recent Transactions', 'Old Transactions'];
+
+    const devnetOptions = ['Most Transacted', 'Least Transacted'];
+
+    const allOptions = isDevnet
+      ? [...baseOptions, ...devnetOptions]
+      : baseOptions;
+
     const filters = [
       {
         title: 'Order By',
         current: orderBy,
-        data: [
-          'Recent Transactions',
-          'Old Transactions',
-          'Most Transactioned',
-          'Least Transactioned',
-        ],
+        data: allOptions,
         onClick: (selected: string) => {
           setOrderBy(selected);
           setRefreshKey((prev: number) => prev + 1);

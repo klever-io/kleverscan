@@ -116,9 +116,10 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
 
     if (
       !isDevnet &&
-      (orderBy === 'Most Transactioned' || orderBy === 'Least Transactioned')
+      (orderBy === 'Most Transacted' || orderBy === 'Least Transacted')
     ) {
       setOrderBy('Recent Transactions');
+      setRefreshKey(prev => prev + 1);
     }
   }, [orderBy]);
 
@@ -128,9 +129,9 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
         return { sortBy: 'timestamp', orderBy: 'desc' };
       case 'Old Transactions':
         return { sortBy: 'timestamp', orderBy: 'asc' };
-      case 'Most Transactioned':
+      case 'Most Transacted':
         return { sortBy: 'totalTransactions', orderBy: 'desc' };
-      case 'Least Transactioned':
+      case 'Least Transacted':
         return { sortBy: 'totalTransactions', orderBy: 'asc' };
       default:
         return { sortBy: 'timestamp', orderBy: 'desc' };
@@ -183,7 +184,7 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
 
     const baseOptions = ['Recent Transactions', 'Old Transactions'];
 
-    const devnetOptions = ['Most Transactioned', 'Least Transactioned'];
+    const devnetOptions = ['Most Transacted', 'Least Transacted'];
 
     const allOptions = isDevnet
       ? [...baseOptions, ...devnetOptions]

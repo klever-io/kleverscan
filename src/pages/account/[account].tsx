@@ -252,9 +252,9 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         case t('accounts:SingleAccount.Tabs.Rewards'):
           return rewardsFPRPool(address)(page, limit);
         case t('accounts:SingleAccount.Tabs.NFTCollections'):
-          return assetsRequest(address)(page, limit);
-        default:
           return nftCollectionsRequest(address)(page, limit);
+        default:
+          return assetsRequest(address)(page, limit);
       }
     },
     [router.query.account, router.query.tab, router.query],
@@ -366,7 +366,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         );
       case t('accounts:SingleAccount.Tabs.Rewards'):
         return <Rewards rewardsTableProps={rewardsTableProps} />;
-      case t('accounts:SingleAccount.Tabs.NFTs'):
+      case t('accounts:SingleAccount.Tabs.NFTCollections'):
         return (
           <NftCollections
             nftCollectionsTableProps={nftCollectionsTableProps}

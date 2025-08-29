@@ -4,12 +4,13 @@ import Detail from '@/components/Detail';
 import { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { CustomLink } from '@/styles/common';
+import { CustomLink, NftImage, NftImageContainer, NftImageEmpty, NftImageError } from '@/styles/common';
 import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import Skeleton from '@/components/Skeleton';
 
 interface ICollectionPage {
   collection: INfts[];
@@ -18,12 +19,21 @@ interface ICollectionPage {
   collectionAsset: string;
 }
 
+interface INftImage {
+  [key: string]: {
+    url: string;
+    loading: boolean;
+    error: boolean;
+  };
+}
+
 const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
-  const header = ['ID', 'Collection Name', 'Collection Id', 'Address', ''];
+  const header = ['Image', 'ID', 'Collection Name', 'Collection Id', 'Address', ''];
   const [isTablet, setIsTablet] = useState(false);
   const [address, setAddress] = useState<null | string>(null);
   const [collection, setCollection] = useState<null | string>(null);
   const [metadata, setMetadata] = useState<null | string>(null);
+  const [nftImages, setNftImages] = useState<INftImage>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -49,10 +59,46 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
       route: `assets/${assetId}`,
     });
     const uris = response.data.asset.uris;
-    const metadataUri = uris.find((uri: { key: string; value: string }) => uri.key === 'metadata');
+    const metadataUri = uris?.find((uri: { key: string; value: string }) => uri.key === 'metadata');
     const nftMetadata = metadataUri ? metadataUri.value : null;
-    console.log('nftMetadata', nftMetadata);
     setMetadata(nftMetadata);
+  };
+
+  const fetchNftImage = async (metadataUrl: string, nftId: string) => {
+    setNftImages(prev => ({
+      ...prev,
+      [nftId]: { url: '', loading: true, error: false }
+    }));
+
+    try {
+      const fullUrl = `${metadataUrl}/${nftId}`;
+      const response = await fetch(`/api/nft-metadata?url=${encodeURIComponent(fullUrl)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.image) {
+          setNftImages(prev => ({
+            ...prev,
+            [nftId]: { url: data.image, loading: false, error: false }
+          }));
+        } else {
+          setNftImages(prev => ({
+            ...prev,
+            [nftId]: { url: '', loading: false, error: true }
+          }));
+        }
+      } else {
+        setNftImages(prev => ({
+          ...prev,
+          [nftId]: { url: '', loading: false, error: true }
+        }));
+      }
+    } catch (error) {
+      console.error(`Error fetching NFT image for ID ${nftId}:`, error);
+      setNftImages(prev => ({
+        ...prev,
+        [nftId]: { url: '', loading: false, error: true }
+      }));
+    }
   };
 
   useEffect(() => {
@@ -66,12 +112,38 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
 
     const collectionId = assetId?.split('/')[0];
     const nftId = assetId?.split('/')[1];
+    
+    if (metadata && nftId && !nftImages[nftId]) {
+      fetchNftImage(metadata, nftId);
+    }
+
     const sections: IRowSection[] = address
       ? [
-        {
-          element: props => <img src={`${metadata}/${nftId}/image`} alt="NFT Metadata" />,
-          span: 1,
-        },
+          {
+            element: props => (
+              nftImages[nftId]?.loading ? (
+                <Skeleton width={50} height={50} />
+              ) : (
+              <NftImageContainer key={`image-${assetId}`}>
+               {nftImages[nftId]?.url ? (
+                  <NftImage 
+                    src={nftImages[nftId].url} 
+                    alt={`NFT ${nftId}`} 
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : nftImages[nftId]?.error ? (
+                  <NftImageError>Error</NftImageError>
+                ) : (
+                  <NftImageEmpty>-</NftImageEmpty>
+                )}
+              </NftImageContainer>
+                
+              )
+            ),
+            span: 1,
+          },
           {
             element: props => <span key={assetId}>#{nftId}</span>,
             span: 1,
@@ -106,7 +178,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
                 <CustomLink>Details</CustomLink>
               </Link>
             ),
-            span: 2,
+            span: 1,
           },
         ]
       : [{ element: props => <></>, span: 1 }];

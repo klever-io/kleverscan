@@ -1,6 +1,8 @@
+import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
-import { CustomLink } from '@/styles/common';
+import { CustomLink, DoubleRow } from '@/styles/common';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types';
+import { toLocaleFixed } from '@/utils/formatFunctions';
 import Link from 'next/link';
 import React, { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,39 +24,66 @@ const NftCollections: React.FC<PropsWithChildren<INftCollections>> = ({
       assetId,
       assetType,
       precision,
-      balance,
-      frozenBalance,
-      unfrozenBalance,
-      staking,
+      balance
     } = props;
 
     const ticker = assetId?.split('-')[0];
-    const sectionViewNfts =
-      assetType === 1 ? (
-        <Link
-          href={`/account/${address}/collection/${assetId}`}
-          key={address}
-          legacyBehavior
-        >
-          <CustomLink tabAsset={true}>
-            {t('accounts:SingleAccount.Buttons.ViewNFTs')}
-          </CustomLink>
-        </Link>
-      ) : (
-        <></>
-      );
 
     const sections: IRowSection[] = [
-      { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
+      {
+        element: props =>
+          <DoubleRow>
+            <span key={ticker}>{ticker}</span>
+          </DoubleRow>
+        , span: 1
+      },
       {
         element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
-            {assetId}
-          </Link>
+          <DoubleRow>
+            <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
+              {assetId}
+            </Link>
+          </DoubleRow>
+        ),
+        span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow>
+            <span key={assetType}>Non Fungible</span>
+          </DoubleRow>
+        ),
+        span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow>
+            <span key={balance}>
+              {balance ? toLocaleFixed(balance / 10 ** precision, precision) : '0'}
+            </span>
+          </DoubleRow>
+        ),
+        span: 1,
+      },
+      {
+        element: props => (
+          <DoubleRow>
+            <Link
+              href={`/account/${address}/collection/${assetId}`}
+              key={address}
+              legacyBehavior
+            >
+              <CustomLink tabAsset={true}>
+                {t('accounts:SingleAccount.Buttons.ViewNFTs')}
+              </CustomLink>
+            </Link>
+          </DoubleRow>
         ),
         span: 1,
       },
     ];
+
+    return sections;
   };
 
   const tableProps: ITable = {

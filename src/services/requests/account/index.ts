@@ -434,3 +434,42 @@ export const getAccountBalanceRequest = async (
 
   return { otherAssets, balance };
 };
+
+export const nftCollectionsRequest = (
+  address: string,
+): ((page: number, limit: number) => Promise<IResponse>) => {
+  const get = async (page: number, limit: number): Promise<IResponse> => {
+    if (!address) {
+      return {
+        data: { assets: [] },
+        error: '',
+        code: '',
+      };
+    }
+
+    const res = await api.get({
+      route: `address/${address}`,
+    });
+
+    if (res.error && res.error !== '') {
+      return {
+        data: { assets: [] },
+        error: res.error,
+        code: 'error',
+      };
+    }
+
+    const assets = res.data.account.assets as { [key: string]: IAccountAsset };
+    const nftCollections = Object.values(assets).filter(
+      (asset: IAccountAsset) => asset.assetType === 1,
+    );
+
+    return {
+      data: { assets: nftCollections },
+      code: 'successful',
+      error: '',
+    };
+  };
+
+  return get;
+};

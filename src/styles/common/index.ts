@@ -692,3 +692,40 @@ export const InvokeMethodBagde = styled.div`
 export const CommonContainer = styled.div`
   margin-top: 60px;
 `;
+
+export const NftImageContainer = styled.div`
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const NftImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+`;
+
+export const NftImageError = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: #ffebee;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #d32f2f;
+`;
+
+export const NftImageEmpty = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;

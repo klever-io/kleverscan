@@ -28,6 +28,7 @@ import {
   accountCall,
   assetsRequest,
   bucketsRequest,
+  nftCollectionsRequest,
   ownedAssetsRequest,
   pricesCall,
   rewardsFPRPool,
@@ -91,6 +92,7 @@ import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { requestTransactionsDefault } from '../transactions';
 import { PermissionOperations } from '@/components/AccountPermission';
+import NftCollections from '@/components/Tabs/NftCollections';
 
 export interface IStakingRewards {
   label: string;
@@ -119,6 +121,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     t('common:Titles.Transactions'),
     t('accounts:SingleAccount.Tabs.Buckets'),
     t('accounts:SingleAccount.Tabs.Rewards'),
+    t('accounts:SingleAccount.Tabs.NFTCollections'),
   ];
   const tabHeaders = [t('common:Tabs.Overview')];
   const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
@@ -248,6 +251,8 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
           return bucketsRequest(address)(page, limit);
         case t('accounts:SingleAccount.Tabs.Rewards'):
           return rewardsFPRPool(address)(page, limit);
+        case t('accounts:SingleAccount.Tabs.NFTCollections'):
+          return nftCollectionsRequest(address)(page, limit);
         default:
           return assetsRequest(address)(page, limit);
       }
@@ -287,6 +292,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     dataName: 'rewards',
     request: (page: number, limit: number) => getRequest(page, limit),
     query: router.query,
+  };
+
+  const nftCollectionsTableProps: IInnerTableProps = {
+    scrollUp: false,
+    dataName: 'assets',
+    query: router.query,
+    request: getRequest,
   };
 
   const tabProps: ITabs = {
@@ -354,6 +366,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         );
       case t('accounts:SingleAccount.Tabs.Rewards'):
         return <Rewards rewardsTableProps={rewardsTableProps} />;
+      case t('accounts:SingleAccount.Tabs.NFTCollections'):
+        return (
+          <NftCollections
+            nftCollectionsTableProps={nftCollectionsTableProps}
+            address={router.query.account as string}
+          />
+        );
       default:
         return <div />;
     }

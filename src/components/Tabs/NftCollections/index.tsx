@@ -20,27 +20,23 @@ const NftCollections: React.FC<PropsWithChildren<INftCollections>> = ({
   const header = ['Collection', 'ID', 'Token Type', 'Holding'];
 
   const rowSections = (props: IAccountAsset): IRowSection[] => {
-    const {
-      assetId,
-      assetType,
-      precision,
-      balance
-    } = props;
+    const { assetId, assetType, precision, balance } = props;
 
     const ticker = assetId?.split('-')[0];
 
     const sections: IRowSection[] = [
       {
-        element: props =>
+        element: props => (
           <DoubleRow>
             <span key={ticker}>{ticker}</span>
           </DoubleRow>
-        , span: 1
+        ),
+        span: 1,
       },
       {
         element: props => (
           <DoubleRow>
-            <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
+            <Link key={assetId} href={`/asset/${assetId}`}>
               {assetId}
             </Link>
           </DoubleRow>
@@ -59,7 +55,9 @@ const NftCollections: React.FC<PropsWithChildren<INftCollections>> = ({
         element: props => (
           <DoubleRow>
             <span key={balance}>
-              {balance ? toLocaleFixed(balance / 10 ** precision, precision) : '0'}
+              {balance
+                ? toLocaleFixed(balance / 10 ** precision, precision)
+                : '0'}
             </span>
           </DoubleRow>
         ),

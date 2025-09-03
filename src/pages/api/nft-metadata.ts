@@ -15,16 +15,22 @@ export default async function handler(
       return res.status(400).json({ error: 'URL parameter is required' });
     }
 
+    const controller = new AbortController();
+    const t = setTimeout(() => controller.abort(), 5_000);
     const response = await fetch(url, {
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'User-Agent': 'KleverScan/1.0',
       },
+      signal: controller.signal,
+      cache: 'no-store',
+      redirect: 'follow',
     });
+    clearTimeout(t);
 
     if (!response.ok) {
-      return res.status(response.status).json({ 
-        error: `Failed to fetch metadata: ${response.statusText}` 
+      return res.status(response.status).json({
+        error: `Failed to fetch metadata: ${response.statusText}`,
       });
     }
 
@@ -32,9 +38,9 @@ export default async function handler(
     res.status(200).json(data);
   } catch (error) {
     console.error('Error fetching NFT metadata:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : 'Unknown error',
     });
   }
-} 
+}

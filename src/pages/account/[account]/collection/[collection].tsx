@@ -1,4 +1,4 @@
-import { PropsWithChildren, useMemo } from 'react';
+import { PropsWithChildren, useMemo, useRef, useCallback } from 'react';
 import { Validators as Icon } from '@/assets/cards';
 import Detail from '@/components/Detail';
 import { ITable } from '@/components/Table';
@@ -13,18 +13,20 @@ import {
 } from '@/styles/common';
 import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
-import { getStorageViewMode, storageViewMode } from '@/utils';
+import {
+  getStorageViewMode,
+  setQueryAndRouter,
+  storageViewMode,
+} from '@/utils';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Skeleton from '@/components/Skeleton';
 import NftCardView from '@/components/NftCardView';
-import {
-  ViewToggleContainer,
-  ViewToggleButton,
-  GridContainer,
-  PaginationContainer,
-} from './styles';
+import { ViewToggleContainer, ViewToggleButton, GridContainer } from './styles';
+
+import Pagination from '@/components/Pagination';
+import { PaginationContainer } from '@/components/Pagination/styles';
 
 interface ICollectionPage {
   collection: INfts[];
@@ -62,6 +64,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   const [nfts, setNfts] = useState<INfts[]>([]);
   const [pagination, setPagination] = useState<IPagination | null>(null);
   const [loading, setLoading] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -76,35 +79,44 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     }
   }, [router.isReady]);
 
-  const requestCollection = async (page: number, limit: number) => {
-    setLoading(true);
-    try {
-      const response = await api.get({
-        route: `address/${address}/collection/${collection}?page=${page}&limit=${limit}`,
-      });
-      setNfts(response.data.collection || []);
-      setPagination(response.data.pagination || null);
-      setCurrentPage(page);
-      return response;
-    } catch (error) {
-      console.error('Error fetching collection:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const requestCollection = useCallback(
+    async (page: number, limit: number) => {
+      setLoading(true);
+      try {
+        const response = await api.get({
+          route: `address/${address}/collection/${collection}?page=${page}&limit=${limit}`,
+        });
+        setNfts(response?.data?.collection || []);
+        setPagination(response?.pagination || null);
+        setCurrentPage(page);
+        return response;
+      } catch (error) {
+        console.error('Error fetching collection:', error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [address, collection],
+  );
 
   const requestMetadata = async () => {
-    const assetId = router.query.collection as string;
-    const response = await api.get({
-      route: `assets/${assetId}`,
-    });
-    const uris = response.data.asset.uris;
-    const metadataUri = uris?.find(
-      (uri: { key: string; value: string }) => uri.key === 'metadata',
-    );
-    const nftMetadata = metadataUri ? metadataUri.value : null;
-    setMetadata(nftMetadata);
+    try {
+      const assetId = router.query.collection as string;
+      const response = await api.get({
+        route: `assets/${assetId}`,
+      });
+      const uris = response.data.asset.uris;
+      const metadataUri = uris?.find(
+        (uri: { key: string; value: string }) => uri.key === 'metadata',
+      );
+      const nftMetadata = metadataUri ? metadataUri.value : null;
+      setMetadata(nftMetadata);
+    } catch (error) {
+      console.error('Error fetching metadata:', error);
+      throw error;
+      setMetadata(null);
+    }
   };
 
   const fetchNftImage = async (metadataUrl: string, nftId: string) => {
@@ -149,9 +161,19 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   useEffect(() => {
     if (address && collection) {
       requestMetadata();
-      requestCollection(1, 20);
+      requestCollection(1, 12);
     }
-  }, [address, collection]);
+  }, [address, collection, requestCollection]);
+
+  useEffect(() => {
+    if (router.query.page && address && collection) {
+      const pageFromUrl = Number(router.query.page);
+      if (pageFromUrl !== currentPage && pageFromUrl > 0) {
+        setCurrentPage(pageFromUrl);
+        requestCollection(pageFromUrl, 12);
+      }
+    }
+  }, [router.query.page, address, collection, requestCollection]);
 
   const { isMobile } = useMobile();
 
@@ -247,10 +269,6 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     }));
   };
 
-  const handlePageChange = (page: number) => {
-    requestCollection(page, 20);
-  };
-
   const renderGridView = () => {
     if (loading) {
       return (
@@ -287,21 +305,19 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
 
         {pagination && (
           <PaginationContainer>
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage <= 1}
-            >
-              Previous
-            </button>
-            <span>
-              Page {currentPage} of {pagination.totalPages}
-            </span>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage >= pagination.totalPages}
-            >
-              Next
-            </button>
+            <Pagination
+              tableRef={gridRef}
+              count={pagination?.totalPages || 1}
+              page={currentPage}
+              onPaginate={page => {
+                setCurrentPage(page);
+                setQueryAndRouter(
+                  { ...router.query, page: page.toString() },
+                  router,
+                );
+                requestCollection(page, 12);
+              }}
+            />
           </PaginationContainer>
         )}
       </>

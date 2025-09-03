@@ -70,7 +70,7 @@ const NftCardView: React.FC<NftCardViewProps> = ({
           </div>
         </NftCardDetails>
         <NftCardAddress>
-          <Link href={`/account/${address}`} legacyBehavior>
+          <Link href={`/account/${address}`}>
             {isMobile ? parseAddress(address, 14) : parseAddress(address, 20)}
           </Link>
         </NftCardAddress>

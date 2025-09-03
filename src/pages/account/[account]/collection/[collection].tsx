@@ -114,7 +114,6 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
       setMetadata(nftMetadata);
     } catch (error) {
       console.error('Error fetching metadata:', error);
-      throw error;
       setMetadata(null);
     }
   };

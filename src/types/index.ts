@@ -633,7 +633,7 @@ export interface IChainStatistics {
   lastBlockTxCount: number;
 }
 
-interface IError {
+export interface IError {
   message: string;
 }
 

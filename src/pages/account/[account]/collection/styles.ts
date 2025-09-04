@@ -1,9 +1,30 @@
 import styled from 'styled-components';
 
+export const Container = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+`;
+
 export const ViewToggleContainer = styled.div`
+  width: 20%;
   display: flex;
   gap: 8px;
   margin-top: 18px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+    margin-top: 12px;
+  }
 `;
 
 export const ViewToggleButton = styled.button<{ active: boolean }>`
@@ -72,5 +93,40 @@ export const PaginationContainer = styled.div`
   span {
     font-size: 14px;
     color: ${({ theme }) => theme.gray800};
+  }
+`;
+
+export const InputContainer = styled.div`
+  width: 80%;
+  height: 44px;
+  padding: 10px 12px;
+  border-radius: 200px;
+  border: 1px solid ${({ theme }) => theme.darkText};
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  input {
+    width: 100%;
+    font-family: 'Manrope';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: ${props =>
+      props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+
+    &::placeholder {
+      color: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+    }
+  }
+
+  > svg {
+    cursor: pointer;
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+    }
   }
 `;

@@ -23,10 +23,17 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Skeleton from '@/components/Skeleton';
 import NftCardView from '@/components/NftCardView';
-import { ViewToggleContainer, ViewToggleButton, GridContainer } from './styles';
+import {
+  ViewToggleContainer,
+  ViewToggleButton,
+  GridContainer,
+  InputContainer,
+  Container,
+} from './styles';
 
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
+import { Search } from '@/assets/icons';
 
 interface ICollectionPage {
   collection: INfts[];
@@ -64,6 +71,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   const [nfts, setNfts] = useState<INfts[]>([]);
   const [pagination, setPagination] = useState<IPagination | null>(null);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState<string>('');
   const gridRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -86,6 +94,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
         const response = await api.get({
           route: `address/${address}/collection/${collection}?page=${page}&limit=${limit}`,
         });
+
         setNfts(response?.data?.collection || []);
         setPagination(response?.pagination || null);
         setCurrentPage(page);
@@ -261,6 +270,10 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     request: (page: number, limit: number) => requestCollection(page, limit),
   };
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
   const handleImageError = (nftId: string) => {
     setNftImages(prev => ({
       ...prev,
@@ -330,20 +343,31 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     };
 
     return (
-      <ViewToggleContainer>
-        <ViewToggleButton
-          active={viewMode === 'table'}
-          onClick={() => handleViewModeChange('table')}
-        >
-          Table View
-        </ViewToggleButton>
-        <ViewToggleButton
-          active={viewMode === 'grid'}
-          onClick={() => handleViewModeChange('grid')}
-        >
-          Grid View
-        </ViewToggleButton>
-      </ViewToggleContainer>
+      <Container>
+        <InputContainer>
+          <input
+            type="text"
+            placeholder="Search NFT"
+            value={search}
+            onChange={handleSearchChange}
+          />
+          <Search />
+        </InputContainer>
+        <ViewToggleContainer>
+          <ViewToggleButton
+            active={viewMode === 'table'}
+            onClick={() => handleViewModeChange('table')}
+          >
+            Table View
+          </ViewToggleButton>
+          <ViewToggleButton
+            active={viewMode === 'grid'}
+            onClick={() => handleViewModeChange('grid')}
+          >
+            Grid View
+          </ViewToggleButton>
+        </ViewToggleContainer>
+      </Container>
     );
   };
 
@@ -351,6 +375,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     title: `NFT Collection - ${collection}`,
     headerIcon: Icon,
     cards: undefined,
+    dataName: 'collection',
     tableProps: viewMode === 'table' ? tableProps : undefined,
     route: `/account/${address}`,
     customContent: viewMode === 'grid' ? renderGridView() : undefined,

@@ -1,5 +1,5 @@
 import { formatNumberDecimal } from '@/utils/formatFunctions';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { IWizardComponents } from '..';
 import { ButtonsComponent } from '../ButtonsComponent';
@@ -17,11 +17,18 @@ export const CreateAssetInitialSupplyStep: React.FC<
   const {
     watch,
     register,
+    setValue,
     formState: { errors },
   } = useFormContext();
   const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
-  watch('initialSupply');
+  const formInitialSupply = watch('initialSupply');
+
+  useEffect(() => {
+    if (formInitialSupply && formInitialSupply !== inputValue) {
+      setInputValue(formInitialSupply);
+    }
+  }, [formInitialSupply]);
 
   let error = errors?.initialSupply;
 
@@ -30,7 +37,9 @@ export const CreateAssetInitialSupplyStep: React.FC<
     next: !error,
   };
   const handleInputChange = (e: { target: { value: string } }) => {
-    setInputValue(formatNumberDecimal(e.target.value));
+    const formattedValue = formatNumberDecimal(e.target.value);
+    setInputValue(formattedValue);
+    setValue('initialSupply', formattedValue);
   };
   return (
     <GenericCardContainer>

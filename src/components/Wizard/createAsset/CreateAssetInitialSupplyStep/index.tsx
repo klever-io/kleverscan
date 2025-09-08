@@ -25,8 +25,8 @@ export const CreateAssetInitialSupplyStep: React.FC<
   const formInitialSupply = watch('initialSupply');
 
   useEffect(() => {
-    if (formInitialSupply && formInitialSupply !== inputValue) {
-      setInputValue(formInitialSupply);
+    if (formInitialSupply !== inputValue) {
+      setInputValue(formInitialSupply ?? '');
     }
   }, [formInitialSupply]);
 
@@ -39,7 +39,11 @@ export const CreateAssetInitialSupplyStep: React.FC<
   const handleInputChange = (e: { target: { value: string } }) => {
     const formattedValue = formatNumberDecimal(e.target.value);
     setInputValue(formattedValue);
-    setValue('initialSupply', formattedValue);
+    setValue('initialSupply', formattedValue, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
   return (
     <GenericCardContainer>

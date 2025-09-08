@@ -30,8 +30,8 @@ export const CreateAssetMaxSupplyStep: React.FC<
   let error = errors?.maxSupply;
 
   useEffect(() => {
-    if (formMaxSupply && formMaxSupply !== inputValue) {
-      setInputValue(formMaxSupply);
+    if (formMaxSupply !== inputValue) {
+      setInputValue(formMaxSupply ?? '');
     }
   }, [formMaxSupply]);
 
@@ -44,7 +44,11 @@ export const CreateAssetMaxSupplyStep: React.FC<
     const { value } = e.target;
     const formattedValue = formatNumberDecimal(value);
     setInputValue(formattedValue);
-    setValue('maxSupply', formattedValue);
+    setValue('maxSupply', formattedValue, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   function handlerOnClick() {

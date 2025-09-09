@@ -130,3 +130,9 @@ export const InputContainer = styled.div`
     }
   }
 `;
+
+export const NoNftsFound = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+`;

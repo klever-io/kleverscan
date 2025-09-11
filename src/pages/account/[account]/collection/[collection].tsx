@@ -394,6 +394,9 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
             type="text"
             placeholder="Search NFT By Id"
             value={search}
+            aria-label="Search NFT by ID"
+            autoComplete="off"
+            inputMode="numeric"
             onChange={handleSearchChange}
           />
           <Search />

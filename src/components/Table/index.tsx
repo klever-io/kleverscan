@@ -73,6 +73,7 @@ export interface ITable {
   Filters?: React.FC;
   smaller?: boolean;
   showPagination?: boolean;
+  refreshKey?: number;
 }
 
 const onErrorHandler = () => {
@@ -96,6 +97,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
   smaller = false,
   showLimit = true,
   showPagination = true,
+  refreshKey,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -131,7 +133,12 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
     isFetching,
     refetch,
   } = useQuery(
-    [dataName || 'items', JSON.stringify(router.query), router.pathname],
+    [
+      dataName || 'items',
+      JSON.stringify(router.query),
+      router.pathname,
+      refreshKey,
+    ],
     () =>
       tableRequest(
         Number(router.query?.page) || 1,

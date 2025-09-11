@@ -73,8 +73,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   const [pagination, setPagination] = useState<IPagination | null>(null);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState<string>('');
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [allNfts, setAllNfts] = useState<INfts[]>([]);
+  const [tableRefreshKey, setTableRefreshKey] = useState(0);
   const [debouncedSearch, setDebouncedSearch] = useState<string>('');
   const gridRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -92,40 +91,31 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   }, [router.isReady]);
 
   const requestCollection = useCallback(
-    async (page: number, limit: number) => {
+    async (page: number, limit: number, searchTerm?: string) => {
       setLoading(true);
       try {
-        const actualLimit = debouncedSearch.trim() !== '' ? 1000 : limit;
+        const searchValue =
+          searchTerm !== undefined ? searchTerm : debouncedSearch;
+        const actualLimit = searchValue.trim() !== '' ? 1000 : limit;
 
         const response = await api.get({
           route: `address/${address}/collection/${collection}?page=${page}&limit=${actualLimit}`,
         });
-
+        let filteredNfts = [];
         const collectionData = response?.data?.collection || [];
-
-        if (debouncedSearch.trim() !== '') {
-          const filteredNfts = collectionData.filter((nft: INfts) => {
-            const nftId = nft.assetId?.split('/')[1] || '';
-            const collectionName = nft.assetName || '';
-            const address = nft.address || '';
-
-            return (
-              nftId.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-              collectionName
-                .toLowerCase()
-                .includes(debouncedSearch.toLowerCase()) ||
-              address.toLowerCase().includes(debouncedSearch.toLowerCase())
-            );
-          });
+        if (searchValue.trim() !== '' && searchValue.trim() !== undefined) {
+          filteredNfts = collectionData.filter((nft: INfts) =>
+            nft.nftNonce.toString().includes(searchValue),
+          );
           setNfts(filteredNfts);
+          setPagination(null);
+          return { data: { collection: filteredNfts } };
         } else {
           setNfts(collectionData);
+          setPagination(response?.pagination || null);
+          setCurrentPage(page);
+          return response;
         }
-
-        setAllNfts(collectionData);
-        setPagination(response?.pagination || null);
-        setCurrentPage(page);
-        return response;
       } catch (error) {
         console.error('Error fetching collection:', error);
         throw error;
@@ -213,6 +203,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
+      setTableRefreshKey(prev => prev + 1);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -220,7 +211,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
 
   useEffect(() => {
     if (address && collection) {
-      requestCollection(1, 12);
+      requestCollection(1, 12, debouncedSearch);
     }
   }, [debouncedSearch, address, collection, requestCollection]);
 
@@ -308,13 +299,20 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     header,
     rowSections,
     dataName: 'collection',
-    request: (page: number, limit: number) => requestCollection(page, limit),
+    request: (page: number, limit: number) =>
+      requestCollection(page, limit, debouncedSearch),
+    refreshKey: tableRefreshKey,
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchValue = e.target.value;
     setSearch(searchValue);
-    setRefreshKey(prev => prev + 1);
+    setCurrentPage(1);
+
+    if (searchValue === '') {
+      setDebouncedSearch('');
+      setTableRefreshKey(prev => prev + 1);
+    }
   };
 
   const handleImageError = (nftId: string) => {
@@ -374,7 +372,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
                   { ...router.query, page: page.toString() },
                   router,
                 );
-                requestCollection(page, 12);
+                requestCollection(page, 12, debouncedSearch);
               }}
             />
           </PaginationContainer>

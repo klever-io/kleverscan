@@ -30,7 +30,7 @@ export const ViewToggleContainer = styled.div`
 export const ViewToggleButton = styled.button<{ active: boolean }>`
   padding: 8px 16px;
   border: 1px solid
-    ${({ theme, active }) => (active ? theme.violet : theme.border)};
+    ${({ theme, active }) => (!active ? theme.violet : 'transparent')};
   background: ${({ theme, active }) => (active ? theme.violet : 'transparent')};
   color: ${({ theme, active }) => (active ? 'white' : theme.black)};
   border-radius: 6px;
@@ -97,7 +97,7 @@ export const PaginationContainer = styled.div`
 `;
 
 export const InputContainer = styled.div`
-  width: 80%;
+  width: 100%;
   height: 44px;
   padding: 10px 12px;
   border-radius: 200px;

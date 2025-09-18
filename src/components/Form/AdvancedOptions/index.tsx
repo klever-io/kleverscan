@@ -293,12 +293,16 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreAssets, setHasMoreAssets] = useState(true);
   const [assetsPoolFetching, setAssetsPoolFetching] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const getAvailablePoolAssets = async (
     page: number = 1,
     reset: boolean = false,
   ) => {
-    setAssetsPoolFetching(true);
+    if (reset || page === 1) {
+      setAssetsPoolFetching(true);
+    }
+
     try {
       const result = await filterPoolAssets(
         getAssetsList(
@@ -314,12 +318,16 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
 
       if (reset) {
         setAssetsPool(result.filteredAssets);
+        setCurrentPage(1);
+        setIsInitialized(true);
       } else {
-        setAssetsPool(prev => [...prev, ...result.filteredAssets]);
+        if (result.filteredAssets.length > 0) {
+          setAssetsPool(prev => [...prev, ...result.filteredAssets]);
+          setCurrentPage(page);
+        }
       }
 
       setHasMoreAssets(result.hasMore);
-      setCurrentPage(page);
     } catch (error) {
       console.error('Error fetching pool assets:', error);
     } finally {
@@ -329,6 +337,7 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
 
   useEffect(() => {
     if (assets?.length) {
+      setIsInitialized(false);
       clearPoolAssetsCache();
       getAvailablePoolAssets(1, true);
     }
@@ -371,17 +380,21 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
           <Select
             key={JSON.stringify(kdaFee.current)}
             collection={kdaFee.current}
-            options={assetsPool}
+            options={isInitialized ? assetsPool : []}
             onChange={(value: any) => {
               kdaFee.current = value;
               setKdaFeeAsset(value || null);
             }}
             zIndex={4}
-            loading={assetsPoolFetching || assetsFetching || loading}
-            onMenuScrollToBottom={handleMenuScrollToBottom}
-            noOptionsMessage={() =>
-              hasMoreAssets ? 'Loading more...' : 'No options available'
+            loading={
+              !isInitialized || assetsPoolFetching || assetsFetching || loading
             }
+            onMenuScrollToBottom={handleMenuScrollToBottom}
+            noOptionsMessage={() => {
+              if (!isInitialized) return 'Loading options...';
+              if (hasMoreAssets) return 'Loading more...';
+              return 'No options available';
+            }}
           />
         </SelectContent>
       </FieldContainer>

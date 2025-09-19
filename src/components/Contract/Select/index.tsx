@@ -23,6 +23,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   onChange: (value: any) => void;
   onInputChange?: (value: any) => void;
   onMenuOpen?: () => void;
+  onMenuScrollToBottom?: () => void;
   title?: string;
   label?: string;
   zIndex?: number;
@@ -44,6 +45,7 @@ const Select: React.FC<PropsWithChildren<IFilter>> = ({
   onChange,
   onInputChange,
   onMenuOpen,
+  onMenuScrollToBottom,
   noOptionsMessage,
   selectPlaceholder,
   title,
@@ -81,6 +83,7 @@ const Select: React.FC<PropsWithChildren<IFilter>> = ({
     options,
     onChange,
     onMenuOpen,
+    onMenuScrollToBottom,
     noOptionsMessage,
     onCreateOption,
     onInputChange,

@@ -10,6 +10,12 @@ import {
   NftImageContainer,
   NftImageEmpty,
   NftImageError,
+  ViewToggleContainer,
+  ViewToggleButton,
+  GridContainer,
+  NftSearchContainer,
+  NftInputContainer,
+  NoNftsFound,
 } from '@/styles/common';
 import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
@@ -23,14 +29,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Skeleton from '@/components/Skeleton';
 import NftCardView from '@/components/NftCardView';
-import {
-  ViewToggleContainer,
-  ViewToggleButton,
-  GridContainer,
-  InputContainer,
-  Container,
-  NoNftsFound,
-} from './styles';
 
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
@@ -388,8 +386,8 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     };
 
     return (
-      <Container>
-        <InputContainer>
+      <NftSearchContainer>
+        <NftInputContainer>
           <input
             type="text"
             placeholder="Search NFT By Id"
@@ -400,7 +398,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
             onChange={handleSearchChange}
           />
           <Search />
-        </InputContainer>
+        </NftInputContainer>
         <ViewToggleContainer>
           <ViewToggleButton
             active={viewMode === 'table'}
@@ -415,7 +413,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
             Grid View
           </ViewToggleButton>
         </ViewToggleContainer>
-      </Container>
+      </NftSearchContainer>
     );
   };
 

@@ -11,9 +11,11 @@ interface IDetail {
   title: string;
   headerIcon: any;
   cards: any | undefined;
-  tableProps: ITable;
+  tableProps?: ITable;
   route?: string;
   filters?: IFilter[];
+  customContent?: React.ReactNode;
+  customHeader?: React.ReactNode;
 }
 
 const Detail: React.FC<PropsWithChildren<IDetail>> = ({
@@ -24,12 +26,15 @@ const Detail: React.FC<PropsWithChildren<IDetail>> = ({
   tableProps,
   route,
   filters,
+  customContent,
+  customHeader,
 }) => {
   return (
     <Container>
       <Header filterOn={!!filters}>
         <Title title={title} Icon={Icon} route={route} />
       </Header>
+      {customHeader && <FilterContainer>{customHeader}</FilterContainer>}
       {filters && (
         <FilterContainer>
           {filters.map(filter => (
@@ -43,7 +48,7 @@ const Detail: React.FC<PropsWithChildren<IDetail>> = ({
           {children}
         </TableContainer>
       )}
-      <Table {...tableProps} />
+      {customContent ? customContent : tableProps && <Table {...tableProps} />}
     </Container>
   );
 };

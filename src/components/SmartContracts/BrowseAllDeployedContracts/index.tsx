@@ -20,9 +20,12 @@ import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { NextRouter, useRouter } from 'next/router';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import Filter from '@/components/Filter';
+import { getNetwork } from '@/utils/networkFunctions';
 
 interface IRequestQuery {
   deployer?: string;
+  orderBy?: 'desc' | 'asc';
+  sortBy?: 'timestamp' | 'totalTransactions';
 }
 
 const smartContractsListRowSections = (
@@ -47,10 +50,7 @@ const smartContractsListRowSections = (
           </CenteredRow>
           <CenteredRow>
             <Link
-              href={
-                `/smart-contract/${contractAddress}` +
-                (name ? `?name=${name}` : '')
-              }
+              href={`/smart-contract/${contractAddress}`}
               key={contractAddress}
             >
               <Mono>{parseAddress(contractAddress, 25)}</Mono>
@@ -65,7 +65,7 @@ const smartContractsListRowSections = (
     {
       element: props => (
         <CenteredRow>
-          <span>{totalTransactions || '- -'}</span>
+          <span>{totalTransactions}</span>
         </CenteredRow>
       ),
       span: 1,
@@ -75,10 +75,7 @@ const smartContractsListRowSections = (
       element: props => (
         <CenteredRow>
           <Link
-            href={
-              `/smart-contract/${contractAddress}` +
-              (name ? `?name=${name}` : '')
-            }
+            href={`/smart-contract/${contractAddress}`}
             key={contractAddress}
           >
             <Mono>{parseAddress(deployer, 25)}</Mono>
@@ -110,8 +107,36 @@ const smartContractsListRowSections = (
 
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [orderBy, setOrderBy] = useState<string>('Most Transactioned');
+  const [orderBy, setOrderBy] = useState<string>('Recent Transactions');
   const router = useRouter();
+
+  useEffect(() => {
+    const currentNetwork = getNetwork();
+    const isDevnet = currentNetwork === 'Devnet';
+
+    if (
+      !isDevnet &&
+      (orderBy === 'Most Transacted' || orderBy === 'Least Transacted')
+    ) {
+      setOrderBy('Recent Transactions');
+      setRefreshKey(prev => prev + 1);
+    }
+  }, [orderBy]);
+
+  const getSortParams = (filterOption: string) => {
+    switch (filterOption) {
+      case 'Recent Transactions':
+        return { sortBy: 'timestamp', orderBy: 'desc' };
+      case 'Old Transactions':
+        return { sortBy: 'timestamp', orderBy: 'asc' };
+      case 'Most Transacted':
+        return { sortBy: 'totalTransactions', orderBy: 'desc' };
+      case 'Least Transacted':
+        return { sortBy: 'totalTransactions', orderBy: 'asc' };
+      default:
+        return { sortBy: 'timestamp', orderBy: 'desc' };
+    }
+  };
 
   const requestSmartContractsList = useCallback(
     async (
@@ -121,11 +146,12 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
       query?: IRequestQuery,
     ) => {
       try {
+        const sortParams = getSortParams(orderBy);
         const localQuery: { [key: string]: any } = {
           ...router.query,
           page,
           limit,
-          orderBy,
+          ...sortParams,
         };
 
         const smartContractsListRes = await api.get({
@@ -136,32 +162,9 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
           !smartContractsListRes.error ||
           smartContractsListRes.error === ''
         ) {
-          const sortedSmartContracts = smartContractsListRes.data.sc.sort(
-            (a: any, b: any) => {
-              switch (orderBy) {
-                case 'Last Date':
-                  return (b.timestamp || 0) - (a.timestamp || 0);
-                case 'First Date':
-                  return (a.timestamp || 0) - (b.timestamp || 0);
-                case 'Most Transactioned':
-                  return (
-                    (b.totalTransactions || 0) - (a.totalTransactions || 0)
-                  );
-                case 'Least Transactioned':
-                  return (
-                    (a.totalTransactions || 0) - (b.totalTransactions || 0)
-                  );
-                default:
-                  return (
-                    (b.totalTransactions || 0) - (a.totalTransactions || 0)
-                  );
-              }
-            },
-          );
-
           const data = {
             ...smartContractsListRes,
-            data: { smartContracts: sortedSmartContracts },
+            data: { smartContracts: smartContractsListRes.data.sc },
           };
           return data;
         } else {
@@ -176,16 +179,22 @@ const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   );
 
   const handleFilters = () => {
+    const currentNetwork = getNetwork();
+    const isDevnet = currentNetwork === 'Devnet';
+
+    const baseOptions = ['Recent Transactions', 'Old Transactions'];
+
+    const devnetOptions = ['Most Transacted', 'Least Transacted'];
+
+    const allOptions = isDevnet
+      ? [...baseOptions, ...devnetOptions]
+      : baseOptions;
+
     const filters = [
       {
         title: 'Order By',
         current: orderBy,
-        data: [
-          'Last Date',
-          'First Date',
-          'Most Transactioned',
-          'Least Transactioned',
-        ],
+        data: allOptions,
         onClick: (selected: string) => {
           setOrderBy(selected);
           setRefreshKey((prev: number) => prev + 1);

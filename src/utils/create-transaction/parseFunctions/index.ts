@@ -6,6 +6,8 @@ let poolPaginationCache: {
   [key: string]: { totalPages: number; loadedPages: number };
 } = {};
 
+let poolLoadsInFlight: Record<string, boolean> = {};
+
 const BACKEND_PAGE_LIMIT = 20;
 const MAX_INCREMENTAL_PAGES = 5;
 
@@ -14,6 +16,8 @@ const loadPoolsInBackground = async (
   cacheKey: string,
   targetPages: number = 2,
 ): Promise<void> => {
+  if (poolLoadsInFlight[cacheKey]) return;
+  poolLoadsInFlight[cacheKey] = true;
   const startPage = poolPaginationCache[cacheKey].loadedPages + 1;
   const endPage = Math.min(
     startPage + targetPages - 1,
@@ -41,6 +45,7 @@ const loadPoolsInBackground = async (
       break;
     }
   }
+  poolLoadsInFlight[cacheKey] = false;
 };
 
 export const filterPoolAssets = async (
@@ -88,13 +93,11 @@ export const filterPoolAssets = async (
     ),
   );
 
-  // Pagina os resultados filtrados
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
   const paginatedAssets = filteredAssets.slice(startIndex, endIndex);
   const totalFilteredPages = Math.ceil(filteredAssets.length / limit);
 
-  // Se precisamos de mais dados e não temos todos carregados, carrega mais em background
   const needsMoreData =
     paginatedAssets.length < limit &&
     poolPaginationCache[cacheKey].loadedPages <
@@ -104,7 +107,6 @@ export const filterPoolAssets = async (
     loadPoolsInBackground(assets, cacheKey, 2).catch(console.error);
   }
 
-  // Determina se há mais páginas disponíveis
   const hasMoreBackendPages =
     poolPaginationCache[cacheKey].loadedPages <
     poolPaginationCache[cacheKey].totalPages;
@@ -124,4 +126,5 @@ export const filterPoolAssets = async (
 export const clearPoolAssetsCache = () => {
   poolCache = {};
   poolPaginationCache = {};
+  poolLoadsInFlight = {};
 };

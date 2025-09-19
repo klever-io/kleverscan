@@ -299,9 +299,8 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
     page: number = 1,
     reset: boolean = false,
   ) => {
-    if (reset || page === 1) {
-      setAssetsPoolFetching(true);
-    }
+    if (assetsPoolFetching) return;
+    setAssetsPoolFetching(true);
 
     try {
       const result = await filterPoolAssets(
@@ -323,8 +322,8 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
       } else {
         if (result.filteredAssets.length > 0) {
           setAssetsPool(prev => [...prev, ...result.filteredAssets]);
-          setCurrentPage(page);
         }
+        setCurrentPage(page);
       }
 
       setHasMoreAssets(result.hasMore);

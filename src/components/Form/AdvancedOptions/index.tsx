@@ -23,9 +23,17 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import { useExtension } from '@/contexts/extension';
 import getAccount from '@/services/requests/searchBar/account';
-import { IAccountResponse, IDropdownItem, IPermissions } from '@/types';
+import {
+  IAccountResponse,
+  IDropdownItem,
+  IPermissions,
+  ICollectionList,
+} from '@/types';
 import { IAccPermission } from '@/types/contracts';
-import { filterPoolAssets } from '@/utils/create-transaction/parseFunctions';
+import {
+  filterPoolAssets,
+  clearPoolAssetsCache,
+} from '@/utils/create-transaction/parseFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -281,23 +289,71 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
     initialData: [],
   });
 
-  const getAvailablePoolAssets = async () =>
-    filterPoolAssets(
-      getAssetsList(assets || [], 'FreezeContract', null, null, walletAddress),
-    );
+  const [assetsPool, setAssetsPool] = useState<ICollectionList[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreAssets, setHasMoreAssets] = useState(true);
+  const [assetsPoolFetching, setAssetsPoolFetching] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  const { data: assetsPool, isFetching: assetsPoolFetching } = useQuery({
-    queryKey: ['assetsPool'],
-    queryFn: getAvailablePoolAssets,
-    initialData: [],
-    enabled: !!assets?.length,
-  });
+  const getAvailablePoolAssets = async (
+    page: number = 1,
+    reset: boolean = false,
+  ) => {
+    if (assetsPoolFetching) return;
+    setAssetsPoolFetching(true);
+
+    try {
+      const result = await filterPoolAssets(
+        getAssetsList(
+          assets || [],
+          'FreezeContract',
+          null,
+          null,
+          walletAddress,
+        ),
+        page,
+        10,
+      );
+
+      if (reset) {
+        setAssetsPool(result.filteredAssets);
+        setCurrentPage(1);
+        setIsInitialized(true);
+      } else {
+        if (result.filteredAssets.length > 0) {
+          setAssetsPool(prev => [...prev, ...result.filteredAssets]);
+        }
+        setCurrentPage(page);
+      }
+
+      setHasMoreAssets(result.hasMore);
+    } catch (error) {
+      console.error('Error fetching pool assets:', error);
+    } finally {
+      setAssetsPoolFetching(false);
+    }
+  };
+
+  useEffect(() => {
+    if (assets?.length) {
+      setIsInitialized(false);
+      clearPoolAssetsCache();
+      getAvailablePoolAssets(1, true);
+    }
+  }, [assets, walletAddress]);
 
   const refetch = async () => {
     setLoading(true);
+    clearPoolAssetsCache();
     await getAssets();
-    await getAvailablePoolAssets();
+    await getAvailablePoolAssets(1, true);
     setLoading(false);
+  };
+
+  const handleMenuScrollToBottom = () => {
+    if (hasMoreAssets && !assetsPoolFetching) {
+      getAvailablePoolAssets(currentPage + 1, false);
+    }
   };
 
   const assetBalance = kdaFee?.current.balance || null;
@@ -323,13 +379,21 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
           <Select
             key={JSON.stringify(kdaFee.current)}
             collection={kdaFee.current}
-            options={assetsPool}
+            options={isInitialized ? assetsPool : []}
             onChange={(value: any) => {
               kdaFee.current = value;
               setKdaFeeAsset(value || null);
             }}
             zIndex={4}
-            loading={assetsPoolFetching || assetsFetching || loading}
+            loading={
+              !isInitialized || assetsPoolFetching || assetsFetching || loading
+            }
+            onMenuScrollToBottom={handleMenuScrollToBottom}
+            noOptionsMessage={() => {
+              if (!isInitialized) return 'Loading options...';
+              if (hasMoreAssets) return 'Loading more...';
+              return 'No options available';
+            }}
           />
         </SelectContent>
       </FieldContainer>

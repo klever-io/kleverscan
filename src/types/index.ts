@@ -831,7 +831,7 @@ export interface IAssetPoolResponse extends IResponse {
   };
 }
 
-export interface IAssetPoolsResponse extends IResponse {
+export interface IAssetPoolsResponse extends IPaginatedResponse {
   data: {
     pools: IAssetPool[];
   };

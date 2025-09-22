@@ -213,6 +213,18 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     }
   }, [debouncedSearch, address, collection, requestCollection]);
 
+  useEffect(() => {
+    if (!metadata || nfts.length === 0) return;
+
+    const idsToFetch = nfts
+      .map(n => n.assetId?.split('/')[1])
+      .filter((id): id is string => !!id && !nftImages[id]);
+
+    idsToFetch.forEach(id => {
+      fetchNftImage(metadata, id);
+    });
+  }, [metadata, nfts, nftImages]);
+
   const { isMobile } = useMobile();
 
   const rowSections = (nft: INfts): IRowSection[] => {
@@ -220,10 +232,6 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
 
     const collectionId = assetId?.split('/')[0];
     const nftId = assetId?.split('/')[1];
-
-    if (metadata && nftId && !nftImages[nftId]) {
-      fetchNftImage(metadata, nftId);
-    }
 
     const sections: IRowSection[] = address
       ? [
@@ -334,16 +342,14 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     return (
       <>
         {nfts.length === 0 && debouncedSearch.trim() !== '' ? (
-          <NoNftsFound>No NFTs found matching "{debouncedSearch}"</NoNftsFound>
+          <NoNftsFound role="status" aria-live="polite">
+            No NFTs found matching "{debouncedSearch}"
+          </NoNftsFound>
         ) : (
           <GridContainer>
             {nfts.map(nft => {
               const { assetId } = nft;
               const nftId = assetId?.split('/')[1];
-
-              if (metadata && nftId && !nftImages[nftId]) {
-                fetchNftImage(metadata, nftId);
-              }
 
               return (
                 <NftCardView

@@ -10,6 +10,9 @@ import {
   NftImageContainer,
   NftImageEmpty,
   NftImageError,
+  ViewToggleContainer,
+  ViewToggleButton,
+  GridContainer,
 } from '@/styles/common';
 import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
@@ -23,7 +26,6 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Skeleton from '@/components/Skeleton';
 import NftCardView from '@/components/NftCardView';
-import { ViewToggleContainer, ViewToggleButton, GridContainer } from './styles';
 
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';

@@ -739,7 +739,7 @@ export const ViewToggleContainer = styled.div`
 export const ViewToggleButton = styled.button<{ active: boolean }>`
   padding: 8px 16px;
   border: 1px solid
-    ${({ theme, active }) => (active ? theme.violet : theme.border)};
+    ${({ theme, active }) => (!active ? theme.violet : 'transparent')};
   background: ${({ theme, active }) => (active ? theme.violet : 'transparent')};
   color: ${({ theme, active }) => (active ? 'white' : theme.black)};
   border-radius: 6px;
@@ -803,4 +803,59 @@ export const PaginationContainer = styled.div`
     font-size: 14px;
     color: ${({ theme }) => theme.gray800};
   }
+`;
+
+export const NftSearchContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+`;
+
+export const NftInputContainer = styled.div`
+  width: 100%;
+  height: 44px;
+  padding: 10px 12px;
+  border-radius: 200px;
+  border: 1px solid ${({ theme }) => theme.darkText};
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  input {
+    width: 100%;
+    font-family: 'Manrope';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: ${props =>
+      props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+
+    &::placeholder {
+      color: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+    }
+  }
+
+  > svg {
+    cursor: pointer;
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+    }
+  }
+`;
+
+export const NoNftsFound = styled.div`
+  text-align: center;
+  padding: 2rem;
+  color: #666;
 `;

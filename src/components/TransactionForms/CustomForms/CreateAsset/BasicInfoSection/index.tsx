@@ -142,7 +142,6 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
         span={2}
         tooltip={tooltip.logo}
         logoError={logoError}
-        loading={isLoading}
         propsValidate={isValidLogo}
       />
     </FormSection>

@@ -45,13 +45,15 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
             return erroMessage;
           } else {
             setLogoError(logoErrorMsg);
-            return false;
+            return logoErrorMsg;
           }
         }
       }
       setLogoError(null);
+      return true;
     } catch (error) {
       setLogoError(logoErrorMsg);
+      return logoErrorMsg;
     }
   };
 
@@ -140,6 +142,7 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
         span={2}
         tooltip={tooltip.logo}
         logoError={logoError}
+        loading={isLoading}
         propsValidate={isValidLogo}
       />
     </FormSection>

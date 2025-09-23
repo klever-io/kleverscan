@@ -1,6 +1,4 @@
 import { transparentize } from 'polished';
-import { BiTransfer } from 'react-icons/bi';
-import { IoIosLogOut } from 'react-icons/io';
 import styled, { css, keyframes } from 'styled-components';
 
 export const ConnectButton = styled.div<{
@@ -37,16 +35,13 @@ export const ConnectButton = styled.div<{
   span {
     white-space: nowrap;
   }
+
   label {
     cursor: pointer;
   }
 
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
     max-width: 100%;
-    svg {
-      width: 18px;
-      height: 18px;
-    }
   }
 
   &:hover {
@@ -119,101 +114,6 @@ export const NavBarOptionsItems = styled.div`
   }
 `;
 
-export const LogoutIcon = styled(IoIosLogOut)`
-  color: ${props => props.theme.borderLogo};
-  cursor: pointer;
-`;
-
-export const LogoutContainer = styled.div`
-  position: relative;
-  font-size: 0.75rem;
-  margin-left: 0.8rem;
-
-  &:hover {
-    svg {
-      filter: brightness(1.5);
-    }
-  }
-
-  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    &:hover {
-      &::before {
-        content: '';
-        position: absolute;
-        top: 2rem;
-        left: 0.25rem;
-        width: 0;
-        height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 10px solid ${props => props.theme.card.background};
-        transform: translate(-25%, 100%);
-      }
-
-      &::after {
-        content: 'Logout';
-        position: absolute;
-        top: 1rem;
-        left: 0;
-        background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.card.white};
-        padding: 0.5rem;
-        border-radius: 5px;
-        z-index: 1;
-        transform: translate(-25%, 100%);
-      }
-    }
-  }
-`;
-
-export const CopyContainer = styled.div`
-  position: relative;
-  font-size: 0.9rem;
-  margin-left: 0.8rem;
-  margin-top: 0.41rem;
-
-  svg {
-    g {
-      fill: ${props => props.theme.navbar.text};
-    }
-  }
-
-  &:hover {
-    svg {
-      filter: brightness(1.5);
-    }
-  }
-
-  @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    &:hover {
-      &::before {
-        content: '';
-        position: absolute;
-        top: 1.25rem;
-        left: 0.25rem;
-        width: 0;
-        height: 0;
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 10px solid ${props => props.theme.card.background};
-        transform: translate(-25%, 100%);
-      }
-
-      &::after {
-        content: 'Copy address';
-        position: absolute;
-        top: 1rem;
-        left: 0;
-        background-color: ${props => props.theme.card.background};
-        color: ${props => props.theme.card.white};
-        padding: 0.5rem;
-        border-radius: 5px;
-        z-index: 1;
-        transform: translate(-50%, 40%);
-      }
-    }
-  }
-`;
 export const MenuTransaction = styled.ul`
   color: ${props => props.theme.navbar.text};
   border-radius: 10px;
@@ -230,18 +130,6 @@ export const MobileTransaction = styled.a`
   align-items: center;
   gap: 1rem;
   color: ${props => props.theme.navbar.text};
-`;
-
-export const MobileStyledTransfer = styled(BiTransfer)`
-  color: ${props => props.theme.navbar.text};
-  size: 20px;
-`;
-
-export const StyledTransfer = styled(BiTransfer)`
-  color: ${props => props.theme.navbar.text};
-
-  width: 25px;
-  height: 25px;
 `;
 
 export const FadeIn = keyframes`
@@ -293,25 +181,41 @@ export const BackgroundHelper = styled.div<{ opened: boolean }>`
 
 export const ConnectedWallet = styled.div`
   display: flex;
-  align-items: flex-start;
-  flex-direction: column;
+  align-items: center;
+  flex-direction: row;
   position: relative;
-  &::after {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background-color: ${props => props.theme.green};
-    content: '';
-    position: absolute;
-    right: -15px;
+  background-color: ${({ theme }) => (theme.dark ? '#161616' : '#FFFFFF')};
+  border: 1px solid ${({ theme }) => (theme.dark ? '#161616' : '#E1E1E1')};
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  gap: 0.5rem;
+
+  svg {
+    path {
+      color: ${props =>
+        props.theme.dark ? props.theme.true.white : props.theme.true.black};
+    }
   }
 `;
 
 export const GraySpan = styled.span`
-  color: ${props =>
-    props.theme.dark ? props.theme.true.white : props.theme.navbar.text};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.3rem;
+  &:hover {
+    filter: brightness(1.3);
+  }
+
+  svg {
+    path {
+      color: ${props => props.theme.red};
+    }
+  }
 `;
 
 export const BlackSpan = styled.span`
   color: ${props => props.theme.black};
+  font-size: 0.75rem;
+  font-weight: 700;
 `;

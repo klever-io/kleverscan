@@ -13,6 +13,9 @@ import {
   ViewToggleContainer,
   ViewToggleButton,
   GridContainer,
+  NftSearchContainer,
+  NftInputContainer,
+  NoNftsFound,
 } from '@/styles/common';
 import { INfts, IPagination, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
@@ -29,6 +32,7 @@ import NftCardView from '@/components/NftCardView';
 
 import Pagination from '@/components/Pagination';
 import { PaginationContainer } from '@/components/Pagination/styles';
+import { Search } from '@/assets/icons';
 
 interface ICollectionPage {
   collection: INfts[];
@@ -66,6 +70,9 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   const [nfts, setNfts] = useState<INfts[]>([]);
   const [pagination, setPagination] = useState<IPagination | null>(null);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState<string>('');
+  const [tableRefreshKey, setTableRefreshKey] = useState(0);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>('');
   const gridRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -82,16 +89,31 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
   }, [router.isReady]);
 
   const requestCollection = useCallback(
-    async (page: number, limit: number) => {
+    async (page: number, limit: number, searchTerm?: string) => {
       setLoading(true);
       try {
+        const searchValue =
+          searchTerm !== undefined ? searchTerm : debouncedSearch;
+        const actualLimit = searchValue.trim() !== '' ? 1000 : limit;
+
         const response = await api.get({
-          route: `address/${address}/collection/${collection}?page=${page}&limit=${limit}`,
+          route: `address/${address}/collection/${collection}?page=${page}&limit=${actualLimit}`,
         });
-        setNfts(response?.data?.collection || []);
-        setPagination(response?.pagination || null);
-        setCurrentPage(page);
-        return response;
+        let filteredNfts = [];
+        const collectionData = response?.data?.collection || [];
+        if (searchValue.trim() !== '' && searchValue.trim() !== undefined) {
+          filteredNfts = collectionData.filter((nft: INfts) =>
+            nft.nftNonce.toString().includes(searchValue),
+          );
+          setNfts(filteredNfts);
+          setPagination(null);
+          return { data: { collection: filteredNfts } };
+        } else {
+          setNfts(collectionData);
+          setPagination(response?.pagination || null);
+          setCurrentPage(page);
+          return response;
+        }
       } catch (error) {
         console.error('Error fetching collection:', error);
         throw error;
@@ -99,7 +121,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
         setLoading(false);
       }
     },
-    [address, collection],
+    [address, collection, debouncedSearch],
   );
 
   const requestMetadata = async () => {
@@ -176,6 +198,33 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     }
   }, [router.query.page, address, collection, requestCollection]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setTableRefreshKey(prev => prev + 1);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    if (address && collection) {
+      requestCollection(1, 12, debouncedSearch);
+    }
+  }, [debouncedSearch, address, collection, requestCollection]);
+
+  useEffect(() => {
+    if (!metadata || nfts.length === 0) return;
+
+    const idsToFetch = nfts
+      .map(n => n.assetId?.split('/')[1])
+      .filter((id): id is string => !!id && !nftImages[id]);
+
+    idsToFetch.forEach(id => {
+      fetchNftImage(metadata, id);
+    });
+  }, [metadata, nfts, nftImages]);
+
   const { isMobile } = useMobile();
 
   const rowSections = (nft: INfts): IRowSection[] => {
@@ -183,10 +232,6 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
 
     const collectionId = assetId?.split('/')[0];
     const nftId = assetId?.split('/')[1];
-
-    if (metadata && nftId && !nftImages[nftId]) {
-      fetchNftImage(metadata, nftId);
-    }
 
     const sections: IRowSection[] = address
       ? [
@@ -260,7 +305,20 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     header,
     rowSections,
     dataName: 'collection',
-    request: (page: number, limit: number) => requestCollection(page, limit),
+    request: (page: number, limit: number) =>
+      requestCollection(page, limit, debouncedSearch),
+    refreshKey: tableRefreshKey,
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchValue = e.target.value;
+    setSearch(searchValue);
+    setCurrentPage(1);
+
+    if (searchValue === '') {
+      setDebouncedSearch('');
+      setTableRefreshKey(prev => prev + 1);
+    }
   };
 
   const handleImageError = (nftId: string) => {
@@ -283,28 +341,30 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
 
     return (
       <>
-        <GridContainer>
-          {nfts.map(nft => {
-            const { assetId } = nft;
-            const nftId = assetId?.split('/')[1];
+        {nfts.length === 0 && debouncedSearch.trim() !== '' ? (
+          <NoNftsFound role="status" aria-live="polite">
+            No NFTs found matching "{debouncedSearch}"
+          </NoNftsFound>
+        ) : (
+          <GridContainer>
+            {nfts.map(nft => {
+              const { assetId } = nft;
+              const nftId = assetId?.split('/')[1];
 
-            if (metadata && nftId && !nftImages[nftId]) {
-              fetchNftImage(metadata, nftId);
-            }
+              return (
+                <NftCardView
+                  key={assetId}
+                  nft={nft}
+                  nftImages={nftImages}
+                  metadata={metadata}
+                  onImageError={handleImageError}
+                />
+              );
+            })}
+          </GridContainer>
+        )}
 
-            return (
-              <NftCardView
-                key={assetId}
-                nft={nft}
-                nftImages={nftImages}
-                metadata={metadata}
-                onImageError={handleImageError}
-              />
-            );
-          })}
-        </GridContainer>
-
-        {pagination && (
+        {pagination && debouncedSearch.trim() === '' && (
           <PaginationContainer>
             <Pagination
               tableRef={gridRef}
@@ -316,7 +376,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
                   { ...router.query, page: page.toString() },
                   router,
                 );
-                requestCollection(page, 12);
+                requestCollection(page, 12, debouncedSearch);
               }}
             />
           </PaginationContainer>
@@ -325,27 +385,41 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     );
   };
 
-  const ViewModeToggle = () => {
+  const viewModeToggle = () => {
     const handleViewModeChange = (newViewMode: 'table' | 'grid') => {
       setViewMode(newViewMode);
       storageViewMode(newViewMode);
     };
 
     return (
-      <ViewToggleContainer>
-        <ViewToggleButton
-          active={viewMode === 'table'}
-          onClick={() => handleViewModeChange('table')}
-        >
-          Table View
-        </ViewToggleButton>
-        <ViewToggleButton
-          active={viewMode === 'grid'}
-          onClick={() => handleViewModeChange('grid')}
-        >
-          Grid View
-        </ViewToggleButton>
-      </ViewToggleContainer>
+      <NftSearchContainer>
+        <NftInputContainer>
+          <input
+            type="text"
+            placeholder="Search NFT By Id"
+            value={search}
+            aria-label="Search NFT by ID"
+            autoComplete="off"
+            inputMode="numeric"
+            onChange={handleSearchChange}
+          />
+          <Search />
+        </NftInputContainer>
+        <ViewToggleContainer>
+          <ViewToggleButton
+            active={viewMode === 'table'}
+            onClick={() => handleViewModeChange('table')}
+          >
+            Table View
+          </ViewToggleButton>
+          <ViewToggleButton
+            active={viewMode === 'grid'}
+            onClick={() => handleViewModeChange('grid')}
+          >
+            Grid View
+          </ViewToggleButton>
+        </ViewToggleContainer>
+      </NftSearchContainer>
     );
   };
 
@@ -353,10 +427,11 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     title: `NFT Collection - ${collection}`,
     headerIcon: Icon,
     cards: undefined,
+    dataName: 'collection',
     tableProps: viewMode === 'table' ? tableProps : undefined,
     route: `/account/${address}`,
     customContent: viewMode === 'grid' ? renderGridView() : undefined,
-    customHeader: <ViewModeToggle />,
+    customHeader: viewModeToggle(),
   };
 
   return <>{address && collection && <Detail {...detailProps} />}</>;

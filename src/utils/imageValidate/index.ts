@@ -61,47 +61,98 @@ export const validateImgUrl = async (
   url: string,
   timeout: number,
 ): Promise<[boolean, string?]> => {
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    const sizeInKB = blob.size / 1024;
-    let width = 0;
-    let height = 0;
-
-    if (sizeInKB > 1024 * 3) {
-      return [false, 'maximum image size should be 3mb'];
+  if (regexImgUrl(url)) {
+    const imageLoadResult = await isImage(url, timeout);
+    if (imageLoadResult) {
+      return [true];
     }
+  }
 
-    const img = new Image();
-    img.src = URL.createObjectURL(blob);
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    const imgLoaded = new Promise<[number, number]>(resolve => {
-      img.onload = () => {
-        width = img.width;
-        height = img.height;
-        resolve([width, height]);
-      };
+    const response = await fetch(url, {
+      signal: controller.signal,
+      mode: 'no-cors',
     });
+    clearTimeout(timeoutId);
 
-    [width, height] = await imgLoaded;
-
-    if (width > 1920 || height > 1080) {
-      return [false, 'maximum image size should be 1920x1080'];
+    if (response.type === 'opaque') {
+      const imageLoadResult = await isImage(url, timeout);
+      if (imageLoadResult) {
+        return [true];
+      }
     }
   } catch (error) {
-    return [false];
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        return [false, 'Failed to fetch image'];
+      }
+
+      const blob = await response.blob();
+      const sizeInKB = blob.size / 1024;
+      let width = 0;
+      let height = 0;
+
+      if (sizeInKB > 1024 * 3) {
+        return [false, 'maximum image size should be 3mb'];
+      }
+
+      const img = new Image();
+      img.src = URL.createObjectURL(blob);
+
+      const imgLoaded = new Promise<[number, number]>((resolve, reject) => {
+        const loadTimeout = setTimeout(() => {
+          reject(new Error('Image load timeout'));
+        }, timeout);
+
+        img.onload = () => {
+          clearTimeout(loadTimeout);
+          width = img.width;
+          height = img.height;
+          resolve([width, height]);
+        };
+
+        img.onerror = () => {
+          clearTimeout(loadTimeout);
+          reject(new Error('Failed to load image'));
+        };
+      });
+
+      [width, height] = await imgLoaded;
+
+      if (width > 1920 || height > 1080) {
+        return [false, 'maximum image size should be 1920x1080'];
+      }
+
+      URL.revokeObjectURL(img.src);
+
+      return [true];
+    } catch (corsError) {
+      if (corsError instanceof Error && corsError.name === 'AbortError') {
+        return [false, 'Request timeout'];
+      }
+
+      const imageLoadResult = await isImage(url, timeout);
+      if (imageLoadResult) {
+        return [true];
+      }
+
+      const headerResult = await validateImgRequestHeader(url, timeout);
+      if (headerResult) {
+        return [true];
+      }
+
+      return [false, 'Unable to validate image due to CORS restrictions'];
+    }
   }
 
-  if (regexImgUrl(url)) {
-    return [true];
-  }
-
-  if (await validateImgRequestHeader(url, timeout)) {
-    return [true];
-  }
-
-  if (await isImage(url, timeout)) {
-    return [true];
-  }
-  return [false];
+  return [false, 'Image validation failed'];
 };

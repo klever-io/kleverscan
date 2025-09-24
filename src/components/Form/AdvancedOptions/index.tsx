@@ -348,45 +348,51 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
 
     setIsSearching(true);
 
-    const limits = [20, 50, 0];
+    try {
+      const limits = [20, 50, 0];
 
-    for (const limit of limits) {
-      const result = await filterPoolAssets(
-        getAssetsList(
-          assets || [],
-          'FreezeContract',
-          null,
-          null,
-          walletAddress,
-        ),
-        1,
-        limit === 0 ? 999999 : limit,
-      );
-
-      const queryLower = query.trim().toLowerCase();
-      const filteredResults = result.filteredAssets.filter(asset => {
-        const aId = (asset.assetId ?? '').toLowerCase();
-        const label = (asset.label ?? '').toLowerCase();
-        const val =
-          typeof asset.value === 'string' ? asset.value.toLowerCase() : '';
-        return (
-          aId.includes(queryLower) ||
-          label.includes(queryLower) ||
-          val.includes(queryLower)
+      for (const limit of limits) {
+        const result = await filterPoolAssets(
+          getAssetsList(
+            assets || [],
+            'FreezeContract',
+            null,
+            null,
+            walletAddress,
+          ),
+          1,
+          limit === 0 ? 999999 : limit,
         );
-      });
 
-      setAssetsPool(filteredResults);
-      setCurrentPage(1);
-      setIsInitialized(true);
-      setHasMoreAssets(false);
+        const queryLower = query.trim().toLowerCase();
+        const filteredResults = result.filteredAssets.filter(asset => {
+          const aId = (asset.assetId ?? '').toLowerCase();
+          const label = (asset.label ?? '').toLowerCase();
+          const val =
+            typeof asset.value === 'string' ? asset.value.toLowerCase() : '';
+          return (
+            aId.includes(queryLower) ||
+            label.includes(queryLower) ||
+            val.includes(queryLower)
+          );
+        });
 
-      if (filteredResults.length > 0 || limit === 0) {
-        break;
+        setAssetsPool(filteredResults);
+        setCurrentPage(1);
+        setIsInitialized(true);
+        setHasMoreAssets(false);
+
+        if (filteredResults.length > 0 || limit === 0) {
+          break;
+        }
       }
+    } catch (error) {
+      console.error('Error searching pool assets:', error);
+      setAssetsPool([]);
+      setHasMoreAssets(false);
+    } finally {
+      setIsSearching(false);
     }
-
-    setIsSearching(false);
   };
 
   const handleInputChange = (inputValue: string) => {

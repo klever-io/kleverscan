@@ -363,12 +363,18 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
         limit === 0 ? 999999 : limit,
       );
 
-      const filteredResults = result.filteredAssets.filter(
-        asset =>
-          asset.assetId?.toLowerCase().includes(query.toLowerCase()) ||
-          asset.label?.toLowerCase().includes(query.toLowerCase()) ||
-          asset.value?.toLowerCase().includes(query.toLowerCase()),
-      );
+      const queryLower = query.trim().toLowerCase();
+      const filteredResults = result.filteredAssets.filter(asset => {
+        const aId = (asset.assetId ?? '').toLowerCase();
+        const label = (asset.label ?? '').toLowerCase();
+        const val =
+          typeof asset.value === 'string' ? asset.value.toLowerCase() : '';
+        return (
+          aId.includes(queryLower) ||
+          label.includes(queryLower) ||
+          val.includes(queryLower)
+        );
+      });
 
       setAssetsPool(filteredResults);
       setCurrentPage(1);

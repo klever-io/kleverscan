@@ -38,6 +38,7 @@ export interface IFilter extends React.InputHTMLAttributes<HTMLInputElement> {
   defaultValue?: any;
   noOptionsMessage?: any;
   onCreateOption?: (value: any) => void;
+  isSearching?: boolean;
 }
 
 const Select: React.FC<PropsWithChildren<IFilter>> = ({
@@ -60,6 +61,7 @@ const Select: React.FC<PropsWithChildren<IFilter>> = ({
   selectedValue,
   onCreateOption,
   defaultValue,
+  isSearching,
   ...rest
 }) => {
   const Placeholder = useCallback((props: any) => {
@@ -87,6 +89,7 @@ const Select: React.FC<PropsWithChildren<IFilter>> = ({
     noOptionsMessage,
     onCreateOption,
     onInputChange,
+    isSearching,
   };
 
   const getPlaceholder = () => {

@@ -12,6 +12,11 @@ export const parseSplitRoyalties = (data: any): void => {
     delete data.transferPercentage;
   }
 
+  if (!data.royalties) {
+    data.royalties = {};
+    return;
+  }
+
   if (!Array.isArray(data.royalties?.splitRoyalties)) {
     return;
   }

@@ -18,6 +18,7 @@ import { IBlock } from '@/types/blocks';
 import { IProposal, MostTransferredToken } from '@/types/proposals';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
+import { getNetwork } from '@/utils/networkFunctions';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -56,6 +57,7 @@ export const HomeData = createContext({} as IHomeData);
 
 export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const watcherTimeout = isDev ? 100000 : 4 * 1000; // 4 secs
+  const network = getNetwork();
 
   const [
     aggregateResult,
@@ -130,6 +132,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
       queryKey: 'hotContracts',
       queryFn: homeHotContracts,
       refetchInterval: watcherTimeout,
+      enabled: network !== 'Mainnet',
     },
   ]);
 
@@ -180,12 +183,13 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     mostTransactedNFTs: mostTransactedNFTs.data || [],
     mostTransactedKDAFee: mostTransactedKDAFee.data || [],
     epoch: aggregateResult.data?.overview?.epochNumber,
-    hotContracts: hotContracts.data?.hotContracts || [],
+    hotContracts:
+      network !== 'Mainnet' ? hotContracts.data?.hotContracts || [] : [],
     loadingMostTransacted:
       mostTransactedTokens.isLoading ||
       mostTransactedNFTs.isLoading ||
       mostTransactedKDAFee.isLoading ||
-      hotContracts.isLoading,
+      (network !== 'Mainnet' ? hotContracts.isLoading : false),
   };
 
   prevValuesRef.current = {

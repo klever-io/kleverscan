@@ -9,7 +9,8 @@
       "Transactions": "Transactions",
       "Buckets": "Buckets",
       "Rewards": "Rewards",
-      "NFTCollections": "NFT Collections"
+      "NFTCollections": "NFT Collections",
+      "SmartContracts": "Smart Contracts"
     },
     "Content": {
       "Address": "Address",

@@ -473,3 +473,27 @@ export const nftCollectionsRequest = (
 
   return get;
 };
+
+export const getSCDeployedByAddress = (address: string) => {
+  const get = async (page: number, limit: number): Promise<IResponse> => {
+    const res = await api.get({
+      route: `sc/list?deployer=${address}`,
+    });
+
+    if (res.error || res.error !== '') {
+      return {
+        data: { sc: [] },
+        error: res.error,
+        code: 'error',
+      };
+    }
+
+    return {
+      data: { sc: res.data.sc },
+      code: 'successful',
+      error: '',
+    };
+  };
+
+  return get;
+};

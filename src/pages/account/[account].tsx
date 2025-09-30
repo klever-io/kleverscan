@@ -28,6 +28,7 @@ import {
   accountCall,
   assetsRequest,
   bucketsRequest,
+  getSCDeployedByAddress,
   nftCollectionsRequest,
   ownedAssetsRequest,
   pricesCall,
@@ -93,6 +94,7 @@ import nextI18nextConfig from '../../../next-i18next.config';
 import { requestTransactionsDefault } from '../transactions';
 import { PermissionOperations } from '@/components/AccountPermission';
 import NftCollections from '@/components/Tabs/NftCollections';
+import SCDeployerdByAddress from '@/components/Tabs/SCDeployerdByAddress';
 
 export interface IStakingRewards {
   label: string;
@@ -122,6 +124,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     t('accounts:SingleAccount.Tabs.Buckets'),
     t('accounts:SingleAccount.Tabs.Rewards'),
     t('accounts:SingleAccount.Tabs.NFTCollections'),
+    t('accounts:SingleAccount.Tabs.SmartContracts'),
   ];
   const tabHeaders = [t('common:Tabs.Overview')];
   const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
@@ -253,6 +256,8 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
           return rewardsFPRPool(address)(page, limit);
         case t('accounts:SingleAccount.Tabs.NFTCollections'):
           return nftCollectionsRequest(address)(page, limit);
+        case t('accounts:SingleAccount.Tabs.SmartContracts'):
+          return getSCDeployedByAddress(address)(page, limit);
         default:
           return assetsRequest(address)(page, limit);
       }
@@ -297,6 +302,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const nftCollectionsTableProps: IInnerTableProps = {
     scrollUp: false,
     dataName: 'assets',
+    query: router.query,
+    request: getRequest,
+  };
+
+  const smartContractsTableProps: IInnerTableProps = {
+    scrollUp: false,
+    dataName: 'sc',
     query: router.query,
     request: getRequest,
   };
@@ -370,6 +382,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         return (
           <NftCollections
             nftCollectionsTableProps={nftCollectionsTableProps}
+            address={router.query.account as string}
+          />
+        );
+      case t('accounts:SingleAccount.Tabs.SmartContracts'):
+        return (
+          <SCDeployerdByAddress
+            smartContractsTableProps={smartContractsTableProps}
             address={router.query.account as string}
           />
         );

@@ -1,8 +1,7 @@
 import { KLV } from '@/assets/coins';
-import { Check, Plug } from '@/assets/icons';
+import { Wallet, ArrowRight, CategoryTransparent } from '@/assets/icons';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
-import api from '@/services/api';
 import {
   IAccountBalance,
   getAccountBalanceRequest,
@@ -21,35 +20,49 @@ import {
   useRef,
   useState,
 } from 'react';
-import { AiOutlineClose } from 'react-icons/ai';
-import { BiLogOut, BiWalletAlt } from 'react-icons/bi';
-import { IoMdAddCircle } from 'react-icons/io';
-import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
+
 import { MdContentCopy } from 'react-icons/md';
-import { RiArrowDownSLine, RiArrowRightSLine } from 'react-icons/ri';
+import { RiArrowDownSLine } from 'react-icons/ri';
 import { useQuery } from 'react-query';
-import { toast } from 'react-toastify';
+
 import Copy from '../Copy';
 import {
+  AccordionContent,
   ActionItem,
-  BalanceContainer,
+  AssetContent,
+  AssetItem,
+  AssetName,
+  AssetPrice,
   BodyContent,
-  ContainerAsset,
-  DropdownIcon,
-  HeaderInfo,
-  IoReloadSharpWrapper,
-  OtherAssetsContainer,
-  QRCodeContainer,
+  MyProjectsContainer,
+  MyProjectsContent,
+  MyWalletContainer,
+  MyWalletContent,
+  MyWalletInfo,
+  OwnedItem,
+  Pill,
+  PrimaryAssetContent,
+  ProgressBarContainer,
+  ProgressBarFill,
   QRCodeContent,
-  ReloadContainer,
-  SpanDropdown,
+  SeeTokens,
   SubSection,
+  TotalTransactions,
+  TransactionContainer,
+  TransactionContent,
+  Usage,
   UserInfoContainer,
 } from './styles';
+import { getOwnedAssets } from '@/services/requests/asset';
+
+import AssetLogo from '../Logo/AssetLogo';
+import { IAsset } from '@/types';
 
 export interface IAssetBalance {
   assetId: string;
+  assetName: string;
   balance: string;
+  logo?: string;
 }
 
 interface IAccountDetailsModal {
@@ -75,13 +88,12 @@ export const AccountDetailsModal: React.FC<
   const [primaryAsset, setPrimaryAsset] = useState<IAssetBalance[]>([]);
   const [expandAssets, setExpandAssets] = useState<boolean>(false);
   const [loadingBalance, setLoadingBalance] = useState<boolean>(false);
-  const [openNetworks, setOpenNetworks] = useState<boolean>(false);
+  const [openWallet, setOpenWallet] = useState<boolean>(true);
+  const [openCategory, setOpenCategory] = useState<boolean>(true);
 
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
-  const { walletAddress, connectExtension, logoutExtension } = useExtension();
+  const { walletAddress } = useExtension();
   const { isMobile } = useMobile();
-  const network = getNetwork();
-  const router = useRouter();
 
   const { data, refetch: getAccountBalance } = useQuery<IAccountBalance>({
     queryKey: ['accountBalance', walletAddress],
@@ -92,39 +104,111 @@ export const AccountDetailsModal: React.FC<
     },
   });
 
+  const reorderAssets = (
+    assets: IAssetBalance[],
+  ): { firstFour: IAssetBalance[]; remaining: IAssetBalance[] } => {
+    const klvIndex = assets.findIndex(asset => asset.assetId === 'KLV');
+    const kfiIndex = assets.findIndex(asset => asset.assetId === 'KFI');
+
+    const result = [...assets];
+
+    if (klvIndex !== -1) {
+      const [klv] = result.splice(klvIndex, 1);
+      result.unshift(klv);
+    }
+
+    if (kfiIndex !== -1 && kfiIndex !== 0) {
+      const [kfi] = result.splice(kfiIndex, 1);
+      result.splice(1, 0, kfi);
+    }
+
+    const firstFour = result.slice(0, 4);
+    const remaining = result.slice(4);
+
+    return { firstFour, remaining };
+  };
+
   const { balance, otherAssets } = useMemo(() => {
     if (data) {
       const { balance, otherAssets } = data;
-      return { balance, otherAssets };
+      const { firstFour, remaining } = reorderAssets(otherAssets);
+
+      return {
+        balance,
+        otherAssets: {
+          firstFour,
+          remaining,
+        },
+      };
     }
     return {
       balance: {
         klv: '',
       },
-      otherAssets: [],
+      otherAssets: {
+        firstFour: [],
+        remaining: [],
+      },
     };
   }, [data]);
 
-  const requestKLV = async () => {
-    setLoadingBalance(true);
-    const response = await api.post({
-      route: `transaction/send-user-funds/${walletAddress}`,
-    });
+  const assetIds = otherAssets.firstFour.map(asset => asset.assetId);
 
-    if (response?.error) {
-      const error =
-        response?.error.replace('transaction generation failed:', '') ||
-        'You already ordered KLV in less than 24 hours!';
+  const { data: ownedAssets } = useQuery({
+    queryKey: ['ownedAssets', walletAddress],
+    queryFn: () => getOwnedAssets(walletAddress),
+    enabled: !!walletAddress,
+  });
 
-      toast.error(error);
-      setLoadingBalance(false);
-    } else {
-      toast.success('Test KLV request successful!');
-      setLoadingBalance(true);
-      getAccountBalance();
+  const calculatePoolMetrics = (asset: IAsset) => {
+    if (!asset.poolData) {
+      return {
+        available: 0,
+        quotient: 0,
+        used: 0,
+        total: 0,
+      };
     }
 
-    setLoadingBalance(false);
+    const { precision } = asset;
+    const { klvBalance, kdaBalance, fRatioKDA, fRatioKLV, active } =
+      asset.poolData;
+
+    const parsedKLVBalance = klvBalance / 10 ** 6;
+
+    const parsedKdaBalance = kdaBalance / 10 ** precision;
+
+    const available = klvBalance / 10 ** 6;
+
+    const quotient = fRatioKDA / 10 ** precision / (fRatioKLV / 10 ** 6);
+
+    const totalKLVUsed = parsedKdaBalance / quotient;
+
+    const total = totalKLVUsed + parsedKLVBalance;
+
+    return {
+      available,
+      quotient,
+      totalKLVUsed,
+      total,
+      active,
+    };
+  };
+
+  const [openAccordions, setOpenAccordions] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (ownedAssets && ownedAssets.length > 0) {
+      setOpenAccordions([ownedAssets[0].assetId]);
+    }
+  }, [ownedAssets]);
+
+  const toggleAccordion = (assetId: string) => {
+    setOpenAccordions(prev =>
+      prev.includes(assetId)
+        ? prev.filter(accordionId => accordionId !== assetId)
+        : [...prev, assetId],
+    );
   };
 
   const onClickSetAssetPrimary = (assetId: string, balance: string) => {
@@ -168,7 +252,7 @@ export const AccountDetailsModal: React.FC<
       const getPrimaryAsset: IAssetBalance = JSON.parse(storagePrimaryAssets);
       setPrimaryAsset([getPrimaryAsset]);
 
-      const newPrimaryAsset = otherAssets.find(
+      const newPrimaryAsset = otherAssets.firstFour.find(
         asset => asset.assetId === getPrimaryAsset.assetId,
       );
 
@@ -189,165 +273,290 @@ export const AccountDetailsModal: React.FC<
   }, [walletAddress]);
 
   return (
-    <UserInfoContainer openUserInfos={openUserInfos} isMobile={isMobile}>
-      <HeaderInfo>
-        <div>
-          <BiWalletAlt size={'1em'} />
-          <p>My Wallet</p>
-        </div>
-        <AiOutlineClose
-          onClick={() => setOpenUserInfos(false)}
-          cursor={'pointer'}
-        />
-      </HeaderInfo>
-      <QRCodeContainer>
-        {walletAddress && (
-          <QRCodeContent>
-            <div>
-              <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
-            </div>
-          </QRCodeContent>
-        )}
-        {walletAddress && <small>{parseAddress(walletAddress, 25)}</small>}
-
-        <ReloadContainer>
-          <BalanceContainer>
-            <ContainerAsset onClick={() => setExpandAssets(!expandAssets)}>
-              {primaryAsset.length > 0 ? (
-                <>
-                  <>
-                    <span>{primaryAsset[0].balance || '---'}</span>
-                    {primaryAsset[0].assetId === 'KLV' ? (
-                      <KLV />
-                    ) : (
-                      <span>{primaryAsset[0].assetId}</span>
-                    )}
-                  </>
-                </>
-              ) : (
-                <>
-                  <span>{balance['klv']}</span>
-                  <KLV />
-                </>
-              )}
-              <SpanDropdown {...dropdownProps}>
-                <DropdownIcon $openOtherAssets={!expandAssets} />
-                {expandAssets && otherAssets.length > 0 && (
-                  <OtherAssetsContainer isMobile={isMobile}>
-                    {otherAssets.map((asset: any) => (
-                      <div
-                        key={JSON.stringify(asset)}
-                        onClick={() => {
-                          onClickSetAssetPrimary(asset.assetId, asset.balance);
-                          setExpandAssets(false);
-                        }}
-                      >
-                        <span>{asset.balance}</span>
-                        <p>{asset.assetId}</p>
-                      </div>
-                    ))}
-                  </OtherAssetsContainer>
-                )}
-              </SpanDropdown>
-            </ContainerAsset>
-            <IoReloadSharpWrapper
-              onClick={() => getAccountBalance()}
-              $loading={loadingBalance}
-            >
-              <IoReloadSharp />
-            </IoReloadSharpWrapper>
-          </BalanceContainer>
-        </ReloadContainer>
-      </QRCodeContainer>
+    <UserInfoContainer
+      openUserInfos={openUserInfos}
+      isMobile={isMobile}
+      hasOwnedAssets={!!ownedAssets?.length}
+    >
       <BodyContent>
-        <Link
-          href={`/account/${walletAddress}`}
-          onClick={() => setOpenUserInfos(false)}
-        >
-          <ActionItem>
-            <BiWalletAlt size={'1.2rem'} />
-            <p>Account Details</p>
-            <RiArrowRightSLine size={'1.2em'} />
-          </ActionItem>
-        </Link>
-        <Link
-          href={`/create-transaction`}
-          onClick={() => setOpenUserInfos(false)}
-        >
-          <ActionItem>
-            <IoCreateOutline size={'1.2rem'} />
-            <p>Create Transaction</p>
-            <RiArrowRightSLine size={'1.2em'} />
-          </ActionItem>
-        </Link>
-        <SubSection active={openNetworks}>
+        <SubSection active={openWallet}>
           <ActionItem
             onClick={() => {
-              setOpenNetworks(!openNetworks);
+              setOpenWallet(!openWallet);
             }}
-            active={openNetworks}
+            active={openWallet}
           >
-            <Plug />
-            <p>Change Network</p>
-            <RiArrowDownSLine size={'1.2em'} />
+            <Wallet />
+            <p>My Wallet</p>
+            <RiArrowDownSLine size={'1.5rem'} />
           </ActionItem>
-          {openNetworks && (
-            <>
-              <ActionItem
-                onClick={() => {
-                  if (network === 'Mainnet') {
-                    return;
-                  }
-                  router.push(getNetworkPath('mainnet'));
-                  setOpenUserInfos(false);
-                }}
-                secondary
-                disabled={network === 'Mainnet'}
+          {openWallet && (
+            <MyWalletContainer>
+              <MyWalletContent>
+                <MyWalletInfo>
+                  <div>
+                    {walletAddress && (
+                      <span>{parseAddress(walletAddress, 15)}</span>
+                    )}
+                    {walletAddress && (
+                      <Copy info="Wallet Address" data={walletAddress}>
+                        <MdContentCopy size={'1rem'} />
+                      </Copy>
+                    )}
+                  </div>
+
+                  <div>
+                    {primaryAsset.length > 0 ? (
+                      <PrimaryAssetContent>
+                        {primaryAsset[0].assetId === 'KLV' ? (
+                          <KLV />
+                        ) : (
+                          <AssetLogo
+                            logo=""
+                            ticker={primaryAsset[0]?.assetId || ''}
+                            name={primaryAsset[0]?.assetId || ''}
+                            size={24}
+                            invertColors={true}
+                          />
+                        )}
+                        <span>{primaryAsset[0].balance || '---'}</span>
+                      </PrimaryAssetContent>
+                    ) : (
+                      <PrimaryAssetContent>
+                        <KLV />
+                        <span>{balance['klv']}</span>
+                      </PrimaryAssetContent>
+                    )}
+                  </div>
+                </MyWalletInfo>
+                <div>
+                  {walletAddress && (
+                    <QRCodeContent>
+                      <div>
+                        <QRCodeSVG value={walletAddress} size={100}></QRCodeSVG>
+                      </div>
+                    </QRCodeContent>
+                  )}
+                </div>
+              </MyWalletContent>
+
+              {otherAssets.firstFour.map(asset => (
+                <AssetItem
+                  key={asset.assetId}
+                  onClick={() => {
+                    onClickSetAssetPrimary(asset.assetId, asset.balance);
+                    setExpandAssets(false);
+                  }}
+                >
+                  <div>
+                    <AssetLogo
+                      logo={asset?.logo || ''}
+                      ticker={asset?.assetName || ''}
+                      name={asset?.assetName || ''}
+                      size={24}
+                    />
+                  </div>
+                  <AssetContent>
+                    <AssetName>
+                      <p>{asset.assetId}</p>
+                      <p>{asset.assetName}</p>
+                    </AssetName>
+                    <AssetPrice>
+                      <p>{asset.balance}</p>
+                    </AssetPrice>
+                  </AssetContent>
+                </AssetItem>
+              ))}
+
+              <Link
+                href={`/account/${walletAddress}?tab=Assets`}
+                onClick={() => setOpenUserInfos(false)}
               >
-                <p>Mainnet</p>
-                {network === 'Mainnet' && <Check />}
-              </ActionItem>
-              <ActionItem
-                onClick={() => {
-                  if (network === 'Testnet') {
-                    return;
-                  }
-                  router.push(getNetworkPath('testnet'));
-                  setOpenUserInfos(false);
-                }}
-                secondary
-                disabled={network === 'Testnet'}
-              >
-                <p>Testnet</p>
-                {network === 'Testnet' && <Check />}
-              </ActionItem>
-            </>
+                <SeeTokens>
+                  <p>
+                    See all{' '}
+                    {otherAssets.remaining.length +
+                      otherAssets.firstFour.length}{' '}
+                    tokens
+                  </p>
+
+                  <ArrowRight />
+                </SeeTokens>
+              </Link>
+            </MyWalletContainer>
           )}
         </SubSection>
 
-        {network === 'Testnet' && (
-          <ActionItem onClick={requestKLV}>
-            <IoMdAddCircle size={'1.2rem'} />
-            <p>Request Test KLV</p>
-          </ActionItem>
-        )}
-        {walletAddress && (
-          <Copy info="Wallet Address" data={walletAddress}>
-            <ActionItem>
-              <MdContentCopy size={'1.2rem'} />
-              <p>Copy Address</p>
+        {ownedAssets && ownedAssets.length > 0 && (
+          <SubSection active={openCategory}>
+            <ActionItem
+              onClick={() => {
+                setOpenCategory(!openCategory);
+              }}
+              active={openCategory}
+            >
+              <CategoryTransparent />
+              <p>My Projects</p>
+              <RiArrowDownSLine size={'1.5rem'} />
             </ActionItem>
-          </Copy>
+
+            {openCategory && (
+              <MyProjectsContainer>
+                {ownedAssets.map(asset => {
+                  const poolMetrics = asset.poolData
+                    ? calculatePoolMetrics(asset)
+                    : null;
+
+                  return (
+                    <MyProjectsContent key={asset.assetId}>
+                      <OwnedItem
+                        onClick={() => toggleAccordion(asset.assetId)}
+                        active={openAccordions.includes(asset.assetId)}
+                      >
+                        <AssetLogo
+                          logo={asset?.logo || ''}
+                          ticker={asset?.ticker || ''}
+                          name={asset?.name || ''}
+                          size={24}
+                        />
+                        <p>{asset.name}</p>
+                        <RiArrowDownSLine size={'1.5rem'} />
+                      </OwnedItem>
+                      {openAccordions.includes(asset.assetId) && (
+                        <AccordionContent>
+                          <Pill
+                            full={false}
+                            fontSize="0.625rem"
+                            fontWeight={400}
+                            variant="small"
+                            padding="0.188rem 0.438rem"
+                          >
+                            {asset.assetType}
+                          </Pill>
+                          {asset.transactionData &&
+                            asset.transactionLastDay && (
+                              <TransactionContainer>
+                                <TransactionContent>
+                                  <p>Total transactions</p>
+
+                                  <TotalTransactions>
+                                    {asset.transactionData?.totalRecords}
+                                    <span>
+                                      +
+                                      {asset.transactionData?.totalRecords >
+                                        0 &&
+                                      asset.transactionLastDay?.totalRecords
+                                        ? `${((asset.transactionLastDay.totalRecords / asset.transactionData.totalRecords) * 100).toFixed(2)}%`
+                                        : '0%'}
+                                    </span>
+                                  </TotalTransactions>
+                                </TransactionContent>
+                                <TransactionContent>
+                                  <p>Last 24h</p>
+                                  <h4>
+                                    {asset.transactionLastDay &&
+                                    asset.transactionLastDay.totalRecords > 0
+                                      ? `+${asset.transactionLastDay.totalRecords}`
+                                      : asset.transactionLastDay
+                                          ?.totalRecords || 0}
+                                  </h4>
+                                </TransactionContent>
+                              </TransactionContainer>
+                            )}
+
+                          {poolMetrics && (
+                            <TransactionContainer>
+                              <TransactionContent isActive={poolMetrics.active}>
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  <h2>KDA Fee Pool</h2>
+                                  {!poolMetrics.active && (
+                                    <Pill
+                                      full={false}
+                                      fontSize="0.625rem"
+                                      fontWeight={400}
+                                      variant="small"
+                                      padding="0.188rem 0.438rem"
+                                    >
+                                      Inactive
+                                    </Pill>
+                                  )}
+                                </div>
+                                <h3>{poolMetrics.available} available KLV</h3>
+                                <h4>
+                                  {poolMetrics.totalKLVUsed} /{' '}
+                                  {poolMetrics.total} KLV
+                                </h4>
+
+                                <Usage>
+                                  <h2>Usage</h2>
+                                  <h2>
+                                    {poolMetrics?.total &&
+                                    poolMetrics?.totalKLVUsed
+                                      ? `${((poolMetrics.totalKLVUsed / poolMetrics.total) * 100).toFixed(2)}%`
+                                      : 'N/A'}
+                                  </h2>
+                                </Usage>
+
+                                <ProgressBarContainer>
+                                  <ProgressBarFill
+                                    percentage={
+                                      ((poolMetrics.totalKLVUsed ?? 0) /
+                                        (poolMetrics.total ?? 1)) *
+                                      100
+                                    }
+                                  />
+                                </ProgressBarContainer>
+                              </TransactionContent>
+                            </TransactionContainer>
+                          )}
+
+                          {poolMetrics && (
+                            <div style={{ width: '100%' }}>
+                              <Link
+                                href={`create-transaction?contract=DepositContract&contractDetails=%7B"depositType"%3A1%2C"collection"%3A"${asset.assetId}"%7D`}
+                              >
+                                <Pill full={true} variant="primary">
+                                  Deposit to KDA Fee Pool
+                                </Pill>
+                              </Link>
+                            </div>
+                          )}
+
+                          {poolMetrics && (
+                            <div style={{ width: '100%' }}>
+                              <Link
+                                href={`/asset/${asset.assetId}?card=KDA+Pool`}
+                              >
+                                <Pill full={true} variant="secondary">
+                                  Go to KDA Fee Pool Page
+                                </Pill>
+                              </Link>
+                            </div>
+                          )}
+
+                          <div style={{ width: '100%' }}>
+                            <Link href={`/asset/${asset.assetId}`}>
+                              <Pill full={true} variant="tertiary">
+                                Go to Asset page
+                              </Pill>
+                            </Link>
+                          </div>
+                        </AccordionContent>
+                      )}
+                    </MyProjectsContent>
+                  );
+                })}
+              </MyProjectsContainer>
+            )}
+          </SubSection>
         )}
-        <ActionItem
-          onClick={() => {
-            logoutExtension();
-            setOpenUserInfos(false);
-          }}
-        >
-          <BiLogOut size={'1.2rem'} />
-          <p>Disconnect</p>
-        </ActionItem>
       </BodyContent>
     </UserInfoContainer>
   );

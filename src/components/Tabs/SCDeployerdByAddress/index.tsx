@@ -4,11 +4,12 @@ import { smartContractsTableHeaders } from '@/utils/contracts';
 import Table, { ITable } from '@/components/Table';
 import { SmartContractsList } from '@/types/smart-contract';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
-import { Link } from '@/components/Form/EncodingConverter/PasswordModal/styles';
 import { parseAddress } from '@/utils/parseValues';
 import { Copy } from '@/assets/icons';
 import { formatDate } from '@/utils/formatFunctions';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import useSmartContractsList from '@/components/SmartContracts/useSmartContractsList';
 
 interface ISCDepoyedByAddress {
   smartContractsTableProps: IInnerTableProps;
@@ -19,6 +20,10 @@ const SCDeployerdByAddress: React.FC<
   PropsWithChildren<ISCDepoyedByAddress>
 > = ({ smartContractsTableProps, address }) => {
   const router = useRouter();
+  const { request, Filters } = useSmartContractsList(
+    'Recent Transactions',
+    address,
+  );
 
   const scDeployerListRowSections = (
     props: SmartContractsList,
@@ -101,6 +106,10 @@ const SCDeployerdByAddress: React.FC<
     type: 'smartContracts',
     header: smartContractsTableHeaders,
     rowSections: scDeployerListRowSections,
+    request: (page, limit) => request(page, limit, router),
+    dataName: 'smartContracts',
+    showLimit: true,
+    Filters,
   };
 
   return <Table {...tableProps} />;

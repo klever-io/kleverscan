@@ -63,10 +63,7 @@ const SCDeployedByAddress: React.FC<PropsWithChildren<ISCDepoyedByAddress>> = ({
       {
         element: props => (
           <CenteredRow key={contractAddress}>
-            <Link
-              href={`/smart-contract/${contractAddress}`}
-              key={contractAddress}
-            >
+            <Link href={`/account/${deployer}`} key={contractAddress}>
               <Mono>{parseAddress(deployer, 25)}</Mono>
             </Link>
             <Copy data={deployer} info="deployer" />
@@ -79,9 +76,7 @@ const SCDeployedByAddress: React.FC<PropsWithChildren<ISCDepoyedByAddress>> = ({
         element: props => (
           <DoubleRow key={contractAddress}>
             <CenteredRow>
-              <Link href={''}>
-                <Mono>{parseAddress(deployTxHash, 25)}</Mono>
-              </Link>
+              <Mono>{parseAddress(deployTxHash, 25)}</Mono>
               <Copy data={deployTxHash} info="deployTxHash" />
             </CenteredRow>
             <CenteredRow>

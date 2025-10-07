@@ -16,6 +16,7 @@ import { formatAmount } from '@/utils/formatFunctions';
 import { UINT32_MAX } from '@/utils/globalVariables';
 import { NextRouter } from 'next/router';
 import { smartContractsTableRequest } from '../smartContracts';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 export const generateEmptyAccountResponse = (
   hash: string,
@@ -470,11 +471,9 @@ export const getSCDeployedByAddress = (address: string, query: any) => {
   ): Promise<IPaginatedResponse> => {
     const parsedQuery = {
       deployer: address,
-      page,
-      limit,
       sortBy: query?.sortBy || 'totalTransactions',
       orderBy: query?.orderBy || 'desc',
-    };
+    } as unknown as NextParsedUrlQuery;
 
     return await smartContractsTableRequest(page, limit, parsedQuery);
   };

@@ -1,30 +1,23 @@
-import { IInnerTableProps, IRowSection } from '@/types';
-import React, { PropsWithChildren } from 'react';
-import { smartContractsTableHeaders } from '@/utils/contracts';
-import Table, { ITable } from '@/components/Table';
-import { SmartContractsList } from '@/types/smart-contract';
-import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
-import { parseAddress } from '@/utils/parseValues';
 import { Copy } from '@/assets/icons';
+import Filters from '@/components/SmartContracts/SmartContractFilters';
+import Table, { ITable } from '@/components/Table';
+import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
+import { IInnerTableProps, IRowSection } from '@/types';
+import { SmartContractsList } from '@/types/smart-contract';
+import { smartContractsTableHeaders } from '@/utils/contracts';
 import { formatDate } from '@/utils/formatFunctions';
-import { useRouter } from 'next/router';
+import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
-import useSmartContractsList from '@/components/SmartContracts/useSmartContractsList';
+import React, { PropsWithChildren } from 'react';
 
 interface ISCDepoyedByAddress {
   smartContractsTableProps: IInnerTableProps;
   address: string;
 }
 
-const SCDeployerdByAddress: React.FC<
-  PropsWithChildren<ISCDepoyedByAddress>
-> = ({ smartContractsTableProps, address }) => {
-  const router = useRouter();
-  const { request, Filters } = useSmartContractsList(
-    'Recent Transactions',
-    address,
-  );
-
+const SCDeployedByAddress: React.FC<PropsWithChildren<ISCDepoyedByAddress>> = ({
+  smartContractsTableProps,
+}) => {
   const scDeployerListRowSections = (
     props: SmartContractsList,
   ): IRowSection[] => {
@@ -40,7 +33,7 @@ const SCDeployerdByAddress: React.FC<
     return [
       {
         element: props => (
-          <DoubleRow>
+          <DoubleRow key={contractAddress}>
             <CenteredRow>
               <span>{name || '- -'}</span>
             </CenteredRow>
@@ -60,7 +53,7 @@ const SCDeployerdByAddress: React.FC<
 
       {
         element: props => (
-          <CenteredRow>
+          <CenteredRow key={contractAddress}>
             <span>{totalTransactions}</span>
           </CenteredRow>
         ),
@@ -69,7 +62,7 @@ const SCDeployerdByAddress: React.FC<
 
       {
         element: props => (
-          <CenteredRow>
+          <CenteredRow key={contractAddress}>
             <Link
               href={`/smart-contract/${contractAddress}`}
               key={contractAddress}
@@ -84,7 +77,7 @@ const SCDeployerdByAddress: React.FC<
 
       {
         element: props => (
-          <DoubleRow>
+          <DoubleRow key={contractAddress}>
             <CenteredRow>
               <Link href={''}>
                 <Mono>{parseAddress(deployTxHash, 25)}</Mono>
@@ -106,8 +99,7 @@ const SCDeployerdByAddress: React.FC<
     type: 'smartContracts',
     header: smartContractsTableHeaders,
     rowSections: scDeployerListRowSections,
-    request: (page, limit) => request(page, limit, router),
-    dataName: 'smartContracts',
+    dataName: 'sc',
     showLimit: true,
     Filters,
   };
@@ -115,4 +107,4 @@ const SCDeployerdByAddress: React.FC<
   return <Table {...tableProps} />;
 };
 
-export default SCDeployerdByAddress;
+export default SCDeployedByAddress;

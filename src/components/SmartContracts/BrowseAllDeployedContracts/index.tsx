@@ -1,23 +1,17 @@
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
-import { SmartContractsList } from '@/types/smart-contract';
-import { smartContractsTableHeaders } from '@/utils/contracts';
-import { IRowSection } from '@/types';
 import Copy from '@/components/Copy';
 import Table, { ITable } from '@/components/Table';
-import { CardsTitleWrapper, InputContractContainer } from './styles';
-import AssetLogo from '@/components/Logo/AssetLogo';
-import { parseAddress } from '@/utils/parseValues';
-import { Cell } from '@/components/Home/MostTransacted/styles';
-import { formatDate } from '@/utils/formatFunctions';
-import Link from 'next/link';
+import { smartContractsTableRequest } from '@/services/requests/smartContracts';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
-import { NextRouter, useRouter } from 'next/router';
-import useSmartContractsList from '@/components/SmartContracts/useSmartContractsList';
+import { IRowSection } from '@/types';
+import { SmartContractsList } from '@/types/smart-contract';
+import { smartContractsTableHeaders } from '@/utils/contracts';
+import { formatDate } from '@/utils/formatFunctions';
+import { parseAddress } from '@/utils/parseValues';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { PropsWithChildren } from 'react';
+import Filters from '../SmartContractFilters';
+import { CardsTitleWrapper } from './styles';
 
 interface IRequestQuery {
   deployer?: string;
@@ -99,15 +93,14 @@ const smartContractsListRowSections = (
 
 const BrowseAllDeployedContracts: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const { request, Filters } = useSmartContractsList();
 
   const tableProps: ITable = {
     type: 'smartContracts',
     header: smartContractsTableHeaders,
     rowSections: smartContractsListRowSections,
-    request: (page, limit) => request(page, limit, router),
-    dataName: 'smartContracts',
-    showLimit: true,
+    request: (page, limit) =>
+      smartContractsTableRequest(page, limit, router.query),
+    dataName: 'sc',
     Filters,
   };
 

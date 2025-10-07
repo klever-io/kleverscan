@@ -1,16 +1,12 @@
 import { KLV } from '@/assets/coins';
 import { AccountDetails as AccountIcon } from '@/assets/title-icons';
+import { PermissionOperations } from '@/components/AccountPermission';
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import Tabs, { ITabs } from '@/components/Tabs';
-import Assets from '@/components/Tabs/Assets';
-import Buckets from '@/components/Tabs/Buckets';
-import ProprietaryAssets from '@/components/Tabs/ProprietaryAssets';
-import Rewards from '@/components/Tabs/Rewards';
-import Transactions from '@/components/Tabs/Transactions';
 import Tooltip from '@/components/Tooltip/index';
 import {
   ContainerFilter,
@@ -26,13 +22,7 @@ import {
   KLVAllowancePromise,
   accountAssetsOwnerCall,
   accountCall,
-  assetsRequest,
-  bucketsRequest,
-  getSCDeployedByAddress,
-  nftCollectionsRequest,
-  ownedAssetsRequest,
   pricesCall,
-  rewardsFPRPool,
 } from '@/services/requests/account';
 import {
   CardContent,
@@ -47,15 +37,9 @@ import {
   RowAlert,
   RowContent,
 } from '@/styles/common';
-import { IInnerTableProps, IResponse } from '@/types/index';
+import { IResponse } from '@/types/index';
 import { IsTokenBurn, setQueryAndRouter } from '@/utils';
-import { contractsList } from '@/utils/contracts';
-import {
-  filterOperations,
-  hexToBinary,
-  invertBytes,
-  toLocaleFixed,
-} from '@/utils/formatFunctions';
+import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import {
@@ -63,8 +47,6 @@ import {
   BalanceContainer,
   BalanceKLVValue,
   BalanceTransferContainer,
-  ButtonExpand,
-  CheckboxOperations,
   ContainerSigners,
   Em,
   FrozenContainerLi,
@@ -72,11 +54,8 @@ import {
   IconContainer,
   ItemContainerPermissions,
   ItemContentPermissions,
-  OperationsContainer,
-  OperationsContent,
   RewardsAvailableContainer,
   StakingRewards,
-  ValidOperation,
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { GetServerSideProps } from 'next';
@@ -91,10 +70,9 @@ import React, {
 } from 'react';
 import { useQuery } from 'react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { requestTransactionsDefault } from '../transactions';
-import { PermissionOperations } from '@/components/AccountPermission';
-import NftCollections from '@/components/Tabs/NftCollections';
-import SCDeployerdByAddress from '@/components/Tabs/SCDeployerdByAddress';
+import SelectedTabComponent, {
+  EmptyComponent,
+} from '@/components/Account/SelectedTabComponent';
 
 export interface IStakingRewards {
   label: string;
@@ -111,10 +89,6 @@ export interface IAllowanceResponse extends IResponse {
     result: { allowance: number; stakingRewards: number };
   };
 }
-
-const EmptyComponent: React.FC<PropsWithChildren> = () => {
-  return <></>;
-};
 
 const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const { t } = useTranslation(['common', 'accounts']);
@@ -239,80 +213,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     }
   };
 
-  const getRequest = useCallback(
-    (page: number, limit: number): Promise<any> => {
-      const address = router.query.account as string;
-
-      switch (router.query.tab) {
-        case t('common:Titles.Assets'):
-          return assetsRequest(address)(page, limit);
-        case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
-          return ownedAssetsRequest(address)(page, limit);
-        case t('common:Titles.Transactions'):
-          return requestTransactionsDefault(page, limit, router);
-        case t('accounts:SingleAccount.Tabs.Buckets'):
-          return bucketsRequest(address)(page, limit);
-        case t('accounts:SingleAccount.Tabs.Rewards'):
-          return rewardsFPRPool(address)(page, limit);
-        case t('accounts:SingleAccount.Tabs.NFTCollections'):
-          return nftCollectionsRequest(address)(page, limit);
-        case t('accounts:SingleAccount.Tabs.SmartContracts'):
-          return getSCDeployedByAddress(address)(page, limit);
-        default:
-          return assetsRequest(address)(page, limit);
-      }
-    },
-    [router.query.account, router.query.tab, router.query],
-  );
-
-  const assetsTableProps: IInnerTableProps = {
-    scrollUp: false,
-    dataName: 'assets',
-    query: router.query,
-    request: getRequest,
-  };
-
-  const proprietaryAssetsTableProps: IInnerTableProps = {
-    scrollUp: false,
-    dataName: 'proprietaryAssets',
-    query: router.query,
-    request: getRequest,
-  };
-
-  const transactionTableProps: IInnerTableProps = {
-    dataName: 'transactions',
-    request: getRequest,
-    query: router.query,
-  };
-
-  const bucketsTableProps: IInnerTableProps = {
-    scrollUp: false,
-    dataName: 'buckets',
-    request: getRequest,
-    query: router.query,
-  };
-
-  const rewardsTableProps: IInnerTableProps = {
-    scrollUp: false,
-    dataName: 'rewards',
-    request: (page: number, limit: number) => getRequest(page, limit),
-    query: router.query,
-  };
-
-  const nftCollectionsTableProps: IInnerTableProps = {
-    scrollUp: false,
-    dataName: 'assets',
-    query: router.query,
-    request: getRequest,
-  };
-
-  const smartContractsTableProps: IInnerTableProps = {
-    scrollUp: false,
-    dataName: 'sc',
-    query: router.query,
-    request: getRequest,
-  };
-
   const tabProps: ITabs = {
     headers,
     onClick: header => {
@@ -340,58 +240,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         return <Overview />;
       case t('accounts:SingleAccount.Tabs.Permission'):
         return <Permission />;
-      default:
-        return <div />;
-    }
-  };
-  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
-    const Filters = showInteractionButtons ? CreateAssetButton : undefined;
-
-    switch (router?.query?.tab || t('common:Titles.Assets')) {
-      case t('common:Titles.Assets'):
-        return (
-          <Assets
-            assetsTableProps={assetsTableProps}
-            address={router.query.account as string}
-            showInteractionButtons={showInteractionButtons}
-            Filters={Filters}
-          />
-        );
-
-      case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
-        return (
-          <ProprietaryAssets
-            assetsTableProps={proprietaryAssetsTableProps}
-            address={router.query.account as string}
-            showInteractionButtons={showInteractionButtons}
-            Filters={Filters}
-          />
-        );
-      case t('common:Titles.Transactions'):
-        return <Transactions transactionsTableProps={transactionTableProps} />;
-      case t('accounts:SingleAccount.Tabs.Buckets'):
-        return (
-          <Buckets
-            bucketsTableProps={bucketsTableProps}
-            showInteractionButtons={showInteractionButtons}
-          />
-        );
-      case t('accounts:SingleAccount.Tabs.Rewards'):
-        return <Rewards rewardsTableProps={rewardsTableProps} />;
-      case t('accounts:SingleAccount.Tabs.NFTCollections'):
-        return (
-          <NftCollections
-            nftCollectionsTableProps={nftCollectionsTableProps}
-            address={router.query.account as string}
-          />
-        );
-      case t('accounts:SingleAccount.Tabs.SmartContracts'):
-        return (
-          <SCDeployerdByAddress
-            smartContractsTableProps={smartContractsTableProps}
-            address={router.query.account as string}
-          />
-        );
       default:
         return <div />;
     }
@@ -456,7 +304,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     AllowanceClaimButton,
     KLVStakingClaimButton,
     KFIStakingClaimButton,
-    CreateAssetButton,
   ] = showInteractionButtons
     ? getInteractionsButtons([
         {
@@ -497,10 +344,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
             claimType: 0,
             id: 'KFI',
           },
-        },
-        {
-          title: t('accounts:SingleAccount.Buttons.CreateAsset'),
-          contractType: 'CreateAssetContract',
         },
       ])
     : Array.from({ length: 6 }, () => EmptyComponent);
@@ -823,8 +666,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         </CardContent>
       </CardTabContainer>
       <Tabs {...tabProps}>
-        {router?.query?.tab ===
-          t('accounts:SingleAccount.Tabs.Transactions') && (
+        {router?.query?.tab === 'Transactions' && (
           <TxsFiltersWrapper>
             <ContainerFilter>
               <RightFiltersContent>
@@ -838,7 +680,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
             </ContainerFilter>
           </TxsFiltersWrapper>
         )}
-        <SelectedTabComponent />
+        <SelectedTabComponent showInteractionButtons={showInteractionButtons} />
       </Tabs>
     </Container>
   );

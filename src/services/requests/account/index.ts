@@ -5,28 +5,17 @@ import {
   IAccount,
   IAccountAsset,
   IAccountResponse,
-  IAsset,
   IAssetsBuckets,
   IAssetsResponse,
   IBucket,
   IPaginatedResponse,
   IResponse,
-  ITransaction,
   Service,
 } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { UINT32_MAX } from '@/utils/globalVariables';
-import { getPrecision } from '@/utils/precisionFunctions';
 import { NextRouter } from 'next/router';
-
-interface IQueryParams {
-  page?: number;
-  limit?: number;
-  startDate?: string;
-  endDate?: string;
-  tab?: string;
-  sender?: '' | 'receiver' | 'sender';
-}
+import { smartContractsTableRequest } from '../smartContracts';
 
 export const generateEmptyAccountResponse = (
   hash: string,
@@ -474,25 +463,20 @@ export const nftCollectionsRequest = (
   return get;
 };
 
-export const getSCDeployedByAddress = (address: string) => {
-  const get = async (page: number, limit: number): Promise<IResponse> => {
-    const res = await api.get({
-      route: `sc/list?deployer=${address}`,
-    });
-
-    if (res.error || res.error !== '') {
-      return {
-        data: { sc: [] },
-        error: res.error,
-        code: 'error',
-      };
-    }
-
-    return {
-      data: { sc: res.data.sc },
-      code: 'successful',
-      error: '',
+export const getSCDeployedByAddress = (address: string, query: any) => {
+  const get = async (
+    page: number,
+    limit: number,
+  ): Promise<IPaginatedResponse> => {
+    const parsedQuery = {
+      deployer: address,
+      page,
+      limit,
+      sortBy: query?.sortBy || 'totalTransactions',
+      orderBy: query?.orderBy || 'desc',
     };
+
+    return await smartContractsTableRequest(page, limit, parsedQuery);
   };
 
   return get;

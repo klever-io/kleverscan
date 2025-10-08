@@ -10,14 +10,13 @@ import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import React, { PropsWithChildren } from 'react';
 
-interface ISCDepoyedByAddress {
+interface ISCDeployedByAddress {
   smartContractsTableProps: IInnerTableProps;
-  address: string;
 }
 
-const SCDeployedByAddress: React.FC<PropsWithChildren<ISCDepoyedByAddress>> = ({
-  smartContractsTableProps,
-}) => {
+const SCDeployedByAddress: React.FC<
+  PropsWithChildren<ISCDeployedByAddress>
+> = ({ smartContractsTableProps }) => {
   const scDeployerListRowSections = (
     props: SmartContractsList,
   ): IRowSection[] => {

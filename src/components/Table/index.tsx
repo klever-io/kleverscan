@@ -35,6 +35,7 @@ import {
   TableRowProps,
   TableEmptyData,
 } from './styles';
+import SmartContractCard from '../SmartContracts/SmartContractCard';
 
 export interface ITable {
   type:
@@ -58,7 +59,9 @@ export interface ITable {
     | 'validatorsList'
     | 'rewards'
     | 'marketplaces'
-    | 'launchPad';
+    | 'launchPad'
+    | 'smartContracts'
+    | 'smartContractsInvokes';
 
   header: string[];
   rowSections: (item: any) => IRowSection[];
@@ -70,6 +73,7 @@ export interface ITable {
   Filters?: React.FC;
   smaller?: boolean;
   showPagination?: boolean;
+  refreshKey?: number;
 }
 
 const onErrorHandler = () => {
@@ -93,6 +97,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
   smaller = false,
   showLimit = true,
   showPagination = true,
+  refreshKey,
 }) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -128,7 +133,12 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
     isFetching,
     refetch,
   } = useQuery(
-    [dataName || 'items', JSON.stringify(router.query), router.pathname],
+    [
+      dataName || 'items',
+      JSON.stringify(router.query),
+      router.pathname,
+      refreshKey,
+    ],
     () =>
       tableRequest(
         Number(router.query?.page) || 1,
@@ -287,7 +297,17 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
               let spanCount = 0;
               const isLastRow = index === response?.items?.length - 1;
 
-              return (
+              return type === 'smartContracts' && (isMobile || isTablet) ? (
+                <SmartContractCard
+                  key={index}
+                  name={item?.name}
+                  timestamp={item?.timestamp}
+                  contractAddress={item?.contractAddress}
+                  deployer={item?.deployer}
+                  deployTxHash={item?.deployTxHash}
+                  totalTransactions={item?.totalTransactions}
+                />
+              ) : (
                 <TableRow
                   key={JSON.stringify(item)}
                   {...props}

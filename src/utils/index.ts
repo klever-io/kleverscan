@@ -9,6 +9,10 @@ import { format, fromUnixTime } from 'date-fns';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
 import { secondsToHourMinSec } from './timeFunctions';
+import {
+  storageViewMode,
+  getStorageViewMode,
+} from './localStorage/localStorageData';
 
 /**
  * Checks if the contractType is Transfer or Freeze. Otherwise returns false.
@@ -185,3 +189,5 @@ export const IsTokenBurn = (token: string) => {
     'klv1000000000000000000000000000000000000000000000000000ql8r3r7';
   return token === tokenBurn;
 };
+
+export { storageViewMode, getStorageViewMode };

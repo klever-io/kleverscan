@@ -3,9 +3,11 @@ import { IAssetPool, IAssetPoolResponse, IAssetPoolsResponse } from '@/types';
 
 export const getSomeAssetsPool = async (
   assets: string,
+  page: number = 1,
+  limit: number = 10,
 ): Promise<IAssetPoolsResponse> => {
   const res = await api.get({
-    route: `assets/pool/list?asset=${assets}`,
+    route: `assets/pool/list?asset=${assets}&page=${page}&limit=${limit}`,
   });
 
   if (!res.error || res.error === '') {

@@ -10,6 +10,7 @@ import { GiTwoCoins } from 'react-icons/gi';
 import { MdFeedback, MdOutlineLocalMall } from 'react-icons/md';
 import { RiPenNibFill } from 'react-icons/ri';
 import { TbArrowsLeftRight } from 'react-icons/tb';
+import { getNetwork } from '@/utils/networkFunctions';
 export interface INavbarItem {
   name: string;
   pathTo: string;
@@ -21,6 +22,7 @@ export interface INavbarItem {
 export const heightLimit = 70; // pixels
 export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
+export const network = getNetwork();
 
 const navbarItems: INavbarItem[] = [
   {
@@ -43,11 +45,21 @@ const navbarItems: INavbarItem[] = [
     pathTo: '/assets',
     Icon: Graph,
   },
-  {
-    name: 'Validators',
-    pathTo: '/validators',
-    Icon: TickSquare,
-  },
+  ...(network !== 'Mainnet'
+    ? [
+        {
+          name: 'Smart Contracts',
+          pathTo: '/smart-contracts',
+          Icon: TickSquare,
+        },
+      ]
+    : [
+        {
+          name: 'Validators',
+          pathTo: '/validators',
+          Icon: TickSquare,
+        },
+      ]),
   {
     name: 'More',
     pathTo: '',
@@ -58,6 +70,15 @@ const navbarItems: INavbarItem[] = [
       //   pathTo: '/nodes',
       //   Icon: Compass,
       // },
+      ...(network !== 'Mainnet'
+        ? [
+            {
+              name: 'Validators',
+              pathTo: '/validators',
+              Icon: TickSquare,
+            },
+          ]
+        : []),
       {
         name: 'Proposals',
         pathTo: '/proposals',

@@ -10,6 +10,7 @@ import {
   IWhitelistInfo,
 } from './contracts';
 import { INodeOverview, IProposal } from './proposals';
+import { ISmartContractResponse } from './smart-contract';
 
 export type Query = {
   [key: string]: any;
@@ -632,7 +633,7 @@ export interface IChainStatistics {
   lastBlockTxCount: number;
 }
 
-interface IError {
+export interface IError {
   message: string;
 }
 
@@ -830,7 +831,7 @@ export interface IAssetPoolResponse extends IResponse {
   };
 }
 
-export interface IAssetPoolsResponse extends IResponse {
+export interface IAssetPoolsResponse extends IPaginatedResponse {
   data: {
     pools: IAssetPool[];
   };
@@ -1090,7 +1091,8 @@ export type SearchRequest =
   | ITransactionResponse
   | IAssetResponse
   | IAccountResponse
-  | IBlockResponse;
+  | IBlockResponse
+  | ISmartContractResponse;
 
 export interface NotFound {
   notFound: true;

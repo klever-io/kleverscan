@@ -11,6 +11,7 @@ import {
   ImportJsonButton,
   MultisignButton,
 } from '../../styles';
+import DropFileCard from '@/components/DropFileCard';
 interface IMultisignButtons {
   setSignBcastTransaction: React.Dispatch<React.SetStateAction<boolean>>;
   multiSignData: IMultisignData;
@@ -305,13 +306,55 @@ export const ButtonsComponent: React.FC<
         )}
         <ButtonContainer>
           {multiSignData.hash && (
-            <MultisignButton
-              isJsonButton
-              type="button"
-              onClick={handleDownload}
-            >
-              Download JSON file
-            </MultisignButton>
+            <>
+              <MultisignButton
+                isJsonButton
+                type="button"
+                onClick={handleDownload}
+              >
+                Download JSON file
+              </MultisignButton>
+              <MultisignButton
+                isJsonButton
+                type="button"
+                onClick={() => {
+                  setSignBcastTransaction(false);
+                  setTxHash(null);
+                  setSelectedHash('');
+                  setDragginOverlayCount(0);
+                  multiSignDataRef.pop();
+                }}
+              >
+                Remove JSON file
+              </MultisignButton>
+            </>
+          )}
+
+          {multiSignDataRef.length === 0 && (
+            <DropFileCard
+              title="Import Signed JSON file"
+              message="Drag and drop a file here, or click to browse"
+              accept=".json"
+              onDragOver={preventEvent}
+              onDrop={(event: any) => processFile(event, true, setSelectedHash)}
+              onDragEnter={event => {
+                handleDragEnter(
+                  event,
+                  draggingOverlayCount,
+                  setDragginOverlayCount,
+                );
+              }}
+              onDragLeave={event => {
+                handleDragLeave(
+                  event,
+                  draggingOverlayCount,
+                  setDragginOverlayCount,
+                );
+              }}
+              onChange={(event: any) =>
+                processFile(event, false, setSelectedHash, multiSignDataRef)
+              }
+            />
           )}
           <DragContainer
             onDragOver={preventEvent}

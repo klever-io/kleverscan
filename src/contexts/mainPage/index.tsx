@@ -11,12 +11,14 @@ import {
   homeProposalsCall,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
+  homeHotContracts,
 } from '@/services/requests/home';
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IProposal, MostTransferredToken } from '@/types/proposals';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
+import { getNetwork } from '@/utils/networkFunctions';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -32,6 +34,7 @@ export interface IHomeData {
   newAccounts?: number;
   totalAccounts?: number;
   transactions: ITransaction[];
+  loadingTransactions?: boolean;
   totalTransactions?: number;
   loadingCards: boolean;
   loadingBlocks: boolean;
@@ -45,13 +48,16 @@ export interface IHomeData {
   mostTransactedTokens: MostTransferredToken[];
   mostTransactedNFTs: MostTransferredToken[];
   mostTransactedKDAFee: MostTransferredToken[];
+  hotContracts: MostTransferredToken[];
   epoch?: number;
+  loadingMostTransacted?: boolean;
 }
 
 export const HomeData = createContext({} as IHomeData);
 
 export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const watcherTimeout = isDev ? 100000 : 4 * 1000; // 4 secs
+  const network = getNetwork();
 
   const [
     aggregateResult,
@@ -65,6 +71,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     mostTransactedTokens,
     mostTransactedNFTs,
     mostTransactedKDAFee,
+    hotContracts,
   ] = useQueries([
     {
       queryKey: 'aggregateData',
@@ -121,6 +128,12 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
       queryFn: homeMostTransactedKDAFee,
       refetchInterval: watcherTimeout,
     },
+    {
+      queryKey: 'hotContracts',
+      queryFn: homeHotContracts,
+      refetchInterval: watcherTimeout,
+      enabled: network !== 'Mainnet',
+    },
   ]);
 
   const prevValuesRef = useRef({
@@ -151,6 +164,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
         ? accountResult.data?.totalAccounts
         : prevValuesRef.current.totalAccounts,
     transactions: aggregateResult.data?.transactions || [],
+    loadingTransactions: transactionsResult.isLoading,
     totalTransactions:
       (transactionsResult.data?.totalTransactions || 0) >
       prevValuesRef.current.totalTransactions
@@ -169,6 +183,13 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     mostTransactedNFTs: mostTransactedNFTs.data || [],
     mostTransactedKDAFee: mostTransactedKDAFee.data || [],
     epoch: aggregateResult.data?.overview?.epochNumber,
+    hotContracts:
+      network !== 'Mainnet' ? hotContracts.data?.hotContracts || [] : [],
+    loadingMostTransacted:
+      mostTransactedTokens.isLoading ||
+      mostTransactedNFTs.isLoading ||
+      mostTransactedKDAFee.isLoading ||
+      (network !== 'Mainnet' ? hotContracts.isLoading : false),
   };
 
   prevValuesRef.current = {

@@ -18,3 +18,22 @@ export const getStorageUpdateConfig = (): boolean => {
   }
   return false;
 };
+
+export const storageViewMode = (viewMode: 'table' | 'grid'): void => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('viewMode', viewMode);
+  }
+};
+
+export const getStorageViewMode = (): 'table' | 'grid' => {
+  if (typeof window !== 'undefined') {
+    const storageViewMode = localStorage.getItem('viewMode');
+    if (storageViewMode === 'table' || storageViewMode === 'grid') {
+      return storageViewMode;
+    } else {
+      localStorage.setItem('viewMode', 'table');
+      return 'table';
+    }
+  }
+  return 'table';
+};

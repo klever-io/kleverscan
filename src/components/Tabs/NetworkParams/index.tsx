@@ -4,7 +4,7 @@ import api from '@/services/api';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import React from 'react';
 import { proposalsMap } from './proposalsMap';
-import { toLocaleFixed } from '@/utils/formatFunctions';
+import { toLocaleFixed, formatAmount } from '@/utils/formatFunctions';
 import { useContractModal } from '@/contexts/contractModal';
 
 interface INetworkParams extends IPaginatedResponse {
@@ -38,7 +38,16 @@ const requestNetworkParams = async (): Promise<INetworkParams> => {
             ? proposalsMap[key as keyof typeof proposalsMap].message
             : '',
           currentValue: data.parameters[key]?.value
-            ? `${(Number(data.parameters[key].value) / 10 ** proposalsMap[key as keyof typeof proposalsMap].precision).toLocaleString()} ${proposalsMap[key as keyof typeof proposalsMap].unit}`
+            ? (() => {
+                const proposal = proposalsMap[key as keyof typeof proposalsMap];
+                const value =
+                  Number(data.parameters[key].value) / 10 ** proposal.precision;
+                const formattedValue =
+                  proposal.unit === 'Gas'
+                    ? formatAmount(value)
+                    : value.toLocaleString();
+                return `${formattedValue} ${proposal.unit}`;
+              })()
             : '',
         };
       })

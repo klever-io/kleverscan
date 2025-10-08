@@ -39,6 +39,16 @@ export const AssetHeaderContainer = styled.div`
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
+
+  span {
+    max-width: 280px;
+    font-size: 20px;
+    font-weight: 700;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
   p {
     margin-top: 0.25rem;
     color: ${props => props.theme.darkText} !important;
@@ -255,8 +265,6 @@ export const LeftSide = styled.div`
   flex-direction: column;
 
   gap: 12px;
-
-  max-width: 565px;
 `;
 
 export const Description = styled.p`

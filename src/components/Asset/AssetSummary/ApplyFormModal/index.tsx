@@ -67,7 +67,7 @@ export const ApplyFormModal: React.FC<
 
   const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
 
-  const isEdit = !!defaultValues?.short_description;
+  const isEdit = defaultValues?.short_description !== undefined;
 
   const { t } = useTranslation('assets');
 

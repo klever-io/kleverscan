@@ -23,9 +23,17 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ReloadWrapper } from '@/contexts/contract/styles';
 import { useExtension } from '@/contexts/extension';
 import getAccount from '@/services/requests/searchBar/account';
-import { IAccountResponse, IDropdownItem, IPermissions } from '@/types';
+import {
+  IAccountResponse,
+  IDropdownItem,
+  IPermissions,
+  ICollectionList,
+} from '@/types';
 import { IAccPermission } from '@/types/contracts';
-import { filterPoolAssets } from '@/utils/create-transaction/parseFunctions';
+import {
+  filterPoolAssets,
+  clearPoolAssetsCache,
+} from '@/utils/create-transaction/parseFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -281,23 +289,160 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
     initialData: [],
   });
 
-  const getAvailablePoolAssets = async () =>
-    filterPoolAssets(
-      getAssetsList(assets || [], 'FreezeContract', null, null, walletAddress),
-    );
+  const [assetsPool, setAssetsPool] = useState<ICollectionList[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMoreAssets, setHasMoreAssets] = useState(true);
+  const [assetsPoolFetching, setAssetsPoolFetching] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
+    null,
+  );
 
-  const { data: assetsPool, isFetching: assetsPoolFetching } = useQuery({
-    queryKey: ['assetsPool'],
-    queryFn: getAvailablePoolAssets,
-    initialData: [],
-    enabled: !!assets?.length,
-  });
+  const getAvailablePoolAssets = async (
+    page: number = 1,
+    reset: boolean = false,
+    limit: number = 10,
+  ) => {
+    if (assetsPoolFetching) return;
+    setAssetsPoolFetching(true);
+
+    try {
+      const result = await filterPoolAssets(
+        getAssetsList(
+          assets || [],
+          'FreezeContract',
+          null,
+          null,
+          walletAddress,
+        ),
+        page,
+        limit,
+      );
+
+      if (reset) {
+        setAssetsPool(result.filteredAssets);
+        setCurrentPage(1);
+        setIsInitialized(true);
+      } else {
+        if (result.filteredAssets.length > 0) {
+          setAssetsPool(prev => [...prev, ...result.filteredAssets]);
+        }
+        setCurrentPage(page);
+      }
+
+      setHasMoreAssets(result.hasMore);
+    } catch (error) {
+      console.error('Error fetching pool assets:', error);
+    } finally {
+      setAssetsPoolFetching(false);
+    }
+  };
+
+  const searchWithProgressiveLimit = async (query: string) => {
+    if (!query.trim()) {
+      getAvailablePoolAssets(1, true, 10);
+      return;
+    }
+
+    setIsSearching(true);
+
+    try {
+      const limits = [20, 50, 0];
+
+      for (const limit of limits) {
+        const result = await filterPoolAssets(
+          getAssetsList(
+            assets || [],
+            'FreezeContract',
+            null,
+            null,
+            walletAddress,
+          ),
+          1,
+          limit === 0 ? 999999 : limit,
+        );
+
+        const queryLower = query.trim().toLowerCase();
+        const filteredResults = result.filteredAssets.filter(asset => {
+          const aId = (asset.assetId ?? '').toLowerCase();
+          const label = (asset.label ?? '').toLowerCase();
+          const val =
+            typeof asset.value === 'string' ? asset.value.toLowerCase() : '';
+          return (
+            aId.includes(queryLower) ||
+            label.includes(queryLower) ||
+            val.includes(queryLower)
+          );
+        });
+
+        setAssetsPool(filteredResults);
+        setCurrentPage(1);
+        setIsInitialized(true);
+        setHasMoreAssets(false);
+
+        if (filteredResults.length > 0 || limit === 0) {
+          break;
+        }
+      }
+    } catch (error) {
+      console.error('Error searching pool assets:', error);
+      setAssetsPool([]);
+      setHasMoreAssets(false);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleInputChange = (inputValue: string) => {
+    setSearchQuery(inputValue);
+
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    const newTimeout = setTimeout(() => {
+      searchWithProgressiveLimit(inputValue);
+    }, 500);
+
+    setSearchTimeout(newTimeout);
+  };
+
+  useEffect(() => {
+    if (assets?.length) {
+      setIsInitialized(false);
+      clearPoolAssetsCache();
+      getAvailablePoolAssets(1, true, 10);
+    }
+  }, [assets, walletAddress]);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
 
   const refetch = async () => {
     setLoading(true);
+    setSearchQuery('');
+    setIsSearching(false);
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+      setSearchTimeout(null);
+    }
+    clearPoolAssetsCache();
     await getAssets();
-    await getAvailablePoolAssets();
+    await getAvailablePoolAssets(1, true, 10);
     setLoading(false);
+  };
+
+  const handleMenuScrollToBottom = () => {
+    if (hasMoreAssets && !assetsPoolFetching && !searchQuery.trim()) {
+      getAvailablePoolAssets(currentPage + 1, false, 10);
+    }
   };
 
   const assetBalance = kdaFee?.current.balance || null;
@@ -323,13 +468,27 @@ const AdvancedOptionsContent: React.FC<PropsWithChildren> = () => {
           <Select
             key={JSON.stringify(kdaFee.current)}
             collection={kdaFee.current}
-            options={assetsPool}
+            options={isInitialized ? assetsPool : []}
             onChange={(value: any) => {
               kdaFee.current = value;
               setKdaFeeAsset(value || null);
             }}
+            onInputChange={handleInputChange}
             zIndex={4}
-            loading={assetsPoolFetching || assetsFetching || loading}
+            loading={
+              !isInitialized || assetsPoolFetching || assetsFetching || loading
+            }
+            isSearching={isSearching}
+            onMenuScrollToBottom={handleMenuScrollToBottom}
+            noOptionsMessage={() => {
+              if (isSearching) return 'Searching...';
+              if (!isInitialized) return 'Loading options...';
+              if (searchQuery.trim() && assetsPool.length === 0)
+                return 'No results found';
+              if (hasMoreAssets && !searchQuery.trim())
+                return 'Loading more...';
+              return 'No options available';
+            }}
           />
         </SelectContent>
       </FieldContainer>

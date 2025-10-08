@@ -625,6 +625,22 @@ const homeMostTransactedKDAFee = async (): Promise<
   }
 };
 
+const homeHotContracts = async (): Promise<
+  { hotContracts: MostTransferredToken[] } | undefined
+> => {
+  try {
+    const hotContractsRes = await api.get({
+      route: 'sc/statistics',
+    });
+
+    if (!hotContractsRes.error || hotContractsRes.error === '') {
+      return { hotContracts: hotContractsRes.data };
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 export {
   defaultAggregateData,
   homeAccountsCall,
@@ -649,4 +665,5 @@ export {
   homeTotalValidators,
   homeTransactionsCall,
   homeYesterdayAccountsCall,
+  homeHotContracts,
 };

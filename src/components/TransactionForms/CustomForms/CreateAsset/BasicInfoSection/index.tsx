@@ -45,13 +45,15 @@ export const BasicInfoSection: React.FC<PropsWithChildren<ISectionProps>> = ({
             return erroMessage;
           } else {
             setLogoError(logoErrorMsg);
-            return false;
+            return logoErrorMsg;
           }
         }
       }
       setLogoError(null);
+      return true;
     } catch (error) {
       setLogoError(logoErrorMsg);
+      return logoErrorMsg;
     }
   };
 

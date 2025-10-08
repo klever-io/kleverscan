@@ -1,4 +1,4 @@
-import { Redirect } from '@/assets/icons';
+import { RedFailed, Redirect, WhiteTick } from '@/assets/icons';
 import { getStatusIcon } from '@/assets/status';
 import { Loader } from '@/components/Loader/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -37,8 +37,11 @@ import {
   TokenTicker,
   TxTypeSpan,
   UnderlineSpan,
+  PropertiesWrapper,
 } from '../styles';
-import { CustomLink } from '@/styles/common';
+import { CenteredRow, CustomLink } from '@/styles/common';
+import { ISmartContractResponse } from '@/types/smart-contract';
+import { timestampToDate } from '@/utils/timeFunctions';
 
 const getRedirectButton = (
   path: string,
@@ -453,6 +456,85 @@ export const BlockRowSections = (
   }
   return [
     { element: props => <TitleSpan>Block Summary</TitleSpan>, span: 2 },
+    { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
+  ];
+};
+
+export const SmartContractRowSections = (
+  res: ISmartContractResponse,
+  precision: number,
+  setShowTooltip: React.Dispatch<React.SetStateAction<boolean>>,
+): IRowSection[] => {
+  if (res.data && res.data.sc) {
+    const { sc } = res.data;
+
+    return [
+      {
+        element: props => (
+          <TitleWrapper>
+            <TitleSpan>Smart Contract</TitleSpan>
+            {getRedirectButton(
+              `/smart-contract/${sc.contractAddress}`,
+              setShowTooltip,
+            )}
+          </TitleWrapper>
+        ),
+        span: 2,
+      },
+      {
+        element: props => (
+          <HashSpan
+            style={{ maxWidth: '20rem' }}
+            onClick={() => setShowTooltip(false)}
+          >
+            <Link href={`/smart-contract/${sc.contractAddress}`} legacyBehavior>
+              {sc.contractAddress}
+            </Link>
+          </HashSpan>
+        ),
+        span: 2,
+      },
+      {
+        element: props => (
+          <>
+            <SpanWrapperBottom>
+              {' '}
+              Upgrades: {sc.upgrades.length}
+            </SpanWrapperBottom>
+          </>
+        ),
+        span: 1,
+      },
+      {
+        element: props => <DateSpan>{timestampToDate(sc.timestamp)}</DateSpan>,
+        span: 1,
+      },
+      {
+        element: props => (
+          <HashSpan
+            style={{ maxWidth: '20rem' }}
+            onClick={() => setShowTooltip(false)}
+          >
+            <span>
+              <strong>Properties: </strong>
+            </span>
+            <CenteredRow>
+              <PropertiesWrapper>
+                {Object.entries(sc?.properties || {}).map(([key, value]) => (
+                  <SpanWrapper key={key}>
+                    {key} {value ? <WhiteTick /> : <RedFailed />}
+                  </SpanWrapper>
+                ))}
+              </PropertiesWrapper>
+            </CenteredRow>
+          </HashSpan>
+        ),
+        span: 2,
+      },
+    ];
+  }
+  return [
+    { element: props => <TitleSpan>Smart Contract</TitleSpan>, span: 2 },
     { element: props => <span>{JSON.stringify(res.error)}</span>, span: 2 },
   ];
 };

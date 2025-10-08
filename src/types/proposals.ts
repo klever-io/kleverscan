@@ -254,10 +254,17 @@ export interface IProposalsMap {
   KAppFeeDeposit: IProposalMapItem;
   KAppFeeITOTrigger: IProposalMapItem;
   KAppFeeSmartContract: IProposalMapItem;
+  GasMultiplier: IProposalMapItem;
+  MaxGasPerBlock: IProposalMapItem;
+  MaxGasPerTX: IProposalMapItem;
 }
 
 export interface MostTransferredToken {
   doc_count: number;
   key: string;
   logo: string;
+  name: string;
+  address: string;
+  ownerAddress: string;
+  count: number;
 }

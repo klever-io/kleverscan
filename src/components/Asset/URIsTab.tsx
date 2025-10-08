@@ -14,9 +14,20 @@ export const UrisTab: React.FC<PropsWithChildren<AssetProps>> = ({ asset }) => {
                 <strong>{key}</strong>
               </span>
               <div>
-                <a href={`${value}`} target="blank">
-                  {value}
-                </a>
+                {(() => {
+                  const formattedUri = value.toLowerCase().startsWith('http')
+                    ? value
+                    : `https://${value}`;
+                  return (
+                    <a
+                      href={formattedUri}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {formattedUri}
+                    </a>
+                  );
+                })()}
               </div>
             </Row>
           ),

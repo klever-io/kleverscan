@@ -5,28 +5,18 @@ import {
   IAccount,
   IAccountAsset,
   IAccountResponse,
-  IAsset,
   IAssetsBuckets,
   IAssetsResponse,
   IBucket,
   IPaginatedResponse,
   IResponse,
-  ITransaction,
   Service,
 } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { UINT32_MAX } from '@/utils/globalVariables';
-import { getPrecision } from '@/utils/precisionFunctions';
 import { NextRouter } from 'next/router';
-
-interface IQueryParams {
-  page?: number;
-  limit?: number;
-  startDate?: string;
-  endDate?: string;
-  tab?: string;
-  sender?: '' | 'receiver' | 'sender';
-}
+import { smartContractsTableRequest } from '../smartContracts';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 export const generateEmptyAccountResponse = (
   hash: string,
@@ -469,6 +459,23 @@ export const nftCollectionsRequest = (
       code: 'successful',
       error: '',
     };
+  };
+
+  return get;
+};
+
+export const getSCDeployedByAddress = (address: string, query: any) => {
+  const get = async (
+    page: number,
+    limit: number,
+  ): Promise<IPaginatedResponse> => {
+    const parsedQuery = {
+      deployer: address,
+      sortBy: query?.sortBy || 'totalTransactions',
+      orderBy: query?.orderBy || 'desc',
+    } as unknown as NextParsedUrlQuery;
+
+    return await smartContractsTableRequest(page, limit, parsedQuery);
   };
 
   return get;

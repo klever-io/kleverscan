@@ -576,6 +576,13 @@ export interface IInnerTableProps {
   query?: ITxQuery;
   page?: number;
 }
+export interface IPartialInnerTableProps {
+  dataName?: string;
+  request?: (page: number, limit: number) => Promise<any>;
+  scrollUp?: boolean;
+  query?: ITxQuery;
+  page?: number;
+}
 
 export interface IValidatorResponse extends IResponse {
   data: {

@@ -280,7 +280,7 @@ export const DoubleRow = styled.div<TableRowElementProps>`
 
   gap: 10px;
 
-  width: fit-content;
+  width: 100%;
 
   ${props =>
     props.$smaller &&

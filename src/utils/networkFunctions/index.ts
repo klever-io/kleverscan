@@ -18,18 +18,24 @@ export const getNetwork = (): string => {
 };
 
 export const getProposalNetworkParams = (params: IProposalParams) => {
-  const fullInfoParams = Object.entries(params).map(([index, value]) => ({
-    paramIndex: index,
-    paramLabel:
-      NetworkParamsIndexer[index as keyof typeof NetworkParamsIndexer],
-    paramValue: Number(value),
-    paramText:
+  const fullInfoParams = Object.entries(params).map(([index, value]) => {
+    const paramText =
       proposalsMap[
         NetworkParamsIndexer[
           index as keyof typeof NetworkParamsIndexer
         ] as unknown as keyof typeof proposalsMap
-      ].message,
-  }));
+      ]?.message;
+
+    if (!paramText) console.warn('Missing param in proposalsMap:', index);
+
+    return {
+      paramIndex: index,
+      paramLabel:
+        NetworkParamsIndexer[index as keyof typeof NetworkParamsIndexer],
+      paramValue: Number(value),
+      paramText,
+    };
+  });
 
   return fullInfoParams;
 };

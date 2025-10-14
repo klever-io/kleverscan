@@ -207,6 +207,9 @@ export enum NetworkParamsIndexer {
   KAppFeeITOTrigger = 35,
   KAppFeeDeposit = 36,
   KAppFeeSmartContract = 37,
+  GasMultiplier = 38,
+  MaxGasPerBlock = 39,
+  MaxGasPerTX = 40,
 }
 
 export interface IProposalMapItem {

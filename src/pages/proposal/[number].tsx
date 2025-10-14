@@ -298,7 +298,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
           paramText:
             proposalsMap[
               NetworkParamsIndexer[Number(index)] as keyof typeof proposalsMap
-            ].message,
+            ]?.message,
         };
       });
     }

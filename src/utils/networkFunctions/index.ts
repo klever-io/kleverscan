@@ -24,7 +24,7 @@ export const getProposalNetworkParams = (params: IProposalParams) => {
         NetworkParamsIndexer[
           index as keyof typeof NetworkParamsIndexer
         ] as unknown as keyof typeof proposalsMap
-      ]?.message;
+      ]?.message || '';
 
     if (!paramText) console.warn('Missing param in proposalsMap:', index);
 

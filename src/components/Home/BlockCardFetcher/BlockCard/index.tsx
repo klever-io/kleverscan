@@ -97,7 +97,7 @@ const BlockCard: React.FC<PropsWithChildren<IBlockCard>> = ({
           </Link>
           <small>
             {getAge(fromUnixTime(timestamp), commonT)}{' '}
-            {commonT('Date.Elapsed Time')}
+            {commonT('Date.Elapsed_Time')}
           </small>
         </BlockCardRow>
         <BlockCardRow>

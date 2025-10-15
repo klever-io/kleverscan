@@ -38,7 +38,7 @@ export const formatDate = (
   const dateString = `${month}/${day}/${String(year).slice(-2)} ${hours}:${minutes}`;
 
   return showElapsedTime
-    ? `${relativeTime} ${t ? t('Date.Time.Elapsed_Time') : 'ago'} (${dateString} UTC)`
+    ? `${relativeTime} ${t ? t('Date.Elapsed_Time') : 'ago'} (${dateString} UTC)`
     : `${dateString} UTC`;
 };
 

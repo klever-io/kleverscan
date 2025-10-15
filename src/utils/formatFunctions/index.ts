@@ -3,13 +3,21 @@ import { IFilterDater } from '@/types';
 import { bech32 } from 'bech32';
 import { format } from 'date-fns';
 import { contractsList } from '../contracts';
+import { getAge } from '../timeFunctions';
+import { TFunction } from 'i18next';
 
 /**
- * given a timestamp returns a human readable date string in the format MM/dd/yyyy HH:mm
+ * given a timestamp returns a human readable date string in UTC format with relative time
  * @param timestamp number
- * @returns a formatted date in a string type
+ * @returns a formatted date in a string type in format "MM/DD/YY HH:mm (X seconds/minutes/hours/days ago)"
  */
-export const formatDate = (timestamp: number, reduced = false): string => {
+export const formatDate = (
+  timestamp: number,
+  { showElapsedTime, t }: { showElapsedTime?: boolean; t?: TFunction } = {
+    showElapsedTime: false,
+    t: undefined,
+  },
+): string => {
   while (new Date(timestamp).getFullYear() < 2000) {
     timestamp = timestamp * 10 ** 3;
   }
@@ -18,9 +26,20 @@ export const formatDate = (timestamp: number, reduced = false): string => {
     timestamp = timestamp / 10 ** 3;
   }
 
-  return !reduced
-    ? format(new Date(timestamp || 0), 'MM/dd/yyyy HH:mm')
-    : format(new Date(timestamp || 0), 'MM/dd/yy HH:mm');
+  const date = new Date(timestamp || 0);
+  const relativeTime = getAge(date, t);
+
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+  const dateString = `${month}/${day}/${String(year).slice(-2)} ${hours}:${minutes}`;
+
+  return showElapsedTime
+    ? `${relativeTime} ${t ? t('Date.Time.Elapsed_Time') : 'ago'} (${dateString} UTC)`
+    : `${dateString} UTC`;
 };
 
 const toFixedDown = (number: number, decimals: number) => {

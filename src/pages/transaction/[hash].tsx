@@ -314,7 +314,11 @@ export const OverviewDetails: React.FC<PropsWithChildren<IOverviewDetails>> = ({
               <strong>Time</strong>
             </span>
             <span>
-              <p>{formatDate(timestamp)}</p>
+              <p>
+                {formatDate(timestamp, {
+                  showElapsedTime: true,
+                })}
+              </p>
             </span>
           </Row>
         )}

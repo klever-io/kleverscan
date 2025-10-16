@@ -2,6 +2,7 @@ import Table, { ITable } from '@/components/Table';
 import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { useContractModal } from '@/contexts/contractModal';
+import { AssetType } from '@/types/assets';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr } from '@/utils';
 import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
@@ -15,6 +16,19 @@ interface IAssets {
   showInteractionButtons?: boolean;
   Filters?: React.FC<PropsWithChildren>;
 }
+
+const getAssetTypeName = (type: number) => {
+  switch (type) {
+    case AssetType.Fungible:
+      return 'Fungible';
+    case AssetType.NonFungible:
+      return 'Non-Fungible';
+    case AssetType.SemiFungible:
+      return 'Semi-Fungible';
+    default:
+      return 'Unknown';
+  }
+};
 
 const Assets: React.FC<PropsWithChildren<IAssets>> = ({
   assetsTableProps,
@@ -74,9 +88,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       },
       {
         element: props => (
-          <span key={assetType}>
-            {assetType === 0 ? 'Fungible' : 'Non Fungible'}
-          </span>
+          <span key={assetType}>{getAssetTypeName(assetType)}</span>
         ),
         span: 1,
       },

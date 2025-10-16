@@ -302,9 +302,6 @@ export interface IAssetsBuckets {
 
 export interface IHolders {
   asset: IAsset;
-  holdersTableProps: IInnerTableProps;
-  setHolderQuery: React.Dispatch<React.SetStateAction<string>>;
-  holderQuery: string;
 }
 export interface IHolder extends IAccountAsset {
   totalBalance: number;

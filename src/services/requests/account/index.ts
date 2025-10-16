@@ -49,6 +49,7 @@ export const generateEmptyAccountResponse = (
 
 export const assetsRequest = (
   address: string,
+  assetType?: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const get = async (page: number, limit: number): Promise<IResponse> => {
     if (!address) {
@@ -100,8 +101,24 @@ export const assetsRequest = (
       });
     }
 
+    // Filter by asset type if specified
+    let filteredAssets = assetsArray;
+    if (assetType) {
+      const typeMap: { [key: string]: number } = {
+        Fungible: 0,
+        NonFungible: 1,
+        SemiFungible: 2,
+      };
+      const typeValue = typeMap[assetType];
+      if (typeValue !== undefined) {
+        filteredAssets = assetsArray.filter(
+          asset => asset.assetType === typeValue,
+        );
+      }
+    }
+
     return {
-      data: { assets: assetsArray },
+      data: { assets: filteredAssets },
       error: '',
       code: 'successful',
     };

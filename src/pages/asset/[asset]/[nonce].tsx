@@ -73,7 +73,7 @@ const AssetNonce: React.FC<PropsWithChildren> = () => {
           <AssetTitle asset={nonceData} />
         </Header>
 
-        {isNonFungible && (
+        {(isNonFungible || isLoadingNonce) && (
           <NonFungibleView
             assetId={assetId}
             nonceValue={nonceValue}

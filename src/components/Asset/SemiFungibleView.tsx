@@ -1,11 +1,18 @@
-import { AssetTabs } from '@/components/Asset/AssetTabs';
 import { SftMetadata } from '@/components/Asset/SFTMetadata';
+import { SftOverviewTab } from '@/components/Asset/SftOverviewTab';
 import Table, { ITable } from '@/components/Table';
-import { assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { requestSftDetails } from '@/services/requests/asset/nonce';
+import {
+  CardContent,
+  CardHeader,
+  CardHeaderItem,
+  CardTabContainer,
+} from '@/styles/common';
+import { AssetCardContent } from '@/views/assets';
 import { CardContainer } from '@/views/transactions/detail';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { useQuery } from 'react-query';
 
 interface ISemiFungibleViewProps {
@@ -15,6 +22,7 @@ interface ISemiFungibleViewProps {
 export const SemiFungibleView: React.FC<
   PropsWithChildren<ISemiFungibleViewProps>
 > = ({ tableProps }) => {
+  const { t } = useTranslation(['common', 'assets']);
   const router = useRouter();
   const assetId = router.query.asset as string;
   const nonceValue = router.query.nonce as string;
@@ -27,7 +35,17 @@ export const SemiFungibleView: React.FC<
 
   return (
     <>
-      <AssetTabs asset={sftData} />
+      <CardTabContainer>
+        <CardHeader>
+          <CardHeaderItem selected>
+            <span>{t('common:Tabs.Overview')}</span>
+          </CardHeaderItem>
+        </CardHeader>
+
+        <AssetCardContent>
+          <SftOverviewTab sft={sftData} />
+        </AssetCardContent>
+      </CardTabContainer>
 
       <SftMetadata
         sft={sftData ? { ...sftData, nonce: nonceValue } : undefined}

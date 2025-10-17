@@ -31,7 +31,7 @@ export const SftMetadata: React.FC<PropsWithChildren<INonceDetails>> = ({
       <>
         <CardRaw>
           <ReactJson
-            src={sft?.meta ?? {}}
+            src={sft?.meta?.metadata ?? {}}
             name={false}
             displayObjectSize={false}
             enableClipboard={true}

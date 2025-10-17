@@ -489,7 +489,8 @@ export interface IAsset {
 
 export interface ISftAsset extends IAsset {
   meta?: {
-    [key: string]: any;
+    maxSupply: number;
+    circulationSupply: number;
     metadata?: {
       [key: string]: any;
     };

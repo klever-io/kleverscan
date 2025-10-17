@@ -314,7 +314,7 @@ export const OverviewDetails: React.FC<PropsWithChildren<IOverviewDetails>> = ({
               <strong>Time</strong>
             </span>
             <span>
-              <p>
+              <p suppressHydrationWarning>
                 {formatDate(timestamp, {
                   showElapsedTime: true,
                 })}

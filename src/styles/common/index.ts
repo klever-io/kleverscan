@@ -14,6 +14,10 @@ export const Container = styled.div`
   margin-top: 40px;
 `;
 
+export const SpacedContainer = styled(Container)`
+  gap: 32px;
+`;
+
 export const Header = styled.section<{ filterOn?: boolean }>`
   display: flex;
 

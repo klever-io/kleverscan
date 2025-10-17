@@ -334,7 +334,12 @@ const CollectionIDField: React.FC<
   } = useQuery({
     queryKey: ['collectionList', watchCollection, debouncedCollectionInput],
     queryFn: () =>
-      collectionListCall(router, walletAddress, debouncedCollectionInput),
+      collectionListCall(
+        router,
+        walletAddress,
+        debouncedCollectionInput,
+        !collection.isNFT && !collection.isFungible,
+      ),
     initialData: [],
     onSuccess: newData => {
       if (!newData) return;

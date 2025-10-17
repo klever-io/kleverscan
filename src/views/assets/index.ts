@@ -60,6 +60,9 @@ export const AssetCardContent = styled(CardContent)`
 
   display: grid;
 
+  background: ${({ theme }) => theme.white};
+  border-radius: 8px;
+
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 
   @media (min-width: ${({ theme }) => theme.breakpoints.mobile}) {

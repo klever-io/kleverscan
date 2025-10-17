@@ -1,6 +1,5 @@
 import Assets from '@/components/Tabs/Assets';
 import Buckets from '@/components/Tabs/Buckets';
-import NftCollections from '@/components/Tabs/NftCollections';
 import ProprietaryAssets from '@/components/Tabs/ProprietaryAssets';
 import Rewards from '@/components/Tabs/Rewards';
 import SCDeployedByAddress from '@/components/Tabs/SCDeployedByAddress';
@@ -11,7 +10,6 @@ import {
   assetsRequest,
   bucketsRequest,
   getSCDeployedByAddress,
-  nftCollectionsRequest,
   ownedAssetsRequest,
   rewardsFPRPool,
 } from '@/services/requests/account';
@@ -30,11 +28,12 @@ const getRequest = (
   t: TFunction<[string, string], undefined>,
 ): ((page: number, limit: number) => Promise<IResponse | []>) => {
   const address = router.query.account as string;
+  const assetType = router.query.assetType as string | undefined;
 
   switch (router.query.tab) {
     case t('common:Titles.Assets'):
       return (page: number, limit: number) =>
-        assetsRequest(address)(page, limit);
+        assetsRequest(address, assetType)(page, limit);
     case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
       return (page: number, limit: number) =>
         ownedAssetsRequest(address)(page, limit);
@@ -47,15 +46,12 @@ const getRequest = (
     case t('accounts:SingleAccount.Tabs.Rewards'):
       return (page: number, limit: number) =>
         rewardsFPRPool(address)(page, limit);
-    case t('accounts:SingleAccount.Tabs.NFTCollections'):
-      return (page: number, limit: number) =>
-        nftCollectionsRequest(address)(page, limit);
     case t('accounts:SingleAccount.Tabs.SmartContracts'):
       return (page: number, limit: number) =>
         getSCDeployedByAddress(address, router.query)(page, limit);
     default:
       return (page: number, limit: number) =>
-        assetsRequest(address)(page, limit);
+        assetsRequest(address, assetType)(page, limit);
   }
 };
 
@@ -81,11 +77,6 @@ const bucketsTableProps: IPartialInnerTableProps = {
 const rewardsTableProps: IPartialInnerTableProps = {
   scrollUp: false,
   dataName: 'rewards',
-};
-
-const nftCollectionsTableProps: IPartialInnerTableProps = {
-  scrollUp: false,
-  dataName: 'assets',
 };
 
 const smartContractsTableProps: IPartialInnerTableProps = {
@@ -188,19 +179,6 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
           }
         />
       );
-    case t('accounts:SingleAccount.Tabs.NFTCollections'):
-      return (
-        <NftCollections
-          nftCollectionsTableProps={
-            {
-              ...nftCollectionsTableProps,
-              request: getRequest(router, t),
-              query: router.query,
-            } as IInnerTableProps
-          }
-          address={router.query.account as string}
-        />
-      );
     case t('accounts:SingleAccount.Tabs.SmartContracts'):
       return (
         <SCDeployedByAddress
@@ -214,7 +192,6 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
               },
             } as IInnerTableProps
           }
-          address={router.query.account as string}
         />
       );
     default:

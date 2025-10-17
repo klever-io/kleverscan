@@ -17,6 +17,7 @@ import { UINT32_MAX } from '@/utils/globalVariables';
 import { NextRouter } from 'next/router';
 import { smartContractsTableRequest } from '../smartContracts';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { AssetType } from '@/types/assets';
 
 export const generateEmptyAccountResponse = (
   hash: string,
@@ -49,6 +50,7 @@ export const generateEmptyAccountResponse = (
 
 export const assetsRequest = (
   address: string,
+  assetType?: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const get = async (page: number, limit: number): Promise<IResponse> => {
     if (!address) {
@@ -87,7 +89,7 @@ export const assetsRequest = (
 
     assetsToRequest = assetsToRequest.slice(0, -1);
     const allAccountAssets = await api.get({
-      route: `assets/list?page=${page}&limit${limit}&asset=${assetsToRequest}`,
+      route: `assets/list?page=${page}&limit=${limit}&asset=${assetsToRequest}`,
     });
     if (!allAccountAssets.error || allAccountAssets.error === '') {
       assetsArray.forEach((asset: IAccountAsset, index) => {
@@ -100,8 +102,24 @@ export const assetsRequest = (
       });
     }
 
+    // Filter by asset type if specified
+    let filteredAssets = assetsArray;
+    if (assetType) {
+      const typeMap: { [key: string]: number } = {
+        Fungible: AssetType.Fungible,
+        NonFungible: AssetType.NonFungible,
+        SemiFungible: AssetType.SemiFungible,
+      };
+      const typeValue = typeMap[assetType];
+      if (typeValue !== undefined) {
+        filteredAssets = assetsArray.filter(
+          asset => asset.assetType === typeValue,
+        );
+      }
+    }
+
     return {
-      data: { assets: assetsArray },
+      data: { assets: filteredAssets },
       error: '',
       code: 'successful',
     };

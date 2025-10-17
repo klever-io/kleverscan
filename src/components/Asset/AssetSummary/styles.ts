@@ -10,7 +10,7 @@ export const PageTitle = styled.h1`
   font-size: 1.25rem !important;
 `;
 
-export const AssetTitle = styled.div`
+export const AssetTitleContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;

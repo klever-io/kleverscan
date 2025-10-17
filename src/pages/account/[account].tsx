@@ -97,7 +97,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     t('common:Titles.Transactions'),
     t('accounts:SingleAccount.Tabs.Buckets'),
     t('accounts:SingleAccount.Tabs.Rewards'),
-    t('accounts:SingleAccount.Tabs.NFTCollections'),
     t('accounts:SingleAccount.Tabs.SmartContracts'),
   ];
   const tabHeaders = [t('common:Tabs.Overview')];

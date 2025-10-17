@@ -152,15 +152,15 @@ export const Row = styled.div<{ span?: number }>`
     word-break: break-all;
   }
 
-  &::after {
+  &:not(:last-child)::after {
     content: '';
     position: absolute;
-    border-bottom: 1px solid ${props => props.theme.faq.border};
+    border-bottom: 1px solid ${props => props.theme.border};
     bottom: 0px;
 
     left: 0;
     height: 1px;
-    width: 500%;
+    width: 100%;
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
@@ -169,7 +169,6 @@ export const Row = styled.div<{ span?: number }>`
       css`
         grid-column: auto / span ${props.span};
       `}
-    padding: 1.5rem 2rem;
   }
 `;
 

@@ -487,6 +487,15 @@ export interface IAsset {
   stakingHolders: number;
 }
 
+export interface ISftAsset extends IAsset {
+  meta?: {
+    [key: string]: any;
+    metadata?: {
+      [key: string]: any;
+    };
+  };
+}
+
 export interface IITO {
   assetId: string;
   isActive: boolean;

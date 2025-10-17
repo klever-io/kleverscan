@@ -75,11 +75,7 @@ const NftCardView: React.FC<NftCardViewProps> = ({
           </Link>
         </NftCardAddress>
         <NftCardLink>
-          <Link
-            href={`/account/${address}/collection/${collectionId}/${nftId}`}
-          >
-            View Details
-          </Link>
+          <Link href={`/asset/${collectionId}/${nftId}`}>View Details</Link>
         </NftCardLink>
       </NftCardInfo>
     </NftCardContainer>

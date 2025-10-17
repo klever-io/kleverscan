@@ -1,11 +1,10 @@
-import { Button } from '@/components/CreateTxShortCut/styles';
 import { getRawTxTheme } from '@/pages/transaction/[hash]';
 import { ISftAsset } from '@/types';
 import { AssetCardContent } from '@/views/assets';
 import { Row } from '@/views/assets/detail';
 import { CardRaw } from '@/views/transactions/detail';
 import dynamic from 'next/dynamic';
-import { PropsWithChildren, useMemo, useState } from 'react';
+import { PropsWithChildren, useMemo } from 'react';
 import { useTheme } from 'styled-components';
 
 interface INonceDetails {
@@ -15,7 +14,6 @@ interface INonceDetails {
 export const SftMetadata: React.FC<PropsWithChildren<INonceDetails>> = ({
   sft,
 }) => {
-  const [showRawData, setShowRawData] = useState(false);
   const { isDarkTheme } = useTheme();
 
   const ReactJson = useMemo(
@@ -52,12 +50,6 @@ export const SftMetadata: React.FC<PropsWithChildren<INonceDetails>> = ({
           </span>
           <CardRaw>
             <RawDataComponent />
-            <Button
-              onClick={() => setShowRawData(!showRawData)}
-              style={{ marginBottom: '1rem' }}
-            >
-              {showRawData ? 'Collapse' : 'Expand'}
-            </Button>
           </CardRaw>
         </Row>
       )}

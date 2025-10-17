@@ -31,14 +31,12 @@ export const AssetTabs: React.FC<PropsWithChildren<IAssetTabsProps>> = ({
   const cardHeaders = [
     `${t('common:Tabs.Overview')}`,
     `${t('common:Tabs.More')}`,
+    ...(asset?.uris ? ['URIS'] : []),
+    ...(assetPool ? ['KDA Pool'] : []),
+    ...(ITO ? ['ITO'] : []),
+    ...(asset?.royalties ? ['Staking & Royalties'] : []),
+    ...(asset?.staking?.interestType === 'FPRI' ? ['Staking History'] : []),
   ];
-  asset?.uris && cardHeaders.push('URIS');
-  assetPool && cardHeaders.push('KDA Pool');
-  ITO && cardHeaders.push('ITO');
-  asset?.royalties && cardHeaders.push('Staking & Royalties');
-  if (asset?.staking?.interestType === 'FPRI') {
-    asset?.staking && cardHeaders.push('Staking History');
-  }
 
   const [selectedCard, setSelectedCard] = useState(
     defaultCard || cardHeaders[0],

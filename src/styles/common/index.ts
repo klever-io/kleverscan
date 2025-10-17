@@ -14,13 +14,7 @@ export const Container = styled.div`
   margin-top: 40px;
 `;
 
-export const SpacedContainer = styled.div`
-  display: flex;
-
-  flex-direction: column;
-
-  margin-top: 40px;
-
+export const SpacedContainer = styled(Container)`
   gap: 32px;
 `;
 

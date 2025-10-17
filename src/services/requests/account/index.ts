@@ -17,6 +17,7 @@ import { UINT32_MAX } from '@/utils/globalVariables';
 import { NextRouter } from 'next/router';
 import { smartContractsTableRequest } from '../smartContracts';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { AssetType } from '@/types/assets';
 
 export const generateEmptyAccountResponse = (
   hash: string,
@@ -105,9 +106,9 @@ export const assetsRequest = (
     let filteredAssets = assetsArray;
     if (assetType) {
       const typeMap: { [key: string]: number } = {
-        Fungible: 0,
-        NonFungible: 1,
-        SemiFungible: 2,
+        Fungible: AssetType.Fungible,
+        NonFungible: AssetType.NonFungible,
+        SemiFungible: AssetType.SemiFungible,
       };
       const typeValue = typeMap[assetType];
       if (typeValue !== undefined) {

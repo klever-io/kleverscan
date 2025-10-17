@@ -88,7 +88,7 @@ export const assetsRequest = (
 
     assetsToRequest = assetsToRequest.slice(0, -1);
     const allAccountAssets = await api.get({
-      route: `assets/list?page=${page}&limit${limit}&asset=${assetsToRequest}`,
+      route: `assets/list?page=${page}&limit=${limit}&asset=${assetsToRequest}`,
     });
     if (!allAccountAssets.error || allAccountAssets.error === '') {
       assetsArray.forEach((asset: IAccountAsset, index) => {

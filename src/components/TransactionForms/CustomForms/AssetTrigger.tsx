@@ -46,6 +46,31 @@ const parseAssetTrigger = (data: IAssetTrigger) => {
   parseMetadata(data);
 };
 
+const parseUpdateMetadata = ({
+  data,
+  metadataProps,
+  collection,
+  triggerType,
+}: {
+  data: any;
+  metadataProps: IMetadataOptions;
+  collection?: ICollectionList;
+  triggerType: number;
+}) => {
+  if (triggerType === 8) {
+    if (collection?.isNFT) {
+      metadataProps.setMetadata(data.metadata);
+    } else {
+      const name = data['name'] || '';
+      const parsedMetadataString =
+        Buffer.from(name).toString('hex') +
+        '@' +
+        Buffer.from(data.metadata).toString('hex');
+      metadataProps.setMetadata(parsedMetadataString);
+    }
+  }
+};
+
 const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
   formKey,
   handleFormSubmit,
@@ -63,10 +88,24 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
     setMetadata,
   };
 
+  useEffect(() => {
+    setMetadata('');
+
+    return () => {
+      setMetadata('');
+    };
+  }, [triggerType]);
+
   const onSubmit = async (data: IAssetTrigger) => {
     const dataDeepCopy = deepCopyObject(data);
     parseURIs(data);
     parseAssetTrigger(dataDeepCopy);
+    parseUpdateMetadata({
+      data: dataDeepCopy,
+      metadataProps,
+      collection,
+      triggerType,
+    });
     await handleFormSubmit(dataDeepCopy);
   };
 
@@ -192,20 +231,25 @@ const getAssetTriggerForm = (
             title="Mime"
             tooltip={tooltip.updateMetadata.mime}
           />
+          {collection.isNFT && (
+            <FormInput
+              name="receiver"
+              title="NFT Holder Address"
+              required
+              dynamicInitialValue={walletAddress}
+              tooltip={tooltip.receiver}
+            />
+          )}
+          {!collection.isNFT && (
+            <FormInput
+              name="name"
+              title="Sub-Collection Name"
+              tooltip={tooltip.receiver}
+            />
+          )}
           <FormInput
-            name="receiver"
-            title="NFT Holder Address"
-            required
-            dynamicInitialValue={walletAddress}
-            tooltip={tooltip.receiver}
-          />
-          <FormInput
-            title="Data"
-            type="textarea"
-            value={metadata}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setMetadata(e.target.value)
-            }
+            title="Metadata"
+            name="metadata"
             required
             span={2}
             tooltip={tooltip.updateMetadata.data}

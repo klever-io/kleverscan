@@ -35,7 +35,12 @@
   "Tabs": {
     "Overview": "Overview",
     "More": "More",
-    "Holders": "Holders"
+    "Holders": "Holders",
+    "URIS": "URIS",
+    "KDA Pool": "KDA Pool",
+    "ITO": "ITO",
+    "Staking & Royalties": "Staking & Royalties",
+    "Staking History": "Staking History"
   },
   "Buttons": {
     "Expand": "Expand",

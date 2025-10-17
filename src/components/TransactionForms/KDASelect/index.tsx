@@ -338,7 +338,7 @@ const CollectionIDField: React.FC<
         router,
         walletAddress,
         debouncedCollectionInput,
-        !collection.isNFT,
+        !collection.isNFT && !collection.isFungible,
       ),
     initialData: [],
     onSuccess: newData => {

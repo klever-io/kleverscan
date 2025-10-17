@@ -57,6 +57,8 @@ const parseUpdateMetadata = ({
   collection?: ICollectionList;
   triggerType: number;
 }) => {
+  if (!collection || !data.metadata) return;
+
   if (triggerType === 8) {
     if (collection?.isNFT) {
       metadataProps.setMetadata(data.metadata);

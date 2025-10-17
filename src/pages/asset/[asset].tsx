@@ -1,24 +1,17 @@
 import { AssetSummary } from '@/components/Asset/AssetSummary';
-import { ITOTab } from '@/components/Asset/ITOTab';
-import { KDAPoolTab } from '@/components/Asset/KDAPoolTab';
-import { MoreTab } from '@/components/Asset/MoreTab';
-import { OverviewTab } from '@/components/Asset/OverviewTab';
-import { StakingHistoryTab } from '@/components/Asset/StakingHistoryTab';
-import { StakingRoyaltiesTab } from '@/components/Asset/StakingRoyaltiesTab';
-import { UrisTab } from '@/components/Asset/URIsTab';
+import { AssetTabs } from '@/components/Asset/AssetTabs';
 import Tabs, { ITabs } from '@/components/NewTabs';
 import Table, { ITable } from '@/components/Table';
 import Holders from '@/components/Tabs/Holders';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
 import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
-import { CardHeader, CardHeaderItem, CardTabContainer } from '@/styles/common';
 import { AssetTypeString } from '@/types/assets';
 import { IAssetPage } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { transactionTableHeaders } from '@/utils/contracts';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
-import { AssetCardContent, AssetPageContainer } from '@/views/assets';
+import { AssetPageContainer } from '@/views/assets';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -64,20 +57,6 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
 
   const [selectedTab, setSelectedTab] = useState<null | string>(null);
 
-  const cardHeaders = [
-    `${t('common:Tabs.Overview')}`,
-    `${t('common:Tabs.More')}`,
-  ];
-  asset?.uris && cardHeaders.push('URIS');
-  assetPool && cardHeaders.push('KDA Pool');
-  ITO && cardHeaders.push('ITO');
-  cardHeaders.push('Staking & Royalties');
-  if (asset?.staking?.interestType === 'FPRI') {
-    asset?.staking && cardHeaders.push('Staking History');
-  }
-
-  const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
-
   const initialQueryState = {
     ...router.query,
   };
@@ -86,35 +65,8 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     if (router?.isReady) {
       setQueryAndRouter(initialQueryState, router);
       setSelectedTab((router.query.tab as string) || getTableHeaders()[0]);
-      setSelectedCard((router.query.card as string) || cardHeaders[0]);
     }
   }, [router.isReady]);
-
-  const SelectedComponent: React.FC<PropsWithChildren> = useCallback(() => {
-    switch (selectedCard) {
-      case `${t('common:Tabs.Overview')}`:
-        return <OverviewTab asset={asset} />;
-      case `${t('common:Tabs.More')}`:
-        return <MoreTab asset={asset} />;
-      case 'URIS':
-        return <UrisTab asset={asset} />;
-      case 'Staking & Royalties':
-        return (
-          <StakingRoyaltiesTab
-            asset={asset}
-            setSelectedCard={setSelectedCard}
-          />
-        );
-      case 'ITO':
-        return <ITOTab ITO={ITO} />;
-      case 'KDA Pool':
-        return <KDAPoolTab asset={asset} assetPool={assetPool} />;
-      case 'Staking History':
-        return <StakingHistoryTab staking={asset?.staking} asset={asset} />;
-      default:
-        return <div />;
-    }
-  }, [selectedCard, asset, ITO, assetPool, t]);
 
   const requestTransactions = async (page: number, limit: number) => {
     const newQuery = {
@@ -178,26 +130,15 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   return (
     <AssetPageContainer>
       <AssetSummary asset={asset} ITO={ITO} />
-      <CardTabContainer>
-        <CardHeader>
-          {cardHeaders.map((header, index) => (
-            <CardHeaderItem
-              key={String(index)}
-              selected={selectedCard === header}
-              onClick={() => {
-                setSelectedCard(header);
-                setQueryAndRouter({ ...router.query, card: header }, router);
-              }}
-            >
-              <span>{header}</span>
-            </CardHeaderItem>
-          ))}
-        </CardHeader>
-
-        <AssetCardContent>
-          <SelectedComponent />
-        </AssetCardContent>
-      </CardTabContainer>
+      <AssetTabs
+        asset={asset}
+        ITO={ITO}
+        assetPool={assetPool}
+        defaultCard={(router.query.card as string) || undefined}
+        onCardChange={card =>
+          setQueryAndRouter({ ...router.query, card }, router)
+        }
+      />
 
       <Tabs {...tabProps}>
         <SelectedTabComponent />

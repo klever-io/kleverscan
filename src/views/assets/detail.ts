@@ -152,7 +152,7 @@ export const Row = styled.div<{ span?: number }>`
     word-break: break-all;
   }
 
-  &:not(:last-child)::after {
+  &::after {
     content: '';
     position: absolute;
     border-bottom: 1px solid ${props => props.theme.border};

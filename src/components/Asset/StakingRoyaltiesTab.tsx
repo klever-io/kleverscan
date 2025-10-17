@@ -165,19 +165,18 @@ export const StakingRoyaltiesTab: React.FC<
             ),
         )}
 
-      {asset?.royalties?.itoPercentage && (
+      {asset?.royalties?.itoPercentage ? (
         <Row>
           <strong>ITO {t('assets:Staking.Percentage').toUpperCase()}</strong>
           <p>{`${asset.royalties.itoPercentage / 10 ** 2}%`}</p>
         </Row>
-      )}
-
-      {asset?.royalties?.itoFixed && (
+      ) : null}
+      {asset?.royalties?.itoFixed ? (
         <Row>
           <strong>ITO {t('assets:Staking.Fixed').toUpperCase()}</strong>
           <p>{`${asset.royalties.itoFixed / 10 ** KLV_PRECISION} KLV`}</p>
         </Row>
-      )}
+      ) : null}
 
       {(asset?.royalties?.splitRoyalties ?? []).length > 0 && (
         <>

@@ -162,12 +162,6 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('common:Cards.Market Cap')}</strong>
-        </span>
-        <span>--</span>
-      </Row>
-      <Row>
-        <span>
           <strong>{t('assets:Overview.Staking Type')}</strong>
         </span>
         <span>

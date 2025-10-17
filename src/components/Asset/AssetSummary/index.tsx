@@ -1,47 +1,39 @@
-import { PropsWithChildren } from 'react';
 import SocialIcons from '@/assets/social';
 import { AssetProps } from '@/components/Asset/OverviewTab';
 import { HashComponent } from '@/components/Contract';
 import Title from '@/components/Layout/Title';
-import AssetLogo from '@/components/Logo/AssetLogo';
-import Skeleton from '@/components/Skeleton';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
 import { useParticipate } from '@/contexts/participate';
 import { assetInfoCall } from '@/services/requests/asset';
 import { IParsedITO } from '@/types';
+import DOMPurify from 'dompurify';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect } from 'react';
+import { PropsWithChildren, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { TbPencilMinus } from 'react-icons/tb';
 import { useQuery } from 'react-query';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
 import { ParticipateModal } from './ParticipateModal';
-import DOMPurify from 'dompurify';
 
+import { AssetTitle } from './AssetTitle';
 import {
   About,
   AboutContent,
   AboutTitle,
   AddDescriptionButton,
   AddProjectDescription,
-  AssetHeaderContainer,
-  AssetSubtitle,
-  AssetTitle,
-  AssetTypeContainer,
   BackgroundImage,
   Container,
   Description,
-  EditContainer,
   EditDescriptionButton,
   Header,
   LeftSide,
   LinkStyles,
   PageTitle,
-  ParticipateButton,
   RightSide,
   SocialNetworks,
   TitleContainer,
@@ -137,43 +129,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
               )}
             />
 
-            <AssetTitle>
-              {asset ? (
-                <AssetLogo
-                  logo={asset?.logo || ''}
-                  ticker={asset?.ticker || ''}
-                  name={asset?.name || ''}
-                  verified={asset?.verified}
-                  size={56}
-                />
-              ) : (
-                <Skeleton width={56} height={56} />
-              )}
-              <AssetHeaderContainer>
-                {asset ? (
-                  <Title
-                    key={asset?.name}
-                    Component={() =>
-                      isMobile ? (
-                        <span>{asset?.name}</span>
-                      ) : (
-                        <h1>{asset?.name}</h1>
-                      )
-                    }
-                  />
-                ) : (
-                  <Skeleton width={200} height={40} />
-                )}
-                {asset ? (
-                  <AssetSubtitle>
-                    {asset?.assetId}
-                    <AssetTypeContainer>{asset?.assetType}</AssetTypeContainer>
-                  </AssetSubtitle>
-                ) : (
-                  <Skeleton width={'100%'} height={34} />
-                )}
-              </AssetHeaderContainer>
-            </AssetTitle>
+            <AssetTitle asset={asset} />
           </TitleContainer>
 
           {asset_info?.short_description ? (

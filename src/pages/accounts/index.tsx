@@ -164,7 +164,7 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
             <strong>{title}</strong>
           </span>
           <p>
-            {age} {t('common:Date.Elapsed Time')}
+            {age} {t('common:Date.Elapsed_Time')}
           </p>
         </div>
         <div>

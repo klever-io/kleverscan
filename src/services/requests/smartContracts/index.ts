@@ -4,6 +4,7 @@ import {
   SmartContractsList,
   SmartContractTransactionData,
 } from '@/types/smart-contract';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 const smartContractsListCall = async (): Promise<
   { smartContracts: SmartContractsList[] } | undefined
@@ -18,6 +19,37 @@ const smartContractsListCall = async (): Promise<
     }
   } catch (error) {
     console.error(error);
+  }
+};
+
+const smartContractsTableRequest = async (
+  page: number,
+  limit: number,
+  query: NextParsedUrlQuery,
+) => {
+  try {
+    const parsedQuery = {
+      deployer: query?.deployer || undefined,
+      sortBy: query?.sortBy || 'totalTransactions',
+      orderBy: query?.orderBy || 'desc',
+      page,
+      limit,
+    };
+
+    !query?.deployer && delete parsedQuery.deployer;
+
+    const smartContractsListRes = await api.get({
+      route: 'sc/list',
+      query: parsedQuery,
+    });
+    if (!smartContractsListRes.error) {
+      return smartContractsListRes;
+    } else {
+      throw new Error(smartContractsListRes.error);
+    }
+  } catch (error) {
+    console.error('Error fetching smart contracts list:', error);
+    throw error;
   }
 };
 
@@ -142,7 +174,7 @@ const smartContractTransactionDetailsCall = async (
 ): Promise<{ transaction: SmartContractTransactionData } | undefined> => {
   try {
     const res = await api.get({
-      route: `transaction/${txHash}`,
+      route: `transaction/${txHash}?withResults=true`,
     });
 
     if (!res.error || res.error === '') {
@@ -154,12 +186,13 @@ const smartContractTransactionDetailsCall = async (
 };
 
 export {
+  scInvokesTotalRecordsCall,
+  smartContractBeforeYesterdayTransactionsCall,
+  smartContractsBeforeYesterdayTransactionsCall,
   smartContractsListCall,
   smartContractsStatisticCall,
+  smartContractsTableRequest,
   smartContractsTotalContractsCall,
   smartContractTotalTransactionsListCall,
-  scInvokesTotalRecordsCall,
-  smartContractsBeforeYesterdayTransactionsCall,
-  smartContractBeforeYesterdayTransactionsCall,
   smartContractTransactionDetailsCall,
 };

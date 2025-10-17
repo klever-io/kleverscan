@@ -35,7 +35,12 @@
   "Tabs": {
     "Overview": "Overview",
     "More": "More",
-    "Holders": "Holders"
+    "Holders": "Holders",
+    "URIS": "URIS",
+    "KDA Pool": "KDA Pool",
+    "ITO": "ITO",
+    "Staking & Royalties": "Staking & Royalties",
+    "Staking History": "Staking History"
   },
   "Buttons": {
     "Expand": "Expand",
@@ -66,7 +71,7 @@
   },
   "Date": {
     "Updated": "Updated",
-    "Elapsed Time": "ago",
+    "Elapsed_Time": "ago",
     "Today": "Today",
     "Yesterday": "Yesterday",
     "Day": "Day",

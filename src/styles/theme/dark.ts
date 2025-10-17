@@ -6,6 +6,7 @@ const darktheme = {
   background: '#06060B',
   white: '#151515',
   black: '#FFFF',
+  border: '#646693',
   gray700: '#B7BDC6',
   darkText: '#C6C7EB',
 

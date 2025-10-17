@@ -72,7 +72,7 @@ const getInputType = (value: string) => {
   if (value.toUpperCase() === 'KLV' || value.toUpperCase() === 'KFI') {
     return 'asset';
   }
-  
+
   if (value.length <= 15) {
     return 'asset';
   }
@@ -158,7 +158,7 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
       const timeoutId = setTimeout(() => {
         gtag.searchEvent(type);
       }, 2000);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [type, canSearchResult]);

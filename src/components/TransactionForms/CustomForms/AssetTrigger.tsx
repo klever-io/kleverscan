@@ -63,6 +63,14 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
     setMetadata,
   };
 
+  useEffect(() => {
+    setMetadata('');
+
+    return () => {
+      setMetadata('');
+    };
+  }, [triggerType]);
+
   const onSubmit = async (data: IAssetTrigger) => {
     const dataDeepCopy = deepCopyObject(data);
     parseURIs(data);
@@ -122,6 +130,93 @@ const getMintForm = (collection: ICollectionList, walletAddress: string) => {
       !watchCollectionAssetId ? (
         <FormInput name="value" title="Max Amount for new ID" type="number" />
       ) : null}
+    </FormSection>
+  );
+};
+
+const UpdateMetadataForm: React.FC<{
+  collection: ICollectionList;
+  walletAddress: string;
+  setMetadata: (metadata: string) => void;
+}> = ({ collection, walletAddress, setMetadata }) => {
+  const { getValues } = useFormContext();
+  const metadataState = React.useRef({ name: '', metadata: '' });
+
+  const updateNonNFTMetadata = () => {
+    const parsedMetadataString =
+      Buffer.from(metadataState.current.name).toString('hex') +
+      '@' +
+      Buffer.from(metadataState.current.metadata).toString('hex');
+    setMetadata(parsedMetadataString);
+  };
+
+  const handleNameChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    metadataState.current.name = e.target.value;
+    updateNonNFTMetadata();
+  };
+
+  const handleMetadataChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    if (collection.isNFT) {
+      setMetadata(e.target.value);
+    } else {
+      metadataState.current.metadata = e.target.value;
+      updateNonNFTMetadata();
+    }
+  };
+
+  React.useEffect(() => {
+    const formValues = getValues() as any;
+    const currentMetadata = formValues.metadata || '';
+    const currentName = formValues.name || '';
+
+    metadataState.current.metadata = currentMetadata;
+    metadataState.current.name = currentName;
+
+    if (currentMetadata) {
+      if (collection.isNFT) {
+        setMetadata(currentMetadata);
+      } else {
+        updateNonNFTMetadata();
+      }
+    }
+  }, [collection.isNFT, collection.value]);
+
+  return (
+    <FormSection>
+      <FormInput
+        name="mime"
+        title="Mime"
+        tooltip={tooltip.updateMetadata.mime}
+      />
+      {collection.isNFT && (
+        <FormInput
+          name="receiver"
+          title="NFT Holder Address"
+          required
+          dynamicInitialValue={walletAddress}
+          tooltip={tooltip.receiver}
+        />
+      )}
+      {!collection.isNFT && (
+        <FormInput
+          name="name"
+          title="Sub-Collection Name"
+          onChange={handleNameChange}
+          tooltip={tooltip.receiver}
+        />
+      )}
+      <FormInput
+        name="metadata"
+        title="Metadata"
+        required
+        onChange={handleMetadataChange}
+        span={2}
+        tooltip={tooltip.updateMetadata.data}
+      />
     </FormSection>
   );
 };
@@ -186,31 +281,11 @@ const getAssetTriggerForm = (
       );
     case 8:
       return (
-        <FormSection>
-          <FormInput
-            name="mime"
-            title="Mime"
-            tooltip={tooltip.updateMetadata.mime}
-          />
-          <FormInput
-            name="receiver"
-            title="NFT Holder Address"
-            required
-            dynamicInitialValue={walletAddress}
-            tooltip={tooltip.receiver}
-          />
-          <FormInput
-            title="Data"
-            type="textarea"
-            value={metadata}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-              setMetadata(e.target.value)
-            }
-            required
-            span={2}
-            tooltip={tooltip.updateMetadata.data}
-          />
-        </FormSection>
+        <UpdateMetadataForm
+          collection={collection}
+          walletAddress={walletAddress}
+          setMetadata={setMetadata}
+        />
       );
     case 9:
       return null;

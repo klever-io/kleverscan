@@ -90,7 +90,7 @@ const ValidatorCards: React.FC<PropsWithChildren<IValidatorCards>> = ({
               <strong>{t('CurrentDelegations')}</strong>
             </span>
             <span>
-              <p>{`${age} ${commonT('Date.Elapsed Time')}`}</p>
+              <p>{`${age} ${commonT('Date.Elapsed_Time')}`}</p>
             </span>
           </VotesHeader>
           <VotesFooter>
@@ -149,7 +149,7 @@ const ValidatorCards: React.FC<PropsWithChildren<IValidatorCards>> = ({
               <strong>{t('Delegated')}</strong>
             </span>
             <p>{`(${commonT('Date.Updated')}: ${age} ${commonT(
-              'Date.Elapsed Time',
+              'Date.Elapsed_Time',
             )})`}</p>
           </CardHeader>
           <EmptyProgressBar>

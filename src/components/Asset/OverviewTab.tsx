@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { useQuery } from 'react-query';
+import { AssetTypeString } from '@/types/assets';
 
 export interface AssetProps {
   asset?: IAsset;
@@ -35,6 +36,23 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
     queryFn: () => holdersCall(router.query.asset as string),
     enabled: !!router?.isReady,
   });
+
+  const isSftCollection =
+    asset?.assetType === AssetTypeString.SemiFungible &&
+    !asset?.assetId?.includes('/');
+
+  const formatSupply = (
+    value?: number,
+    { infiniteOnZero = false }: { infiniteOnZero?: boolean } = {},
+  ) => {
+    if (isSftCollection) return value;
+    if (!asset) return 'N/A';
+    if (infiniteOnZero && value === 0) return '∞';
+    return toLocaleFixed(
+      (value || 0) / 10 ** (asset?.precision || 0),
+      asset?.precision || 0,
+    );
+  };
 
   return (
     <>
@@ -63,10 +81,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         <span>
           <small>
             {asset ? (
-              toLocaleFixed(
-                asset?.maxSupply / 10 ** asset?.precision,
-                asset?.precision,
-              )
+              formatSupply(asset?.maxSupply, { infiniteOnZero: true })
             ) : (
               <Skeleton />
             )}
@@ -79,14 +94,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         </span>
         <span>
           <small>
-            {asset ? (
-              toLocaleFixed(
-                asset?.initialSupply / 10 ** asset?.precision,
-                asset?.precision,
-              )
-            ) : (
-              <Skeleton />
-            )}
+            {asset ? formatSupply(asset?.initialSupply) : <Skeleton />}
           </small>
         </span>
       </Row>
@@ -96,14 +104,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         </span>
         <span>
           <small>
-            {asset ? (
-              toLocaleFixed(
-                asset?.circulatingSupply / 10 ** asset?.precision,
-                asset?.precision,
-              )
-            ) : (
-              <Skeleton />
-            )}
+            {asset ? formatSupply(asset?.circulatingSupply) : <Skeleton />}
           </small>
         </span>
       </Row>
@@ -158,12 +159,6 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
             <Skeleton />
           )}
         </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>{t('common:Cards.Market Cap')}</strong>
-        </span>
-        <span>--</span>
       </Row>
       <Row>
         <span>

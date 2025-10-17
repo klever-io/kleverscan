@@ -55,20 +55,20 @@ export const AssetTabs: React.FC<PropsWithChildren<IAssetTabsProps>> = ({
         return <OverviewTab asset={asset} />;
       case `${t('common:Tabs.More')}`:
         return <MoreTab asset={asset} />;
-      case 'URIS':
+      case `${t('common:Tabs.URIS')}`:
         return <UrisTab asset={asset} />;
-      case 'Staking & Royalties':
+      case `${t('common:Tabs.Staking & Royalties')}`:
         return (
           <StakingRoyaltiesTab
             asset={asset}
             setSelectedCard={setSelectedCard}
           />
         );
-      case 'ITO':
+      case `${t('common:Tabs.ITO')}`:
         return <ITOTab ITO={ITO} />;
-      case 'KDA Pool':
+      case `${t('common:Tabs.KDA Pool')}`:
         return <KDAPoolTab asset={asset} assetPool={assetPool} />;
-      case 'Staking History':
+      case `${t('common:Tabs.Staking History')}`:
         return <StakingHistoryTab staking={asset?.staking} asset={asset} />;
       default:
         return <div />;

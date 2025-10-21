@@ -7,11 +7,15 @@ import {
   IProprietaryAsset,
   IRowSection,
 } from '@/types/index';
-import { parseApr } from '@/utils';
+import { parseApr, setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
+import { AssetType, AssetTypeString } from '@/types/assets';
+import { useRouter } from 'next/router';
+import Filter, { IFilter } from '@/components/Filter';
+import { FilterDiv } from '@/components/TransactionsFilters/styles';
 
 interface IProprietaryAssets {
   assetsTableProps: IInnerTableProps;
@@ -19,6 +23,19 @@ interface IProprietaryAssets {
   showInteractionButtons?: boolean;
   Filters?: React.FC<PropsWithChildren>;
 }
+
+const getAssetTypeName = (type: string) => {
+  switch (type) {
+    case AssetTypeString.Fungible:
+      return 'Fungible';
+    case AssetTypeString.NonFungible:
+      return 'Non-Fungible';
+    case AssetTypeString.SemiFungible:
+      return 'Semi-Fungible';
+    default:
+      return 'Unknown';
+  }
+};
 
 const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
   assetsTableProps,
@@ -38,6 +55,68 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
   ];
   const { t } = useTranslation('accounts');
   const { getInteractionsButtons } = useContractModal();
+  const router = useRouter();
+
+  const getAssetTypeFilter = () => {
+    if (router.query?.assetType === AssetTypeString.Fungible) {
+      return 'Fungible';
+    } else if (router.query?.assetType === AssetTypeString.NonFungible) {
+      return 'Non-Fungible';
+    } else if (router.query?.assetType === AssetTypeString.SemiFungible) {
+      return 'Semi-Fungible';
+    }
+    return 'All';
+  };
+
+  const handleAssetTypeFilter = (filter: string) => {
+    const updatedQuery = { ...router.query };
+    delete updatedQuery.page;
+
+    switch (filter) {
+      case 'All':
+        delete updatedQuery.assetType;
+        break;
+      case 'Fungible':
+        updatedQuery.assetType = AssetTypeString.Fungible;
+        break;
+      case 'Non-Fungible':
+        updatedQuery.assetType = AssetTypeString.NonFungible;
+        break;
+      case 'Semi-Fungible':
+        updatedQuery.assetType = AssetTypeString.SemiFungible;
+        break;
+    }
+
+    setQueryAndRouter(updatedQuery, router);
+  };
+
+  const assetTypeFilters: IFilter[] = [
+    {
+      firstItem: 'All',
+      data: ['Fungible', 'Non-Fungible', 'Semi-Fungible'],
+      onClick: e => {
+        handleAssetTypeFilter(e);
+      },
+      current: getAssetTypeFilter(),
+      overFlow: 'visible',
+      inputType: 'button',
+      isHiddenInput: false,
+      title: 'Asset Type',
+    },
+  ];
+
+  const FiltersComponent: React.FC<PropsWithChildren> = () => {
+    return (
+      <>
+        <FilterDiv>
+          {assetTypeFilters.map((filter, index) => (
+            <Filter key={index} {...filter} />
+          ))}
+        </FilterDiv>
+        {Filters && <Filters />}
+      </>
+    );
+  };
 
   const rowSections = (props: IProprietaryAsset): IRowSection[] => {
     const { assetId, assetType, precision, circulatingSupply, staking } = props;
@@ -69,9 +148,7 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
       },
       {
         element: props => (
-          <span key={assetType}>
-            {assetType === 'Fungible' ? 'Fungible' : 'Non Fungible'}
-          </span>
+          <span key={assetType}>{getAssetTypeName(assetType)}</span>
         ),
         span: 1,
       },
@@ -128,7 +205,7 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
     rowSections,
     type: 'assets',
     header,
-    Filters,
+    Filters: FiltersComponent,
   };
 
   return <Table {...tableProps} />;

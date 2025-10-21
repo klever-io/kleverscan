@@ -297,7 +297,10 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
         )}
       </SelectContent>
       {showAssetIdInputConditional && (
-        <CollectionIDField collection={selectedCollection} />
+        <CollectionIDField
+          collection={selectedCollection}
+          assetTriggerType={assetTriggerType}
+        />
       )}
     </SelectContainer>
   );
@@ -305,11 +308,12 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
 
 interface CollectionIDFieldProps {
   collection: ICollectionList;
+  assetTriggerType?: number | null;
 }
 
 const CollectionIDField: React.FC<
   PropsWithChildren<CollectionIDFieldProps>
-> = ({ collection }) => {
+> = ({ collection, assetTriggerType }) => {
   const [isCustom, setIsCustom] = useState(false);
   const [collectionInputValue, setCollectionInputValue] = useState('');
   const [collectionIdData, setCollectionIdData] = useState<ICollection[]>([]);
@@ -362,9 +366,20 @@ const CollectionIDField: React.FC<
       const parseCollectionId = asset.assetId.split('/')[1];
       return { label: parseCollectionId, value: parseCollectionId };
     });
-    allCollectionIdData.unshift({ label: 'New Collection', value: '' });
+
+    const isSemiFungible =
+      collection?.assetType === 2 || collection?.assetType === 'SemiFungible';
+    if (isSemiFungible && assetTriggerType === 0) {
+      allCollectionIdData.unshift({ label: 'New Collection', value: '' });
+    }
+
     return allCollectionIdData;
-  }, [collectionIdData, selectedCollection?.assetType]);
+  }, [
+    collectionIdData,
+    selectedCollection?.assetType,
+    collection?.assetType,
+    assetTriggerType,
+  ]);
 
   const selectedCollectionId = collectionOptions?.filter(
     e => e.value === watchCollectionAssetId,

@@ -12,12 +12,12 @@ import {
   IResponse,
   Service,
 } from '@/types';
+import { AssetType } from '@/types/assets';
 import { formatAmount } from '@/utils/formatFunctions';
 import { UINT32_MAX } from '@/utils/globalVariables';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
 import { smartContractsTableRequest } from '../smartContracts';
-import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
-import { AssetType } from '@/types/assets';
 
 export const generateEmptyAccountResponse = (
   hash: string,
@@ -130,11 +130,17 @@ export const assetsRequest = (
 
 export const ownedAssetsRequest = (
   address: string,
+  assetType?: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const get = async (page: number, limit: number): Promise<IResponse> => {
     const ownedAssetsResponse = await api.get({
       route: 'assets/kassets',
-      query: { owner: `${address}`, page, limit },
+      query: {
+        owner: `${address}`,
+        type: assetType ? assetType : undefined,
+        page,
+        limit,
+      },
     });
 
     if (ownedAssetsResponse.error) {

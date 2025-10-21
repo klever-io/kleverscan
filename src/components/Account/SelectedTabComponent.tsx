@@ -36,7 +36,7 @@ const getRequest = (
         assetsRequest(address, assetType)(page, limit);
     case t('accounts:SingleAccount.Tabs.ProprietaryAssets'):
       return (page: number, limit: number) =>
-        ownedAssetsRequest(address)(page, limit);
+        ownedAssetsRequest(address, assetType)(page, limit);
     case t('common:Titles.Transactions'):
       return (page: number, limit: number) =>
         requestTransactionsDefault(page, limit, router);

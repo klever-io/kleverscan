@@ -1,6 +1,5 @@
 import Filter, { IFilter } from '@/components/Filter';
 import { setQueryAndRouter } from '@/utils';
-import { getNetwork } from '@/utils/networkFunctions';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -17,12 +16,7 @@ const Filters: React.FC = () => {
     setLocalQuery(router.query);
   }, [router.isReady, router.query]);
 
-  const currentNetwork = getNetwork();
-  const isDevnet = currentNetwork === 'Devnet';
-
-  const sortOptions = isDevnet
-    ? ['Timestamp', 'Total Transactions']
-    : ['Timestamp'];
+  const sortOptions = ['Timestamp', 'Total Transactions'];
   const orderOptions = ['Desc', 'Asc'];
 
   const initialParts = { sortBy: 'totalTransactions', orderBy: 'desc' };

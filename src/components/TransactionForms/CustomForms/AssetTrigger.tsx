@@ -96,7 +96,8 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
           required
         />
       </FormSection>
-      <KDASelect required assetTriggerType={triggerType} />
+      <KDASelect required key={triggerType} assetTriggerType={triggerType} />
+
       {triggerType !== undefined &&
         collection &&
         getAssetTriggerForm(

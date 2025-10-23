@@ -17,6 +17,7 @@ import Link from 'next/link';
 import { PurpleArrowRight } from '@/assets/icons';
 import { parseAddress } from '@/utils/parseValues';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 import SkeletonTable from '@/components/SkeletonTable';
 const network = getNetwork();
 
@@ -45,7 +46,7 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
       data: mostTransactedKDAFee,
       header: ['Rank', 'Token', 'Total Txn'],
     },
-    ...(network !== 'Mainnet'
+    ...(isKVMAvailable(network)
       ? [
           {
             title: 'Hot Contracts',

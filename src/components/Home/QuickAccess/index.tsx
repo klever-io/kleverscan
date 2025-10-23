@@ -1,5 +1,6 @@
 import { Currency, PaperPlus, Token, Transfer } from '@/assets/transaction';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import { FaRegSnowflake, FaRocket, FaVoteYea } from 'react-icons/fa';
@@ -48,7 +49,7 @@ const QuickAccess: React.FC<{
       openWiz: () => setWizard('NFT'),
       icon: <Token />,
     },
-    ...(network !== 'Mainnet'
+    ...(isKVMAvailable(network)
       ? [
           {
             title: 'Create SFT',
@@ -106,7 +107,7 @@ const QuickAccess: React.FC<{
           <CardItem
             key={JSON.stringify(contract.title)}
             onClick={e => handleClick(contract, e)}
-            isMainNet={network !== 'Mainnet'}
+            isMainNet={isKVMAvailable(network)}
           >
             <PlusIcon>{contract.icon}</PlusIcon>
             <p>{contract.title}</p>

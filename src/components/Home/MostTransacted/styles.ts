@@ -1,5 +1,6 @@
 import { TableGradientBorder } from '@/components/Table/styles';
 import styled from 'styled-components';
+import { isKVMAvailable } from '@/utils/kvm';
 
 export const SectionContainer = styled.div<{
   network?: string;
@@ -11,7 +12,7 @@ export const SectionContainer = styled.div<{
   @media (min-width: 768px) {
     display: grid;
     grid-template-columns: ${props =>
-      props.network !== 'Mainnet' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'};
+      isKVMAvailable(props.network) ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'};
     /* gap: 16px; */
   }
 `;

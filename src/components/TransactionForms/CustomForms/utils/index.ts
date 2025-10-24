@@ -5,16 +5,15 @@ import { Pack, PackInfo, WhitelistInfo } from './types';
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export const parseSplitRoyalties = (data: any): void => {
+  if (!data.royalties) {
+    return;
+  }
+
   if (data?.splitRoyalties) {
     delete data.splitRoyalties;
   }
   if (data?.transferPercentage) {
     delete data.transferPercentage;
-  }
-
-  if (!data.royalties) {
-    data.royalties = {};
-    return;
   }
 
   if (!Array.isArray(data.royalties?.splitRoyalties)) {

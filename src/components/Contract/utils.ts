@@ -423,17 +423,17 @@ const getAssetsList = (
 
   if (contractType === 'AssetTriggerContract' && assetTriggerType !== null) {
     const bothCollectionNFT = [0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12];
-    const justNFT = [8];
-    const justToken = [13];
+    const shouldNotFungible = [8];
+    const shouldBeFungible = [13];
 
     if (bothCollectionNFT.includes(assetTriggerType)) {
       return filterByProperties(assets, assetTriggerType);
-    } else if (justNFT.includes(assetTriggerType)) {
+    } else if (shouldNotFungible.includes(assetTriggerType)) {
       const newAssets = assets.filter((value: ICollectionList) => {
-        return value.isNFT;
+        return !value.isFungible;
       });
       return filterByProperties(newAssets, assetTriggerType);
-    } else if (justToken.includes(assetTriggerType)) {
+    } else if (shouldBeFungible.includes(assetTriggerType)) {
       const newAssets = assets.filter((value: ICollectionList) => {
         return !value.isNFT;
       });

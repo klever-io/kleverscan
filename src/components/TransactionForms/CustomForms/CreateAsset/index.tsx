@@ -1,5 +1,6 @@
 import { parseRoles } from '@/components/Wizard/utils';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 import { ICreateAsset } from '@klever/sdk-web';
 import React, { PropsWithChildren } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -58,7 +59,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IContractProps>> = ({
       label: 'Non Fungible',
       value: 1,
     },
-    ...(network !== 'Mainnet'
+    ...(isKVMAvailable(network)
       ? [
           {
             label: 'Semi Fungible',

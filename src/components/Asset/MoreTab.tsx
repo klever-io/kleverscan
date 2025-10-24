@@ -52,122 +52,154 @@ export const MoreTab: React.FC<PropsWithChildren<AssetProps>> = ({ asset }) => {
         </span>
         <span>{asset ? asset.precision : <Skeleton />}</span>
       </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Freeze')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? statusWithIcon(asset.properties.canFreeze, t) : <Skeleton />}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Wipe')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? statusWithIcon(asset.properties.canWipe, t) : <Skeleton />}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Pause')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? statusWithIcon(asset.properties.canPause, t) : <Skeleton />}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Mint')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? statusWithIcon(asset.properties.canMint, t) : <Skeleton />}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Burn')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? statusWithIcon(asset.properties.canBurn, t) : <Skeleton />}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Change Owner')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? (
-            statusWithIcon(asset.properties.canChangeOwner, t)
-          ) : (
-            <Skeleton />
-          )}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Add Roles')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? (
-            statusWithIcon(asset.properties.canAddRoles, t)
-          ) : (
-            <Skeleton />
-          )}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>
-            {t('common:Properties.Can', {
-              type: `${t('common:Properties.Pause')}`,
-            })}
-          </strong>
-        </span>
-        <span>
-          {asset ? statusWithIcon(asset.attributes.isPaused, t) : <Skeleton />}
-        </span>
-      </Row>
-      <Row>
-        <span>
-          <strong>{t('common:Properties.NFT Mint Stopped')}</strong>
-        </span>
-        <span>
-          {asset ? (
-            statusWithIcon(asset.attributes.isNFTMintStopped, t)
-          ) : (
-            <Skeleton />
-          )}
-        </span>
-      </Row>
+      {asset?.properties && (
+        <>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Freeze')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.properties.canFreeze, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Wipe')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.properties.canWipe, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Pause')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.properties.canPause, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Mint')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.properties.canMint, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Burn')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.properties.canBurn, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Change Owner')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.properties.canChangeOwner, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Add Roles')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.properties.canAddRoles, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+        </>
+      )}
+      {asset?.attributes && (
+        <>
+          <Row>
+            <span>
+              <strong>
+                {t('common:Properties.Can', {
+                  type: `${t('common:Properties.Pause')}`,
+                })}
+              </strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.attributes.isPaused, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+          <Row>
+            <span>
+              <strong>{t('common:Properties.NFT Mint Stopped')}</strong>
+            </span>
+            <span>
+              {asset ? (
+                statusWithIcon(asset.attributes.isNFTMintStopped, t)
+              ) : (
+                <Skeleton />
+              )}
+            </span>
+          </Row>
+        </>
+      )}
     </>
   );
 };

@@ -285,7 +285,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
           {
             element: props => (
               <Link
-                href={`/account/${address}/collection/${collectionId}/${nftId}`}
+                href={`/asset/${collectionId}/${nftId}`}
                 key={assetId}
                 legacyBehavior
               >

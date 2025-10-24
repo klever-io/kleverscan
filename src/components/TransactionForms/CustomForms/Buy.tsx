@@ -11,6 +11,7 @@ import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import { FormBody, FormSection, RoyaltiesContainer } from '../styles';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 
 type FormData = {
   buyType: number;
@@ -90,7 +91,7 @@ const Buy: React.FC<PropsWithChildren<IContractProps>> = ({
           type="number"
           required
         />
-        {!buyType && network !== 'Mainnet' && (
+        {!buyType && isKVMAvailable(network) && (
           <FormInput
             name="currencyAmount"
             title={'Currency Amount'}

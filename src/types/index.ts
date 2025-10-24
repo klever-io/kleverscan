@@ -302,9 +302,6 @@ export interface IAssetsBuckets {
 
 export interface IHolders {
   asset: IAsset;
-  holdersTableProps: IInnerTableProps;
-  setHolderQuery: React.Dispatch<React.SetStateAction<string>>;
-  holderQuery: string;
 }
 export interface IHolder extends IAccountAsset {
   totalBalance: number;
@@ -490,6 +487,16 @@ export interface IAsset {
   stakingHolders: number;
 }
 
+export interface ISftAsset extends IAsset {
+  meta?: {
+    maxSupply: number;
+    circulationSupply: number;
+    metadata?: {
+      [key: string]: any;
+    };
+  };
+}
+
 export interface IITO {
   assetId: string;
   isActive: boolean;
@@ -572,6 +579,13 @@ export interface ITxQuery {
 export interface IInnerTableProps {
   dataName: string;
   request: (page: number, limit: number) => Promise<any>;
+  scrollUp?: boolean;
+  query?: ITxQuery;
+  page?: number;
+}
+export interface IPartialInnerTableProps {
+  dataName?: string;
+  request?: (page: number, limit: number) => Promise<any>;
   scrollUp?: boolean;
   query?: ITxQuery;
   page?: number;

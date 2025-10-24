@@ -1,10 +1,10 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import Copy from '@/components/Copy';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
-import { parseAddress } from '@/utils/parseValues';
+import { parseAddress, parseHolders } from '@/utils/parseValues';
 import Link from 'next/link';
 import React from 'react';
 import {
@@ -13,14 +13,9 @@ import {
   RankingContainer,
   RankingText,
 } from './styles';
-
-interface IHolderTableProps {
-  scrollUp: boolean;
-  totalPages: number;
-  dataName: string;
-  request: (page: number, limit: number) => Promise<any>;
-  page: number;
-}
+import api from '@/services/api';
+import { useRouter } from 'next/router';
+import { setQueryAndRouter } from '@/utils';
 
 const header = [
   'Rank',
@@ -31,12 +26,20 @@ const header = [
   'Total Balance',
 ];
 
-const Holders: React.FC<IHolders> = ({
-  asset,
-  holdersTableProps,
-  setHolderQuery,
-  holderQuery,
-}) => {
+const Holders: React.FC<IHolders> = ({ asset }) => {
+  const router = useRouter();
+  const [holderQuery, setHolderQuery] = useState<string>('');
+
+  useEffect(() => {
+    if (router?.isReady) {
+      setHolderQuery(router.query.sortBy as string);
+    }
+  }, [router.isReady]);
+
+  useEffect(() => {
+    setQueryAndRouter({ ...router.query, sortBy: holderQuery }, router);
+  }, [holderQuery]);
+
   const rowSections = (props: IBalance): IRowSection[] => {
     const { address, frozenBalance, index, rank, balance, totalBalance } =
       props;
@@ -122,11 +125,42 @@ const Holders: React.FC<IHolders> = ({
     },
   ];
 
+  const requestAssetHolders = async (page: number, limit: number) => {
+    let newQuery = {
+      ...router.query,
+      sortBy: holderQuery?.toLowerCase() || '',
+    };
+    if (holderQuery === 'Total Balance')
+      newQuery = { ...router.query, sortBy: 'total' };
+
+    if (asset) {
+      const response = await api.get({
+        route: `assets/holders/${asset.assetId}`,
+        query: { ...newQuery, page, limit },
+      });
+
+      let parsedHolders: IBalance[] = [];
+      if (!response.error) {
+        const holders = response.data.accounts;
+
+        parsedHolders = parseHolders(
+          holders,
+          asset.assetId,
+          response.pagination,
+        );
+      }
+
+      return { ...response, data: { accounts: parsedHolders } };
+    }
+    return { data: { accounts: [] } };
+  };
+
   const tableProps: ITable = {
     rowSections,
     header: getHeader(),
     type: 'holders',
-    ...holdersTableProps,
+    dataName: 'accounts',
+    request: (page: number, limit: number) => requestAssetHolders(page, limit),
   };
 
   return (

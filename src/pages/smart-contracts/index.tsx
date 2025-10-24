@@ -19,6 +19,7 @@ import MostUsedApplications from '@/components/SmartContracts/MostUsedApplicatio
 import BrowseAllDeployedContracts from '@/components/SmartContracts/BrowseAllDeployedContracts';
 import SmartContractTopCard from '@/components/SmartContracts/SmartContractTopCard';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 
 const SmartContracts: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'smartContracts']);
@@ -54,7 +55,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
   const network = getNetwork();
-  if (network === 'Mainnet') {
+  if (!isKVMAvailable(network)) {
     return {
       notFound: true,
     };

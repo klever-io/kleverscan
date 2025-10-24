@@ -4,6 +4,7 @@ import {
   SectionTitle,
 } from '@/components/TransactionForms/styles';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 import { useRouter } from 'next/router';
 import { PropsWithChildren } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -75,7 +76,7 @@ export const RolesSection: React.FC<PropsWithChildren> = () => {
             toggleOptions={['No', 'Yes']}
             tooltip={tooltip.roles.hasRoleDeposit}
           />
-          {network !== 'Mainnet' && (
+          {isKVMAvailable(network) && (
             <FormInput
               name={`role.hasRoleTransfer`}
               title={`Has Role Transfer`}

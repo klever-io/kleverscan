@@ -272,7 +272,11 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
             <Copy info="TXHash" data={hash} />
           </CenteredRow>
           <CenteredRow>
-            <TimestampInfo>{formatDate(timestamp || Date.now())}</TimestampInfo>
+            <TimestampInfo>
+              {formatDate(timestamp || Date.now(), {
+                showElapsedTime: true,
+              })}
+            </TimestampInfo>
             <Status status={status?.toLowerCase()}>
               {capitalizeString(status)}
             </Status>

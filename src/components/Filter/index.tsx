@@ -20,6 +20,7 @@ export interface IFilterItem {
 export interface IFilter {
   title?: string;
   firstItem?: string;
+  hideAllOption?: boolean;
   inputType?: string;
   overFlow?: string;
   data: string[];
@@ -39,6 +40,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   onChange,
   current: initial,
   firstItem,
+  hideAllOption = false,
   overFlow,
   inputType = 'text',
   loading,
@@ -126,7 +128,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       onChange(value);
     }
   };
-  const getDataArray = () => [allItem].concat(data);
+  const getDataArray = () => (hideAllOption ? data : [allItem].concat(data));
 
   const filterArrayByInput = (input: string) => {
     if (input === '') {
@@ -185,9 +187,11 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
           {closed && selected ? selected : ''}
         </span>
 
-        <CloseContainer empty={selected === allItem} onClick={handleClear}>
-          <AiOutlineClose />
-        </CloseContainer>
+        {!hideAllOption && (
+          <CloseContainer empty={selected === allItem} onClick={handleClear}>
+            <AiOutlineClose />
+          </CloseContainer>
+        )}
 
         <ArrowDownContainer onClick={() => arrowOnClick()} open={!closed}>
           <FilterArrowDown />

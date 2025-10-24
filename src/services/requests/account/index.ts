@@ -5,28 +5,19 @@ import {
   IAccount,
   IAccountAsset,
   IAccountResponse,
-  IAsset,
   IAssetsBuckets,
   IAssetsResponse,
   IBucket,
   IPaginatedResponse,
   IResponse,
-  ITransaction,
   Service,
 } from '@/types';
+import { AssetType } from '@/types/assets';
 import { formatAmount } from '@/utils/formatFunctions';
 import { UINT32_MAX } from '@/utils/globalVariables';
-import { getPrecision } from '@/utils/precisionFunctions';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
-
-interface IQueryParams {
-  page?: number;
-  limit?: number;
-  startDate?: string;
-  endDate?: string;
-  tab?: string;
-  sender?: '' | 'receiver' | 'sender';
-}
+import { smartContractsTableRequest } from '../smartContracts';
 
 export const generateEmptyAccountResponse = (
   hash: string,
@@ -59,6 +50,7 @@ export const generateEmptyAccountResponse = (
 
 export const assetsRequest = (
   address: string,
+  assetType?: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const get = async (page: number, limit: number): Promise<IResponse> => {
     if (!address) {
@@ -97,7 +89,7 @@ export const assetsRequest = (
 
     assetsToRequest = assetsToRequest.slice(0, -1);
     const allAccountAssets = await api.get({
-      route: `assets/list?page=${page}&limit${limit}&asset=${assetsToRequest}`,
+      route: `assets/list?page=${page}&limit=${limit}&asset=${assetsToRequest}`,
     });
     if (!allAccountAssets.error || allAccountAssets.error === '') {
       assetsArray.forEach((asset: IAccountAsset, index) => {
@@ -110,8 +102,24 @@ export const assetsRequest = (
       });
     }
 
+    // Filter by asset type if specified
+    let filteredAssets = assetsArray;
+    if (assetType) {
+      const typeMap: { [key: string]: number } = {
+        Fungible: AssetType.Fungible,
+        NonFungible: AssetType.NonFungible,
+        SemiFungible: AssetType.SemiFungible,
+      };
+      const typeValue = typeMap[assetType];
+      if (typeValue !== undefined) {
+        filteredAssets = assetsArray.filter(
+          asset => asset.assetType === typeValue,
+        );
+      }
+    }
+
     return {
-      data: { assets: assetsArray },
+      data: { assets: filteredAssets },
       error: '',
       code: 'successful',
     };
@@ -122,11 +130,17 @@ export const assetsRequest = (
 
 export const ownedAssetsRequest = (
   address: string,
+  assetType?: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const get = async (page: number, limit: number): Promise<IResponse> => {
     const ownedAssetsResponse = await api.get({
       route: 'assets/kassets',
-      query: { owner: `${address}`, page, limit },
+      query: {
+        owner: `${address}`,
+        type: assetType ? assetType : undefined,
+        page,
+        limit,
+      },
     });
 
     if (ownedAssetsResponse.error) {
@@ -469,6 +483,23 @@ export const nftCollectionsRequest = (
       code: 'successful',
       error: '',
     };
+  };
+
+  return get;
+};
+
+export const getSCDeployedByAddress = (address: string, query: any) => {
+  const get = async (
+    page: number,
+    limit: number,
+  ): Promise<IPaginatedResponse> => {
+    const parsedQuery = {
+      deployer: address,
+      sortBy: query?.sortBy || 'totalTransactions',
+      orderBy: query?.orderBy || 'desc',
+    } as unknown as NextParsedUrlQuery;
+
+    return await smartContractsTableRequest(page, limit, parsedQuery);
   };
 
   return get;

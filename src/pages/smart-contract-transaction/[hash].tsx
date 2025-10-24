@@ -19,6 +19,7 @@ import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { smartContractTransactionDetailsCall } from '@/services/requests/smartContracts';
 import dynamic from 'next/dynamic';
+import { isKVMAvailable } from '@/utils/kvm';
 
 const SmartContractTransaction: React.FC = () => {
   const router = useRouter();
@@ -81,7 +82,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
   const network = getNetwork();
-  if (network === 'Mainnet') {
+  if (!isKVMAvailable(network)) {
     return {
       notFound: true,
     };

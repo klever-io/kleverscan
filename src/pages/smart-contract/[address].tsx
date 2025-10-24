@@ -242,7 +242,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
   const network = getNetwork();
-  if (network === 'Mainnet') {
+  if (!isKVMAvailable(network)) {
     return {
       notFound: true,
     };

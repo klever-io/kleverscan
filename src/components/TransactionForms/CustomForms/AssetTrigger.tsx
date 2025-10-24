@@ -3,6 +3,7 @@ import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 import { deepCopyObject } from '@/utils/objectFunctions';
 import { IAssetTrigger } from '@klever/sdk-web';
 import React, { PropsWithChildren, useEffect } from 'react';
@@ -407,7 +408,7 @@ export const AddRoleSection: React.FC<PropsWithChildren> = () => {
         toggleOptions={['No', 'Yes']}
         tooltip={tooltip.role.hasRoleDeposit}
       />
-      {network !== 'Mainnet' && (
+      {isKVMAvailable(network) && (
         <FormInput
           name={`role.hasRoleTransfer`}
           title={`Has Role Transfer`}

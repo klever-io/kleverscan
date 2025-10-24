@@ -133,14 +133,21 @@ export const ownedAssetsRequest = (
   assetType?: string,
 ): ((page: number, limit: number) => Promise<IResponse>) => {
   const get = async (page: number, limit: number): Promise<IResponse> => {
+    let query: Record<string, any> = {
+      owner: `${address}`,
+      page,
+      limit,
+    };
+
+    if (assetType) {
+      query = {
+        ...query,
+        type: assetType,
+      };
+    }
     const ownedAssetsResponse = await api.get({
       route: 'assets/kassets',
-      query: {
-        owner: `${address}`,
-        type: assetType ? assetType : undefined,
-        page,
-        limit,
-      },
+      query,
     });
 
     if (ownedAssetsResponse.error) {

@@ -11,6 +11,7 @@ import { MdFeedback, MdOutlineLocalMall } from 'react-icons/md';
 import { RiPenNibFill } from 'react-icons/ri';
 import { TbArrowsLeftRight } from 'react-icons/tb';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 export interface INavbarItem {
   name: string;
   pathTo: string;
@@ -45,7 +46,7 @@ const navbarItems: INavbarItem[] = [
     pathTo: '/assets',
     Icon: Graph,
   },
-  ...(network !== 'Mainnet'
+  ...(isKVMAvailable(network)
     ? [
         {
           name: 'Smart Contracts',
@@ -70,7 +71,7 @@ const navbarItems: INavbarItem[] = [
       //   pathTo: '/nodes',
       //   Icon: Compass,
       // },
-      ...(network !== 'Mainnet'
+      ...(isKVMAvailable(network)
         ? [
             {
               name: 'Validators',

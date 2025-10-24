@@ -19,6 +19,7 @@ import { IProposal, MostTransferredToken } from '@/types/proposals';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
 import { getNetwork } from '@/utils/networkFunctions';
+import { isKVMAvailable } from '@/utils/kvm';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -132,7 +133,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
       queryKey: 'hotContracts',
       queryFn: homeHotContracts,
       refetchInterval: watcherTimeout,
-      enabled: network !== 'Mainnet',
+      enabled: isKVMAvailable(network),
     },
   ]);
 
@@ -183,13 +184,14 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     mostTransactedNFTs: mostTransactedNFTs.data || [],
     mostTransactedKDAFee: mostTransactedKDAFee.data || [],
     epoch: aggregateResult.data?.overview?.epochNumber,
-    hotContracts:
-      network !== 'Mainnet' ? hotContracts.data?.hotContracts || [] : [],
+    hotContracts: isKVMAvailable(network)
+      ? hotContracts.data?.hotContracts || []
+      : [],
     loadingMostTransacted:
       mostTransactedTokens.isLoading ||
       mostTransactedNFTs.isLoading ||
       mostTransactedKDAFee.isLoading ||
-      (network !== 'Mainnet' ? hotContracts.isLoading : false),
+      (isKVMAvailable(network) ? hotContracts.isLoading : false),
   };
 
   prevValuesRef.current = {

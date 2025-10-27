@@ -38,6 +38,7 @@ import { useMobile } from '@/contexts/mobile';
 import { timestampToDate } from '@/utils/timeFunctions';
 import { getNetwork } from '@/utils/networkFunctions';
 import Link from 'next/link';
+import { isKVMAvailable } from '@/utils/kvm';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();

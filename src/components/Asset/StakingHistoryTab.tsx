@@ -228,7 +228,7 @@ const FPRHistory: React.FC<PropsWithChildren<FPRHistoryProps>> = ({
         >
           <strong>
             {t('common:Buttons.Show', {
-              type: `${t('common:Tabs.More').toLowerCase()}`,
+              type: `${t('common:Tabs.More')?.toLowerCase()}`,
             })}
           </strong>
         </StakingHistoryFooter>

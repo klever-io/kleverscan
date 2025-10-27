@@ -15,7 +15,7 @@ export const UrisTab: React.FC<PropsWithChildren<AssetProps>> = ({ asset }) => {
               </span>
               <div>
                 {(() => {
-                  const formattedUri = value.toLowerCase().startsWith('http')
+                  const formattedUri = value?.toLowerCase().startsWith('http')
                     ? value
                     : `https://${value}`;
                   return (

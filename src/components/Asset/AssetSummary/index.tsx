@@ -70,7 +70,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
     const matchingSocials = Object.entries(asset?.uris || {})
       .map(([key, value]) => {
         const matchingSocial = availableSocialNetworks.filter(social => {
-          return value.toLowerCase().includes(social.toLocaleLowerCase());
+          return value?.toLowerCase().includes(social?.toLocaleLowerCase());
         });
 
         return !!matchingSocial.length

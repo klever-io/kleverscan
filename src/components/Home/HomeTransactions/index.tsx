@@ -194,7 +194,9 @@ export const homeTransactionsTabletRowSections = (
         <DoubleRow {...props} key={hash}>
           <CenteredRow>
             <TimestampInfo>
-              {formatDate(timestamp || Date.now(), true)}
+              {formatDate(timestamp || Date.now(), {
+                showElapsedTime: true,
+              })}
             </TimestampInfo>
             <Status status={status?.toLowerCase()}>
               {capitalizeString(status)}

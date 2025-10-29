@@ -409,7 +409,7 @@ const getAssetsList = (
   assetTriggerType: number | null,
   withdrawType: number | null,
   ownerAddress: string,
-  type?: 'token' | 'NFT',
+  type?: 'token' | 'NFT' | 'SFT',
 ): any[] => {
   if (type === 'NFT') {
     return assets.filter((value: ICollectionList) => {
@@ -417,7 +417,11 @@ const getAssetsList = (
     });
   } else if (type === 'token') {
     return assets.filter((value: ICollectionList) => {
-      return !value.isNFT;
+      return !value.isFungible;
+    });
+  } else if (type === 'SFT') {
+    return assets.filter((value: ICollectionList) => {
+      return !value.isNFT && !value.isFungible;
     });
   }
 

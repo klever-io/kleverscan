@@ -206,11 +206,15 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         } as unknown as IAccount);
 
     const { assets, frozenBalance, balance } = accountData;
+    const parsedAssets: string = Array.from(
+      new Set(Object.keys(assets).map(assetId => assetId.split('/')[0])),
+    ).join(',');
+
     const list: ICollectionList[] = [];
     const assetInfo: IAssetsResponse = await api.get({
       route: `assets/list`,
       query: {
-        asset: Object.keys(assets).join(','),
+        asset: parsedAssets,
         limit: 10000,
       },
     });

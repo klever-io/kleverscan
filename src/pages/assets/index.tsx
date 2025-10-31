@@ -66,7 +66,7 @@ const AssetsFilters: React.FC<PropsWithChildren> = () => {
     },
     {
       title: `${t('common:Buttons.Asset Type')}`,
-      data: [`Fungible`, `NonFungible`],
+      data: [`Fungible`, `NonFungible`, `SemiFungible`],
       onClick: value => handleSelected(value, 'type'),
       inputType: 'button',
       current: (router.query.type as string) || undefined,

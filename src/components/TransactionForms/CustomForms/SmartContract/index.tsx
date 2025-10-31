@@ -58,7 +58,7 @@ const parseFunctionArguments = (
   data: FormData,
   setMetadata: any,
   abi: ABIMap | null,
-  scType: number,
+  scType: number | string,
   metadata: string,
 ) => {
   const { arguments: args } = data;
@@ -320,7 +320,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
   );
   const network = getNetwork();
 
-  const scType = watch('scType');
+  const scType: number | string = watch('scType') as number | string;
 
   useDidUpdateEffect(() => {
     setMetadata('');
@@ -402,6 +402,8 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
     required: true,
   };
 
+  const hasSCType = scType !== undefined && scType !== '';
+
   if (hasFunctions)
     formInputProps['options'] =
       functions &&
@@ -425,87 +427,95 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
           required
           disableCustom
         />
-
-        {showAddressCondition && (
-          <FormInput
-            name="address"
-            span={2}
-            title={scType !== 1 ? 'Contract Address' : 'Contract Owner Address'}
-            tooltip={scType !== 1 ? tooltip.address : tooltip.deployAddress}
-            required
-          />
-        )}
-
-        {scType !== 0 && (
-          <FormInput
-            title="Contract Binary"
-            type="file"
-            accept=".wasm"
-            onChange={(e: any) => {
-              const reader = new FileReader();
-              reader.onload = (e: any) => {
-                const fileBytes = e.target.result;
-
-                const hex = Buffer.from(fileBytes).toString('hex');
-
-                const propertiesHex = parseInt(propertiesString, 2)
-                  .toString(16)
-                  .padStart(4, '0');
-                if (scType === 1) {
-                  setMetadata(hex + '@0500@' + propertiesHex);
-                } else {
-                  setMetadata(hex + '@' + propertiesHex);
+        {hasSCType && (
+          <>
+            {showAddressCondition && (
+              <FormInput
+                name="address"
+                span={2}
+                title={
+                  scType !== 1 ? 'Contract Address' : 'Contract Owner Address'
                 }
-                setFileData(hex);
-              };
-              reader.readAsArrayBuffer(e.target.files[0]);
-            }}
-            onClick={(e: any) => {
-              e.target.value = '';
-            }}
-            required
-            span={2}
-            tooltip={tooltip.data}
-          />
-        )}
-        {scType !== 0 && fileData?.length > 0 && (
-          <PropertiesSection
-            propertiesString={propertiesString}
-            setPropertiesString={setPropertiesString}
-          />
-        )}
-        {showAbiAndArgumentsCondition && (
-          <FormInput
-            title="Contract ABI"
-            type="file"
-            accept=".json"
-            span={2}
-            tooltip={tooltip.abi}
-            onChange={handleImportAbi}
-            onClick={(e: any) => {
-              setAbi(null);
-              e.target.value = '';
-            }}
-          />
-        )}
-        {scType === 0 && <FormInput {...formInputProps} />}
-        {showAbiAndArgumentsCondition && (
-          <ArgumentsSection
-            arguments={
-              scType === 1
-                ? abi?.construct?.arguments || undefined
-                : func?.arguments || undefined
-            }
-            types={abi?.types}
-            handleInputChange={handleInputChange}
-          />
-        )}
-        {callValuesCondition && (
-          <CallValueSection
-            allowedAssets={
-              scType === 1 ? abi?.construct?.allowedAssets : func?.allowedAssets
-            }
-          />
+                tooltip={scType !== 1 ? tooltip.address : tooltip.deployAddress}
+                required
+              />
+            )}
+
+            {scType !== 0 && (
+              <FormInput
+                title="Contract Binary"
+                type="file"
+                accept=".wasm"
+                onChange={(e: any) => {
+                  const reader = new FileReader();
+                  reader.onload = (e: any) => {
+                    const fileBytes = e.target.result;
+
+                    const hex = Buffer.from(fileBytes).toString('hex');
+
+                    const propertiesHex = parseInt(propertiesString, 2)
+                      .toString(16)
+                      .padStart(4, '0');
+                    if (scType === 1) {
+                      setMetadata(hex + '@0500@' + propertiesHex);
+                    } else {
+                      setMetadata(hex + '@' + propertiesHex);
+                    }
+                    setFileData(hex);
+                  };
+                  reader.readAsArrayBuffer(e.target.files[0]);
+                }}
+                onClick={(e: any) => {
+                  e.target.value = '';
+                }}
+                required
+                span={2}
+                tooltip={tooltip.data}
+              />
+            )}
+            {scType !== 0 && fileData?.length > 0 && (
+              <PropertiesSection
+                propertiesString={propertiesString}
+                setPropertiesString={setPropertiesString}
+              />
+            )}
+            {showAbiAndArgumentsCondition && (
+              <FormInput
+                title="Contract ABI"
+                type="file"
+                accept=".json"
+                span={2}
+                tooltip={tooltip.abi}
+                onChange={handleImportAbi}
+                onClick={(e: any) => {
+                  setAbi(null);
+                  e.target.value = '';
+                }}
+              />
+            )}
+            {scType === 0 && <FormInput {...formInputProps} />}
+            {showAbiAndArgumentsCondition && (
+              <ArgumentsSection
+                arguments={
+                  scType === 1
+                    ? abi?.construct?.arguments || undefined
+                    : func?.arguments || undefined
+                }
+                types={abi?.types}
+                handleInputChange={handleInputChange}
+                hasAbi={abi !== null}
+              />
+            )}
+            {callValuesCondition && (
+              <CallValueSection
+                allowedAssets={
+                  scType === 1
+                    ? abi?.construct?.allowedAssets
+                    : func?.allowedAssets
+                }
+              />
+            )}
+          </>
         )}
       </FormSection>
     </FormBody>

@@ -30,6 +30,7 @@ interface IArguments {
   arguments?: ABIFunctionArguments;
   types?: Record<string, ABIType>;
   handleInputChange: (e: React.FocusEvent<HTMLInputElement>) => void;
+  hasAbi?: boolean;
 }
 
 const getInitialValue = (
@@ -69,6 +70,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
   arguments: args,
   types,
   handleInputChange,
+  hasAbi = false,
 }) => {
   const [isVariadic, setIsVariadic] = useState(false);
   const [argument, setArgument] = useState({});
@@ -139,14 +141,18 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
 
         const inputType = field.type === 'enum' ? 'dropdown' : field.type;
 
+        const canDelete = !hasAbi || field.type === 'variadic';
+
         return (
           <FormSection key={field.id} inner>
             <SectionTitle>
-              <HiTrash
-                onClick={() =>
-                  removeWrapper({ index, remove, getValues, router })
-                }
-              />
+              {canDelete && (
+                <HiTrash
+                  onClick={() =>
+                    removeWrapper({ index, remove, getValues, router })
+                  }
+                />
+              )}
               Argument {index + 1}
             </SectionTitle>
             <FormInput
@@ -173,12 +179,14 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
         <SelectContainer>
           <ReactSelect
             classNamePrefix="react-select"
-            onInputChange={(newValue: any) => {
-              append({
-                type: utils.getJSType(newValue?.value || ''),
-                raw_type: newValue?.value || '',
-                value: getInitialValue(newValue?.value || '', types),
-              });
+            onChange={(newValue: any) => {
+              if (newValue?.value) {
+                append({
+                  type: utils.getJSType(newValue.value),
+                  raw_type: newValue.value,
+                  value: getInitialValue(newValue.value, types),
+                });
+              }
             }}
             value={null}
             options={RUST_TYPES_WITH_OPTION.map(type => ({

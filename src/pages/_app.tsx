@@ -19,8 +19,6 @@ import Maintenance from '@/components/Maintenance';
 //add window methods to global scope
 declare global {
   interface Window {
-    kleverWeb: any;
-    kleverHub: any;
     Canny: any;
     attachEvent: any;
   }
@@ -39,7 +37,7 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.kleverWeb?.isKlever) {
+    if (typeof window !== 'undefined' && window.kleverWeb) {
       gtag.hasExtensionWalletAccess(true);
     }
   }, []);

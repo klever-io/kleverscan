@@ -142,7 +142,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
           payload: parsedPayload,
         },
       ]);
-      const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
+      const signedTx = await web.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
       if (setTxHash) setTxHash(response.data.txsHashes[0]);
       toast.success(t('itos:successBroadcastTxToast'));

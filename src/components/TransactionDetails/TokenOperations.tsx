@@ -7,15 +7,58 @@ import { ButtonExpand } from '@/views/transactions/detail';
 import { parseAddress } from '@/utils/parseValues';
 import { BalanceContainer } from '@/views/accounts/detail';
 import Copy from '../Copy';
+import { isValidContractAddress } from '@klever/connect';
+import { useQuery } from 'react-query';
+import api from '@/services/api';
 
 interface Props {
   receipts: any[];
 }
 
+interface ContractNameDisplayProps {
+  address: string;
+  displayName: string;
+}
+
+const ContractNameDisplay: React.FC<ContractNameDisplayProps> = ({
+  address,
+  displayName,
+}) => {
+  const isContract = isValidContractAddress(address);
+
+  const { data: contractData } = useQuery(
+    ['smartContract', address],
+    async () => {
+      if (!isContract) return null;
+      const res = await api.get({
+        route: `sc/${address}`,
+      });
+      if (!res.error && res.data?.sc) {
+        return res.data.sc;
+      }
+      return null;
+    },
+    {
+      enabled: isContract,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: false,
+    },
+  );
+
+  const contractName = contractData?.name;
+
+  return (
+    <Link
+      href={isContract ? `/smart-contract/${address}` : `/account/${address}`}
+    >
+      {contractName || displayName}
+    </Link>
+  );
+};
+
 const copyStyle = {
   padding: '0',
-  marginLeft: '0.5rem',
-  marginRight: '1rem',
+  marginRight: '0.25rem',
   border: 'none',
 };
 
@@ -24,7 +67,6 @@ const TokenOperations: React.FC<Props> = ({ receipts }) => {
 
   if (!receipts || receipts.length === 0) return null;
 
-  // receipts coming from node are often typeString === 'Transfer' for most value ops
   const operations = receipts.filter((r: any) =>
     ['Transfer'].includes(r.typeString),
   );
@@ -53,7 +95,7 @@ const TokenOperations: React.FC<Props> = ({ receipts }) => {
   return (
     <Row>
       <span>
-        <strong>Tx</strong>
+        <strong>Token Transfers</strong>
       </span>
       <RowContent>
         <BalanceContainer>
@@ -65,8 +107,7 @@ const TokenOperations: React.FC<Props> = ({ receipts }) => {
                   op.assetId.split('/')[0]) ||
                 'KLV';
               const prec = (precisions && (precisions as any)[assetId]) || 0;
-              const rawAmount =
-                Number(op.value ?? op.amount ?? op.amountDelegated ?? 0) || 0;
+              const rawAmount = Number(op.value ?? 0);
               const amount = toLocaleFixed(rawAmount / 10 ** prec, prec);
 
               // Determine whether this transfer is a mint or burn by convention
@@ -80,35 +121,36 @@ const TokenOperations: React.FC<Props> = ({ receipts }) => {
                   <FlexSpan>
                     {isMint ? (
                       <>
-                        Mint to
-                        <Link href={`/account/${to}`}>
-                          {parseAddress(to, 16)}
-                        </Link>{' '}
-                        <Copy data={to} info="Address" style={copyStyle} />
+                        Mint to{' '}
+                        <ContractNameDisplay
+                          address={to}
+                          displayName={parseAddress(to, 16)}
+                        />{' '}
                       </>
                     ) : isBurn ? (
                       <>
                         Burn from{' '}
-                        <Link href={`/account/${from}`}>
-                          {parseAddress(from, 16)}
-                        </Link>
-                        <Copy data={from} info="Address" style={copyStyle} />
+                        <ContractNameDisplay
+                          address={from}
+                          displayName={parseAddress(from, 16)}
+                        />
                       </>
                     ) : (
                       <>
                         Transfer from{' '}
-                        <Link href={`/account/${from}`}>
-                          {parseAddress(from, 16)}
-                        </Link>{' '}
+                        <ContractNameDisplay
+                          address={from}
+                          displayName={parseAddress(from, 16)}
+                        />{' '}
                         to{' '}
-                        <Link href={`/account/${to}`}>
-                          {parseAddress(to, 16)}
-                        </Link>{' '}
+                        <ContractNameDisplay
+                          address={to}
+                          displayName={parseAddress(to, 16)}
+                        />{' '}
                       </>
                     )}
                     {amount}
                     <Link href={`/asset/${assetId}`}>{assetId}</Link>
-                    <Copy data={assetId} info="Asset ID" style={copyStyle} />
                   </FlexSpan>
                 </div>
               );

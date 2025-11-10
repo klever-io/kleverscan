@@ -232,7 +232,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
         },
       ]);
 
-      const signedTx = await window.kleverWeb.signTransaction(voteTransaction);
+      const signedTx = await web.signTransaction(voteTransaction);
       const response = await web.broadcastTransactions([signedTx]);
 
       setTxHash(response.data.txsHashes[0]);

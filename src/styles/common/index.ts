@@ -453,6 +453,7 @@ export const DefaultScrollBar = css`
 
 export const FlexSpan = styled.span`
   display: flex;
+  flex-wrap: wrap;
   gap: 0.3rem;
   align-items: center;
 `;

@@ -62,11 +62,9 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
     if (typeof window !== 'undefined' && window.kleverWeb?.provider) {
       window.kleverWeb.provider = {
         api:
-          process.env.DEFAULT_API_HOST ||
-          'https://api.testnet.klever.org/v1.0',
+          process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.org/v1.0',
         node:
-          process.env.DEFAULT_NODE_HOST ||
-          'https://node.testnet.klever.org',
+          process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.org',
       };
     }
 
@@ -93,7 +91,7 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
           setExtensionLoading(false);
         }
       }
-      const address: string = await window.kleverWeb.getWalletAddress();
+      const address: string = await web.getWalletAddress();
       if (address.startsWith('klv') && address.length === 62) {
         setWalletAddress(address);
       } else {

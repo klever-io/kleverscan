@@ -1,7 +1,6 @@
 import { PropsWithChildren } from 'react';
 import {
   FormEncodingConverter,
-  FormPEMFileConverter,
   IPropsEncodingConverter,
 } from '@/components/Form/EncodingConverter';
 import Title from '@/components/Layout/Title';
@@ -77,8 +76,6 @@ const EncodingConverter: React.FC<PropsWithChildren> = () => {
           encoded: utf8ToHex,
         };
         return <FormEncodingConverter {...hexUtf8Props} />;
-      case `${t('PEM File')}  / ${t('Address')} - ${t('PrivateKey')} `:
-        return <FormPEMFileConverter />;
       case ` ${t('PublicKey')} / ${t('Address')}`:
         const publicKeyAddressPorps: IPropsEncodingConverter = {
           titleTextArea: {

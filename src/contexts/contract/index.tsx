@@ -445,9 +445,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         const senderAddress =
           senderAccount !== walletAddress ? senderAccount : walletAddress;
         if (signTxMultiSign.current) {
-          const signedTx = await window.kleverWeb.signTransaction(
-            unsignedTx.result,
-          );
+          const signedTx = await web.signTransaction(unsignedTx.result);
           const { RawData, Signature } = signedTx;
 
           parseMultisignTransaction = {
@@ -507,9 +505,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
           toast.success('Transaction built and signed');
         }
       } else {
-        const signedTx = await window.kleverWeb.signTransaction(
-          unsignedTx.result,
-        );
+        const signedTx = await web.signTransaction(unsignedTx.result);
         const response = await web.broadcastTransactions([signedTx]);
         if (response.error) {
           const messageError = response.error;

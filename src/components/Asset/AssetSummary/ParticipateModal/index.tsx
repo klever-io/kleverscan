@@ -1,44 +1,30 @@
-import { PropsWithChildren } from 'react';
 import FungibleITO, { isFloat } from '@/components/FungibleITO';
-import { StyledArrow } from '@/components/Layout/Title/styles';
-import AssetLogo from '@/components/Logo/AssetLogo';
-import { useExtension } from '@/contexts/extension';
-import { IParsedITO } from '@/types';
-import { IPackItem } from '@/types/contracts';
-import { getPrecision } from '@/utils/precisionFunctions';
-import { web } from '@klever/sdk-web';
-import { useTranslation } from 'next-i18next';
-import dynamic from 'next/dynamic';
-import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
-import {
-  ArrowContainer,
-  AssetName,
-  AssetVisualization,
-  Background,
-  BuyForm,
-  Container,
-  Content,
-  CurrencyTicker,
-  Fees,
-  Header,
-  Input,
-  InputContainer,
-  InputRow,
-  Label,
-  NFTSelectContainer,
-  NoNFungileContentHeader,
-  SelectContainer,
-  SubmitButton,
-  Title,
-  TitleContainer,
-} from './styles';
-import NonFungibleITO from '@/components/NonFungileITO';
 import {
   ItemsContainer,
   KeyLabel,
   PackContainer,
 } from '@/components/ITO/styles';
+import { StyledArrow } from '@/components/Layout/Title/styles';
+import NonFungibleITO from '@/components/NonFungileITO';
+import { useExtension } from '@/contexts/extension';
+import { IParsedITO } from '@/types';
+import { IPackItem } from '@/types/contracts';
+import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
+import {
+  ArrowContainer,
+  Background,
+  Container,
+  Content,
+  Header,
+  NoNFungileContentHeader,
+  SelectContainer,
+  Title,
+  TitleContainer,
+} from './styles';
+import { web } from '@klever/sdk-web';
 
 const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
@@ -298,14 +284,23 @@ export const ParticipateModal: React.FC<
     try {
       setLoading(true);
       setTxHash('');
-      const unsignedTx = await web.buildTransaction([
+      const unsignedTx = await web?.buildTransaction([
         {
           type: 17, // Buy Order type
           payload: payload,
         },
       ]);
-      const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
-      const response = await web.broadcastTransactions([signedTx]);
+      if (!unsignedTx) {
+        throw new Error('Transaction building failed.');
+      }
+      const signedTx = await web.signTransaction(unsignedTx);
+      if (!signedTx) {
+        throw new Error('Transaction signing was cancelled.');
+      }
+      const response = await web?.broadcastTransactions([signedTx]);
+      if (!response?.data?.txsHashes?.length) {
+        throw new Error('Transaction broadcasting failed.');
+      }
 
       setTxHash(response.data.txsHashes[0]);
       toast.success('Transaction successfully broadcasted.');

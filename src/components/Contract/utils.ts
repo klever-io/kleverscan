@@ -863,7 +863,7 @@ const buildTransaction = async (
   const txBody: ITxRequest = {
     type: fistContractType,
     nonce,
-    sender: options?.sender ?? window?.kleverWeb?.address,
+    sender: options?.sender ?? window?.kleverWeb?.address ?? '',
     data: txData || [],
     permID,
     contracts: payloads,

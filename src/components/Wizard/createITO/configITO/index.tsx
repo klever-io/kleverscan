@@ -236,7 +236,7 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
           payload: parseTransaction,
         },
       ]);
-      const signedTx = await window.kleverWeb.signTransaction(unsignedTx);
+      const signedTx = await web.signTransaction(unsignedTx);
       const response = await web.broadcastTransactions([signedTx]);
       setTxHash(response.data.txsHashes[0]);
       window.scrollTo(0, 0);

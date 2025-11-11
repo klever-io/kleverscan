@@ -53,7 +53,6 @@ export const displayITOpacks = (
                       currencyId={item.key}
                       selectedITO={ITO}
                       setTxHash={setTxHash}
-                      t={t}
                     />
                   );
                 })}

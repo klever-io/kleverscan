@@ -389,7 +389,6 @@ export const ParticipateModal: React.FC<
                           currencyId={item.key}
                           selectedITO={ITO}
                           setTxHash={setTxHash}
-                          t={t}
                         />
                       );
                     })}

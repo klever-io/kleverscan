@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { web } from '@klever/sdk-web';
-import { TFunction } from 'next-i18next';
+import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
@@ -15,7 +15,6 @@ interface INonFungible {
   currencyId: string;
   setTxHash?: (e: string) => any;
   showcase?: boolean;
-  t: TFunction;
 }
 
 const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
@@ -24,8 +23,9 @@ const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
   currencyId,
   setTxHash,
   showcase,
-  t,
 }) => {
+  const { t } = useTranslation('itos');
+
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -38,6 +38,7 @@ const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
       id: selectedITO.assetId,
       currencyId,
       amount: pack.amount,
+      currencyAmount: pack.rawPrice,
     };
 
     const parsedPayload = {

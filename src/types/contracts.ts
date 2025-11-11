@@ -412,6 +412,7 @@ export enum EnumITOStatus {
 export interface IPackItem {
   amount: number;
   price: number;
+  rawPrice?: number;
 }
 export interface IPackInfo {
   key: string;

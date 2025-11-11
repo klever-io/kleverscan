@@ -53,6 +53,7 @@ export const processITOPrecisions = async (
   ITO.packData.forEach(async packInfo => {
     const keyPrecision = await getPrecision(packInfo.key);
     packInfo.packs.forEach(pack => {
+      pack.rawPrice = pack.price;
       pack.price = pack.price / 10 ** keyPrecision;
       pack.amount = pack.amount / 10 ** assetPrecision;
     });

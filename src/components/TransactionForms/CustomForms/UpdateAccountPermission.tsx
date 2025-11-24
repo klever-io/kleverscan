@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
-import { contractsList } from '@/utils/contracts';
+import { contractsIndexMap, contractIndices } from '@/utils/contracts';
 import { setCharAt } from '@/utils/convertString';
 import { invertBytes } from '@/utils/formatFunctions';
 import React from 'react';
@@ -39,8 +39,10 @@ type FormData = {
   }[];
 };
 
-const binaryDefault = '0000000000000000000000000';
-const maxBinaryDefault = '1111111111111111111111111';
+const binaryDefault =
+  '0000000000000000000000000000000000000000000000000000000000000000';
+const maxBinaryDefault =
+  '1000000000000000000000000000000000000000011111111111111111111111';
 
 const parseBinaryToHex = (dataRef: FormData): FormData => {
   const data: FormData = JSON.parse(JSON.stringify(dataRef));
@@ -182,7 +184,8 @@ const PermissionsSection: React.FC<PropsWithChildren> = () => {
 
                     <span>All</span>
                   </CheckboxContract>
-                  {contractsList.map((item: any, contractIndex: number) => {
+                  {contractIndices.map((contractIndex: number) => {
+                    const item = contractsIndexMap[contractIndex];
                     return (
                       <CheckboxContract key={contractIndex}>
                         <Checkbox

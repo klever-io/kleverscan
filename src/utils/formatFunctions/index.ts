@@ -2,7 +2,7 @@ import { ISelectedDays } from '@/components/DateFilter';
 import { IFilterDater } from '@/types';
 import { bech32 } from 'bech32';
 import { format } from 'date-fns';
-import { contractsList } from '../contracts';
+import { contractsList, contractIndices } from '../contracts';
 import { getAge } from '../timeFunctions';
 import { TFunction } from 'i18next';
 
@@ -198,12 +198,14 @@ export const hexToBinary = (hex: string): string => {
 
 export const filterOperations = (filterString: string): boolean[] => {
   const reverseFilterString = filterString.split('').reverse().join('');
+  const maxIndex = 64;
   let paddedString: string = reverseFilterString;
-  if (paddedString.length !== contractsList.length) {
-    paddedString = reverseFilterString.padEnd(contractsList.length, '0');
+  if (paddedString.length !== maxIndex) {
+    paddedString = reverseFilterString.padEnd(maxIndex, '0');
   }
-  const filteredContracts = contractsList.map((_contract, index) => {
-    if (paddedString[index] === '1') {
+  const filteredContracts = contractsList.map((_contract, arrayIndex) => {
+    const actualIndex = contractIndices[arrayIndex];
+    if (paddedString[actualIndex] === '1') {
       return true;
     }
     return false;

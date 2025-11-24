@@ -28,7 +28,9 @@ const getRequest = (
   t: TFunction<[string, string], undefined>,
 ): ((page: number, limit: number) => Promise<IResponse | []>) => {
   const address = router.query.account as string;
-  const assetType = router.query.assetType as string | undefined;
+  const rawAssetType = router.query.assetType as string | undefined;
+  const assetType =
+    rawAssetType && rawAssetType !== 'undefined' ? rawAssetType : undefined;
 
   switch (router.query.tab) {
     case t('common:Titles.Assets'):

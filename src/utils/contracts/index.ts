@@ -313,33 +313,43 @@ export const contractTypes = (contracts: IContract[]): string => {
   return contracts.length > 1 ? 'Multi contract' : contracts[0].typeString;
 };
 
-export const contractsList = [
-  'Transfer',
-  'CreateAsset',
-  'Create Validator',
-  'Config Validator',
-  'Freeze',
-  'Unfreeze',
-  'Delegate',
-  'Undelegate',
-  'Withdraw',
-  'Claim',
-  'Unjail',
-  'Asset Trigger',
-  'Set Account Name',
-  'Proposal',
-  'Vote',
-  'Config ITO',
-  'Set ITO Prices',
-  'Buy',
-  'Sell',
-  'Cancel Market Order',
-  'Create Market',
-  'Config Marketplace',
-  'Update Account Permission',
-  'Deposit',
-  'ITO Trigger',
-];
+// Mapping of contract indices to their display names
+export const contractsIndexMap: Record<number, string> = {
+  0: 'Transfer',
+  1: 'CreateAsset',
+  2: 'Create Validator',
+  3: 'Config Validator',
+  4: 'Freeze',
+  5: 'Unfreeze',
+  6: 'Delegate',
+  7: 'Undelegate',
+  8: 'Withdraw',
+  9: 'Claim',
+  10: 'Unjail',
+  11: 'Asset Trigger',
+  12: 'Set Account Name',
+  13: 'Proposal',
+  14: 'Vote',
+  15: 'Config ITO',
+  16: 'Set ITO Prices',
+  17: 'Buy',
+  18: 'Sell',
+  19: 'Cancel Market Order',
+  20: 'Create Market',
+  21: 'Config Marketplace',
+  22: 'Update Account Permission',
+  23: 'Deposit',
+  24: 'ITO Trigger',
+  63: 'Smart Contract',
+};
+
+// Get all contract indices (for iteration in UI)
+export const contractIndices = Object.keys(contractsIndexMap).map(Number);
+
+// Legacy array format (for backward compatibility with existing code)
+export const contractsList = contractIndices.map(
+  index => contractsIndexMap[index],
+);
 
 export const paramContractMap = {
   TransferContract: 'KAppFeeTransfer',

@@ -120,7 +120,6 @@ export interface ReducedContract {
   [22]?: number;
   [23]?: number;
   [24]?: number;
-  [25]?: number;
   [63]?: number;
 }
 

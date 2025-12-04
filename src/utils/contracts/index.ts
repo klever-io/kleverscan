@@ -135,10 +135,11 @@ export const contractOptions: IContractOption[] = [
     label: 'ITO Trigger',
     value: 'ITOTriggerContract',
   },
-  {
-    label: 'Update Account Permission',
-    value: 'UpdateAccountPermissionContract',
-  },
+  // TODO: Temporarily disabled due issue report - re-enable after analysis
+  // {
+  //   label: 'Update Account Permission',
+  //   value: 'UpdateAccountPermissionContract',
+  // },
   {
     label: 'Smart Contract',
     value: 'SmartContract',

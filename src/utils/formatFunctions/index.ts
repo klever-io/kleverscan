@@ -191,7 +191,7 @@ export const hexToBinary = (hex: string): string => {
   if (!isHex(hex)) {
     return '';
   }
-  const binary = parseInt(hex, 16).toString(2);
+  const binary = BigInt('0x' + hex).toString(2);
 
   return binary.padStart(hex.length * 4, '0');
 };

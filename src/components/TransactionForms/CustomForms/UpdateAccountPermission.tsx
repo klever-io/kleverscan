@@ -54,7 +54,7 @@ const parseBinaryToHex = (dataRef: FormData): FormData => {
     }
     const binaryOperations =
       data.permissions[index].binaryOperations || binaryDefault;
-    const hex = Number(`0b${binaryOperations}`).toString(16);
+    const hex = BigInt(`0b${binaryOperations}`).toString(16);
     let paddedHex = hex;
     if (paddedHex.length % 2 !== 0) {
       paddedHex = '0' + paddedHex;

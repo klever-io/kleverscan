@@ -261,11 +261,11 @@ describe('Permission Utils', () => {
 
       expect(binaryOperations.length).toBe(64);
 
-      // Expected hex values:
-      // Big-endian: 0x800000000006DD (bit 63 + bits 0,2,3,4,6,7,9,10 = 0x6DD)
+      // Expected hex values (16 hex chars for 64-bit binary):
+      // Big-endian: 0x80000000000006DD (bit 63 + bits 0,2,3,4,6,7,9,10 = 0x6DD)
       // Little-endian (with inversion): dd06000000000080
       const expectedHexWithInversion = 'dd06000000000080';
-      const expectedHexWithoutInversion = '800000000006dd';
+      const expectedHexWithoutInversion = '80000000000006dd';
 
       // Test encoding
       const hexWithInversion = binaryOperationsToHex(binaryOperations, true);

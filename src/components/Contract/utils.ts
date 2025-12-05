@@ -1,6 +1,7 @@
 import { IPackItem } from '@/types/contracts';
 import { ICollectionList } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import { binaryToHex } from '@/utils/permissions';
 import { getPrecision } from '@/utils/precisionFunctions';
 import {
   IAssetTrigger,
@@ -665,13 +666,10 @@ const parseValues = (
     parsedValues.proposalId = proposalId;
   } else if (contractType === 'UpdateAccountPermissionContract') {
     if (parsedValues.permissions?.length > 0) {
-      parsedValues.permissions.forEach((item: any, index: number) => {
-        const hex = Number(`0b${binaryOperations[index]}`).toString(16);
-        let newHex = hex;
-        if (newHex.length % 2 !== 0) {
-          newHex = '0' + newHex;
-        }
-        parsedValues.permissions[index].operations = newHex;
+      parsedValues.permissions.forEach((_item: any, index: number) => {
+        parsedValues.permissions[index].operations = binaryToHex(
+          binaryOperations[index],
+        );
       });
     }
   }

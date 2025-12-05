@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 import { useContract } from '@/contexts/contract';
 import { contractsIndexMap, contractIndices } from '@/utils/contracts';
 import { setCharAt } from '@/utils/convertString';
-import { invertBytes } from '@/utils/formatFunctions';
+import { binaryOperationsToHex } from '@/utils/permissions';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
@@ -54,13 +54,8 @@ const parseBinaryToHex = (dataRef: FormData): FormData => {
     }
     const binaryOperations =
       data.permissions[index].binaryOperations || binaryDefault;
-    const hex = BigInt(`0b${binaryOperations}`).toString(16);
-    let paddedHex = hex;
-    if (paddedHex.length % 2 !== 0) {
-      paddedHex = '0' + paddedHex;
-    }
-    const byteInvertedHex = invertBytes(paddedHex);
-    data.permissions[index].operations = byteInvertedHex;
+    data.permissions[index].operations =
+      binaryOperationsToHex(binaryOperations);
     delete permission.binaryOperations;
   });
 

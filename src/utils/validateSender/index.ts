@@ -1,6 +1,4 @@
-import { ContractsIndex } from '@/types/contracts';
 import { IKAppTransferReceipt, ITransferReceipt } from '@/types/receipts';
-import { contractsList } from '../contracts';
 
 export const receiverIsSender = (
   sender: string,
@@ -33,20 +31,4 @@ export const isDataEmpty = (data: string[]): boolean => {
   }
 
   return true;
-};
-
-export const calculatePermissionOperations = (
-  operations: string,
-): typeof contractsList => {
-  const stringContracts: typeof contractsList = [];
-  if (typeof operations === 'string' && operations.match(/^[0-9A-Fa-f]+$/g)) {
-    const binaryOperations = parseInt(operations, 16).toString(2);
-    const reversedBinaryOperationsArray = binaryOperations.split('').reverse();
-    reversedBinaryOperationsArray.forEach((char, index) => {
-      if (char === '1') {
-        stringContracts.push(ContractsIndex[index]);
-      }
-    });
-  }
-  return stringContracts;
 };

@@ -70,10 +70,7 @@ import {
   usePrecision,
 } from '@/utils/hooks';
 import { getProposalNetworkParams } from '@/utils/networkFunctions';
-import {
-  calculatePermissionOperations,
-  renderCorrectPath,
-} from '@/utils/validateSender';
+import { renderCorrectPath } from '@/utils/validateSender';
 import { BalanceContainer } from '@/views/accounts/detail';
 import { ExpandWrapper } from '@/views/assets/detail';
 import { BigSpan, NetworkParamsContainer } from '@/views/proposals/detail';
@@ -2409,7 +2406,6 @@ export const UpdateAccountPermission: React.FC<
 > = ({ parameter: par, renderMetadata }) => {
   const parameter = par as IUpdateAccountPermissionContract;
   const permission = parameter?.permissions[0];
-  const operations = calculatePermissionOperations(permission?.operations);
   const signers = permission?.signers || [];
 
   return (

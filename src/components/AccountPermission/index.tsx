@@ -7,12 +7,8 @@ import {
   ValidOperation,
 } from './styles';
 import { useTranslation } from 'next-i18next';
-import {
-  filterOperations,
-  hexToBinary,
-  invertBytes,
-} from '@/utils/formatFunctions';
 import { contractsList } from '@/utils/contracts';
+import { getContractStates } from '@/utils/permissions';
 
 interface IPermissionOperations {
   id: number;
@@ -36,10 +32,8 @@ export const PermissionOperations: React.FC<
     <OperationsContainer>
       {operations ? (
         displayOperations.map((item: string, key: number) => {
-          const filterResults = filterOperations(
-            hexToBinary(invertBytes(operations)),
-          );
-          const isChecked = filterResults[key];
+          const contractStates = getContractStates(operations);
+          const isChecked = contractStates[key];
           return (
             <OperationsContent key={contractsList[key]} isChecked={isChecked}>
               {isChecked ? (

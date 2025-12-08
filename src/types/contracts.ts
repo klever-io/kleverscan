@@ -94,6 +94,47 @@ export enum ContractsIndex {
   'Smart Contract' = 63,
 }
 
+/**
+ * Contract index to name mapping.
+ * Single source of truth for contract type indices and their display names.
+ */
+export const contractsIndexMap: Record<number, string> = {
+  0: 'Transfer',
+  1: 'Create Asset',
+  2: 'Create Validator',
+  3: 'Config Validator',
+  4: 'Freeze',
+  5: 'Unfreeze',
+  6: 'Delegate',
+  7: 'Undelegate',
+  8: 'Withdraw',
+  9: 'Claim',
+  10: 'Unjail',
+  11: 'Asset Trigger',
+  12: 'Set Account Name',
+  13: 'Proposal',
+  14: 'Vote',
+  15: 'Config ITO',
+  16: 'Set ITO',
+  17: 'Buy',
+  18: 'Sell',
+  19: 'Cancel Marketplace Order',
+  20: 'Create Marketplace',
+  21: 'Config Marketplace',
+  22: 'Update Account Permission',
+  23: 'Deposit',
+  24: 'ITO Trigger',
+  63: 'Smart Contract',
+};
+
+/** Array of all contract type indices */
+export const contractIndices = Object.keys(contractsIndexMap).map(Number);
+
+/** Array of all contract type names (parallel to contractIndices) */
+export const contractsList = contractIndices.map(
+  index => contractsIndexMap[index],
+);
+
 export interface ReducedContract {
   [0]?: number;
   [1]?: number;

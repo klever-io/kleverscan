@@ -2,7 +2,6 @@ import { ISelectedDays } from '@/components/DateFilter';
 import { IFilterDater } from '@/types';
 import { bech32 } from 'bech32';
 import { format } from 'date-fns';
-import { contractsList, contractIndices } from '../contracts';
 import { getAge } from '../timeFunctions';
 import { TFunction } from 'i18next';
 
@@ -177,41 +176,6 @@ export const base64ToHex = (str: string): string => {
     ).join('');
     return hexString;
   }
-};
-
-export const invertBytes = (hex: string): string => {
-  let newHex = '';
-  for (let i = 0; i < hex.length; i += 2) {
-    newHex = hex.slice(i, i + 2) + newHex;
-  }
-  return newHex;
-};
-
-export const hexToBinary = (hex: string): string => {
-  if (!isHex(hex)) {
-    return '';
-  }
-  const binary = parseInt(hex, 16).toString(2);
-
-  return binary.padStart(hex.length * 4, '0');
-};
-
-export const filterOperations = (filterString: string): boolean[] => {
-  const reverseFilterString = filterString.split('').reverse().join('');
-  const maxIndex = 64;
-  let paddedString: string = reverseFilterString;
-  if (paddedString.length !== maxIndex) {
-    paddedString = reverseFilterString.padEnd(maxIndex, '0');
-  }
-  const filteredContracts = contractsList.map((_contract, arrayIndex) => {
-    const actualIndex = contractIndices[arrayIndex];
-    if (paddedString[actualIndex] === '1') {
-      return true;
-    }
-    return false;
-  });
-
-  return filteredContracts;
 };
 
 export const utf8ToBase64 = (utf8String: string): string => {

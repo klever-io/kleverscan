@@ -87,7 +87,11 @@ const MostUsedApplications = () => {
                       <CardAddressLine>
                         {parseAddress(app.address, 15)}
 
-                        <Copy data={app.address || ''} svgSize={16} />
+                        <Copy
+                          data={app.address || ''}
+                          info="Address"
+                          svgSize={16}
+                        />
                       </CardAddressLine>
                     </CardContractName>
                   </CardContainer>

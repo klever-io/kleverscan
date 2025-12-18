@@ -84,18 +84,18 @@
     "@types/react-i18next": "^8.1.0",
     "@types/react-leaflet": "2.8.2",
     "@types/react-leaflet-markercluster": "3.0.0",
-    "@types/react-syntax-highlighter": "15.5.6",
+    "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
     "bech32": "^2.0.0",
     "cypress": "^15.8.1",
     "eslint": "^9.39.2",
-    "eslint-config-next": "^16.1.0",
+    "eslint-config-next": "^14.2.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-testing-library": "^6.2.0",
     "git-commit-msg-linter": "4.5.0",
     "husky": "8.0.1",
     "jest": "^30.2.0",
-    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-jsdom": "^30.0.0",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "3.0.1",
@@ -108,6 +108,7 @@
     "jackspeak": "^2.3.5",
     "cross-spawn": "^7.0.5",
     "form-data": "^2.5.4",
-    "d3-color": "^3.1.0"
+    "d3-color": "^3.1.0",
+    "glob": "^10.5.0"
   }
 }

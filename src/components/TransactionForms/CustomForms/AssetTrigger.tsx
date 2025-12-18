@@ -57,6 +57,7 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
   const triggerType = watch('triggerType');
 
   const { metadata, setMetadata, queue } = useMulticontract();
+  const { paramsList } = useNetworkParams();
 
   const collection = queue[formKey]?.collection;
 
@@ -107,18 +108,22 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
           collection,
           walletAddress,
           metadataProps,
+          paramsList,
         )}
     </FormBody>
   );
 };
 
-const getMintForm = (collection: ICollectionList, walletAddress: string) => {
+const getMintForm = (
+  collection: ICollectionList,
+  walletAddress: string,
+  paramsList: any,
+) => {
   const hasInternalId = collection.value?.split('/').length > 1;
   const { watch } = useFormContext();
   const watchCollectionAssetId = watch('collectionAssetId');
-  const { paramsList } = useNetworkParams();
   const maxNFTMintPerTx = Number(
-    paramsList?.find(param => param.parameterLabel === 'MaxNFTMintBatch')
+    paramsList?.find((param: any) => param.parameterLabel === 'MaxNFTMintBatch')
       ?.currentValue,
   );
 
@@ -241,10 +246,11 @@ const getAssetTriggerForm = (
   collection: ICollectionList,
   walletAddress: string,
   { metadata, setMetadata }: IMetadataOptions,
+  paramsList: any,
 ) => {
   switch (triggerType) {
     case 0:
-      return getMintForm(collection, walletAddress);
+      return getMintForm(collection, walletAddress, paramsList);
     case 1:
       return (
         <FormSection>

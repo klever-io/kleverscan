@@ -6,11 +6,11 @@ import { IParamList } from '@/types';
 import { createContext, useContext } from 'react';
 import { useQuery } from 'react-query';
 
-interface INetwokParamsProvider {
+interface INetworkParamsProvider {
   paramsList?: IParamList[];
 }
 
-export const NetworkParamsContext = createContext({} as INetwokParamsProvider);
+export const NetworkParamsContext = createContext({} as INetworkParamsProvider);
 
 export const NetworkParamsProvider: React.FC<PropsWithChildren> = ({
   children,
@@ -20,7 +20,7 @@ export const NetworkParamsProvider: React.FC<PropsWithChildren> = ({
     getParamsList,
   );
 
-  const values: INetwokParamsProvider = {
+  const values: INetworkParamsProvider = {
     paramsList,
   };
 
@@ -31,5 +31,5 @@ export const NetworkParamsProvider: React.FC<PropsWithChildren> = ({
   );
 };
 
-export const useNetworkParams = (): INetwokParamsProvider =>
+export const useNetworkParams = (): INetworkParamsProvider =>
   useContext(NetworkParamsContext);

@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import {
+  CardAddressLine,
   CardContainer,
   CardContractInfo,
   CardContractName,
@@ -19,6 +20,7 @@ import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
 import Image from 'next/legacy/image';
 import { useTheme } from '@/contexts/theme';
+import Copy from '@/components/Copy';
 
 const MostUsedApplications = () => {
   const { t } = useTranslation('smartContracts');
@@ -82,7 +84,15 @@ const MostUsedApplications = () => {
                         />
                       </LogoContainer>
                       <span>{app.name || '- -'}</span>
-                      <small>{parseAddress(app.ownerAddress, 15)}</small>
+                      <CardAddressLine>
+                        {parseAddress(app.address, 15)}
+
+                        <Copy
+                          data={app.address || ''}
+                          info="Address"
+                          svgSize={16}
+                        />
+                      </CardAddressLine>
                     </CardContractName>
                   </CardContainer>
                 </Link>

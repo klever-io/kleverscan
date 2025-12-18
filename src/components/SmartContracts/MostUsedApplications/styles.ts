@@ -123,6 +123,16 @@ export const CardContractName = styled.div`
   }
 `;
 
+export const CardAddressLine = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+`;
+
 export const LogoContainer = styled.div`
   display: flex;
   align-items: center;

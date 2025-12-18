@@ -14,7 +14,7 @@ interface ICopyProps {
   color?: string;
 }
 
-const IconContainer = styled.div`
+const IconContainer = styled.button`
   cursor: pointer;
   line-height: 0;
   svg {
@@ -32,7 +32,12 @@ const Copy: React.FC<PropsWithChildren<ICopyProps>> = ({
   svgSize = 24,
   color = '#7B7DB2',
 }) => {
-  const handleCopyInfo = async () => {
+  const handleCopyInfo = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     await clipboard.writeText(String(data));
 
     toast.info(`${info} copied to clipboard`, {

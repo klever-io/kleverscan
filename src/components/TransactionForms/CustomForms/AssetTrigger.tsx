@@ -1,9 +1,10 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useNetworkParams } from '@/contexts/contract/networkParams';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
-import { getNetwork } from '@/utils/networkFunctions';
 import { isKVMAvailable } from '@/utils/kvm';
+import { getNetwork } from '@/utils/networkFunctions';
 import { deepCopyObject } from '@/utils/objectFunctions';
 import { IAssetTrigger } from '@klever/sdk-web';
 import React, { PropsWithChildren, useEffect } from 'react';
@@ -27,7 +28,6 @@ import {
   parseURIs,
 } from './utils';
 import { assetTriggerTooltips as tooltip } from './utils/tooltips';
-import { useNetworkParams } from '@/contexts/contract/networkParams';
 
 export interface IMetadataOptions {
   metadata: string;
@@ -121,7 +121,7 @@ const MintForm: React.FC<{
   const watchCollectionAssetId = watch('collectionAssetId');
   const { paramsList } = useNetworkParams();
   const maxNFTMintPerTx = Number(
-    paramsList?.find((param: any) => param.parameterLabel === 'MaxNFTMintBatch')
+    paramsList?.find(param => param.parameterLabel === 'MaxNFTMintBatch')
       ?.currentValue,
   );
 

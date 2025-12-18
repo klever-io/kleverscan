@@ -60,7 +60,7 @@
     "react-loader-spinner": "^6.1.6",
     "react-query": "3.39.3",
     "react-select": "5.3.2",
-    "react-syntax-highlighter": "^16.1.0",
+    "react-syntax-highlighter": "15.5.0",
     "react-toastify": "^10.0.5",
     "react-tooltip": "^5.27.1",
     "recharts": "2.0.10",

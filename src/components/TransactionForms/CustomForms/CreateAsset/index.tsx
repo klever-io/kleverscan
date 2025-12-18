@@ -25,6 +25,7 @@ import { URIsSection } from './URIsSection';
 export interface ISectionProps {
   isNFT?: boolean;
   isFungible?: boolean;
+  isSFT?: boolean;
   precision?: number;
 }
 
@@ -80,7 +81,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IContractProps>> = ({
     await handleFormSubmit(dataCopy);
   };
 
-  const sectionProps = { isNFT, isFungible, precision };
+  const sectionProps = { isNFT, isFungible, isSFT, precision };
 
   return (
     <FormBody onSubmit={handleSubmit(onSubmit)} key={formKey}>
@@ -99,7 +100,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IContractProps>> = ({
       <RoyaltiesSection {...sectionProps} />
       {isFungible && <StakingSection />}
       <RolesSection />
-      <PropertiesSection />
+      <PropertiesSection {...sectionProps} />
     </FormBody>
   );
 };

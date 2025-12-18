@@ -27,6 +27,7 @@ import {
   parseURIs,
 } from './utils';
 import { assetTriggerTooltips as tooltip } from './utils/tooltips';
+import { useNetworkParams } from '@/contexts/contract/networkParams';
 
 export interface IMetadataOptions {
   metadata: string;
@@ -115,6 +116,11 @@ const getMintForm = (collection: ICollectionList, walletAddress: string) => {
   const hasInternalId = collection.value?.split('/').length > 1;
   const { watch } = useFormContext();
   const watchCollectionAssetId = watch('collectionAssetId');
+  const { paramsList } = useNetworkParams();
+  const maxNFTMintPerTx = Number(
+    paramsList?.find(param => param.parameterLabel === 'MaxNFTMintBatch')
+      ?.currentValue,
+  );
 
   return (
     <FormSection>
@@ -125,7 +131,14 @@ const getMintForm = (collection: ICollectionList, walletAddress: string) => {
         dynamicInitialValue={walletAddress}
         tooltip={tooltip.receiver}
       />
-      <FormInput name="amount" title="Amount" type="number" required />
+      <FormInput
+        name="amount"
+        title="Amount"
+        type="number"
+        max={!collection.isFungible ? maxNFTMintPerTx : undefined}
+        precision={collection.precision}
+        required
+      />
       {!collection.isNFT &&
       !collection.isFungible &&
       !hasInternalId &&

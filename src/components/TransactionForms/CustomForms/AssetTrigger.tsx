@@ -1,9 +1,10 @@
 import { useMulticontract } from '@/contexts/contract/multicontract';
+import { useNetworkParams } from '@/contexts/contract/networkParams';
 import { useExtension } from '@/contexts/extension';
 import { ICollectionList } from '@/types';
 import { assetTriggerTypes } from '@/utils/contracts';
-import { getNetwork } from '@/utils/networkFunctions';
 import { isKVMAvailable } from '@/utils/kvm';
+import { getNetwork } from '@/utils/networkFunctions';
 import { deepCopyObject } from '@/utils/objectFunctions';
 import { IAssetTrigger } from '@klever/sdk-web';
 import React, { PropsWithChildren, useEffect } from 'react';
@@ -111,10 +112,18 @@ const AssetTrigger: React.FC<PropsWithChildren<IContractProps>> = ({
   );
 };
 
-const getMintForm = (collection: ICollectionList, walletAddress: string) => {
+const MintForm: React.FC<{
+  collection: ICollectionList;
+  walletAddress: string;
+}> = ({ collection, walletAddress }) => {
   const hasInternalId = collection.value?.split('/').length > 1;
   const { watch } = useFormContext();
   const watchCollectionAssetId = watch('collectionAssetId');
+  const { paramsList } = useNetworkParams();
+  const maxNFTMintPerTx = Number(
+    paramsList?.find(param => param.parameterLabel === 'MaxNFTMintBatch')
+      ?.currentValue,
+  );
 
   return (
     <FormSection>
@@ -125,7 +134,14 @@ const getMintForm = (collection: ICollectionList, walletAddress: string) => {
         dynamicInitialValue={walletAddress}
         tooltip={tooltip.receiver}
       />
-      <FormInput name="amount" title="Amount" type="number" required />
+      <FormInput
+        name="amount"
+        title="Amount"
+        type="number"
+        max={!collection.isFungible ? maxNFTMintPerTx : undefined}
+        precision={collection.precision}
+        required
+      />
       {!collection.isNFT &&
       !collection.isFungible &&
       !hasInternalId &&
@@ -231,7 +247,7 @@ const getAssetTriggerForm = (
 ) => {
   switch (triggerType) {
     case 0:
-      return getMintForm(collection, walletAddress);
+      return <MintForm collection={collection} walletAddress={walletAddress} />;
     case 1:
       return (
         <FormSection>

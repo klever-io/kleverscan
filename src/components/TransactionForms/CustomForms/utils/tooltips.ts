@@ -68,6 +68,7 @@ export const assetsTooltip = {
       'Burn the tokens from a suspicious account and send them back to owner',
     canPause: 'Stop transactions',
     canMint: 'Create new tokens using a mint process',
+    canMintRequired: ' (Required for NFT and SFT assets)',
     canBurn: 'Eliminate part of the token circulation',
     canChangeOwner: 'Gives the option of changing the asset owner',
     canAddRoles:

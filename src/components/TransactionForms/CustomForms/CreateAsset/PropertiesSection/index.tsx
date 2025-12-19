@@ -10,8 +10,13 @@ import {
   TooltipContent,
 } from '../../../FormInput/styles';
 import { assetsTooltip as tooltip } from '../../utils/tooltips';
+import { ISectionProps } from '../index';
 
-export const PropertiesSection: React.FC<PropsWithChildren> = () => {
+export const PropertiesSection: React.FC<PropsWithChildren<ISectionProps>> = ({
+  isNFT,
+  isSFT,
+}) => {
+  const requireMint = isNFT || isSFT;
   return (
     <FormSection>
       <SectionTitle>
@@ -54,7 +59,11 @@ export const PropertiesSection: React.FC<PropsWithChildren> = () => {
         type="checkbox"
         toggleOptions={['No', 'Yes']}
         dynamicInitialValue={true}
-        tooltip={tooltip.properties.canMint}
+        tooltip={
+          tooltip.properties.canMint +
+          (requireMint ? tooltip.properties.canMintRequired : '')
+        }
+        disabled={requireMint}
       />
       <FormInput
         name="properties.canBurn"

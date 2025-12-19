@@ -13,6 +13,7 @@ import { InternalThemeProvider } from '@/contexts/theme';
 import { GetServerSideProps } from 'next';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ToastContainer } from 'react-toastify';
+import { NetworkParamsProvider } from '@/contexts/contract/networkParams';
 
 const ContextProviders: React.FC<PropsWithChildren> = ({ children }) => {
   const queryClient = new QueryClient({
@@ -29,19 +30,21 @@ const ContextProviders: React.FC<PropsWithChildren> = ({ children }) => {
       <MobileProvider>
         <ExtensionProvider>
           <ModalsProvider>
-            <FeesProvider>
-              <MulticontractProvider>
-                <ContractProvider>
-                  <InputSearchProvider>
-                    <ParticipateProvider>
-                      <ContractModalProvider>
-                        <WizardProvider>{children}</WizardProvider>
-                      </ContractModalProvider>
-                    </ParticipateProvider>
-                  </InputSearchProvider>
-                </ContractProvider>
-              </MulticontractProvider>
-            </FeesProvider>
+            <NetworkParamsProvider>
+              <FeesProvider>
+                <MulticontractProvider>
+                  <ContractProvider>
+                    <InputSearchProvider>
+                      <ParticipateProvider>
+                        <ContractModalProvider>
+                          <WizardProvider>{children}</WizardProvider>
+                        </ContractModalProvider>
+                      </ParticipateProvider>
+                    </InputSearchProvider>
+                  </ContractProvider>
+                </MulticontractProvider>
+              </FeesProvider>
+            </NetworkParamsProvider>
           </ModalsProvider>
         </ExtensionProvider>
       </MobileProvider>

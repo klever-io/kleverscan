@@ -4,6 +4,7 @@ import { PriceTooltip } from '@/components/Chart/Tooltips';
 import QuickAccess from '@/components/Home/QuickAccess';
 import { Loader } from '@/components/Loader/styles';
 import { useWizard } from '@/contexts/contract/wizard';
+
 import {
   homeKfiCall,
   homeKfiChartCall,
@@ -58,6 +59,7 @@ import {
   SetTimeContainerLoaderWrapper,
   SpanTime,
 } from './styles';
+import { RiSwap2Fill } from 'react-icons/ri';
 
 const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 
@@ -76,15 +78,22 @@ interface ICoinTimes {
 
 const swapExchangeInfo = [
   {
-    text1: 'Swap and buy',
-    text2: 'KLV and KFI',
+    text1: 'Swap/Buy KLV and KFI',
+    text2: '',
     url: 'https://app.voxswap.io/KLV-USDT',
     icon: <VoxSwap />,
     color: '#B7EC42',
   },
   {
-    text1: 'Exchange the',
-    text2: 'market top tokens',
+    text1: 'Bridge USD from Ethereum',
+    text2: '',
+    url: 'https://bridge.klever.org',
+    icon: <RiSwap2Fill size={36} color="#aa33b5" />,
+    color: '#aa33b5',
+  },
+  {
+    text1: "Exchange market's top tokens",
+    text2: '',
     url: 'https://bitcoin.me/us/trade/KLV-USDT',
     icon: <BitcoinMe />,
     color: '#FF6700',

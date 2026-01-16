@@ -78,14 +78,14 @@ interface ICoinTimes {
 
 const swapExchangeInfo = [
   {
-    text1: 'Swap/Buy KLV and KFI',
+    text1: 'Swap and buy KLV and KFI',
     text2: '',
     url: 'https://app.voxswap.io/KLV-USDT',
     icon: <VoxSwap />,
     color: '#B7EC42',
   },
   {
-    text1: 'Bridge USD from Ethereum',
+    text1: 'Bridge Ethereum Tokens',
     text2: '',
     url: 'https://bridge.klever.org',
     icon: <RiSwap2Fill size={36} color="#aa33b5" />,

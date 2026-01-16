@@ -507,7 +507,7 @@ export const Button = styled.a<{ borderColor: string }>`
   display: flex;
   align-items: center;
   text-align: start;
-  gap: 16px;
+  gap: 8px;
 
   width: 100%;
   padding: 16px 20px;
@@ -518,7 +518,11 @@ export const Button = styled.a<{ borderColor: string }>`
 
   transition: 0.25s ease-in-out;
 
+  font-size: 1rem;
+
   text-decoration: none !important;
+  white-space: wrap;
+  line-break: auto;
 
   &:hover,
   &:focus {
@@ -537,7 +541,6 @@ export const Button = styled.a<{ borderColor: string }>`
     flex-direction: column;
     padding: 16px 20px;
   }
-  font-size: 1.25rem;
 
   @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
     margin-top: 0rem;
@@ -561,7 +564,7 @@ export const EnchangeLinks = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
   color: ${props => props.theme.black};
   font-size: 1rem;
   font-weight: 500;

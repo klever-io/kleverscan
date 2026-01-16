@@ -109,6 +109,7 @@
     "cross-spawn": "^7.0.5",
     "form-data": "^2.5.4",
     "d3-color": "^3.1.0",
-    "glob": "^10.5.0"
+    "glob": "^10.5.0",
+    "test-exclude": "^7.0.1"
   }
 }

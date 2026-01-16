@@ -1,4 +1,4 @@
-import { BitcoinMe, VoxSwap } from '@/assets/swap-exchange';
+import { BitcoinMe, Bridge, VoxSwap } from '@/assets/swap-exchange';
 import { ChartType } from '@/components/Chart';
 import { PriceTooltip } from '@/components/Chart/Tooltips';
 import QuickAccess from '@/components/Home/QuickAccess';
@@ -88,7 +88,7 @@ const swapExchangeInfo = [
     text1: 'Bridge Ethereum Tokens',
     text2: '',
     url: 'https://bridge.klever.org',
-    icon: <RiSwap2Fill size={36} color="#aa33b5" />,
+    icon: <Bridge />,
     color: '#aa33b5',
   },
   {

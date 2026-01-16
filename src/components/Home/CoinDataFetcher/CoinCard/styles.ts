@@ -521,8 +521,6 @@ export const Button = styled.a<{ borderColor: string }>`
   font-size: 1rem;
 
   text-decoration: none !important;
-  white-space: wrap;
-  line-break: auto;
 
   &:hover,
   &:focus {

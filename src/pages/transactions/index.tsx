@@ -214,15 +214,13 @@ export const requestTransactionsDefault = async (
   };
 };
 
-const getContractType = contractTypes;
-
 export const getCustomFields = (
   contract: IContract[],
   receipts: IReceipt[],
   precision?: number,
   data?: string[],
 ): JSX.Element[] => {
-  const contractType = getContractType(contract);
+  const contractType = contractTypes(contract);
   const filteredSectionsResult = filteredSections(
     contract,
     contractType,
@@ -250,7 +248,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
   const router = useRouter();
 
   let toAddress = '--';
-  const contractType = getContractType(contract);
+  const contractType = contractTypes(contract);
   if (contractType === Contract.Transfer) {
     const parameter = contract[0].parameter as ITransferContract;
 

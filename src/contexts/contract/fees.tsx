@@ -1,24 +1,22 @@
 import { PropsWithChildren } from 'react';
 //create context
 
-import { getParamsList } from '@/services/requests/proposals';
+import { IParamList } from '@/types';
 import { paramContractMap } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { createContext, useContext } from 'react';
-import { useQuery } from 'react-query';
+import { useNetworkParams } from './networkParams';
 
 interface IFees {
   getKappFee: (contractType: string) => number;
   bandwidthFeeMultiplier: number;
+  paramsList?: IParamList[];
 }
 
 export const FeeContext = createContext({} as IFees);
 
 export const FeesProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const { data: paramsList } = useQuery(
-    'feesProviderParamsList',
-    getParamsList,
-  );
+  const { paramsList } = useNetworkParams();
 
   const getKappFee = (contractType: string) => {
     return (
@@ -43,6 +41,7 @@ export const FeesProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const values: IFees = {
     getKappFee,
     bandwidthFeeMultiplier,
+    paramsList,
   };
 
   return <FeeContext.Provider value={values}>{children}</FeeContext.Provider>;

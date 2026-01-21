@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
-import { useHomeData } from '@/contexts/mainPage';
+import { homeDefaultInterval, useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { defaultPagination } from '@/services/apiCalls';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
@@ -252,7 +252,7 @@ const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
-    interval: 4000,
+    interval: homeDefaultInterval,
   };
 
   return (

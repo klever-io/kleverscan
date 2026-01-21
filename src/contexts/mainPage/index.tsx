@@ -1,25 +1,21 @@
 import {
   defaultAggregateData,
   homeAccountsCall,
-  homeActiveProposalsCall,
-  homeBeforeYesterdayTransactionsCall,
   homeGetAggregateCall,
+  homeHotContracts,
   homeMostTransactedKDAFee,
   homeMostTransactedNFTs,
   homeMostTransactedTokens,
   homeNodes,
-  homeProposalsCall,
-  homeTransactionsCall,
   homeYesterdayAccountsCall,
-  homeHotContracts,
 } from '@/services/requests/home';
 import { IEpochInfo, ITransaction, Node } from '@/types';
 import { IBlock } from '@/types/blocks';
 import { IProposal, MostTransferredToken } from '@/types/proposals';
+import { isKVMAvailable } from '@/utils/kvm';
+import { getNetwork } from '@/utils/networkFunctions';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
-import { getNetwork } from '@/utils/networkFunctions';
-import { isKVMAvailable } from '@/utils/kvm';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -54,20 +50,20 @@ export interface IHomeData {
   loadingMostTransacted?: boolean;
 }
 
+export const homeDefaultInterval = 10 * 1000; // 10 secs - Base/Real-time data
+const accountsInterval = 15 * 1000; // 15 secs - Account data (moderate changes)
+const statisticsInterval = 30 * 1000; // 30 secs - Statistics/analytics (slow changes)
+const nodesInterval = 60 * 1000; // 60 secs - Node locations (rare changes)
+
 export const HomeData = createContext({} as IHomeData);
 
 export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const watcherTimeout = isDev ? 100000 : 4 * 1000; // 4 secs
   const network = getNetwork();
 
   const [
     aggregateResult,
     accountResult,
     yesterdayAccountResult,
-    transactionsResult,
-    beforeYesterdayTransactionsResult,
-    proposalsResult,
-    activeProposalsResult,
     nodes,
     mostTransactedTokens,
     mostTransactedNFTs,
@@ -77,62 +73,42 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     {
       queryKey: 'aggregateData',
       queryFn: homeGetAggregateCall,
-      refetchInterval: watcherTimeout,
+      refetchInterval: homeDefaultInterval,
     },
     {
       queryKey: 'accountsData',
       queryFn: homeAccountsCall,
-      refetchInterval: watcherTimeout,
+      refetchInterval: accountsInterval,
     },
     {
       queryKey: 'yesterdayAccountsData',
       queryFn: homeYesterdayAccountsCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: 'transactionsData',
-      queryFn: homeTransactionsCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: 'beforeYesterdayTransactionData',
-      queryFn: homeBeforeYesterdayTransactionsCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: 'proposalsData',
-      queryFn: homeProposalsCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: 'activeProposalsData',
-      queryFn: homeActiveProposalsCall,
-      refetchInterval: watcherTimeout,
+      refetchInterval: accountsInterval,
     },
     {
       queryKey: 'nodesData',
       queryFn: homeNodes,
-      refetchInterval: watcherTimeout,
+      refetchInterval: nodesInterval,
     },
     {
       queryKey: 'mostTransactedTokens',
       queryFn: homeMostTransactedTokens,
-      refetchInterval: watcherTimeout,
+      refetchInterval: statisticsInterval,
     },
     {
       queryKey: 'mostTransactedNFTs',
       queryFn: homeMostTransactedNFTs,
-      refetchInterval: watcherTimeout,
+      refetchInterval: statisticsInterval,
     },
     {
       queryKey: 'mostTransactedKDAFee',
       queryFn: homeMostTransactedKDAFee,
-      refetchInterval: watcherTimeout,
+      refetchInterval: statisticsInterval,
     },
     {
       queryKey: 'hotContracts',
       queryFn: homeHotContracts,
-      refetchInterval: watcherTimeout,
+      refetchInterval: statisticsInterval,
       enabled: isKVMAvailable(network),
     },
   ]);
@@ -142,6 +118,11 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     totalTransactions: 0,
     metrics: defaultAggregateData.metrics,
   });
+
+  const lastDaysTransactionCount =
+    aggregateResult.data?.lastDaysTransactionCount || [];
+  const newTransactions = lastDaysTransactionCount[0]?.doc_count || 0;
+  const beforeYesterdayTxs = lastDaysTransactionCount[1]?.doc_count || 0;
 
   const values: IHomeData = {
     livePeakTPS:
@@ -154,10 +135,8 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
         prevValuesRef.current.metrics.epochFinishSlot
         ? aggregateResult.data.metrics
         : prevValuesRef.current.metrics,
-    newTransactions:
-      beforeYesterdayTransactionsResult.data?.newTransactions || 0,
-    beforeYesterdayTransactions:
-      beforeYesterdayTransactionsResult.data?.beforeYesterdayTxs,
+    newTransactions,
+    beforeYesterdayTransactions: beforeYesterdayTxs,
     newAccounts: yesterdayAccountResult.data?.newAccounts,
     totalAccounts:
       (accountResult.data?.totalAccounts || 0) >
@@ -165,17 +144,17 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
         ? accountResult.data?.totalAccounts
         : prevValuesRef.current.totalAccounts,
     transactions: aggregateResult.data?.transactions || [],
-    loadingTransactions: transactionsResult.isLoading,
+    loadingTransactions: aggregateResult.isLoading,
     totalTransactions:
-      (transactionsResult.data?.totalTransactions || 0) >
+      (aggregateResult.data?.totalTransactions || 0) >
       prevValuesRef.current.totalTransactions
-        ? transactionsResult.data?.totalTransactions
+        ? aggregateResult.data?.totalTransactions
         : prevValuesRef.current.totalTransactions,
     loadingCards: accountResult.isLoading,
     loadingBlocks: aggregateResult.isLoading,
-    totalProposals: proposalsResult.data?.totalProposals,
-    activeProposalsCount: activeProposalsResult.data?.totalActiveProposals,
-    activeProposals: activeProposalsResult.data?.activeProposals,
+    totalProposals: aggregateResult.data?.proposalStatistics?.total,
+    activeProposalsCount: aggregateResult.data?.proposalStatistics?.active,
+    activeProposals: aggregateResult.data?.proposalStatistics?.activeProposals,
     totalValidators: aggregateResult.data?.validatorStatistics.total,
     activeValidators: aggregateResult.data?.validatorStatistics.active,
     lastApprovedProposal: aggregateResult.data?.proposalStatistics.lastProposal,

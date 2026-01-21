@@ -13,7 +13,11 @@ import {
   Service,
 } from '@/types';
 import { IBlock, IBlocksResponse } from '@/types/blocks';
-import { IProposal, MostTransferredToken } from '@/types/proposals';
+import {
+  IProposal,
+  MostTransferredToken,
+  IMostTransactedAggregate,
+} from '@/types/proposals';
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 import { toLocaleFixed } from '@/utils/formatFunctions';
@@ -625,6 +629,53 @@ const homeMostTransactedKDAFee = async (): Promise<
   }
 };
 
+const homeMostTransactedAggregate = async (): Promise<
+  IMostTransactedAggregate | undefined
+> => {
+  try {
+    const aggregateRes = await api.get({
+      route: 'transaction/statistics/aggregate',
+    });
+
+    if (aggregateRes.error) {
+      console.error(aggregateRes.error);
+      return;
+    }
+
+    const allAssetKeys = [
+      ...(aggregateRes.data.data.tokens || []).map((t: any) => t.key),
+      ...(aggregateRes.data.data.nfts || []).map((t: any) => t.key),
+      ...(aggregateRes.data.data.kdaFee || []).map((t: any) => t.key),
+    ];
+
+    const assetsRes = await api.get({
+      route: 'assets/list',
+      query: {
+        asset: allAssetKeys,
+      },
+    });
+
+    const addLogos = (tokens: any[]) =>
+      tokens.map((token: any) => {
+        const asset = assetsRes.data.assets.find(
+          (asset: IAsset) => asset.assetId === token.key,
+        );
+        return {
+          ...token,
+          logo: asset?.logo || '',
+        };
+      });
+
+    return {
+      tokens: addLogos(aggregateRes.data.data.tokens || []),
+      nfts: addLogos(aggregateRes.data.data.nfts || []),
+      kdaFee: addLogos(aggregateRes.data.data.kdaFee || []),
+    };
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const homeHotContracts = async (): Promise<
   { hotContracts: MostTransferredToken[] } | undefined
 > => {
@@ -656,6 +707,7 @@ export {
   homeKlvChartCall,
   homeKlvDataCall,
   homeLastApprovedProposalCall,
+  homeMostTransactedAggregate,
   homeMostTransactedKDAFee,
   homeMostTransactedNFTs,
   homeMostTransactedTokens,

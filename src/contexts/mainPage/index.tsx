@@ -3,9 +3,7 @@ import {
   homeAccountsCall,
   homeGetAggregateCall,
   homeHotContracts,
-  homeMostTransactedKDAFee,
-  homeMostTransactedNFTs,
-  homeMostTransactedTokens,
+  homeMostTransactedAggregate,
   homeNodes,
   homeYesterdayAccountsCall,
 } from '@/services/requests/home';
@@ -65,9 +63,7 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     accountResult,
     yesterdayAccountResult,
     nodes,
-    mostTransactedTokens,
-    mostTransactedNFTs,
-    mostTransactedKDAFee,
+    mostTransactedAggregate,
     hotContracts,
   ] = useQueries([
     {
@@ -91,18 +87,8 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
       refetchInterval: nodesInterval,
     },
     {
-      queryKey: 'mostTransactedTokens',
-      queryFn: homeMostTransactedTokens,
-      refetchInterval: statisticsInterval,
-    },
-    {
-      queryKey: 'mostTransactedNFTs',
-      queryFn: homeMostTransactedNFTs,
-      refetchInterval: statisticsInterval,
-    },
-    {
-      queryKey: 'mostTransactedKDAFee',
-      queryFn: homeMostTransactedKDAFee,
+      queryKey: 'mostTransactedAggregate',
+      queryFn: homeMostTransactedAggregate,
       refetchInterval: statisticsInterval,
     },
     {
@@ -159,17 +145,15 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     activeValidators: aggregateResult.data?.validatorStatistics.active,
     lastApprovedProposal: aggregateResult.data?.proposalStatistics.lastProposal,
     nodes: nodes.data?.nodes,
-    mostTransactedTokens: mostTransactedTokens.data || [],
-    mostTransactedNFTs: mostTransactedNFTs.data || [],
-    mostTransactedKDAFee: mostTransactedKDAFee.data || [],
+    mostTransactedTokens: mostTransactedAggregate.data?.tokens || [],
+    mostTransactedNFTs: mostTransactedAggregate.data?.nfts || [],
+    mostTransactedKDAFee: mostTransactedAggregate.data?.kdaFee || [],
     epoch: aggregateResult.data?.overview?.epochNumber,
     hotContracts: isKVMAvailable(network)
       ? hotContracts.data?.hotContracts || []
       : [],
     loadingMostTransacted:
-      mostTransactedTokens.isLoading ||
-      mostTransactedNFTs.isLoading ||
-      mostTransactedKDAFee.isLoading ||
+      mostTransactedAggregate.isLoading ||
       (isKVMAvailable(network) ? hotContracts.isLoading : false),
   };
 

@@ -21,17 +21,24 @@ export function getPrecision<T extends string | string[]>(
 export async function getPrecision(
   assetIds: string | string[],
 ): Promise<number | { [assetId: string]: number }> {
+  const parsedAssetIds = Array.isArray(assetIds)
+    ? assetIds.map(assetId => assetId.split('/')[0])
+    : assetIds.split('/')[0];
+
   const storedPrecisions: any = localStorage.getItem('precisions')
     ? JSON.parse(localStorage.getItem('precisions') || '{}')
     : {};
 
-  if (typeof assetIds === 'object' && assetIds.length !== undefined) {
-    if (assetIds.length === 0) {
+  if (
+    typeof parsedAssetIds === 'object' &&
+    parsedAssetIds.length !== undefined
+  ) {
+    if (parsedAssetIds.length === 0) {
       return {};
     }
     const assetsToFetch: string[] = [];
 
-    assetIds.forEach(assetId => {
+    parsedAssetIds.forEach(assetId => {
       if (
         !Object.keys(storedPrecisions)
           .filter(key => storedPrecisions[key] !== undefined)
@@ -44,7 +51,7 @@ export async function getPrecision(
     });
 
     if (assetsToFetch.length === 0) {
-      return assetIds.reduce((prev, current) => {
+      return parsedAssetIds.reduce((prev, current) => {
         return {
           ...prev,
           [current]: storedPrecisions[current],
@@ -55,14 +62,14 @@ export async function getPrecision(
     const precisions = (await getPrecisionFromApi(assetsToFetch))?.precisions;
     const newPrecisions = { ...storedPrecisions, ...precisions };
     localStorage.setItem('precisions', JSON.stringify(newPrecisions));
-    return assetIds.reduce((prev, current) => {
+    return parsedAssetIds.reduce((prev, current) => {
       return {
         ...prev,
         [current]: newPrecisions[current],
       };
     }, {});
-  } else if (typeof assetIds === 'string') {
-    const assetId = assetIds;
+  } else if (typeof parsedAssetIds === 'string') {
+    const assetId = parsedAssetIds;
 
     if (assetId === '') {
       throw new Error('Empty Asset ID');

@@ -8,7 +8,7 @@ import {
   TimestampInfo,
 } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
-import { useHomeData } from '@/contexts/mainPage';
+import { homeDefaultInterval, useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { getCustomFields, toAddressSectionElement } from '@/pages/transactions';
 import { defaultPagination } from '@/services/apiCalls';
@@ -288,18 +288,12 @@ const HomeTransactions: React.FC<PropsWithChildren> = () => {
     page: number,
     limit: number,
   ) => Promise<IPaginatedResponse> = useCallback(
-    async (page = 1, limit = 10) => {
+    async (_page = 1, _limit = 10) => {
       const quantity = isTablet ? 5 : 10;
-      const transactionsResponse = await api.get({
-        route: `transaction/list`,
-      });
-
-      const parsedTransactions =
-        await getParsedTransactionPrecision(transactionsResponse);
 
       return {
         data: {
-          transactions: parsedTransactions?.slice(0, quantity),
+          transactions: (homeTransactions || []).slice(0, quantity),
         },
         error: '',
         code: '',
@@ -322,7 +316,7 @@ const HomeTransactions: React.FC<PropsWithChildren> = () => {
     showLimit: false,
     showPagination: false,
     smaller: true,
-    interval: 4000,
+    interval: homeDefaultInterval,
   };
 
   return (

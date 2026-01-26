@@ -953,9 +953,16 @@ export interface IStatisticsResponse extends IResponse {
 export interface IAggregate {
   blocks: IBlock[];
   transactions: ITransaction[];
+  totalTransactions: number;
+  lastDaysTransactionCount: Array<{
+    key: number;
+    doc_count: number;
+  }>;
   statistics: IChainStatistics;
   overview: INodeOverview;
   proposalStatistics: {
+    active: number;
+    total: number;
     activeProposals: IProposal[];
     lastProposal: IProposal;
   };

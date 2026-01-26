@@ -15,8 +15,6 @@ import { getNetwork } from '@/utils/networkFunctions';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
 
-const isDev = process.env.NODE_ENV === 'development';
-
 export interface IDaysCoins {
   [coinName: string]: string | number;
 }
@@ -141,8 +139,8 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     totalProposals: aggregateResult.data?.proposalStatistics?.total,
     activeProposalsCount: aggregateResult.data?.proposalStatistics?.active,
     activeProposals: aggregateResult.data?.proposalStatistics?.activeProposals,
-    totalValidators: aggregateResult.data?.validatorStatistics.total,
-    activeValidators: aggregateResult.data?.validatorStatistics.active,
+    totalValidators: aggregateResult.data?.validatorStatistics?.total,
+    activeValidators: aggregateResult.data?.validatorStatistics?.active,
     lastApprovedProposal: aggregateResult.data?.proposalStatistics.lastProposal,
     nodes: nodes.data?.nodes,
     mostTransactedTokens: mostTransactedAggregate.data?.tokens || [],

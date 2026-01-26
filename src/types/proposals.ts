@@ -271,3 +271,9 @@ export interface MostTransferredToken {
   ownerAddress: string;
   count: number;
 }
+
+export interface IMostTransactedAggregate {
+  tokens: MostTransferredToken[];
+  nfts: MostTransferredToken[];
+  kdaFee: MostTransferredToken[];
+}

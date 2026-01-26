@@ -15,8 +15,6 @@ import { getNetwork } from '@/utils/networkFunctions';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from 'react-query';
 
-const isDev = process.env.NODE_ENV === 'development';
-
 export interface IDaysCoins {
   [coinName: string]: string | number;
 }

@@ -21,6 +21,7 @@ import {
 import { getEpochInfo } from '@/utils';
 import { calcApr } from '@/utils/calcApr';
 import { toLocaleFixed } from '@/utils/formatFunctions';
+import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
 
 const defaultAggregateData = {
   livePeakTPS: '0',
@@ -49,8 +50,13 @@ const homeGetAggregateCall = async (): Promise<
     if (!aggregate.error) {
       const chainStatistics = aggregate.data.statistics;
 
+      const parsedTransactions = await getParsedTransactionPrecision({
+        data: { transactions: aggregate.data.transactions },
+      });
+
       return {
         ...aggregate.data,
+        transactions: parsedTransactions || aggregate.data.transactions,
         livePeakTPS:
           toLocaleFixed(chainStatistics.liveTPS, 2) +
           '/' +
@@ -654,6 +660,16 @@ const homeMostTransactedAggregate = async (): Promise<
         asset: allAssetKeys,
       },
     });
+
+    if (assetsRes.error || !assetsRes.data?.assets) {
+      console.error('Failed to fetch assets:', assetsRes.error);
+      // Return data without logos if assets fetch fails
+      return {
+        tokens: aggregateRes.data.data.tokens || [],
+        nfts: aggregateRes.data.data.nfts || [],
+        kdaFee: aggregateRes.data.data.kdaFee || [],
+      };
+    }
 
     const addLogos = (tokens: any[]) =>
       tokens.map((token: any) => {

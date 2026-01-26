@@ -69,9 +69,7 @@ export async function getPrecision(
       };
     }, {});
   } else if (typeof parsedAssetIds === 'string') {
-    const assetId = parsedAssetIds;
-
-    if (assetId === '') {
+    if (parsedAssetIds === '') {
       throw new Error('Empty Asset ID');
     }
 
@@ -79,14 +77,15 @@ export async function getPrecision(
       !storedPrecisions ||
       !Object.keys(storedPrecisions)
         .filter(key => storedPrecisions[key] !== undefined)
-        .includes(assetId.split('/')[0])
+        .includes(parsedAssetIds)
     ) {
-      const precisions = (await getPrecisionFromApi([assetId]))?.precisions;
+      const precisions = (await getPrecisionFromApi([parsedAssetIds]))
+        ?.precisions;
       const newPrecisions = { ...storedPrecisions, ...precisions };
       localStorage.setItem('precisions', JSON.stringify(newPrecisions));
-      return precisions[assetId];
+      return precisions[parsedAssetIds];
     } else {
-      return storedPrecisions[assetId.split('/')[0]];
+      return storedPrecisions[parsedAssetIds];
     }
   } else {
     throw new Error('Invalid assetId');

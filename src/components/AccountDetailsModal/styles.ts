@@ -97,6 +97,22 @@ export const QRCodeContainer = styled.div`
   }
 `;
 
+export const AddressWithCopy = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  svg {
+    cursor: pointer;
+    color: ${props => props.theme.violet};
+    transition: all 0.2s ease;
+
+    &:hover {
+      filter: brightness(1.3);
+    }
+  }
+`;
+
 export const QRCodeContent = styled.div`
   display: flex;
   justify-content: center;

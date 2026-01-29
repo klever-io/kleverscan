@@ -85,6 +85,7 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
   } = useFormContext();
 
   const watchCollectionAssetId = watch('collectionAssetId');
+  const watchCollection = watch('collection');
 
   const collectionAssetId = queue[parsedIndex]?.collectionAssetId;
 
@@ -173,6 +174,19 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
     });
     trigger('collection');
   };
+
+  // Initialize collection from form's default values
+  useEffect(() => {
+    if (watchCollection && assetsList.length > 0) {
+      const matchedAsset = assetsList.find(
+        (asset: ICollectionList) =>
+          asset.value === watchCollection || asset.assetId === watchCollection,
+      );
+      if (matchedAsset && matchedAsset.value !== selectedCollection?.value) {
+        setCollection(matchedAsset);
+      }
+    }
+  }, [assetsList, watchCollection]);
 
   const refetch = () => {
     refetchAssetsList();

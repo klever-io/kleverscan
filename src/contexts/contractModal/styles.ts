@@ -42,7 +42,8 @@ export const ButtonModal = styled.button<{
       props.isLocked ? props.theme.darkGray : props.theme.violet};
     cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
     > span {
-      color: ${props => !props.isLocked && props.theme.true.white};
+      color: ${props =>
+        props.isLocked ? props.theme.black : props.theme.true.white};
     }
   }
 

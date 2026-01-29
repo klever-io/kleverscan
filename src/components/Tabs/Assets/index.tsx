@@ -42,6 +42,7 @@ const getAssetTypeName = (type: number) => {
 
 interface IActionsDropdownProps {
   assetId: string;
+  actionsTitle: string;
   transferTitle: string;
   freezeTitle: string;
   getInteractionsButtons: (
@@ -52,6 +53,7 @@ interface IActionsDropdownProps {
 
 const ActionsDropdown: React.FC<IActionsDropdownProps> = ({
   assetId,
+  actionsTitle,
   transferTitle,
   freezeTitle,
   getInteractionsButtons,
@@ -98,7 +100,7 @@ const ActionsDropdown: React.FC<IActionsDropdownProps> = ({
   return (
     <ActionsDropdownContainer ref={dropdownRef}>
       <ActionsDropdownButton onClick={() => setIsOpen(!isOpen)}>
-        <span>Actions</span>
+        <span>{actionsTitle}</span>
         <DropdownIcon $isOpen={isOpen} />
       </ActionsDropdownButton>
       <ActionsDropdownMenu $isOpen={isOpen}>
@@ -312,6 +314,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
         element: props => (
           <ActionsDropdown
             assetId={assetId}
+            actionsTitle={t('accounts:SingleAccount.Buttons.Actions')}
             transferTitle={t('accounts:SingleAccount.Buttons.Transfer')}
             freezeTitle={t('accounts:SingleAccount.Buttons.Freeze')}
             getInteractionsButtons={getInteractionsButtons}

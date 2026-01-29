@@ -120,6 +120,12 @@ const Contract: React.FC<PropsWithChildren<IContract>> = ({
   });
 
   useEffect(() => {
+    if (defaultValues) {
+      formMethods.reset(defaultValues);
+    }
+  }, [defaultValues]);
+
+  useEffect(() => {
     if (loading) {
       document.documentElement.style.overflow = 'hidden';
     } else {

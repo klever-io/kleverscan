@@ -452,17 +452,23 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
             <strong>{t('accounts:SingleAccount.Content.Address')}</strong>
           </span>
           <RowContent>
-            <CenteredRow>
-              <span>{getAccountAddress(router.query.account as string)}</span>
-              <Copy info="Address" data={router.query.account as string} />
-              <ReceiveBackground>
-                <QrCodeModal
-                  value={router.query.account as string}
-                  isOverflow={false}
-                />
-              </ReceiveBackground>
-              <SetAccountNameButton />
-            </CenteredRow>
+            <AmountContainer>
+              <BalanceTransferContainer>
+                <CenteredRow>
+                  <span>
+                    {getAccountAddress(router.query.account as string)}
+                  </span>
+                  <Copy info="Address" data={router.query.account as string} />
+                  <ReceiveBackground>
+                    <QrCodeModal
+                      value={router.query.account as string}
+                      isOverflow={false}
+                    />
+                  </ReceiveBackground>
+                </CenteredRow>
+                <SetAccountNameButton />
+              </BalanceTransferContainer>
+            </AmountContainer>
             {IsTokenBurn(router.query.account as string) && (
               <RowAlert>
                 <span>{t('accounts:SingleAccount.BlackHole')}</span>

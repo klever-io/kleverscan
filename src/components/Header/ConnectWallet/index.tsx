@@ -6,11 +6,9 @@ import { useScroll } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
 import Image from 'next/legacy/image';
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
 import WalletHelp from '../WalletHelp';
 import {
   BackgroundHelper,
-  BackGroundUserInfo,
   BlackSpan,
   ConnectButton,
   ConnectedWallet,
@@ -76,6 +74,12 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
     setOpenDrawer(false);
   };
 
+  const handleMouseEnter = () => {
+    if (walletAddress && !openUserInfos) {
+      setOpenUserInfos(true);
+    }
+  };
+
   useEffect(() => {
     if (autoConnectWallet === 'true') {
       connectAndOpen();
@@ -124,18 +128,18 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
         >
           <ConnectButton
             onClick={() => connectAndOpen()}
+            onMouseEnter={handleMouseEnter}
             key={String(extensionInstalled)}
             walletAddress={!!walletAddress}
             $loading={extensionLoading}
+            $modalOpen={openUserInfos && isDeviceMobileCheck()}
           >
             {extensionLoading ? (
               <span style={{ zIndex: 2 }}>Waiting Extension...</span>
             ) : (
               <>
                 {walletAddress && (
-                  <ConnectedWallet
-                    onClick={() => setOpenUserInfos(!openUserInfos)}
-                  >
+                  <ConnectedWallet>
                     <GraySpan>Connected Wallet</GraySpan>
                     <BlackSpan>{parseAddress(walletAddress, 12)}</BlackSpan>
                   </ConnectedWallet>
@@ -158,23 +162,18 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
           </ConnectButton>
         </Tour>
       )}
-      {walletAddress &&
-        ReactDOM.createPortal(
-          <AccountDetailsModal
-            openUserInfos={openUserInfos}
-            setOpenUserInfos={setOpenUserInfos}
-          />,
-          window.document.body,
-        )}
-      {walletAddress &&
-        ReactDOM.createPortal(
-          <BackGroundUserInfo
-            isOpen={openUserInfos}
-            onClick={() => setOpenUserInfos(false)}
-            onTouchStart={() => setOpenUserInfos(false)}
-          />,
-          window.document.body,
-        )}
+      {walletAddress && (
+        <AccountDetailsModal
+          openUserInfos={openUserInfos}
+          setOpenUserInfos={setOpenUserInfos}
+        />
+      )}
+      {walletAddress && openUserInfos && isDeviceMobileCheck() && (
+        <BackgroundHelper
+          opened={openUserInfos}
+          onClick={() => setOpenUserInfos(false)}
+        />
+      )}
     </>
   );
 };

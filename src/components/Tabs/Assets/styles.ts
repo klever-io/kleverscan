@@ -48,13 +48,11 @@ export const ActionsDropdownMenu = styled.div<{ $isOpen: boolean }>`
   overflow: hidden;
 `;
 
-export const DropdownItem = styled.button`
+export const DropdownItem = styled.div`
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0;
   background: none;
   border: none;
-  color: ${props => props.theme.black};
-  text-align: left;
   cursor: pointer;
   font-size: 0.875rem;
   transition: background-color 0.2s ease;
@@ -65,5 +63,12 @@ export const DropdownItem = styled.button`
 
   &:not(:last-child) {
     border-bottom: 1px solid ${props => props.theme.card.border};
+  }
+
+  button {
+    width: 100%;
+    padding: 0.25rem 0.5rem;
+    border: none;
+    border-radius: 0;
   }
 `;

@@ -40,6 +40,87 @@ const getAssetTypeName = (type: number) => {
   }
 };
 
+interface IActionsDropdownProps {
+  assetId: string;
+  transferTitle: string;
+  freezeTitle: string;
+  getInteractionsButtons: (
+    params: any[],
+    isLeftAligned?: boolean,
+  ) => React.FC<PropsWithChildren>[];
+}
+
+const ActionsDropdown: React.FC<IActionsDropdownProps> = ({
+  assetId,
+  transferTitle,
+  freezeTitle,
+  getInteractionsButtons,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [TransferButton, FreezeButton] = getInteractionsButtons([
+    {
+      title: transferTitle,
+      contractType: 'TransferContract',
+      defaultValues: {
+        collection: assetId,
+      },
+    },
+    {
+      title: freezeTitle,
+      contractType: 'FreezeContract',
+      defaultValues: {
+        collection: assetId,
+      },
+    },
+  ]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  return (
+    <ActionsDropdownContainer ref={dropdownRef}>
+      <ActionsDropdownButton onClick={() => setIsOpen(!isOpen)}>
+        <span>Actions</span>
+        <DropdownIcon $isOpen={isOpen} />
+      </ActionsDropdownButton>
+      <ActionsDropdownMenu $isOpen={isOpen}>
+        <DropdownItem
+          onClick={() => {
+            setIsOpen(false);
+          }}
+        >
+          <TransferButton />
+        </DropdownItem>
+        <DropdownItem
+          onClick={() => {
+            setIsOpen(false);
+          }}
+        >
+          <FreezeButton />
+        </DropdownItem>
+      </ActionsDropdownMenu>
+    </ActionsDropdownContainer>
+  );
+};
+
 const Assets: React.FC<PropsWithChildren<IAssets>> = ({
   assetsTableProps,
   address,
@@ -149,70 +230,6 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
         <></>
       );
 
-    const ActionsDropdown = () => {
-      const [isOpen, setIsOpen] = useState(false);
-      const dropdownRef = useRef<HTMLDivElement>(null);
-
-      const [TransferButton, FreezeButton] = getInteractionsButtons([
-        {
-          title: t('accounts:SingleAccount.Buttons.Transfer'),
-          contractType: 'TransferContract',
-          defaultValues: {
-            collection: assetId,
-          },
-        },
-        {
-          title: t('accounts:SingleAccount.Buttons.Freeze'),
-          contractType: 'FreezeContract',
-          defaultValues: {
-            collection: assetId,
-          },
-        },
-      ]);
-
-      useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-          if (
-            dropdownRef.current &&
-            !dropdownRef.current.contains(event.target as Node)
-          ) {
-            setIsOpen(false);
-          }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () =>
-          document.removeEventListener('mousedown', handleClickOutside);
-      }, []);
-
-      const handleTransfer = () => {
-        setIsOpen(false);
-        // The button components handle opening the modal
-      };
-
-      const handleFreeze = () => {
-        setIsOpen(false);
-        // The button components handle opening the modal
-      };
-
-      return (
-        <ActionsDropdownContainer ref={dropdownRef}>
-          <ActionsDropdownButton onClick={() => setIsOpen(!isOpen)}>
-            <span>Actions</span>
-            <DropdownIcon $isOpen={isOpen} />
-          </ActionsDropdownButton>
-          <ActionsDropdownMenu $isOpen={isOpen}>
-            <DropdownItem onClick={handleTransfer}>
-              <TransferButton />
-            </DropdownItem>
-            <DropdownItem onClick={handleFreeze}>
-              <FreezeButton />
-            </DropdownItem>
-          </ActionsDropdownMenu>
-        </ActionsDropdownContainer>
-      );
-    };
-
     const sections: IRowSection[] = [
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
@@ -292,7 +309,14 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       });
     } else if (assetType === 0 && showInteractionButtons) {
       sections.push({
-        element: props => <ActionsDropdown />,
+        element: props => (
+          <ActionsDropdown
+            assetId={assetId}
+            transferTitle={t('accounts:SingleAccount.Buttons.Transfer')}
+            freezeTitle={t('accounts:SingleAccount.Buttons.Freeze')}
+            getInteractionsButtons={getInteractionsButtons}
+          />
+        ),
         span: 2,
       });
     }

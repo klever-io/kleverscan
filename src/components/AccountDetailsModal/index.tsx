@@ -277,6 +277,9 @@ export const AccountDetailsModal: React.FC<
       if (modalCloseTimeout.current) {
         clearTimeout(modalCloseTimeout.current);
       }
+      if (closeTimeout.current) {
+        clearTimeout(closeTimeout.current);
+      }
     };
   }, [isMobile, expandAssets]);
 

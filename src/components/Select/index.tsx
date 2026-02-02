@@ -1,26 +1,31 @@
 import { PropsWithChildren } from 'react';
 import { IoIosArrowDown } from 'react-icons/io';
-import ReactSelect, { components, Props } from 'react-select';
+import ReactSelect, {
+  components,
+  Props as ReactSelectProps,
+} from 'react-select';
 import Creatable from 'react-select/creatable';
 import { Container } from './styles';
 
-interface IBaseSelectProps extends Props {
+export interface IBaseSelectProps extends ReactSelectProps<any, boolean, any> {
   creatable?: boolean;
 }
 
 const BaseSelect: React.FC<PropsWithChildren<IBaseSelectProps>> = props => {
   const { creatable } = props;
   const Placeholder = (props: any) => {
-    return <components.Placeholder {...props} />;
+    const Component = components.Placeholder as any;
+    return <Component {...props} />;
   };
   const CaretDownIcon = () => {
     return <IoIosArrowDown />;
   };
-  const DropdownIndicator = (props: any) => {
+  const DropdownIndicator = (props: any): React.JSX.Element => {
+    const Component = components.DropdownIndicator as any;
     return (
-      <components.DropdownIndicator {...props}>
+      <Component {...props}>
         <CaretDownIcon />
-      </components.DropdownIndicator>
+      </Component>
     );
   };
 
@@ -31,7 +36,9 @@ const BaseSelect: React.FC<PropsWithChildren<IBaseSelectProps>> = props => {
           classNamePrefix="react-select"
           placeholder=""
           components={{ Placeholder, DropdownIndicator }}
-          formatCreateLabel={inputValue => `Create custom: "${inputValue}"`}
+          formatCreateLabel={(inputValue: string) =>
+            `Create custom: "${inputValue}"`
+          }
           {...props}
         />
       ) : (

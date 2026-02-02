@@ -28,7 +28,13 @@ const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
       onMouseLeave={() => setDisplayMessage(false)}
       maxVw={maxVw}
     >
-      {Component ? <div>{Component({})}</div> : <IconHelp>button</IconHelp>}
+      {Component ? (
+        <div>
+          <Component />
+        </div>
+      ) : (
+        <IconHelp>button</IconHelp>
+      )}
       {((Component && msg.length > minMsgLength) || !Component) && (
         <StyledTooltip
           anchorSelect=".button-tooltip"

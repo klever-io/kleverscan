@@ -85,22 +85,22 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
 
     const sections: IRowSection[] = [
       {
-        element: (props, i) => handlerStatus(),
+        element: () => handlerStatus(),
         span: 1,
         width: 50,
       },
       {
-        element: (props, i) => handlerAddresses(i),
+        element: () => handlerAddresses(0),
         span: 1,
         width: 50,
       },
       {
-        element: (props, i) => handlerBalance(),
+        element: () => handlerBalance(),
         span: 1,
         width: 50,
       },
       {
-        element: (props, i) => handlerRatio(),
+        element: () => handlerRatio(),
         span: 1,
         width: 50,
       },

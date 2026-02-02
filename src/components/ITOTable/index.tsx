@@ -295,7 +295,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                                 {isMobile || isTablet ? (
                                   <MobileHeader>{header[index2]}</MobileHeader>
                                 ) : null}
-                                {Element({})}
+                                <Element />
                               </MobileCardItem>
                             );
                           },

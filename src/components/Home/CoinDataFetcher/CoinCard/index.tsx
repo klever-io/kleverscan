@@ -65,7 +65,7 @@ const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 
 interface IPropsRenderCoinsCard {
   coin: ICoinInfo;
-  cardRef: React.RefObject<HTMLDivElement>;
+  cardRef: React.RefObject<HTMLDivElement | null>;
   renderKfiMarketCap: () => string;
   coinDays: React.MutableRefObject<ICoinTimes>;
   assetsData: IAssetsData;

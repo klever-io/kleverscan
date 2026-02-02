@@ -64,19 +64,21 @@ const Select: React.FC<PropsWithChildren<IFilter>> = ({
   isSearching,
   ...rest
 }) => {
-  const Placeholder = useCallback((props: any) => {
-    return <components.Placeholder {...props} />;
+  const Placeholder = useCallback((props: any): React.JSX.Element => {
+    const Component = components.Placeholder as any;
+    return <Component {...props} />;
   }, []);
 
   const CaretDownIcon = useCallback(() => {
     return <IoIosArrowDown />;
   }, []);
 
-  const DropdownIndicator = useCallback((props: any) => {
+  const DropdownIndicator = useCallback((props: any): React.JSX.Element => {
+    const Component = components.DropdownIndicator as any;
     return (
-      <components.DropdownIndicator {...props}>
+      <Component {...props}>
         <CaretDownIcon />
-      </components.DropdownIndicator>
+      </Component>
     );
   }, []);
 

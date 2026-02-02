@@ -18,7 +18,7 @@ import {
 interface IShortCutContract {
   title: string;
   type: string;
-  icon?: JSX.Element;
+  icon?: React.ReactElement;
   openWiz?: () => void;
 }
 

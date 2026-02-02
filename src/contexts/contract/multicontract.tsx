@@ -16,7 +16,7 @@ import { useFees } from './fees';
 export interface IQueue {
   elementId: number;
   contractName: string;
-  ref: JSX.Element;
+  ref: React.ReactElement;
   metadata: string;
   contractType: string;
   collection?: ICollectionList;

@@ -2819,7 +2819,7 @@ const renderPackInfo = (
     assetId: string,
     packsPrecision: PacksPrecision,
   ) => string,
-): JSX.Element[] => {
+): React.ReactElement[] => {
   return packInfo.map((pack: IPackInfo, index: number) => {
     return (
       <HeaderWrapper key={pack.key}>
@@ -2887,7 +2887,7 @@ const renderPackInfoComponents = (
     assetId: string,
     packsPrecision: PacksPrecision,
   ) => string,
-): JSX.Element => {
+): React.ReactElement => {
   return (
     <Row>
       <NestedContainerWrapper>

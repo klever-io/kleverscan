@@ -23,7 +23,7 @@ interface IChart {
     payload,
     label,
     active,
-  }: ITooltipContent) => JSX.Element | null;
+  }: ITooltipContent) => React.ReactElement | null;
   yAxis?: boolean;
   strokeWidth?: number;
   height?: string;

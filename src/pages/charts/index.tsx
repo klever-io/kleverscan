@@ -208,7 +208,10 @@ const Charts: React.FC<PropsWithChildren<ICharts>> = () => {
     }
   };
 
-  const renderWithLoading = (loadingState: boolean, component: JSX.Element) => {
+  const renderWithLoading = (
+    loadingState: boolean,
+    component: React.ReactElement,
+  ) => {
     if (loadingState) {
       return (
         <LoaderWrapper>

@@ -191,7 +191,7 @@ const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
       {
         element: props => (
           <DoubleRow {...props} key={proposer}>
-            <Link href={`/account/${proposer}`}>
+            <Link href={`/account/${proposer}`} data-testid="proposal-link">
               <Mono>{parseAddress(proposer, 16)}</Mono>
             </Link>
             <Status

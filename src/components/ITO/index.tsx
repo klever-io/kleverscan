@@ -18,7 +18,7 @@ export const displayITOpacks = (
   ITO: IParsedITO,
   setTxHash: Dispatch<SetStateAction<string | null>>,
   t: TFunction,
-): JSX.Element => {
+): React.ReactElement => {
   return (
     <>
       <ITOTitle>

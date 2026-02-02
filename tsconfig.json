@@ -15,7 +15,6 @@
     "types": ["@types/gtag.js"],
     "jsx": "preserve",
     "ignoreDeprecations": "5.0",
-    "suppressImplicitAnyIndexErrors": true,
     "baseUrl": "src/",
     "paths": {
       "react": ["../node_modules/@types/react"],

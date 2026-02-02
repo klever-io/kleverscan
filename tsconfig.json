@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "types": ["@types/gtag.js"],
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "ignoreDeprecations": "5.0",
     "baseUrl": "src/",
     "paths": {

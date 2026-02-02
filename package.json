@@ -37,7 +37,7 @@
     "i18next": "^25.8.0",
     "ioredis": "4.28.2",
     "leaflet": "1.7.1",
-    "next": "^15.5.11",
+    "next": "^16.1.6",
     "next-i18next": "^15.3.0",
     "next-images": "1.8.1",
     "next-styled-nprogress": "1.0.3",

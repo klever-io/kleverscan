@@ -42,23 +42,17 @@ module.exports = {
     ],
   },
   reactStrictMode: false,
-  webpack: (config, options) => {
-    config.resolve.fallback = { fs: false, path: false };
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: [
-        options.defaultLoaders.babel,
-        {
-          loader: '@svgr/webpack',
-          options: { babel: false },
-        },
-      ],
-    });
-
-    return config;
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+  turbopack: {
+    resolveAlias: {
+      fs: { browser: './empty.ts' },
+      path: { browser: './empty.ts' },
+    },
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
   },
   typescript: {
     ignoreBuildErrors: process.env?.IS_PRODUCTION === 'true',

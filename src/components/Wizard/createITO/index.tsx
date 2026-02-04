@@ -11,7 +11,7 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { FiPlusSquare } from 'react-icons/fi';
 import { IoArrowForward } from 'react-icons/io5';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { IWizardComponents, infinitySymbol } from '../createAsset';
 import { ButtonsComponent } from '../createAsset/ButtonsComponent';
 import {

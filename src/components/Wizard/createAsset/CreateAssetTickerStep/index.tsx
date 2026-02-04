@@ -72,7 +72,6 @@ export const CreateAssetTickerStep: React.FC<
           {t('wizards:createAssetCommon.ticker.kleverTip')}
         </GenericInfoCard>
       </div>
-
       <ButtonsComponent buttonsProps={buttonsProps} />
     </GenericCardContainer>
   );

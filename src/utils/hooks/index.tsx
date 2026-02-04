@@ -157,16 +157,16 @@ export const useFetchPartial = <T,>(
 
 export const useSkeleton = (): [
   (
-    value: string | number | undefined | JSX.Element[],
+    value: string | number | undefined | React.ReactElement[],
     skeletonParams?: { height?: string | number; width?: number | string },
-  ) => number | string | JSX.Element | JSX.Element[],
+  ) => number | string | React.ReactElement | React.ReactElement[],
   Dispatch<SetStateAction<boolean>>,
 ] => {
   const [loading, setLoading] = useState(true);
   const isSkeleton = (
-    value: string | number | undefined | JSX.Element[],
+    value: string | number | undefined | React.ReactElement[],
     skeletonParams?: { height?: string | number; width?: number | string },
-  ): number | string | JSX.Element | JSX.Element[] => {
+  ): number | string | React.ReactElement | React.ReactElement[] => {
     return !loading && value ? value : <Skeleton {...skeletonParams} />;
   };
   return [isSkeleton, setLoading];

@@ -73,7 +73,7 @@ const MetadataRenderer: React.FC<Props> = ({ data, totalContracts = 0 }) => {
   const { isDarkTheme } = useTheme();
 
   const ReactJson = dynamic(
-    () => import('react-json-view').then(mod => mod.default),
+    () => import('@microlink/react-json-view').then(mod => mod.default),
     { ssr: false },
   );
 
@@ -111,7 +111,7 @@ const MetadataRenderer: React.FC<Props> = ({ data, totalContracts = 0 }) => {
     return <span>{hexToString(metadataString)}</span>;
   };
 
-  const renderMetadata = (index: number): JSX.Element | null => {
+  const renderMetadata = (index: number): React.ReactElement | null => {
     if (!data || (data && !data[index])) return null;
     return (
       <DetailRow>
@@ -152,7 +152,7 @@ export const useMetadataRenderer = (data: string[] | undefined) => {
   const { isDarkTheme } = useTheme();
 
   const ReactJson = dynamic(
-    () => import('react-json-view').then(mod => mod.default),
+    () => import('@microlink/react-json-view').then(mod => mod.default),
     { ssr: false },
   );
 
@@ -190,7 +190,7 @@ export const useMetadataRenderer = (data: string[] | undefined) => {
     return <span>{hexToString(metadataString)}</span>;
   };
 
-  const renderMetadata = (index: number): JSX.Element | null => {
+  const renderMetadata = (index: number): React.ReactElement | null => {
     if (!data || (data && !data[index])) return null;
     return (
       <DetailRow>

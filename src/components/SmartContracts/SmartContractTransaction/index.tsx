@@ -21,7 +21,6 @@ import { getAge } from '@/utils/timeFunctions';
 import { fromUnixTime } from 'date-fns';
 import React from 'react';
 import { ExpandCenteredRow, DivDataJson } from '@/views/transactions/detail';
-import ReactJson from 'react-json-view';
 import { getRawTxTheme } from '@/pages/transaction/[hash]';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -46,7 +45,7 @@ const SCTransactionDetails: React.FC<SCTransactionDetailsProps> = ({
   } = transactionData || {};
   const { isMobile } = useMobile();
   const ReactJson = dynamic(
-    () => import('react-json-view').then(mod => mod.default),
+    () => import('@microlink/react-json-view').then(mod => mod.default),
     { ssr: false },
   );
   const StatusIcon = getStatusIcon(status || 'unknown');

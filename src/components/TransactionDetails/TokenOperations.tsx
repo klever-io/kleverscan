@@ -8,7 +8,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { BalanceContainer } from '@/views/accounts/detail';
 import Copy from '../Copy';
 import { isValidContractAddress } from '@klever/connect';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/services/api';
 
 interface Props {
@@ -26,9 +26,10 @@ const ContractNameDisplay: React.FC<ContractNameDisplayProps> = ({
 }) => {
   const isContract = isValidContractAddress(address);
 
-  const { data: contractData } = useQuery(
-    ['smartContract', address],
-    async () => {
+  const { data: contractData } = useQuery({
+    queryKey: ['smartContract', address],
+
+    queryFn: async () => {
       if (!isContract) return null;
       const res = await api.get({
         route: `sc/${address}`,
@@ -38,12 +39,14 @@ const ContractNameDisplay: React.FC<ContractNameDisplayProps> = ({
       }
       return null;
     },
-    {
-      enabled: isContract,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: false,
-    },
-  );
+
+    enabled: isContract,
+
+    // 5 minutes
+    staleTime: 5 * 60 * 1000,
+
+    retry: false,
+  });
 
   const contractName = contractData?.name;
 

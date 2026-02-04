@@ -8,7 +8,7 @@ import { setQueryAndRouter } from '@/utils';
 import { BASE_TX_SIZE, KLV_PRECISION } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useMobile } from '../mobile';
 import { useFees } from './fees';
@@ -16,7 +16,7 @@ import { useFees } from './fees';
 export interface IQueue {
   elementId: number;
   contractName: string;
-  ref: JSX.Element;
+  ref: React.ReactElement;
   metadata: string;
   contractType: string;
   collection?: ICollectionList;

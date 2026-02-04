@@ -27,7 +27,7 @@ import { IoMdAddCircle } from 'react-icons/io';
 import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
 import { MdContentCopy } from 'react-icons/md';
 import { RiArrowDownSLine, RiArrowRightSLine } from 'react-icons/ri';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import {
@@ -85,14 +85,21 @@ export const AccountDetailsModal: React.FC<
   const network = getNetwork();
   const router = useRouter();
 
-  const { data, refetch: getAccountBalance } = useQuery<IAccountBalance>({
+  const {
+    data,
+    refetch: getAccountBalance,
+    isSuccess,
+  } = useQuery<IAccountBalance>({
     queryKey: ['accountBalance', walletAddress],
     queryFn: () => getAccountBalanceRequest(walletAddress, setLoadingBalance),
     enabled: !!walletAddress,
-    onSettled: () => {
-      setLoadingBalance(false);
-    },
   });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setLoadingBalance(false);
+    }
+  }, [isSuccess]);
 
   const { balance, otherAssets } = useMemo(() => {
     if (data) {

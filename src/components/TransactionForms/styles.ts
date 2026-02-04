@@ -55,7 +55,7 @@ export const FormSection = styled.div<{ inner?: boolean; top?: number }>`
   }
 `;
 
-export const FormBody = styled(Form)<{ inner?: boolean }>`
+export const FormBody = styled(Form as any)<{ inner?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 2rem;

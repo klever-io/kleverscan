@@ -13,7 +13,7 @@ import { CardContainer } from '@/views/transactions/detail';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { PropsWithChildren, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 interface ISemiFungibleViewProps {
   tableProps: ITable;

@@ -23,7 +23,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import React, { useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { IDailyTransaction } from '../../types';
 
@@ -154,18 +154,21 @@ const Charts: React.FC<PropsWithChildren<ICharts>> = () => {
     isError: statisticsIsError,
     data: statistics,
     refetch: refetchStatistics,
-  } = useQuery('statistics', loadInitialData, onErrorHandler());
+  } = useQuery({
+    queryKey: ['statistics'],
+    queryFn: loadInitialData,
+  });
 
   const {
     isLoading: transactionListIsLoading,
     isError: transactionListIsError,
     data: transactionList,
     refetch: refetchTransactionList,
-  } = useQuery(
-    ['transactionList', timeFilter],
-    () => fetchTransactionList(timeFilter),
-    onErrorHandler(),
-  );
+  } = useQuery({
+    queryKey: ['transactionList', timeFilter],
+    queryFn: () => fetchTransactionList(timeFilter),
+    ...onErrorHandler(),
+  });
 
   const errorWithRetryComponent = (onClick: typeof refetchStatistics) => {
     return (
@@ -208,7 +211,10 @@ const Charts: React.FC<PropsWithChildren<ICharts>> = () => {
     }
   };
 
-  const renderWithLoading = (loadingState: boolean, component: JSX.Element) => {
+  const renderWithLoading = (
+    loadingState: boolean,
+    component: React.ReactElement,
+  ) => {
     if (loadingState) {
       return (
         <LoaderWrapper>

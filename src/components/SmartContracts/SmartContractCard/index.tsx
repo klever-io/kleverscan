@@ -27,7 +27,7 @@ const SmartContractCard = ({
   deployer,
   deployTxHash,
   totalTransactions,
-}: SmartContractCardProps): JSX.Element => {
+}: SmartContractCardProps): React.ReactElement => {
   const { t } = useTranslation(['smartContracts']);
   return (
     <SmartContractDataWrapper>

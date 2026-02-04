@@ -75,7 +75,7 @@ const FPRHistory: React.FC<PropsWithChildren<FPRHistoryProps>> = ({
   );
 
   const renderStakingHistory = (historyArray: IFPR[], offset: number) => {
-    const elements: JSX.Element[] = [];
+    const elements: React.ReactElement[] = [];
     const fprLength = asset?.staking?.fpr?.length;
     if (typeof fprLength !== 'number') {
       return elements;

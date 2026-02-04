@@ -53,7 +53,7 @@ interface IAccountRangeOfLastDays extends IResponse {
 interface ICard {
   title: string;
   headers: string[];
-  values: Array<string | JSX.Element>;
+  values: Array<string | React.ReactElement>;
 }
 
 const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
@@ -198,7 +198,7 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
       {
         element: props => (
           <CenteredRow key={address}>
-            <Link href={`/account/${address}`}>
+            <Link href={`/account/${address}`} data-testid="account-link">
               <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
             </Link>
 

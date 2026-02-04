@@ -14,7 +14,7 @@ import { useRouter } from 'next/router';
 import { PropsWithChildren, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { TbPencilMinus } from 'react-icons/tb';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
 import { ParticipateModal } from './ParticipateModal';

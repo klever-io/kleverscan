@@ -12,7 +12,7 @@ import { useDidUpdateEffect } from '@/utils/hooks';
 import { ITransaction } from '@klever/sdk-web';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Content } from '../styles';
 
 import { MultiSignList } from './MultiSignList';

@@ -2,7 +2,7 @@ import { getAsset } from '@/services/requests/asset';
 import { PropsWithChildren } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   ConfirmCardBasisInfo,
   ConfirmCardImage,
@@ -17,7 +17,7 @@ export const AssetDetails: React.FC<PropsWithChildren> = () => {
   const { watch } = useFormContext();
   const collection = watch('collection');
   const { data, isLoading } = useQuery({
-    queryKey: 'collection',
+    queryKey: ['collection', collection],
     queryFn: () => getAsset(collection),
   });
   const RenderLogo: React.FC<PropsWithChildren<{ logo: string }>> = ({

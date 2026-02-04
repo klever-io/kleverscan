@@ -10,7 +10,7 @@ import {
 import { IAsset } from '@/types';
 import { SingleNFTTableContainer } from '@/views/accounts';
 import { CardContainer } from '@/views/transactions/detail';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { requestNonceHolder } from '@/services/requests/asset/nonce';
 import { AssetCardContent } from '@/views/assets';
 

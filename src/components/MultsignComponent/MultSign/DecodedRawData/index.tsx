@@ -15,7 +15,7 @@ interface IDecodedRawData {
 }
 
 const ReactJson = dynamic(
-  () => import('react-json-view').then(mod => mod.default),
+  () => import('@microlink/react-json-view').then(mod => mod.default),
   { ssr: false },
 );
 

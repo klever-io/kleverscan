@@ -7,7 +7,7 @@ import {
 } from '@/services/requests/smartContracts';
 import { HotContracts, SmartContractsList } from '@/types/smart-contract';
 import { createContext, PropsWithChildren, useContext } from 'react';
-import { useQueries } from 'react-query';
+import { useQueries } from '@tanstack/react-query';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -32,33 +32,35 @@ export const SmartContractDataProvider: React.FC<PropsWithChildren> = ({
     smartContractTotalContractsResult,
     smartContractTotalTransactionsResult,
     smartContractsBeforeYesterdayTransactionsResult,
-  ] = useQueries([
-    {
-      queryKey: ['smartContractsStatistic'],
-      queryFn: smartContractsStatisticCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: ['smartContractsList'],
-      queryFn: smartContractsListCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: ['smartContractsTotalContracts'],
-      queryFn: smartContractsTotalContractsCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: ['smartContractsTotalTransactions'],
-      queryFn: smartContractTotalTransactionsListCall,
-      refetchInterval: watcherTimeout,
-    },
-    {
-      queryKey: ['smartContractsBeforeYesterdayTransactionsResult'],
-      queryFn: smartContractsBeforeYesterdayTransactionsCall,
-      refetchInterval: watcherTimeout,
-    },
-  ]);
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ['smartContractsStatistic'],
+        queryFn: smartContractsStatisticCall,
+        refetchInterval: watcherTimeout,
+      },
+      {
+        queryKey: ['smartContractsList'],
+        queryFn: smartContractsListCall,
+        refetchInterval: watcherTimeout,
+      },
+      {
+        queryKey: ['smartContractsTotalContracts'],
+        queryFn: smartContractsTotalContractsCall,
+        refetchInterval: watcherTimeout,
+      },
+      {
+        queryKey: ['smartContractsTotalTransactions'],
+        queryFn: smartContractTotalTransactionsListCall,
+        refetchInterval: watcherTimeout,
+      },
+      {
+        queryKey: ['smartContractsBeforeYesterdayTransactionsResult'],
+        queryFn: smartContractsBeforeYesterdayTransactionsCall,
+        refetchInterval: watcherTimeout,
+      },
+    ],
+  });
 
   const smartContractData: ISmartContractData = {
     smartContractsStatistic:

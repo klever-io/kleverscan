@@ -24,8 +24,10 @@ import {
 import { IRowSection } from '@/types/index';
 import {
   INetworkParams,
+  INodeOverview,
   IParsedNetworkParams,
   IParsedParams,
+  IParsedProposal,
   IParsedProposalParam,
   IParsedVote,
   IParsedVoterResponse,
@@ -81,7 +83,7 @@ import React, {
   useState,
 } from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 import getAccount from '@/services/requests/searchBar/account';
 import { useExtension } from '@/contexts/extension';
@@ -154,16 +156,19 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
     `${t('common:Statements.Yes')}`,
     `${t('common:Statements.No')}`,
   ];
-  const { data: overview } = useQuery({
-    queryKey: 'proposalOverview',
+  const { data: overview } = useQuery<INodeOverview | undefined>({
+    queryKey: ['proposalOverview'],
     queryFn: () => dataOverviewCall(),
   });
-  const { data: proposal } = useQuery({
-    queryKey: 'proposalsCall',
+  const { data: proposal } = useQuery<IParsedProposal | undefined>({
+    queryKey: ['proposalsCall'],
     queryFn: () => dataProposalCall(router),
     enabled: !!router.isReady,
   });
-  const { data: params } = useQuery('paramsList', dataNetworkParams);
+  const { data: params } = useQuery<INetworkParams | undefined>({
+    queryKey: ['paramsList'],
+    queryFn: dataNetworkParams,
+  });
   const { getInteractionsButtons } = useContractModal();
 
   const { walletAddress } = useExtension();
@@ -484,7 +489,9 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
                     <strong> {t('proposals:EndingEpoch')}</strong>
                   </span>
                   <span style={{ color: 'red' }}>
-                    {isSkeleton(proposal?.epochEnd - 1)}
+                    {isSkeleton(
+                      proposal?.epochEnd ? proposal.epochEnd - 1 : undefined,
+                    )}
                   </span>
                 </HalfRow>
                 <HalfRow>

@@ -15,7 +15,7 @@ import {
 import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
 import { useState } from 'react';
-import { UseQueryResult } from 'react-query';
+import { UseQueryResult } from '@tanstack/react-query';
 
 export interface IBuyCard {
   marketplaceAsset: IMarketplaceAsset;

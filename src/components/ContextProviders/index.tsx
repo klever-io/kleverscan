@@ -11,7 +11,7 @@ import { MobileProvider } from '@/contexts/mobile';
 import { ParticipateProvider } from '@/contexts/participate';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { GetServerSideProps } from 'next';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastContainer } from 'react-toastify';
 import { NetworkParamsProvider } from '@/contexts/contract/networkParams';
 

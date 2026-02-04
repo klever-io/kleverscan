@@ -68,7 +68,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 import SelectedTabComponent, {
   EmptyComponent,
@@ -106,10 +106,12 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const { isTablet } = useMobile();
   const router = useRouter();
 
-  const { data: priceCall, isLoading: isLoadingPriceCall } = useQuery(
-    ['pricesCall'],
-    pricesCall,
-  );
+  const { data: priceCall, isLoading: isLoadingPriceCall } = useQuery<
+    number | undefined
+  >({
+    queryKey: ['pricesCall'],
+    queryFn: pricesCall,
+  });
 
   const { data: account, isLoading: isLoadingAccount } = useQuery({
     queryKey: [`account`, router.query.account],

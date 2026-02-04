@@ -73,7 +73,7 @@ const MetadataRenderer: React.FC<Props> = ({ data, totalContracts = 0 }) => {
   const { isDarkTheme } = useTheme();
 
   const ReactJson = dynamic(
-    () => import('react-json-view').then(mod => mod.default),
+    () => import('@microlink/react-json-view').then(mod => mod.default),
     { ssr: false },
   );
 
@@ -152,7 +152,7 @@ export const useMetadataRenderer = (data: string[] | undefined) => {
   const { isDarkTheme } = useTheme();
 
   const ReactJson = dynamic(
-    () => import('react-json-view').then(mod => mod.default),
+    () => import('@microlink/react-json-view').then(mod => mod.default),
     { ssr: false },
   );
 

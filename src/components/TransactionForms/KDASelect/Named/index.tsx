@@ -26,7 +26,7 @@ import { useRouter } from 'next/router';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import FormInput, { cleanEmptyValues } from '../../FormInput';
 
 interface IKDASelect {
@@ -67,7 +67,7 @@ export const NamedKDASelect: React.FC<
     refetch: refetchAssetsList,
     isFetching: assetsFetching,
   } = useQuery({
-    queryKey: 'assetsList',
+    queryKey: ['assetsList'],
     queryFn: getAssets,
     initialData: [],
     enabled: walletAddress !== '',
@@ -78,7 +78,7 @@ export const NamedKDASelect: React.FC<
     refetch: refetchKassetsList,
     isFetching: kassetsFetching,
   } = useQuery({
-    queryKey: 'kassetsList',
+    queryKey: ['kassetsList'],
     queryFn: getKAssets,
     initialData: [],
     enabled: walletAddress !== '',
@@ -203,19 +203,21 @@ const CollectionIDField: React.FC<
       ? collectionName.split('/')[1]
       : '';
 
-  const { isLoading: collectionIdListLoading } = useQuery({
-    queryKey: ['collectionList', collectionName, debouncedCollectionInput],
-    queryFn: () =>
-      collectionListCall(router, walletAddress, debouncedCollectionInput),
-    initialData: [],
-    onSuccess: newData => {
-      if (!newData) return;
+  const { data: collectionListData, isLoading: collectionIdListLoading } =
+    useQuery({
+      queryKey: ['collectionList', collectionName, debouncedCollectionInput],
+      queryFn: () =>
+        collectionListCall(router, walletAddress, debouncedCollectionInput),
+      initialData: [],
+    });
 
+  useEffect(() => {
+    if (collectionListData) {
       setCollectionIdData((prevData): IDropdownItem[] => {
-        return [...prevData, ...newData] as IDropdownItem[];
+        return [...prevData, ...collectionListData] as IDropdownItem[];
       });
-    },
-  });
+    }
+  }, [collectionListData]);
 
   const collectionId = collectionIdData?.filter(
     e => e.value === collectionAssetId,

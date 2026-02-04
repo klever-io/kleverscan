@@ -112,7 +112,7 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
 
   const { isDarkTheme } = useTheme();
   const ReactJson = dynamic(
-    () => import('react-json-view').then(mod => mod.default),
+    () => import('@microlink/react-json-view').then(mod => mod.default),
     { ssr: false },
   );
   const StatusIcon = getStatusIcon(status);

@@ -1,7 +1,7 @@
 import { getAsset } from '@/services/requests/asset';
 import { PropsWithChildren } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { IAssetITOInformations } from '..';
 import { infinitySymbol } from '../../createAsset';
 import { ButtonsComponent } from '../../createAsset/ButtonsComponent';
@@ -23,7 +23,7 @@ export const CreateITOSixStep: React.FC<
   } = useFormContext();
   const collection = watch('collection');
   const { data, isLoading } = useQuery({
-    queryKey: 'collection',
+    queryKey: ['collection', collection],
     queryFn: () => getAsset(collection),
   });
 

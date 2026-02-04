@@ -13,7 +13,7 @@ import { getRawTxTheme } from '../transaction/[hash]';
 import { useTheme } from '@/contexts/theme';
 import SCTransactionDetails from '@/components/SmartContracts/SmartContractTransaction';
 import { SmartContractTransactionData } from '@/types/smart-contract';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { getNetwork } from '@/utils/networkFunctions';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -25,7 +25,7 @@ const SmartContractTransaction: React.FC = () => {
   const router = useRouter();
   const hashUrl = router.query.hash as string;
   const ReactJson = dynamic(
-    () => import('react-json-view').then(mod => mod.default),
+    () => import('@microlink/react-json-view').then(mod => mod.default),
     { ssr: false },
   );
   const { isDarkTheme } = useTheme();

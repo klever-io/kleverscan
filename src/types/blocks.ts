@@ -94,5 +94,5 @@ export interface IStatisticsResponse extends IResponse {
 export interface ICard {
   title: string;
   headers: string[];
-  values: (string | JSX.Element)[];
+  values: (string | React.ReactElement)[];
 }

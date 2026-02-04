@@ -13,7 +13,7 @@ import { IProposal, MostTransferredToken } from '@/types/proposals';
 import { isKVMAvailable } from '@/utils/kvm';
 import { getNetwork } from '@/utils/networkFunctions';
 import { createContext, PropsWithChildren, useContext, useRef } from 'react';
-import { useQueries } from 'react-query';
+import { useQueries } from '@tanstack/react-query';
 
 export interface IDaysCoins {
   [coinName: string]: string | number;
@@ -63,39 +63,41 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
     nodes,
     mostTransactedAggregate,
     hotContracts,
-  ] = useQueries([
-    {
-      queryKey: 'aggregateData',
-      queryFn: homeGetAggregateCall,
-      refetchInterval: homeDefaultInterval,
-    },
-    {
-      queryKey: 'accountsData',
-      queryFn: homeAccountsCall,
-      refetchInterval: accountsInterval,
-    },
-    {
-      queryKey: 'yesterdayAccountsData',
-      queryFn: homeYesterdayAccountsCall,
-      refetchInterval: accountsInterval,
-    },
-    {
-      queryKey: 'nodesData',
-      queryFn: homeNodes,
-      refetchInterval: nodesInterval,
-    },
-    {
-      queryKey: 'mostTransactedAggregate',
-      queryFn: homeMostTransactedAggregate,
-      refetchInterval: statisticsInterval,
-    },
-    {
-      queryKey: 'hotContracts',
-      queryFn: homeHotContracts,
-      refetchInterval: statisticsInterval,
-      enabled: isKVMAvailable(network),
-    },
-  ]);
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ['aggregateData'],
+        queryFn: homeGetAggregateCall,
+        refetchInterval: homeDefaultInterval,
+      },
+      {
+        queryKey: ['accountsData'],
+        queryFn: homeAccountsCall,
+        refetchInterval: accountsInterval,
+      },
+      {
+        queryKey: ['yesterdayAccountsData'],
+        queryFn: homeYesterdayAccountsCall,
+        refetchInterval: accountsInterval,
+      },
+      {
+        queryKey: ['nodesData'],
+        queryFn: homeNodes,
+        refetchInterval: nodesInterval,
+      },
+      {
+        queryKey: ['mostTransactedAggregate'],
+        queryFn: homeMostTransactedAggregate,
+        refetchInterval: statisticsInterval,
+      },
+      {
+        queryKey: ['hotContracts'],
+        queryFn: homeHotContracts,
+        refetchInterval: statisticsInterval,
+        enabled: isKVMAvailable(network),
+      },
+    ],
+  });
 
   const prevValuesRef = useRef({
     totalAccounts: 0,

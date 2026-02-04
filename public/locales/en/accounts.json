@@ -37,6 +37,7 @@
       "Delegate": "Delegate",
       "Undelegate": "Undelegate",
       "Withdraw": "Withdraw",
+      "Actions": "Actions",
       "Transfer": "Transfer",
       "Freeze": "Freeze",
       "AssetTrigger": "Asset Trigger",

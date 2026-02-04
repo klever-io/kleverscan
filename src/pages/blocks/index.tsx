@@ -33,7 +33,7 @@ import { getAge } from '@/utils/timeFunctions';
 import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
 import Link from 'next/link';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 interface IBlocksStatsToday {
   totalBlocks: number;
@@ -146,12 +146,18 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
   const { data: blocksStatsToday, isLoading: isLoadingBlocksStatsToday } =
-    useQuery('statisticsCall', totalStatisticsCall);
+    useQuery({
+      queryKey: ['statisticsCall'],
+      queryFn: totalStatisticsCall,
+    });
   const {
     data: blocksStatsYesterday,
     refetch,
     isLoading: isLoadingBlocksStatsYesterday,
-  } = useQuery('yesterdayStatisticsCall', yesterdayStatisticsCall);
+  } = useQuery({
+    queryKey: ['yesterdayStatisticsCall'],
+    queryFn: yesterdayStatisticsCall,
+  });
 
   const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(!!blocksInterval);

@@ -15,7 +15,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { PropsWithChildren } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import nextI18nextConfig from '../../../../next-i18next.config';
 import { AssetTitle } from '@/components/Asset/AssetSummary/AssetTitle';
 

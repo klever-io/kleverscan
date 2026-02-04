@@ -8,7 +8,7 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import React, { PropsWithChildren, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import { FormBody, FormSection, SpanMessage } from '../styles';
@@ -62,7 +62,10 @@ const Vote: React.FC<PropsWithChildren<IContractProps>> = ({
   };
   const { walletAddress } = useExtension();
   const { senderAccount } = useContract();
-  const { data: proposals } = useQuery('proposals', getProposals);
+  const { data: proposals } = useQuery({
+    queryKey: ['proposals'],
+    queryFn: getProposals,
+  });
   const {
     data: account,
     isLoading: isLoadingAccount,

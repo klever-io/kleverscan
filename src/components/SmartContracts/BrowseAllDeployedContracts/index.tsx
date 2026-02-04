@@ -43,6 +43,7 @@ const smartContractsListRowSections = (
             <Link
               href={`/smart-contract/${contractAddress}`}
               key={contractAddress}
+              data-testid="smart-contract-link"
             >
               <Mono>{parseAddress(contractAddress, 25)}</Mono>
             </Link>

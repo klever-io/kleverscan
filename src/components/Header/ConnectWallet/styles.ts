@@ -7,6 +7,7 @@ export const ConnectButton = styled.div<{
   walletAddress?: boolean;
   $loading?: boolean;
   $searching?: boolean;
+  $modalOpen?: boolean;
 }>`
   max-width: 200px;
   width: 100%;
@@ -16,7 +17,8 @@ export const ConnectButton = styled.div<{
   position: relative;
   background: ${props => (props.walletAddress ? 'none' : props.theme.violet)};
   opacity: ${props => (props.$searching ? '0' : '1')};
-  pointer-events: ${props => (props.$searching ? 'none' : 'all')};
+  pointer-events: ${props =>
+    props.$searching || props.$modalOpen ? 'none' : 'all'};
   display: flex;
   gap: 8px;
   align-items: center;
@@ -296,6 +298,16 @@ export const ConnectedWallet = styled.div`
   align-items: flex-start;
   flex-direction: column;
   position: relative;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${props =>
+      props.theme.dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'};
+  }
+
   &::after {
     width: 0.5rem;
     height: 0.5rem;
@@ -304,6 +316,8 @@ export const ConnectedWallet = styled.div`
     content: '';
     position: absolute;
     right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
   }
 `;
 

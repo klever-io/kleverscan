@@ -10,7 +10,7 @@ export const PriceTooltip = ({
   payload,
   label,
   active,
-}: ITooltipPriceData): JSX.Element | null => {
+}: ITooltipPriceData): React.ReactElement | null => {
   if (active && payload && payload.length) {
     return (
       <TooltipContainer>
@@ -26,7 +26,7 @@ export const TxsTooltip = ({
   payload,
   label,
   active,
-}: ITooltipTxsData): JSX.Element | null => {
+}: ITooltipTxsData): React.ReactElement | null => {
   if (active && payload && payload.length) {
     return (
       <TooltipContainer>
@@ -42,7 +42,7 @@ export const DoubleTxsTooltip = ({
   payload,
   label,
   active,
-}: ITooltipDoubleTxsData): JSX.Element | null => {
+}: ITooltipDoubleTxsData): React.ReactElement | null => {
   if (active && payload && payload.length) {
     const nowIsBigger =
       payload[0]?.payload.valueNow - payload[0]?.payload.valuePast > 0;

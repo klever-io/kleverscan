@@ -19,7 +19,7 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { processRowSectionsLayout } from '@/utils/table';
 import React, { useEffect, useState } from 'react';
 import { LuSearchX } from 'react-icons/lu';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Loader } from '../Loader/styles';
 import {
   AccountRowSections,
@@ -96,7 +96,7 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
   const canSearchResult = canSearch();
 
   const { data, isLoading } = useQuery({
-    queryKey: trimmedSearch,
+    queryKey: [trimmedSearch],
     queryFn: () => getCorrectQueryFn(),
     enabled: canSearchResult,
   });

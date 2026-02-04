@@ -7,7 +7,7 @@ import { useDebounce } from '@/utils/hooks';
 import { parseAddress } from '@/utils/parseValues';
 import React, { useEffect, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { IContractProps, SelectOption } from '.';
 import FormInput from '../FormInput';
 import { FormBody, FormSection } from '../styles';
@@ -64,20 +64,19 @@ const Delegate: React.FC<PropsWithChildren<IContractProps>> = ({
     fetchBuckets();
   }, [senderAccount]);
 
-  const { data: validatorsList, fetchNextPage } = useInfiniteQuery(
-    ['validatorsList', debouncedName],
-    ({ pageParam = 1 }) => validatorsCall(pageParam, debouncedName),
-    {
-      getNextPageParam: lastPage => {
-        if (lastPage) {
-          const { self, totalPages } = lastPage?.pagination;
-          if (totalPages > self) {
-            return self + 1;
-          }
+  const { data: validatorsList, fetchNextPage } = useInfiniteQuery({
+    queryKey: ['validatorsList', debouncedName],
+    queryFn: ({ pageParam = 1 }) => validatorsCall(pageParam, debouncedName),
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      if (lastPage) {
+        const { self, totalPages } = lastPage?.pagination;
+        if (totalPages > self) {
+          return self + 1;
         }
-      },
+      }
     },
-  );
+  });
 
   const handleScrollBottom = () => {
     fetchNextPage();

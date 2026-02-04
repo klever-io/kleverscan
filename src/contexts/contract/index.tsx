@@ -29,7 +29,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useExtension } from '../extension';
 import { useModal } from './modals';
@@ -326,7 +326,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
   };
 
   const { data: assetsList, refetch: refetchAssetsList } = useQuery({
-    queryKey: 'assetsList',
+    queryKey: ['assetsList'],
     queryFn: getAssets,
     initialData: [],
     enabled: !!walletAddress,

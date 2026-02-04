@@ -30,7 +30,7 @@ export const ButtonModal = styled.button<{
   transition: all 0.1s ease;
 
   > span {
-    color: ${props => props.theme.black} !important;
+    color: ${props => props.theme.black};
   }
 
   &:active {
@@ -41,6 +41,10 @@ export const ButtonModal = styled.button<{
     background-color: ${props =>
       props.isLocked ? props.theme.darkGray : props.theme.violet};
     cursor: ${props => (props.isLocked ? 'not-allowed' : 'pointer')};
+    > span {
+      color: ${props =>
+        props.isLocked ? props.theme.black : props.theme.true.white};
+    }
   }
 
   ${props =>

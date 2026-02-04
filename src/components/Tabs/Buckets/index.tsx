@@ -9,7 +9,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { ContractContainer, Status } from './styles';
 
 export interface IBuckets {
@@ -25,7 +25,10 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
   const { t } = useTranslation('accounts');
   const { getInteractionsButtons } = useContractModal();
 
-  const { data: epoch } = useQuery('epoch', () => requestBlockEpoch());
+  const { data: epoch } = useQuery({
+    queryKey: ['epoch'],
+    queryFn: () => requestBlockEpoch(),
+  });
 
   const requestBlockEpoch = async () => {
     const response = await api.get({

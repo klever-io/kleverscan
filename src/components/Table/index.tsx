@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
@@ -132,20 +132,22 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
     isLoading,
     isFetching,
     refetch,
-  } = useQuery(
-    [
+  } = useQuery({
+    queryKey: [
       dataName || 'items',
       JSON.stringify(router.query),
       router.pathname,
       refreshKey,
     ],
-    () =>
+
+    queryFn: () =>
       tableRequest(
         Number(router.query?.page) || 1,
         Number(router.query?.limit) || 10,
       ),
-    onErrorHandler(),
-  );
+
+    ...onErrorHandler(),
+  });
 
   const props: TableRowProps = {
     pathname: router.pathname,
@@ -339,9 +341,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
-                            {Element({
-                              $smaller: smaller,
-                            })}
+                            <Element $smaller={smaller} />
                           </MobileCardItem>
                         );
                       },

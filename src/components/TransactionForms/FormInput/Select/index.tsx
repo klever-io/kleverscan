@@ -9,7 +9,7 @@ import { Container, HiddenInput } from './styles';
 const BaseSelect = dynamic(() => import('@/components/Select'), {
   ssr: false,
   loading: () => null,
-});
+}) as any;
 
 export interface IDropdownItem {
   label: string;
@@ -109,7 +109,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
         onMenuOpen={() => setIsSelectOpen(true)}
         onMenuClose={() => setIsSelectOpen(false)}
         options={options}
-        onChange={e => handleSelect(e)}
+        onChange={(e: any) => handleSelect(e)}
         onInputChange={onInputChange}
         value={selected?.value !== undefined ? selected : undefined}
         onMenuScrollToBottom={handleScrollBottom}

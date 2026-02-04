@@ -116,6 +116,11 @@ const navbarItems: INavbarItem[] = [
         Icon: MdOutlineLocalMall,
       },
       {
+        name: 'Create Transaction',
+        pathTo: '/create-transaction',
+        Icon: Send,
+      },
+      {
         name: 'Feedback',
         pathTo: 'https://forum.klever.org/c/kleverchain/requests/7',
         Icon: MdFeedback,

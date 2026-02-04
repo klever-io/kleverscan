@@ -127,7 +127,11 @@ const Assets: React.FC<PropsWithChildren> = () => {
     const sections: IRowSection[] = [
       {
         element: props => (
-          <Link href={`/asset/${assetId}`} key={assetId}>
+          <Link
+            href={`/asset/${assetId}`}
+            key={assetId}
+            data-testid="asset-link"
+          >
             <AssetLogo
               logo={logo}
               ticker={ticker}

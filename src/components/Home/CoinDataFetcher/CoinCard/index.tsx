@@ -27,7 +27,7 @@ import { ImageLoaderProps } from 'next/legacy/image';
 import Link from 'next/link';
 import React, { PropsWithChildren, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQueries } from 'react-query';
+import { useQueries } from '@tanstack/react-query';
 import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
   ArrowTopRight,
@@ -65,7 +65,7 @@ const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 
 interface IPropsRenderCoinsCard {
   coin: ICoinInfo;
-  cardRef: React.RefObject<HTMLDivElement>;
+  cardRef: React.RefObject<HTMLDivElement | null>;
   renderKfiMarketCap: () => string;
   coinDays: React.MutableRefObject<ICoinTimes>;
   assetsData: IAssetsData;
@@ -266,36 +266,38 @@ const CoinCard: React.FC<PropsWithChildren> = () => {
     klvDataInfo,
     kfiDataInfo,
     kfiPricesInfo,
-  ] = useQueries([
-    {
-      queryKey: 'klvData',
-      queryFn: homeKlvDataCall,
-    },
-    {
-      queryKey: 'klvChartData',
-      queryFn: queryFnKlvChart,
-    },
-    {
-      queryKey: 'kfiData',
-      queryFn: homeKfiDataCall,
-    },
-    {
-      queryKey: 'kfiChartData',
-      queryFn: queryFnKfiChart,
-    },
-    {
-      queryKey: 'klvDataInfo',
-      queryFn: homeKlvCall,
-    },
-    {
-      queryKey: 'kfiDataInfo',
-      queryFn: homeKfiCall,
-    },
-    {
-      queryKey: 'klvPricesCall',
-      queryFn: homeKfiPriceCall,
-    },
-  ]);
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ['klvData'],
+        queryFn: homeKlvDataCall,
+      },
+      {
+        queryKey: ['klvChartData'],
+        queryFn: queryFnKlvChart,
+      },
+      {
+        queryKey: ['kfiData'],
+        queryFn: homeKfiDataCall,
+      },
+      {
+        queryKey: ['kfiChartData'],
+        queryFn: queryFnKfiChart,
+      },
+      {
+        queryKey: ['klvDataInfo'],
+        queryFn: homeKlvCall,
+      },
+      {
+        queryKey: ['kfiDataInfo'],
+        queryFn: homeKfiCall,
+      },
+      {
+        queryKey: ['klvPricesCall'],
+        queryFn: homeKfiPriceCall,
+      },
+    ],
+  });
 
   const refetchCoinsCall = [klvChartResult.refetch, kfiChartResult.refetch];
 

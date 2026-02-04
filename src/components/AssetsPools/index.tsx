@@ -51,17 +51,21 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
         </Row>
       </>
     );
-    const handlerAddresses = (i: number) => (
+    const handlerAddresses = () => (
       <>
         <Row>
           <Link href={`/account/${ownerAddress}`} key={ownerAddress}>
-            <Mono key={ownerAddress + i}>{parseAddress(ownerAddress, 16)}</Mono>
+            <Mono key={ownerAddress + kda}>
+              {parseAddress(ownerAddress, 16)}
+            </Mono>
           </Link>
           <Copy data={ownerAddress} info="Owner Address" />
         </Row>
         <Row>
           <Link href={`/account/${adminAddress}`} key={adminAddress}>
-            <Mono key={adminAddress + i}>{parseAddress(adminAddress, 16)}</Mono>
+            <Mono key={adminAddress + kda}>
+              {parseAddress(adminAddress, 16)}
+            </Mono>
           </Link>
           <Copy data={adminAddress} info="Admin Address" />
         </Row>
@@ -90,7 +94,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
         width: 50,
       },
       {
-        element: () => handlerAddresses(0),
+        element: () => handlerAddresses(),
         span: 1,
         width: 50,
       },

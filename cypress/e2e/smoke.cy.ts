@@ -72,10 +72,8 @@ describe('Smoke Test - All Routes', () => {
           $body.find('[data-testid^="table-row-"]').length > 0;
         const hasEmptyState =
           $body.find('[data-testid="table-empty"]').length > 0;
-        const hasSmartContractCards =
-          $body.find('[data-testid="smart-contract-card"]').length > 0;
 
-        if (!hasEmptyState && (hasTableRows || hasSmartContractCards)) {
+        if (!hasEmptyState && hasTableRows) {
           // Wait for the specific link to exist and click it
           cy.get(route.selector, { timeout: 10000 })
             .should('exist')

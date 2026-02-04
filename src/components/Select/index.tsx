@@ -20,7 +20,7 @@ const BaseSelect: React.FC<PropsWithChildren<IBaseSelectProps>> = props => {
   const CaretDownIcon = () => {
     return <IoIosArrowDown />;
   };
-  const DropdownIndicator = (props: any): React.JSX.Element => {
+  const DropdownIndicator = (props: any): React.ReactElement => {
     const Component = components.DropdownIndicator as any;
     return (
       <Component {...props}>

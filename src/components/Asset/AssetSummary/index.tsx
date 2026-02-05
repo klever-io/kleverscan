@@ -15,6 +15,7 @@ import { PropsWithChildren, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { TbPencilMinus } from 'react-icons/tb';
 import { useQuery } from '@tanstack/react-query';
+import Tooltip from '@/components/Tooltip';
 import { ApplyFormModal } from './ApplyFormModal';
 import { AssetITOSummary } from './AssetITOSummary';
 import { ParticipateModal } from './ParticipateModal';
@@ -184,19 +185,42 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
           />
 
           {walletAddress && asset?.ownerAddress === walletAddress && (
-            <EditDescriptionButton
-              type="button"
-              onClick={() => setOpenApplyFormModal(true)}
-            >
-              <TbPencilMinus />
-              Edit description
-            </EditDescriptionButton>
+            <>
+              {process.env.NEXT_PUBLIC_ENABLE_ASSET_APPLY === 'true' ? (
+                <EditDescriptionButton
+                  type="button"
+                  onClick={() => setOpenApplyFormModal(true)}
+                >
+                  <TbPencilMinus />
+                  Edit description
+                </EditDescriptionButton>
+              ) : (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignSelf: 'flex-end',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <EditDescriptionButton type="button" disabled>
+                    <TbPencilMinus />
+                    Edit description
+                  </EditDescriptionButton>
+                  <Tooltip
+                    msg="The description system is under maintenance and will be back soon. Please contact support if the issue persists."
+                    customStyles={{ place: 'left' }}
+                  />
+                </div>
+              )}
+            </>
           )}
         </About>
       ) : null}
       {!asset_info?.project_description_copy &&
       walletAddress &&
-      asset?.ownerAddress === walletAddress ? (
+      asset?.ownerAddress === walletAddress &&
+      process.env.NEXT_PUBLIC_ENABLE_ASSET_APPLY === 'true' ? (
         <About>
           <AboutTitle>About the project</AboutTitle>
           <AddProjectDescription>

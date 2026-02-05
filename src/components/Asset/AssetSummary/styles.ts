@@ -234,6 +234,14 @@ export const EditDescriptionButton = styled.button`
   &:hover {
     filter: brightness(1.2);
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    &:hover {
+      filter: none;
+    }
+  }
 `;
 
 export const AddProjectDescription = styled.div`

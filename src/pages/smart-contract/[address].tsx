@@ -38,6 +38,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
@@ -247,7 +248,12 @@ export const getServerSideProps: GetServerSideProps = async ({
       notFound: true,
     };
   }
-  const props = await serverSideTranslations(locale, ['en']);
+  const props = await serverSideTranslations(
+    locale,
+    ['common'],
+    nextI18nextConfig,
+    ['en'],
+  );
   return { props };
 };
 

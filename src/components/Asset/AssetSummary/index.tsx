@@ -31,6 +31,7 @@ import {
   Container,
   Description,
   EditDescriptionButton,
+  EditDescriptionButtonContainer,
   Header,
   LeftSide,
   LinkStyles,
@@ -184,37 +185,28 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
             }
           />
 
-          {walletAddress && asset?.ownerAddress === walletAddress && (
-            <>
-              {process.env.NEXT_PUBLIC_ENABLE_ASSET_APPLY === 'true' ? (
-                <EditDescriptionButton
-                  type="button"
-                  onClick={() => setOpenApplyFormModal(true)}
-                >
+          {walletAddress &&
+            asset?.ownerAddress === walletAddress &&
+            (process.env.NEXT_PUBLIC_ENABLE_ASSET_APPLY === 'true' ? (
+              <EditDescriptionButton
+                type="button"
+                onClick={() => setOpenApplyFormModal(true)}
+              >
+                <TbPencilMinus />
+                Edit description
+              </EditDescriptionButton>
+            ) : (
+              <EditDescriptionButtonContainer>
+                <EditDescriptionButton type="button" disabled>
                   <TbPencilMinus />
                   Edit description
                 </EditDescriptionButton>
-              ) : (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignSelf: 'flex-end',
-                    alignItems: 'center',
-                    gap: '8px',
-                  }}
-                >
-                  <EditDescriptionButton type="button" disabled>
-                    <TbPencilMinus />
-                    Edit description
-                  </EditDescriptionButton>
-                  <Tooltip
-                    msg="The description system is under maintenance and will be back soon. Please contact support if the issue persists."
-                    customStyles={{ place: 'left' }}
-                  />
-                </div>
-              )}
-            </>
-          )}
+                <Tooltip
+                  msg="The description system is under maintenance and will be back soon. Please contact support if the issue persists."
+                  customStyles={{ place: 'left' }}
+                />
+              </EditDescriptionButtonContainer>
+            ))}
         </About>
       ) : null}
       {!asset_info?.project_description_copy &&

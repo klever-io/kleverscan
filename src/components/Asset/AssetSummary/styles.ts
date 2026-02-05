@@ -244,6 +244,13 @@ export const EditDescriptionButton = styled.button`
   }
 `;
 
+export const EditDescriptionButtonContainer = styled.div`
+  display: flex;
+  align-self: flex-end;
+  align-items: center;
+  gap: 8px;
+`;
+
 export const AddProjectDescription = styled.div`
   p {
     color: ${({ theme }) => theme.black};

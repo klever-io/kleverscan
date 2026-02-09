@@ -56,7 +56,9 @@ interface IRequestTxQuery {
   asset?: string;
   address?: string;
 }
-export const toAddressSectionElement = (toAddress: string): JSX.Element => {
+export const toAddressSectionElement = (
+  toAddress: string,
+): React.ReactElement => {
   if (toAddress === '--') {
     return <Mono>{toAddress}</Mono>;
   }
@@ -68,7 +70,9 @@ export const toAddressSectionElement = (toAddress: string): JSX.Element => {
     </LinkWithDropdown>
   );
 };
-export const mobileAddressSectionElement = (toAddress: string): JSX.Element => {
+export const mobileAddressSectionElement = (
+  toAddress: string,
+): React.ReactElement => {
   const { isMobile } = useMobile();
   if (isMobile) {
     return (
@@ -219,7 +223,7 @@ export const getCustomFields = (
   receipts: IReceipt[],
   precision?: number,
   data?: string[],
-): JSX.Element[] => {
+): React.ReactElement[] => {
   const contractType = contractTypes(contract);
   const filteredSectionsResult = filteredSections(
     contract,
@@ -264,7 +268,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       element: props => (
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>
+            <Link href={`/transaction/${hash}`} data-testid="transaction-link">
               <Mono>{parseAddress(hash, 24)}</Mono>
             </Link>
             <Copy info="TXHash" data={hash} />

@@ -23,7 +23,7 @@ const getStatusIcon = (status: string): any => {
   }
 };
 
-const statusWithIcon = (action: boolean, t: TFunction): JSX.Element => {
+const statusWithIcon = (action: boolean, t: TFunction): React.ReactElement => {
   const StatusIcon = getStatusIcon(action ? 'success' : 'fail');
 
   return (

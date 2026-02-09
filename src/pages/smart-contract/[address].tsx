@@ -1,20 +1,30 @@
+import { Transactions } from '@/assets/cards';
+import { RedFailed, WhiteTick } from '@/assets/icons';
+import Copy from '@/components/Copy';
+import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
+import Title from '@/components/Layout/Title';
+import SmartContractsTransactions from '@/components/SmartContracts/SmartContractsTransactions';
+import { useMobile } from '@/contexts/mobile';
+import api from '@/services/api';
+import { smartContractBeforeYesterdayTransactionsCall } from '@/services/requests/smartContracts';
 import {
-  Container,
-  Header,
-  CardContent,
-  Row,
+  Badge,
+  BadgeContainer,
   CardContainer,
+  CardContent,
   CardHeader,
   CardHeaderItem,
   CardTabContainer,
   CenteredRow,
-  Badge,
-  BadgeContainer,
+  Container,
+  Header,
+  Row,
 } from '@/styles/common';
-import Title from '@/components/Layout/Title';
-import React, { useEffect, useRef, useState } from 'react';
-import { Transactions } from '@/assets/cards';
-import { useRouter } from 'next/router';
+import { SmartContractDetailsData } from '@/types/smart-contract';
+import { isKVMAvailable } from '@/utils/kvm';
+import { getNetwork } from '@/utils/networkFunctions';
+import { parseAddress } from '@/utils/parseValues';
+import { timestampToDate } from '@/utils/timeFunctions';
 import {
   ArrowData,
   DataCard,
@@ -23,22 +33,12 @@ import {
   DataCardsContent,
   DataCardValue,
 } from '@/views/home';
-import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
-import api from '@/services/api';
-import { smartContractBeforeYesterdayTransactionsCall } from '@/services/requests/smartContracts';
-import { SmartContractDetailsData } from '@/types/smart-contract';
-import { parseAddress } from '@/utils/parseValues';
-import Copy from '@/components/Copy';
-import SmartContractsTransactions from '@/components/SmartContracts/SmartContractsTransactions';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import nextI18nextConfig from '../../../next-i18next.config';
-import { WhiteTick, RedFailed } from '@/assets/icons';
-import { useMobile } from '@/contexts/mobile';
-import { timestampToDate } from '@/utils/timeFunctions';
-import { getNetwork } from '@/utils/networkFunctions';
 import Link from 'next/link';
-import { isKVMAvailable } from '@/utils/kvm';
+import { useRouter } from 'next/router';
+import React, { useEffect, useRef, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
@@ -248,7 +248,12 @@ export const getServerSideProps: GetServerSideProps = async ({
       notFound: true,
     };
   }
-  const props = await serverSideTranslations(locale, ['en']);
+  const props = await serverSideTranslations(
+    locale,
+    ['common'],
+    nextI18nextConfig,
+    ['en'],
+  );
   return { props };
 };
 

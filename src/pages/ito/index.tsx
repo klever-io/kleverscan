@@ -72,7 +72,7 @@ interface RenderViewAssetButtonProps {
 export const renderViewAssetButton = ({
   assetId,
   reference,
-}: RenderViewAssetButtonProps): JSX.Element => {
+}: RenderViewAssetButtonProps): React.ReactElement => {
   const router = useRouter();
   return (
     <ParticipateButton

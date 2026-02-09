@@ -6,7 +6,7 @@ import PaginationModal from './PaginationModal/PaginationModal';
 import { ArrowContainer, Container, ItemContainer } from './styles';
 
 interface IPagination {
-  tableRef?: React.RefObject<HTMLDivElement>;
+  tableRef?: React.RefObject<HTMLDivElement | null>;
   count: number;
   page: number;
   onPaginate(page: number): void;

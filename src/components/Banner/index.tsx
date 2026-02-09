@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import api from '@/services/api';
 import React, { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { BannerContainer, BannerParagraph, ButtonClose } from './styled';
 
 interface IResultsHeath {

@@ -26,7 +26,7 @@ import { useRouter } from 'next/router';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { FieldError, useFormContext } from 'react-hook-form';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 const collectionContracts = [
   'ConfigITOContract',
@@ -85,6 +85,7 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
   } = useFormContext();
 
   const watchCollectionAssetId = watch('collectionAssetId');
+  const watchCollection = watch('collection');
 
   const collectionAssetId = queue[parsedIndex]?.collectionAssetId;
 
@@ -101,7 +102,7 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
     refetch: refetchAssetsList,
     isFetching: assetsFetching,
   } = useQuery({
-    queryKey: 'assetsList',
+    queryKey: ['assetsList'],
     queryFn: getAssets,
     initialData: [],
     enabled: walletAddress !== '',
@@ -112,7 +113,7 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
     refetch: refetchKAssetsList,
     isFetching: kAssetsFetching,
   } = useQuery({
-    queryKey: 'kAssetsList',
+    queryKey: ['kAssetsList'],
     queryFn: getKAssets,
     initialData: [],
     enabled: walletAddress !== '',
@@ -173,6 +174,19 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
     });
     trigger('collection');
   };
+
+  // Initialize collection from form's default values
+  useEffect(() => {
+    if (watchCollection && assetsList.length > 0) {
+      const matchedAsset = assetsList.find(
+        (asset: ICollectionList) =>
+          asset.value === watchCollection || asset.assetId === watchCollection,
+      );
+      if (matchedAsset && matchedAsset.value !== selectedCollection?.value) {
+        setCollection(matchedAsset);
+      }
+    }
+  }, [assetsList, watchCollection]);
 
   const refetch = () => {
     refetchAssetsList();
@@ -332,6 +346,7 @@ const CollectionIDField: React.FC<
   const watchCollectionAssetId = watch('collectionAssetId');
 
   const {
+    data: collectionListData,
     isLoading: collectionIdListLoading,
     refetch,
     isFetching: collectionIdListFetching,
@@ -345,17 +360,21 @@ const CollectionIDField: React.FC<
         !collection.isNFT && !collection.isFungible,
       ),
     initialData: [],
-    onSuccess: newData => {
-      if (!newData) return;
+  });
 
+  useEffect(() => {
+    if (collectionListData) {
       setCollectionIdData(prevData => {
         const overwrittenValues = new Map(
-          [...prevData, ...newData].map(item => [item.assetId, item]),
+          [...prevData, ...collectionListData].map(item => [
+            item.assetId,
+            item,
+          ]),
         ).values();
         return Array.from(overwrittenValues);
       });
-    },
-  });
+    }
+  }, [collectionListData]);
 
   const selectedCollection = collectionIdData?.filter(
     e => String(e.nftNonce) === watchCollectionAssetId,

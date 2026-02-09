@@ -22,7 +22,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { transactionRowSections } from '../transactions';
 

@@ -327,7 +327,7 @@ export const ParticipateModal: React.FC<
             <ReactSelect
               classNamePrefix="react-select"
               options={getPackCurrencyOptions()}
-              onChange={value => {
+              onChange={(value: unknown) => {
                 setSelectedPackCurrency(
                   (value as { value: string })?.value || '',
                 );
@@ -358,7 +358,7 @@ export const ParticipateModal: React.FC<
                     <ReactSelect
                       classNamePrefix="react-select"
                       options={getPriceOptions()}
-                      onChange={value => {
+                      onChange={(value: unknown) => {
                         setSelectedPrice(
                           (value as { index: number })?.index || 0,
                         );

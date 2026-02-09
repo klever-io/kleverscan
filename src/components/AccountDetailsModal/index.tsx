@@ -27,7 +27,7 @@ import { IoMdAddCircle } from 'react-icons/io';
 import { IoCreateOutline, IoReloadSharp } from 'react-icons/io5';
 import { MdContentCopy } from 'react-icons/md';
 import { RiArrowDownSLine, RiArrowRightSLine } from 'react-icons/ri';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import Copy from '../Copy';
 import {
@@ -45,6 +45,7 @@ import {
   SpanDropdown,
   SubSection,
   UserInfoContainer,
+  AddressWithCopy,
 } from './styles';
 
 export interface IAssetBalance {
@@ -78,19 +79,27 @@ export const AccountDetailsModal: React.FC<
   const [openNetworks, setOpenNetworks] = useState<boolean>(false);
 
   const closeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const modalCloseTimeout = useRef<NodeJS.Timeout | null>(null);
   const { walletAddress, connectExtension, logoutExtension } = useExtension();
   const { isMobile } = useMobile();
   const network = getNetwork();
   const router = useRouter();
 
-  const { data, refetch: getAccountBalance } = useQuery<IAccountBalance>({
+  const {
+    data,
+    refetch: getAccountBalance,
+    isSuccess,
+  } = useQuery<IAccountBalance>({
     queryKey: ['accountBalance', walletAddress],
     queryFn: () => getAccountBalanceRequest(walletAddress, setLoadingBalance),
     enabled: !!walletAddress,
-    onSettled: () => {
-      setLoadingBalance(false);
-    },
   });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setLoadingBalance(false);
+    }
+  }, [isSuccess]);
 
   const { balance, otherAssets } = useMemo(() => {
     if (data) {
@@ -137,20 +146,75 @@ export const AccountDetailsModal: React.FC<
   };
 
   const handleMouseEnter = () => {
-    closeTimeout.current !== null && clearTimeout(closeTimeout.current);
+    // Clear any pending close timeout when mouse enters modal
+    if (modalCloseTimeout.current) {
+      clearTimeout(modalCloseTimeout.current);
+      modalCloseTimeout.current = null;
+    }
+    if (closeTimeout.current) {
+      clearTimeout(closeTimeout.current);
+      closeTimeout.current = null;
+    }
   };
 
-  const handleMouseLeave = () => {
-    const seconds = !isMobile && !(screen.width < 1024) ? 500 : 100;
-    closeTimeout.current !== null && clearTimeout(closeTimeout.current);
+  const handleMouseLeave = (e: React.MouseEvent) => {
+    // Disable auto-close on mobile
+    if (isMobile) return;
+
+    // Check if the mouse is actually leaving the modal container
+    // and not just entering a child element
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    const currentTarget = e.currentTarget as HTMLElement;
+
+    // If the related target is within the modal, don't close
+    if (relatedTarget && currentTarget.contains(relatedTarget)) {
+      return;
+    }
+
+    const seconds = 500;
+    if (closeTimeout.current) {
+      clearTimeout(closeTimeout.current);
+    }
+
+    closeTimeout.current = setTimeout(() => {
+      setExpandAssets(false);
+    }, seconds);
+
+    // Close modal after a delay when mouse leaves
+    if (modalCloseTimeout.current) {
+      clearTimeout(modalCloseTimeout.current);
+    }
+    modalCloseTimeout.current = setTimeout(() => {
+      setOpenUserInfos(false);
+    }, 300);
+  };
+
+  const handleDropdownMouseEnter = () => {
+    // Clear the expandAssets close timeout when hovering the dropdown
+    if (closeTimeout.current) {
+      clearTimeout(closeTimeout.current);
+      closeTimeout.current = null;
+    }
+  };
+
+  const handleDropdownMouseLeave = () => {
+    // Don't auto-close dropdown on mobile
+    if (isMobile) return;
+
+    // Only close the expandAssets dropdown, NOT the modal
+    const seconds = 500;
+    if (closeTimeout.current) {
+      clearTimeout(closeTimeout.current);
+    }
+
     closeTimeout.current = setTimeout(() => {
       setExpandAssets(false);
     }, seconds);
   };
 
   const dropdownProps = {
-    onMouseOver: handleMouseEnter,
-    onMouseLeave: handleMouseLeave,
+    onMouseOver: handleDropdownMouseEnter,
+    onMouseLeave: handleDropdownMouseLeave,
   };
 
   const updatePrimaryAsset = () => {
@@ -188,8 +252,51 @@ export const AccountDetailsModal: React.FC<
     getAccountBalance();
   }, [walletAddress]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (!isMobile) return;
+
+      const target = event.target as HTMLElement;
+      const dropdownElement = document.querySelector(
+        '[data-dropdown-container]',
+      );
+      const containerElement = document.querySelector('[data-asset-container]');
+
+      // Close dropdown if clicking outside of it
+      if (
+        expandAssets &&
+        dropdownElement &&
+        !dropdownElement.contains(target) &&
+        !containerElement?.contains(target)
+      ) {
+        setExpandAssets(false);
+      }
+    };
+
+    if (isMobile && expandAssets) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      if (modalCloseTimeout.current) {
+        clearTimeout(modalCloseTimeout.current);
+      }
+      if (closeTimeout.current) {
+        clearTimeout(closeTimeout.current);
+      }
+    };
+  }, [isMobile, expandAssets]);
+
   return (
-    <UserInfoContainer openUserInfos={openUserInfos} isMobile={isMobile}>
+    <UserInfoContainer
+      openUserInfos={openUserInfos}
+      isMobile={isMobile}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <HeaderInfo>
         <div>
           <BiWalletAlt size={'1em'} />
@@ -208,11 +315,21 @@ export const AccountDetailsModal: React.FC<
             </div>
           </QRCodeContent>
         )}
-        {walletAddress && <small>{parseAddress(walletAddress, 25)}</small>}
+        {walletAddress && (
+          <AddressWithCopy>
+            <small>{parseAddress(walletAddress, 25)}</small>
+            <Copy info="Wallet Address" data={walletAddress}>
+              <MdContentCopy size={'1rem'} />
+            </Copy>
+          </AddressWithCopy>
+        )}
 
         <ReloadContainer>
           <BalanceContainer>
-            <ContainerAsset onClick={() => setExpandAssets(!expandAssets)}>
+            <ContainerAsset
+              onClick={() => setExpandAssets(!expandAssets)}
+              data-asset-container
+            >
               {primaryAsset.length > 0 ? (
                 <>
                   <>
@@ -230,7 +347,7 @@ export const AccountDetailsModal: React.FC<
                   <KLV />
                 </>
               )}
-              <SpanDropdown {...dropdownProps}>
+              <SpanDropdown {...dropdownProps} data-dropdown-container>
                 <DropdownIcon $openOtherAssets={!expandAssets} />
                 {expandAssets && otherAssets.length > 0 && (
                   <OtherAssetsContainer isMobile={isMobile}>
@@ -330,14 +447,6 @@ export const AccountDetailsModal: React.FC<
             <IoMdAddCircle size={'1.2rem'} />
             <p>Request Test KLV</p>
           </ActionItem>
-        )}
-        {walletAddress && (
-          <Copy info="Wallet Address" data={walletAddress}>
-            <ActionItem>
-              <MdContentCopy size={'1.2rem'} />
-              <p>Copy Address</p>
-            </ActionItem>
-          </Copy>
         )}
         <ActionItem
           onClick={() => {

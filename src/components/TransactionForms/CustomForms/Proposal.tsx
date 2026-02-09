@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';
 import {
@@ -56,7 +56,10 @@ const Proposal: React.FC<PropsWithChildren<IContractProps>> = ({
 }) => {
   const { handleSubmit } = useFormContext<FormData>();
 
-  const { data: paramsList } = useQuery('paramsList', getParamsList);
+  const { data: paramsList } = useQuery({
+    queryKey: ['paramsList'],
+    queryFn: getParamsList,
+  });
 
   const onSubmit = async (data: FormData) => {
     parseProposal(data);

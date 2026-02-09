@@ -46,7 +46,7 @@ const Select = dynamic(() => import('./Select'), {
 const DropdownCustomLabelSelect = dynamic(() => import('@/components/Select'), {
   ssr: false,
   loading: () => null,
-});
+}) as any;
 
 export interface IBaseFormInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

@@ -66,7 +66,7 @@ const formatAmountField = (
   return toLocaleFixed(amount / 10 ** precision, precision);
 };
 
-const TransferSections = ({ par, precision }: IProps): JSX.Element[] => {
+const TransferSections = ({ par, precision }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ITransferContract;
 
   if (typeof window === 'undefined') return [];
@@ -96,7 +96,10 @@ const TransferSections = ({ par, precision }: IProps): JSX.Element[] => {
   ];
 };
 
-const CreateAssetSections = ({ par, receipts }: IProps): JSX.Element[] => {
+const CreateAssetSections = ({
+  par,
+  receipts,
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ICreateAssetContract;
   const createAssetReceipt = findReceipt(receipts, 1) as ICreateAssetReceipt;
 
@@ -109,7 +112,7 @@ const CreateAssetSections = ({ par, receipts }: IProps): JSX.Element[] => {
   ];
 };
 
-const CreateValidatorSections = ({ par }: IProps): JSX.Element[] => {
+const CreateValidatorSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ICreateValidatorContract;
 
   return [
@@ -127,7 +130,7 @@ const CreateValidatorSections = ({ par }: IProps): JSX.Element[] => {
   ];
 };
 
-const ValidatorConfigSections = ({ par }: IProps): JSX.Element[] => {
+const ValidatorConfigSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IValidatorConfigContract;
 
   return [
@@ -145,7 +148,7 @@ const FreezeSections = ({
   par,
   precision,
   receipts,
-}: IProps): JSX.Element[] => {
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IFreezeContract;
   if (!parameter?.assetId) precision = KLV_PRECISION;
 
@@ -170,7 +173,7 @@ const UnfreezeSections = ({
   par,
   receipts,
   precision,
-}: IProps): JSX.Element[] => {
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IUnfreezeContract;
 
   const unfreezeReceipt = findReceipt(receipts, 4) as
@@ -195,7 +198,7 @@ const UnfreezeSections = ({
   ];
 };
 
-const DelegateSections = ({ par, receipts }: IProps): JSX.Element[] => {
+const DelegateSections = ({ par, receipts }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IDelegateContract;
 
   const delegateReceipt = findReceipt(receipts, 7) as
@@ -221,7 +224,10 @@ const DelegateSections = ({ par, receipts }: IProps): JSX.Element[] => {
   ];
 };
 
-const UndelegateSections = ({ par, receipts }: IProps): JSX.Element[] => {
+const UndelegateSections = ({
+  par,
+  receipts,
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IUndelegateContract;
 
   const delegateReceipt = findReceipt(receipts, 7) as
@@ -248,7 +254,7 @@ const WithdrawSections = ({
   par,
   precision,
   receipts,
-}: IProps): JSX.Element[] => {
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IWithdrawContract;
   const assetId = parameter?.assetId ?? 'KLV';
 
@@ -276,7 +282,7 @@ const ClaimSections = ({
   par,
   receipts,
   precision = 6,
-}: IProps): JSX.Element[] => {
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IClaimContract;
   const claimReceipt = findReceipt(receipts, 17) as IClaimReceipt | undefined;
 
@@ -292,11 +298,11 @@ const ClaimSections = ({
   ];
 };
 
-const UnjailSections = (_props: IProps): JSX.Element[] => {
+const UnjailSections = (_props: IProps): React.ReactElement[] => {
   return [<></>];
 };
 
-const AssetTriggerSections = ({ par }: IProps): JSX.Element[] => {
+const AssetTriggerSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IAssetTriggerContract;
 
   return [
@@ -305,13 +311,13 @@ const AssetTriggerSections = ({ par }: IProps): JSX.Element[] => {
   ];
 };
 
-const SetAccountNameSections = ({ par }: IProps): JSX.Element[] => {
+const SetAccountNameSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ISetAccountNameContract;
 
   return [<span key={parameter?.name}>{parameter?.name}</span>];
 };
 
-const ProposalSections = ({ par, receipts }: IProps): JSX.Element[] => {
+const ProposalSections = ({ par, receipts }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IProposalContract;
   const proposalReceipt = findReceipt(receipts, 5) as IProposalReceipt;
 
@@ -337,7 +343,7 @@ const ProposalSections = ({ par, receipts }: IProps): JSX.Element[] => {
   ];
 };
 
-const VoteSections = ({ par }: IProps): JSX.Element[] => {
+const VoteSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IVoteContract;
 
   return [
@@ -352,7 +358,7 @@ const VoteSections = ({ par }: IProps): JSX.Element[] => {
   ];
 };
 
-const ConfigITOSections = ({ par }: IProps): JSX.Element[] => {
+const ConfigITOSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IConfigITOContract;
 
   return [
@@ -365,13 +371,13 @@ const ConfigITOSections = ({ par }: IProps): JSX.Element[] => {
   ];
 };
 
-const SetITOPricesSections = ({ par }: IProps): JSX.Element[] => {
+const SetITOPricesSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ISetITOPricesContract;
 
   return [<span key={parameter?.assetId}>{parameter?.assetId}</span>];
 };
 
-const BuySections = ({ par, precision }: IProps): JSX.Element[] => {
+const BuySections = ({ par, precision }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IBuyContractPayload;
   const currency =
     parameter?.buyType === 'ITOBuy' ? parameter?.id : parameter?.currencyID;
@@ -387,7 +393,7 @@ const BuySections = ({ par, precision }: IProps): JSX.Element[] => {
   ];
 };
 
-const SellSections = ({ par, precision }: IProps): JSX.Element[] => {
+const SellSections = ({ par, precision }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ISellContract;
 
   let assetId = parameter?.assetId;
@@ -412,7 +418,7 @@ const SellSections = ({ par, precision }: IProps): JSX.Element[] => {
   ];
 };
 
-const CancelMarketOrderSections = ({ par }: IProps): JSX.Element[] => {
+const CancelMarketOrderSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ICancelMarketOrderContract;
 
   return [<span key={parameter?.orderID}>{parameter?.orderID}</span>];
@@ -421,7 +427,7 @@ const CancelMarketOrderSections = ({ par }: IProps): JSX.Element[] => {
 const CreateMarketplaceSections = ({
   par,
   receipts,
-}: IProps): JSX.Element[] => {
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ICreateMarketplaceContract;
 
   const createMarketplaceReceipt = findReceipt(
@@ -441,7 +447,7 @@ const CreateMarketplaceSections = ({
   ];
 };
 
-const ConfigMarketplaceSections = ({ par }: IProps): JSX.Element[] => {
+const ConfigMarketplaceSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IConfigMarketplaceContract;
 
   return [
@@ -457,7 +463,7 @@ const ConfigMarketplaceSections = ({ par }: IProps): JSX.Element[] => {
 
 const UpdateAccountPermissionContractSections = ({
   par,
-}: IProps): JSX.Element[] => {
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IUpdateAccountPermissionContract;
 
   const permissionNames = parameter?.permissions?.map(permission =>
@@ -476,7 +482,7 @@ const UpdateAccountPermissionContractSections = ({
   return [<span key={permissionsString}>{permissionsString}</span>];
 };
 
-const DepositSections = ({ par, precision }: IProps): JSX.Element[] => {
+const DepositSections = ({ par, precision }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IDepositContract;
 
   return [
@@ -491,7 +497,7 @@ const DepositSections = ({ par, precision }: IProps): JSX.Element[] => {
   ];
 };
 
-const IITOTriggerSections = ({ par }: IProps): JSX.Element[] => {
+const IITOTriggerSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as IITOTriggerContract;
   return [
     <span key={parameter?.assetId}>{parameter?.assetId || ''}</span>,
@@ -503,7 +509,7 @@ const SmartContractSections = ({
   par,
   receipts,
   data,
-}: IProps): JSX.Element[] => {
+}: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ISmartContract;
 
   const calledFunction =

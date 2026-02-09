@@ -18,9 +18,12 @@ export const SftMetadata: React.FC<PropsWithChildren<INonceDetails>> = ({
 
   const ReactJson = useMemo(
     () =>
-      dynamic(() => import('react-json-view').then(mod => mod.default), {
-        ssr: false,
-      }),
+      dynamic(
+        () => import('@microlink/react-json-view').then(mod => mod.default),
+        {
+          ssr: false,
+        },
+      ),
     [],
   );
 

@@ -39,7 +39,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { AdvancedOptsContainer, ArrowDownIcon, ArrowUpIcon } from '../styles';
 import {
   ExtraOptionContainer,

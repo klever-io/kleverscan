@@ -21,7 +21,7 @@ const Input: React.FC<PropsWithChildren<InputGlobal>> = ({
   const [search, setSearch] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const timeoutId = useRef<NodeJS.Timeout>();
+  const timeoutId = useRef<NodeJS.Timeout | undefined>(undefined);
   const { searchValue } = useInputSearch();
   const { t } = useTranslation('common');
 

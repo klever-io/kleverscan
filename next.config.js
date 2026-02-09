@@ -13,6 +13,7 @@ const defaultEnvs = [
   'DEFAULT_API_MULTISIGN',
   'NEXT_PUBLIC_TRANSFER_ADDRESS',
   'NEXT_PUBLIC_ADD_ASSET_INFO_VALUE',
+  'NEXT_PUBLIC_ENABLE_ASSET_APPLY',
   'DIRECTUS_STATIC_TOKEN',
   'DEFAULT_CDN_HOST',
   'GA_TRACKING_ID',
@@ -42,23 +43,17 @@ module.exports = {
     ],
   },
   reactStrictMode: false,
-  webpack: (config, options) => {
-    config.resolve.fallback = { fs: false, path: false };
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: [
-        options.defaultLoaders.babel,
-        {
-          loader: '@svgr/webpack',
-          options: { babel: false },
-        },
-      ],
-    });
-
-    return config;
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
+  turbopack: {
+    resolveAlias: {
+      fs: { browser: './empty.ts' },
+      path: { browser: './empty.ts' },
+    },
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
   },
   typescript: {
     ignoreBuildErrors: process.env?.IS_PRODUCTION === 'true',

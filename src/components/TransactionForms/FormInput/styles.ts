@@ -408,13 +408,15 @@ export const ErrorMessage = styled.span<{ warning?: boolean }>`
 `;
 
 export const HelperText = styled.span`
-  color: ${({ theme }) => theme.darkText};
-  opacity: 0.6;
-  font-size: 0.8rem;
-  font-weight: 400;
-  position: absolute;
-  bottom: -1.1rem;
-  left: 0;
+  && {
+    color: ${({ theme }) => theme.darkText};
+    opacity: 0.6;
+    font-size: 0.8rem;
+    font-weight: 400;
+    position: absolute;
+    bottom: -1.1rem;
+    left: 0;
+  }
 `;
 
 export const MarginRightAutoLabel = styled.span`

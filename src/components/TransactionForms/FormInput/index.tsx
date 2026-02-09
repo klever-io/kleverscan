@@ -537,7 +537,9 @@ const FormInput: React.FC<
       {logoError && (
         <ErrorMessage warning={!!logoError}>{logoError}</ErrorMessage>
       )}
-      {helperText && <HelperText>{helperText}</HelperText>}
+      {helperText && !error && !apiError && !logoError && (
+        <HelperText>{helperText}</HelperText>
+      )}
     </Container>
   );
 };

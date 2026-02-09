@@ -368,9 +368,15 @@ const KDAFeePoolForm: React.FC<{
 
   const assetName = collection.label || collection.value || 'KDA';
 
+  const numericQuotient = Number(quotient);
+  const amount = 10 * numericQuotient;
+  const formattedAmount = Number.isFinite(amount)
+    ? amount.toLocaleString(undefined, { maximumFractionDigits: 8 })
+    : undefined;
+
   const helperText =
-    quotient && Number(quotient) > 0
-      ? `If a fee costs 10 KLV, users will pay ${10 * Number(quotient)} ${assetName}`
+    numericQuotient > 0 && formattedAmount !== undefined
+      ? `If a fee costs 10 KLV, users will pay ${formattedAmount} ${assetName}`
       : undefined;
 
   return (

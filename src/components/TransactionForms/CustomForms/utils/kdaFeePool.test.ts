@@ -52,4 +52,16 @@ describe('getKDAFeePoolHelperText', () => {
     expect(result).toContain('TIKTOK-TSE0');
     expect(result).not.toContain('0.20000000000000001');
   });
+
+  it('should show less-than text for extremely small quotients', () => {
+    const result = getKDAFeePoolHelperText(1e-10, 'TINY-ABC1');
+    expect(result).toBe(
+      'If a fee costs 10 KLV, users will pay < 0.00000001 TINY-ABC1',
+    );
+  });
+
+  it('should format normally when amount equals MIN_DISPLAYABLE_AMOUNT', () => {
+    const result = getKDAFeePoolHelperText(1e-9, 'KDA');
+    expect(result).toBe('If a fee costs 10 KLV, users will pay 0.00000001 KDA');
+  });
 });

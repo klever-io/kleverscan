@@ -24,6 +24,7 @@ import {
   DropdownCustomLabelSelectStyles,
   ErrorMessage,
   FileInput,
+  HelperText,
   InfoIcon,
   InputLabel,
   RequiredSpan,
@@ -79,6 +80,7 @@ export interface IBaseFormInputProps
   loading?: boolean;
   warning?: boolean;
   propsValidate?: () => any;
+  helperText?: string | React.ReactNode;
 }
 
 export interface IFormInputProps extends IBaseFormInputProps {
@@ -190,6 +192,7 @@ const FormInput: React.FC<
   loading = false,
   warning,
   propsValidate,
+  helperText,
   ...rest
 }) => {
   const areaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -533,6 +536,9 @@ const FormInput: React.FC<
       )}
       {logoError && (
         <ErrorMessage warning={!!logoError}>{logoError}</ErrorMessage>
+      )}
+      {helperText && !error && !apiError && !logoError && (
+        <HelperText>{helperText}</HelperText>
       )}
     </Container>
   );

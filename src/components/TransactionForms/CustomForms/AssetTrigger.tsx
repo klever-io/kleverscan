@@ -348,30 +348,7 @@ const getAssetTriggerForm = (
       );
     case 15:
       return (
-        <FormSection>
-          <FormInput
-            name="kdaPool.adminAddress"
-            title="Admin Address"
-            dynamicInitialValue={walletAddress}
-            required
-          />
-          <FormInput
-            name="kdaPool.quotient"
-            title="KDA/KLV Quotient"
-            type="number"
-            required
-            tooltip={tooltip.updateKdaPool.quotient}
-          />
-          <FormInput
-            name="kdaPool.active"
-            title="Active"
-            type="checkbox"
-            toggleOptions={['No', 'Yes']}
-            dynamicInitialValue={true}
-            bool
-            tooltip={tooltip.updateKdaPool.active}
-          />
-        </FormSection>
+        <KDAFeePoolForm collection={collection} walletAddress={walletAddress} />
       );
     case 16:
       return null;
@@ -380,6 +357,49 @@ const getAssetTriggerForm = (
     default:
       return null;
   }
+};
+
+const KDAFeePoolForm: React.FC<{
+  collection: ICollectionList;
+  walletAddress: string;
+}> = ({ collection, walletAddress }) => {
+  const { watch } = useFormContext();
+  const quotient = watch('kdaPool.quotient');
+
+  const assetName = collection.label || collection.value || 'KDA';
+
+  const helperText =
+    quotient && Number(quotient) > 0
+      ? `If a fee costs 10 KLV, users will pay ${10 * Number(quotient)} ${assetName}`
+      : undefined;
+
+  return (
+    <FormSection>
+      <FormInput
+        name="kdaPool.adminAddress"
+        title="Admin Address"
+        dynamicInitialValue={walletAddress}
+        required
+      />
+      <FormInput
+        name="kdaPool.quotient"
+        title="KDA per KLV Rate"
+        type="number"
+        required
+        tooltip={tooltip.updateKdaPool.quotient}
+        helperText={helperText}
+      />
+      <FormInput
+        name="kdaPool.active"
+        title="Active"
+        type="checkbox"
+        toggleOptions={['No', 'Yes']}
+        dynamicInitialValue={true}
+        bool
+        tooltip={tooltip.updateKdaPool.active}
+      />
+    </FormSection>
+  );
 };
 
 export const AddRoleSection: React.FC<PropsWithChildren> = () => {

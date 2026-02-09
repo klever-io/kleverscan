@@ -27,6 +27,7 @@ import {
   parseStaking,
   parseURIs,
 } from './utils';
+import { getKDAFeePoolHelperText } from './utils/kdaFeePool';
 import { assetTriggerTooltips as tooltip } from './utils/tooltips';
 
 export interface IMetadataOptions {
@@ -368,16 +369,7 @@ const KDAFeePoolForm: React.FC<{
 
   const assetName = collection.label || collection.value || 'KDA';
 
-  const numericQuotient = Number(quotient);
-  const amount = 10 * numericQuotient;
-  const formattedAmount = Number.isFinite(amount)
-    ? amount.toLocaleString(undefined, { maximumFractionDigits: 8 })
-    : undefined;
-
-  const helperText =
-    numericQuotient > 0 && formattedAmount !== undefined
-      ? `If a fee costs 10 KLV, users will pay ${formattedAmount} ${assetName}`
-      : undefined;
+  const helperText = getKDAFeePoolHelperText(quotient, assetName);
 
   return (
     <FormSection>

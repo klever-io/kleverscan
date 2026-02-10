@@ -20,6 +20,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { smartContractTransactionDetailsCall } from '@/services/requests/smartContracts';
 import dynamic from 'next/dynamic';
 import { isKVMAvailable } from '@/utils/kvm';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const SmartContractTransaction: React.FC = () => {
   const router = useRouter();
@@ -87,7 +88,12 @@ export const getServerSideProps: GetServerSideProps = async ({
       notFound: true,
     };
   }
-  const props = await serverSideTranslations(locale, ['en']);
+  const props = await serverSideTranslations(
+    locale,
+    ['common'],
+    nextI18nextConfig,
+    ['en'],
+  );
   return { props };
 };
 

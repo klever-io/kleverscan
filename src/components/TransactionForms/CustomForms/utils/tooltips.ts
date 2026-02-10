@@ -93,7 +93,7 @@ export const assetTriggerTooltips = {
   },
   updateKdaPool: {
     quotient:
-      'KDA ratio for each KLV E.g.: when KLV the quotient is 2, the cost is 2 KDA per 1 KLV',
+      'How many units of your token equal 1 KLV for fee payment. Example: if set to 2, users pay 2 of your token for every 1 KLV in fees.',
     active: '"Yes" if the pooling should be active',
   },
   role: {

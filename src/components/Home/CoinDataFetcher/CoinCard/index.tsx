@@ -1,5 +1,6 @@
 import { BitcoinMe, Bridge, VoxSwap } from '@/assets/swap-exchange';
 import { ChartType } from '@/components/Chart';
+
 import { PriceTooltip } from '@/components/Chart/Tooltips';
 import QuickAccess from '@/components/Home/QuickAccess';
 import { Loader } from '@/components/Loader/styles';
@@ -21,13 +22,13 @@ import {
   IGeckoResponse,
 } from '@/types';
 import { getVariation } from '@/utils';
+import { useQueries } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import { ImageLoaderProps } from 'next/legacy/image';
 import Link from 'next/link';
 import React, { PropsWithChildren, useRef, useState } from 'react';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQueries } from '@tanstack/react-query';
 import CoinCardSkeleton from '../CoinCardSkeleton';
 import {
   ArrowTopRight,
@@ -59,8 +60,12 @@ import {
   SetTimeContainerLoaderWrapper,
   SpanTime,
 } from './styles';
-import { RiSwap2Fill } from 'react-icons/ri';
 
+const {
+  NEXT_PUBLIC_SWAP_URL,
+  NEXT_PUBLIC_BRIDGE_URL,
+  NEXT_PUBLIC_EXCHANGE_URL,
+} = process.env;
 const Chart = dynamic(() => import('@/components/Chart'), { ssr: false });
 
 interface IPropsRenderCoinsCard {
@@ -80,21 +85,21 @@ const swapExchangeInfo = [
   {
     text1: 'Swap and buy KLV and KFI',
     text2: '',
-    url: 'https://app.voxswap.io/KLV-USDT',
+    url: NEXT_PUBLIC_SWAP_URL || 'https://app.voxswap.io/KLV-USDT',
     icon: <VoxSwap />,
     color: '#B7EC42',
   },
   {
     text1: 'Bridge Ethereum Tokens',
     text2: '',
-    url: 'https://bridge.klever.org',
+    url: NEXT_PUBLIC_BRIDGE_URL || 'https://bridge.klever.org',
     icon: <Bridge />,
     color: '#aa33b5',
   },
   {
     text1: "Exchange market's top tokens",
     text2: '',
-    url: 'https://bitcoin.me/us/trade/KLV-USDT',
+    url: NEXT_PUBLIC_EXCHANGE_URL || 'https://bitcoin.me/',
     icon: <BitcoinMe />,
     color: '#FF6700',
   },

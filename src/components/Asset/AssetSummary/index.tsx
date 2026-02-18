@@ -171,12 +171,12 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
           )}
         </RightSide>
       </Header>
-      {asset_info?.project_description_copy ? (
+      {asset_info?.project_description ? (
         <About>
           <AboutTitle>About the project</AboutTitle>
           <AboutContent
             dangerouslySetInnerHTML={{
-              __html: DOMPurify.sanitize(asset_info?.project_description_copy),
+              __html: DOMPurify.sanitize(asset_info?.project_description),
             }}
             editable={
               walletAddress && asset?.ownerAddress === walletAddress
@@ -209,7 +209,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
             ))}
         </About>
       ) : null}
-      {!asset_info?.project_description_copy &&
+      {!asset_info?.project_description &&
       walletAddress &&
       asset?.ownerAddress === walletAddress &&
       process.env.NEXT_PUBLIC_ENABLE_ASSET_APPLY === 'true' ? (
@@ -236,7 +236,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
             setOpenApplyFormModal={setOpenApplyFormModal}
             defaultValues={{
               short_description: asset_info?.short_description,
-              project_description_copy: asset_info?.project_description_copy,
+              project_description: asset_info?.project_description,
             }}
             refetchAssetInfo={refetchAssetInfo}
             asset={asset}

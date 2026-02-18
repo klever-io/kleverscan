@@ -29,9 +29,8 @@ export interface IProps {
   tries?: number;
 }
 
-export interface IDirectusRequestProps {
-  requestParams: any[];
-  requestFunction: string;
+export interface IAssetInfoRequestProps {
+  assetId: string;
   tries?: number;
 }
 
@@ -66,7 +65,9 @@ export const getHost = (
       process.env.DEFAULT_API_MULTISIGN ||
       'https://multisign.testnet.klever.org',
     [Service.EXPLORER]:
-      process.env.DEFAULT_EXPLORER_HOST || 'https://testnet.kleverscan.org',
+      process.env.DEFAULT_EXPLORER_HOST ||
+      window?.location?.origin ||
+      'https://testnet.kleverscan.org',
     [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',
     [Service.KPRICES]:
       process.env.DEFAULT_KPRICES_HOST ||
@@ -292,21 +293,20 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
 
   return result;
 };
-export const withDirectus = async (
-  props: IDirectusRequestProps,
+export const withAssetInfo = async (
+  props: IAssetInfoRequestProps,
 ): Promise<any> => {
   const request = async () => {
     try {
-      // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)
-      const response = await fetch('/api/directus', {
-        method: Method.POST,
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `/api/asset-info?asset_id=${encodeURIComponent(props.assetId)}`,
+        {
+          method: Method.GET,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-        body: JSON.stringify({
-          ...props,
-        }),
-      });
+      );
 
       return response.json();
     } catch (error) {
@@ -400,8 +400,8 @@ const api = {
     withTimeout(withBody(props, Method.POST)),
   text: async (props: IProps): Promise<any> =>
     withTimeout(withText(props, Method.GET)),
-  directus: async (props: IDirectusRequestProps): Promise<any> =>
-    withTimeout(withDirectus(props)),
+  assetInfo: async (props: IAssetInfoRequestProps): Promise<any> =>
+    withTimeout(withAssetInfo(props)),
 };
 
 export default api;

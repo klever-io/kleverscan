@@ -96,6 +96,13 @@ export const ApplyFormModal: React.FC<
         throw new Error('Failed to fetch settings');
       }
       const settings = await settingsRes.json();
+
+      if (!settings.receiver_address || settings.transfer_value == null) {
+        throw new Error(
+          'Invalid settings response: missing receiver_address or transfer_value',
+        );
+      }
+
       receiver = settings.receiver_address;
       amount = settings.transfer_value;
     } catch (error) {

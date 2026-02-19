@@ -66,7 +66,7 @@ export const getHost = (
       'https://multisign.testnet.klever.org',
     [Service.EXPLORER]:
       process.env.DEFAULT_EXPLORER_HOST ||
-      window?.location?.origin ||
+      (typeof window !== 'undefined' ? window.location.origin : undefined) ||
       'https://testnet.kleverscan.org',
     [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',
     [Service.KPRICES]:

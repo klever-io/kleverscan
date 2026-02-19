@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-const API_URL = process.env.KLEVERSCAN_API_URL || '';
-const API_KEY = process.env.KLEVERSCAN_API_KEY || '';
+const API_URL = process.env.KLEVERSCAN_API_URL;
+const API_KEY = process.env.KLEVERSCAN_API_KEY;
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,6 +9,22 @@ export default async function handler(
 ): Promise<void> {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' });
+    return;
+  }
+
+  if (!API_URL) {
+    console.error('Settings API error: KLEVERSCAN_API_URL is not configured');
+    res
+      .status(500)
+      .json({ error: 'Server misconfiguration: API URL is not set' });
+    return;
+  }
+
+  if (!API_KEY) {
+    console.error('Settings API error: KLEVERSCAN_API_KEY is not configured');
+    res
+      .status(500)
+      .json({ error: 'Server misconfiguration: API key is not set' });
     return;
   }
 

@@ -16,6 +16,7 @@ import {
   BuyForm,
   Container,
   Content,
+  FeeInfo,
   Header,
   Input,
   InputRow,
@@ -28,11 +29,13 @@ import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import { Toolbar } from './Toolbar';
+import { KLV_PRECISION } from '@/utils/globalVariables';
+import { formatAmount } from '@/utils/formatFunctions';
+import { InfoIcon } from '@/components/MultsignComponent/styles';
 
-const ReactSelect = dynamic(() => import('react-select'), {
-  ssr: false,
-  loading: () => null,
-});
+const SHORT_DESCRIPTION_MAX_LENGTH = 255;
+const PROJECT_DESCRIPTION_MAX_LENGTH = 5000;
+const PROJECT_DESCRIPTION_COUNTER_THRESHOLD = 3000;
 
 interface ApplyFormModalProps {
   isOpenApplyFormModal: boolean;
@@ -40,7 +43,7 @@ interface ApplyFormModalProps {
   asset: IAsset;
   defaultValues?: {
     short_description: string;
-    project_description_copy: string;
+    project_description: string;
   };
   setTxHash: (txHash: string) => void;
   setLoading: (state: boolean) => void;
@@ -59,17 +62,14 @@ export const ApplyFormModal: React.FC<
   refetchAssetInfo,
 }) => {
   const [projectDescription, setProjectDescription] = useState<string>(
-    defaultValues?.project_description_copy || '',
+    defaultValues?.project_description || '',
   );
   const [shortDescription, setShortDescription] = useState<string>(
     defaultValues?.short_description || '',
   );
+  const [transferValue, setTransferValue] = useState<number | null>(null);
 
   const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
-
-  const isEdit = defaultValues?.short_description !== undefined;
-
-  const { t } = useTranslation('assets');
 
   const closeModal = () => {
     setOpenApplyFormModal(false);
@@ -78,6 +78,16 @@ export const ApplyFormModal: React.FC<
   useEffect(() => {
     if (isOpenApplyFormModal) {
       document.documentElement.style.overflow = 'hidden';
+      fetch('/api/settings')
+        .then(res => (res.ok ? res.json() : Promise.reject()))
+        .then(data => {
+          if (data?.transfer_value != null) {
+            setTransferValue(data.transfer_value);
+          }
+        })
+        .catch(() => {
+          // non-critical — the value is re-fetched on submit
+        });
     } else {
       document.documentElement.style.overflow = 'unset';
     }
@@ -92,9 +102,34 @@ export const ApplyFormModal: React.FC<
     setLoading(true);
     setTxHash('');
 
+    let receiver: string;
+    let amount: number;
+
+    try {
+      const settingsRes = await fetch('/api/settings');
+      if (!settingsRes.ok) {
+        throw new Error('Failed to fetch settings');
+      }
+      const settings = await settingsRes.json();
+
+      if (!settings.receiver_address || settings.transfer_value == null) {
+        throw new Error(
+          'Invalid settings response: missing receiver_address or transfer_value',
+        );
+      }
+
+      receiver = settings.receiver_address;
+      amount = settings.transfer_value;
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to load transfer settings');
+      setLoading(false);
+      return;
+    }
+
     const payload = {
-      receiver: process.env.NEXT_PUBLIC_TRANSFER_ADDRESS,
-      amount: Number(process.env.NEXT_PUBLIC_ADD_ASSET_INFO_VALUE),
+      receiver,
+      amount,
     };
 
     try {
@@ -110,13 +145,13 @@ export const ApplyFormModal: React.FC<
       const body = {
         id: asset.assetId,
         short_description: shortDescription,
-        project_description_copy: projectDescription,
+        project_description: projectDescription,
         signedTransaction: JSON.stringify(signedTransaction),
       };
 
       const res = await api.post({
         service: Service.EXPLORER,
-        route: isEdit ? 'api/edit-info' : 'api/apply',
+        route: 'api/apply',
         body: JSON.stringify(body),
         tries: 1,
       });
@@ -136,6 +171,11 @@ export const ApplyFormModal: React.FC<
     extensions: [StarterKit, Underline],
     content: `${projectDescription}`,
     onUpdate({ editor }) {
+      const textLength = editor.getHTML().length;
+      if (textLength > PROJECT_DESCRIPTION_MAX_LENGTH) {
+        editor.commands.undo();
+        return;
+      }
       setProjectDescription(editor.getHTML());
     },
   });
@@ -166,13 +206,15 @@ export const ApplyFormModal: React.FC<
         <BuyForm id="buyForm" onSubmit={handleSubmit}>
           <InputRow>
             <Label>
-              Short Description (max 255 characters)
-              <span>{shortDescription.length} / 255</span>
+              Short Description
+              <span>
+                {shortDescription.length} / {SHORT_DESCRIPTION_MAX_LENGTH}
+              </span>
             </Label>
             <Input
               value={shortDescription}
               onChange={e => {
-                if (e.target.value.length > 255) {
+                if (e.target.value.length > SHORT_DESCRIPTION_MAX_LENGTH) {
                   return;
                 }
                 setShortDescription(e.target.value);
@@ -182,12 +224,28 @@ export const ApplyFormModal: React.FC<
           </InputRow>
 
           <InputRow>
-            <Label>About the Project</Label>
+            <Label>
+              About the Project
+              {(editor?.getHTML().length || 0) >=
+                PROJECT_DESCRIPTION_COUNTER_THRESHOLD && (
+                <span>
+                  {editor?.getHTML().length || 0} /{' '}
+                  {PROJECT_DESCRIPTION_MAX_LENGTH}
+                </span>
+              )}
+            </Label>
             <RTEArea editor={editor}>
               <Toolbar editor={editor} />
             </RTEArea>
           </InputRow>
         </BuyForm>
+        {transferValue != null && (
+          <FeeInfo>
+            <InfoIcon />
+            Setting your asset descriptions will cost{' '}
+            <span>{formatAmount(transferValue / 10 ** KLV_PRECISION)} KLV</span>
+          </FeeInfo>
+        )}
         <SubmitButton type="submit" form="buyForm">
           Submit
         </SubmitButton>

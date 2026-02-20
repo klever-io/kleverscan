@@ -61,19 +61,8 @@ export const assetInfoCall = async (router: NextRouter): Promise<any> => {
   try {
     const assetId = router.query?.asset as string;
 
-    const res = await api.directus({
-      requestFunction: 'readItem',
-      requestParams: [
-        'asset_info',
-        assetId,
-        {
-          fields: [
-            'short_description',
-            'project_description',
-            'project_description_copy',
-          ],
-        },
-      ],
+    const res = await api.assetInfo({
+      assetId,
     });
 
     return res;

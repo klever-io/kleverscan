@@ -16,6 +16,7 @@ import {
   BuyForm,
   Container,
   Content,
+  FeeInfo,
   Header,
   Input,
   InputRow,
@@ -28,6 +29,9 @@ import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import { Toolbar } from './Toolbar';
+import { KLV_PRECISION } from '@/utils/globalVariables';
+import { formatAmount } from '@/utils/formatFunctions';
+import { InfoIcon } from '@/components/MultsignComponent/styles';
 
 const SHORT_DESCRIPTION_MAX_LENGTH = 255;
 const PROJECT_DESCRIPTION_MAX_LENGTH = 5000;
@@ -63,6 +67,7 @@ export const ApplyFormModal: React.FC<
   const [shortDescription, setShortDescription] = useState<string>(
     defaultValues?.short_description || '',
   );
+  const [transferValue, setTransferValue] = useState<number | null>(null);
 
   const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
 
@@ -73,6 +78,16 @@ export const ApplyFormModal: React.FC<
   useEffect(() => {
     if (isOpenApplyFormModal) {
       document.documentElement.style.overflow = 'hidden';
+      fetch('/api/settings')
+        .then(res => (res.ok ? res.json() : Promise.reject()))
+        .then(data => {
+          if (data?.transfer_value != null) {
+            setTransferValue(data.transfer_value);
+          }
+        })
+        .catch(() => {
+          // non-critical — the value is re-fetched on submit
+        });
     } else {
       document.documentElement.style.overflow = 'unset';
     }
@@ -224,6 +239,13 @@ export const ApplyFormModal: React.FC<
             </RTEArea>
           </InputRow>
         </BuyForm>
+        {transferValue != null && (
+          <FeeInfo>
+            <InfoIcon />
+            Setting your asset descriptions will cost{' '}
+            <span>{formatAmount(transferValue / 10 ** KLV_PRECISION)} KLV</span>
+          </FeeInfo>
+        )}
         <SubmitButton type="submit" form="buyForm">
           Submit
         </SubmitButton>

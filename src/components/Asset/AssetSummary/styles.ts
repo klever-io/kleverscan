@@ -138,6 +138,7 @@ export const RTEStyles = css`
   }
 
   h1 {
+    color: ${({ theme }) => theme.darkText};
     font-size: 2em;
     font-weight: bold;
   }
@@ -149,6 +150,7 @@ export const RTEStyles = css`
   }
 
   h3 {
+    color: ${({ theme }) => theme.darkText};
     font-size: 1.17em;
     font-weight: bold;
   }
@@ -172,9 +174,9 @@ export const AboutTitle = styled.h2`
 
 export const AboutContent = styled.p<{ editable?: boolean }>`
   color: ${({ theme }) => theme.darkText};
-  border: 2px solid ${props => (props.editable ? '#646693 ' : 'transparent')};
+  border: 1px solid ${props => (props.editable ? '#646693 ' : 'transparent')};
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 8px 16px;
   ${RTEStyles}
 `;
 

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-const API_URL = process.env.KLEVERSCAN_API_URL || '';
-const API_KEY = process.env.KLEVERSCAN_API_KEY || '';
+const API_URL = process.env.DEFAULT_KLEVERSCAN_API_URL || '';
+const API_KEY = process.env.DEFAULT_KLEVERSCAN_API_KEY || '';
 
 export default async function handler(
   req: NextApiRequest,

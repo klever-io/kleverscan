@@ -253,6 +253,22 @@ export const SelectContainer = styled.div`
   }
 `;
 
+export const FeeInfo = styled.p`
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme.darkText};
+  text-align: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  span {
+    font-weight: 700;
+    color: ${({ theme }) => theme.black};
+  }
+`;
+
 export const SubmitButton = styled.button`
   display: grid;
   place-items: center;

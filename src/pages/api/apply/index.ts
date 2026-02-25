@@ -1,7 +1,8 @@
-import { queryDirectus } from '@/services/directus';
 import { broadcastTXandCheckStatus } from '@/utils/transaction';
-import { createItem, updateItem } from '@directus/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+const API_URL = process.env.DEFAULT_KLEVERSCAN_API_URL || '';
+const API_KEY = process.env.DEFAULT_KLEVERSCAN_API_KEY || '';
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,29 +15,7 @@ export default async function handler(
 
   const errors = [];
 
-  const directus = queryDirectus();
-
-  body['payment_status'] = 'not_paid';
-
-  let asset_info;
-  try {
-    const asset_info_req = await directus.request(
-      createItem('asset_info', body),
-    );
-
-    asset_info = asset_info_req.id;
-  } catch (error: any) {
-    if (error?.errors?.[0]?.message.includes('unique')) {
-      errors.push(
-        'Asset Info already exists. Try connecting your wallet. No money was charged. ',
-      );
-    } else {
-      errors.push('Asset Info creation failed. No money was charged.');
-    }
-    console.error(error);
-    return res.status(400).json({ errors: errors });
-  }
-
+  // Broadcast transaction first
   try {
     const { error, status, hash } = await broadcastTXandCheckStatus(
       JSON.parse(signedTransaction),
@@ -47,23 +26,34 @@ export default async function handler(
       return res.status(400).json({ errors: errors });
     }
 
-    const data = {
-      payment_status: 'paid',
-      hash,
+    // Create asset info with the hash
+    const payload = {
+      asset_id: body.id || body.asset_id,
+      project_description: body.project_description,
+      short_description: body.short_description,
+      hash: hash,
     };
 
-    try {
-      const response = await directus.request(
-        updateItem('asset_info', asset_info, data),
-      );
+    const targetUrl = `${API_URL}/api/v1/asset-info/`;
 
-      return res.status(200).json(response);
-    } catch (error) {
-      errors.push('Asset Info update failed');
+    const response = await fetch(targetUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': API_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      errors.push('Asset Info creation failed.');
       return res.status(400).json({ errors: errors });
     }
+
+    const data = await response.json();
+    return res.status(200).json(data);
   } catch (error) {
-    console.error('Apply API error:', error);
+    errors.push('An error occurred while processing your request.');
     return res.status(400).json({ errors: errors });
   }
 }

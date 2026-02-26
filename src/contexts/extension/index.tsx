@@ -39,7 +39,6 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
         doIf({
           success: () => {
             setExtensionInstalled(true);
-            connectExtension();
           },
           failure: () => {
             logoutExtension();

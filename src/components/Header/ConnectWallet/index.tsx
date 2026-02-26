@@ -24,8 +24,6 @@ interface IConnectWallet {
 const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
   clickConnection,
 }) => {
-  const router = useRouter();
-  const autoConnectWallet = router.query?.autoconnect;
   const { isDeviceMobileCheck } = useMobile();
   const [openUserInfos, setOpenUserInfos] = useState(false);
   const {
@@ -79,12 +77,6 @@ const ConnectWallet: React.FC<PropsWithChildren<IConnectWallet>> = ({
       setOpenUserInfos(true);
     }
   };
-
-  useEffect(() => {
-    if (autoConnectWallet === 'true') {
-      connectAndOpen();
-    }
-  }, []);
 
   useEffect(() => {
     document.body.style.overflow = openDrawer ? 'hidden' : 'visible';

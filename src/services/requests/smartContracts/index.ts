@@ -150,18 +150,17 @@ const smartContractBeforeYesterdayTransactionsCall = async (
       route: 'transaction/list/',
       query: {
         scAddress: scAddress,
-        startDate: '-24h',
+        startdate: new Date(
+          Number(Date.now()) - 24 * 60 * 60 * 1000,
+        ).toISOString(), // Transactions from the last day
       },
     });
 
     if (!res.error || res.error === '') {
       const data = {
         newTransactions: 0,
-        beforeYesterdayTxs: res.data?.number_by_day[1]?.doc_count || 0,
+        beforeYesterdayTxs: res.pagination?.totalRecords || 0,
       };
-      if (res.data?.number_by_day?.length > 0) {
-        data.newTransactions = res.data?.number_by_day[0]?.doc_count || 0;
-      }
       return data;
     }
   } catch (error) {

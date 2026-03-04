@@ -200,12 +200,12 @@ const SmartContractInvoke: React.FC = () => {
                 <DataCardValue>
                   <p>{value?.toLocaleString() || 0}</p>
                 </DataCardValue>
-                {variation && !variation.includes('%') && (
+                {/* {variation && !variation.includes('%') && (
                   <DataCardLatest positive={variation.includes('+')}>
                     <ArrowData $positive={variation.includes('+')} />
                     <p>{variation}/24h</p>
                   </DataCardLatest>
-                )}
+                )} */}
               </DataCardContent>
             </DataCard>
           ))}

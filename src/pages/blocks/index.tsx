@@ -149,6 +149,7 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     data: blocksStatsToday,
     isLoading: isLoadingBlocksStatsToday,
     refetch: refetchTotal,
+    dataUpdatedAt: totalUpdatedAt,
   } = useQuery({
     queryKey: ['statisticsCall'],
     queryFn: totalStatisticsCall,
@@ -157,11 +158,16 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     data: blocksStatsYesterday,
     refetch: refetchYesterday,
     isLoading: isLoadingBlocksStatsYesterday,
-    dataUpdatedAt,
+    dataUpdatedAt: yesterdayUpdatedAt,
   } = useQuery({
     queryKey: ['yesterdayStatisticsCall'],
     queryFn: yesterdayStatisticsCall,
   });
+
+  const dataUpdatedAt =
+    totalUpdatedAt && yesterdayUpdatedAt
+      ? Math.min(totalUpdatedAt, yesterdayUpdatedAt)
+      : totalUpdatedAt || yesterdayUpdatedAt || 0;
 
   const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(!!blocksInterval);
@@ -251,19 +257,23 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     },
   ];
 
-  const CardContent: React.FC<PropsWithChildren<ICard>> = ({
+  interface CardContentProps extends ICard {
+    dataUpdatedAt: number;
+  }
+
+  const CardContent: React.FC<PropsWithChildren<CardContentProps>> = ({
     title,
     headers,
     values,
     dataUpdatedAt,
   }) => {
     const [age, setAge] = useState(
-      getAge(new Date(dataUpdatedAt ?? Date.now())),
+      dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '',
     );
 
     useEffect(() => {
       const interval = setInterval(() => {
-        setAge(getAge(new Date(dataUpdatedAt ?? Date.now())));
+        setAge(dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '');
       }, 1 * 1000); // 1 sec
 
       return () => {

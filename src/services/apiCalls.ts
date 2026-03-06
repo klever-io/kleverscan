@@ -14,7 +14,7 @@ export const blockCall = async (
     return res;
   }
 
-  throw new Error(res.error);
+  throw new Error(typeof res.error === 'string' ? res.error : 'Failed to fetch blocks');
 };
 
 export const yesterdayStatisticsCall = async (): Promise<IBlockStats> => {
@@ -24,9 +24,9 @@ export const yesterdayStatisticsCall = async (): Promise<IBlockStats> => {
 
   if (!res.error || res.error === '') {
     return res.data.block_stats_by_day[0];
-  } else {
-    return res.error;
   }
+
+  throw new Error(typeof res.error === 'string' ? res.error : 'Failed to fetch yesterday statistics');
 };
 
 export const totalStatisticsCall = async (): Promise<IBlockStats> => {
@@ -36,9 +36,9 @@ export const totalStatisticsCall = async (): Promise<IBlockStats> => {
 
   if (!res.error || res.error === '') {
     return res.data.block_stats_total;
-  } else {
-    return res.error;
   }
+
+  throw new Error(typeof res.error === 'string' ? res.error : 'Failed to fetch total statistics');
 };
 
 export const defaultPagination: IPagination = {

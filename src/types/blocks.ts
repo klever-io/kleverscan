@@ -95,4 +95,5 @@ export interface ICard {
   title: string;
   headers: string[];
   values: (string | React.ReactElement)[];
+  dataUpdatedAt?: number;
 }

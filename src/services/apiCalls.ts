@@ -5,18 +5,17 @@ import { IBlockResponse, IBlockStats } from '@/types/blocks';
 export const blockCall = async (
   page = 1,
   limit = 10,
-): Promise<IBlockResponse> =>
-  new Promise<IBlockResponse>(async (resolve, reject) => {
-    const res = await api.get({
-      route: `block/list?page=${page}&limit=${limit}`,
-    });
-
-    if (!res.error || res.error === '') {
-      resolve(res);
-    }
-
-    reject(res.error);
+): Promise<IBlockResponse> => {
+  const res = await api.get({
+    route: `block/list?page=${page}&limit=${limit}`,
   });
+
+  if (!res.error || res.error === '') {
+    return res;
+  }
+
+  throw new Error(res.error);
+};
 
 export const yesterdayStatisticsCall = async (): Promise<IBlockStats> => {
   const res = await api.get({

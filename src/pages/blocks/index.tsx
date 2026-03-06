@@ -145,15 +145,19 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
 const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
-  const { data: blocksStatsToday, isLoading: isLoadingBlocksStatsToday } =
-    useQuery({
-      queryKey: ['statisticsCall'],
-      queryFn: totalStatisticsCall,
-    });
+  const {
+    data: blocksStatsToday,
+    isLoading: isLoadingBlocksStatsToday,
+    refetch: refetchTotal,
+  } = useQuery({
+    queryKey: ['statisticsCall'],
+    queryFn: totalStatisticsCall,
+  });
   const {
     data: blocksStatsYesterday,
-    refetch,
+    refetch: refetchYesterday,
     isLoading: isLoadingBlocksStatsYesterday,
+    dataUpdatedAt,
   } = useQuery({
     queryKey: ['yesterdayStatisticsCall'],
     queryFn: yesterdayStatisticsCall,
@@ -171,7 +175,8 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
   useEffect(() => {
     if (blocksInterval) {
       const intervalId = setInterval(() => {
-        refetch();
+        refetchYesterday();
+        refetchTotal();
       }, blocksWatcherInterval);
       return () => clearInterval(intervalId);
     }
@@ -250,21 +255,21 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     title,
     headers,
     values,
+    dataUpdatedAt,
   }) => {
-    const [uptime] = useState(new Date().getTime());
-    const [age, setAge] = useState(getAge(new Date()));
+    const [age, setAge] = useState(
+      getAge(new Date(dataUpdatedAt ?? Date.now())),
+    );
 
     useEffect(() => {
       const interval = setInterval(() => {
-        const newAge = getAge(new Date(uptime));
-
-        setAge(newAge);
+        setAge(getAge(new Date(dataUpdatedAt ?? Date.now())));
       }, 1 * 1000); // 1 sec
 
       return () => {
         clearInterval(interval);
       };
-    }, []);
+    }, [dataUpdatedAt]);
 
     return (
       <Card>
@@ -308,7 +313,7 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
 
       <CardContainer>
         {cards.map((card, index) => (
-          <CardContent key={index} {...card} />
+          <CardContent key={index} {...card} dataUpdatedAt={dataUpdatedAt} />
         ))}
       </CardContainer>
 

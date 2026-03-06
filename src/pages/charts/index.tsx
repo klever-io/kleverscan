@@ -273,8 +273,8 @@ const Charts: React.FC<PropsWithChildren<ICharts>> = () => {
                 {filterDays.map(item => (
                   <ItemTimeFilter
                     key={String(item)}
-                    onClick={() => setTimeFilter(item + 1)}
-                    selected={!!(timeFilter === item + 1)}
+                    onClick={() => setTimeFilter(item)}
+                    selected={timeFilter === item}
                   >
                     {item !== 30 ? `${String(item)}D` : '1M'}
                   </ItemTimeFilter>

@@ -287,7 +287,7 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
           <span>
             <strong>{title}</strong>
           </span>
-          <p>{age} ago</p>
+          <p>{age ? `${age} ago` : ''}</p>
         </div>
         <div>
           <span>

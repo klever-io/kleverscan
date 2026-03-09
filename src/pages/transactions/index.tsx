@@ -151,7 +151,8 @@ export const getTransactionPrecision = (
   }
 
   if ('assetId' in contract.parameter && contract.parameter.assetId) {
-    return assetPrecisions[contract.parameter.assetId];
+    const assetId = contract.parameter.assetId.split('/')[0];
+    return assetPrecisions[assetId];
   }
 
   return;

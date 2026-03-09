@@ -145,19 +145,29 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
 const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
-  const { data: blocksStatsToday, isLoading: isLoadingBlocksStatsToday } =
-    useQuery({
-      queryKey: ['statisticsCall'],
-      queryFn: totalStatisticsCall,
-    });
+  const {
+    data: blocksStatsToday,
+    isLoading: isLoadingBlocksStatsToday,
+    refetch: refetchTotal,
+    dataUpdatedAt: totalUpdatedAt,
+  } = useQuery({
+    queryKey: ['statisticsCall'],
+    queryFn: totalStatisticsCall,
+  });
   const {
     data: blocksStatsYesterday,
-    refetch,
+    refetch: refetchYesterday,
     isLoading: isLoadingBlocksStatsYesterday,
+    dataUpdatedAt: yesterdayUpdatedAt,
   } = useQuery({
     queryKey: ['yesterdayStatisticsCall'],
     queryFn: yesterdayStatisticsCall,
   });
+
+  const dataUpdatedAt =
+    totalUpdatedAt && yesterdayUpdatedAt
+      ? Math.min(totalUpdatedAt, yesterdayUpdatedAt)
+      : totalUpdatedAt || yesterdayUpdatedAt || 0;
 
   const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(!!blocksInterval);
@@ -171,7 +181,8 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
   useEffect(() => {
     if (blocksInterval) {
       const intervalId = setInterval(() => {
-        refetch();
+        refetchYesterday();
+        refetchTotal();
       }, blocksWatcherInterval);
       return () => clearInterval(intervalId);
     }
@@ -246,25 +257,29 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     },
   ];
 
-  const CardContent: React.FC<PropsWithChildren<ICard>> = ({
+  interface CardContentProps extends ICard {
+    dataUpdatedAt: number;
+  }
+
+  const CardContent: React.FC<PropsWithChildren<CardContentProps>> = ({
     title,
     headers,
     values,
+    dataUpdatedAt,
   }) => {
-    const [uptime] = useState(new Date().getTime());
-    const [age, setAge] = useState(getAge(new Date()));
+    const [age, setAge] = useState(
+      dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '',
+    );
 
     useEffect(() => {
       const interval = setInterval(() => {
-        const newAge = getAge(new Date(uptime));
-
-        setAge(newAge);
+        setAge(dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '');
       }, 1 * 1000); // 1 sec
 
       return () => {
         clearInterval(interval);
       };
-    }, []);
+    }, [dataUpdatedAt]);
 
     return (
       <Card>
@@ -272,7 +287,7 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
           <span>
             <strong>{title}</strong>
           </span>
-          <p>{age} ago</p>
+          <p>{age ? `${age} ago` : ''}</p>
         </div>
         <div>
           <span>
@@ -308,7 +323,7 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
 
       <CardContainer>
         {cards.map((card, index) => (
-          <CardContent key={index} {...card} />
+          <CardContent key={index} {...card} dataUpdatedAt={dataUpdatedAt} />
         ))}
       </CardContainer>
 

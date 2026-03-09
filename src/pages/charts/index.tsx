@@ -147,7 +147,7 @@ const Charts: React.FC<PropsWithChildren<ICharts>> = () => {
   const { t: commonT } = useTranslation('common');
   const { t } = useTranslation(['charts']);
   const filterDays = [1, 7, 15, 30];
-  const [timeFilter, setTimeFilter] = useState(15);
+  const [timeFilter, setTimeFilter] = useState(16);
 
   const {
     isLoading: statisticsIsLoading,
@@ -273,8 +273,8 @@ const Charts: React.FC<PropsWithChildren<ICharts>> = () => {
                 {filterDays.map(item => (
                   <ItemTimeFilter
                     key={String(item)}
-                    onClick={() => setTimeFilter(item)}
-                    selected={timeFilter === item}
+                    onClick={() => setTimeFilter(item + 1)}
+                    selected={!!(timeFilter === item + 1)}
                   >
                     {item !== 30 ? `${String(item)}D` : '1M'}
                   </ItemTimeFilter>

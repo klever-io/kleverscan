@@ -2738,7 +2738,9 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
   const scAddress =
     logs?.events
       .map((event: any) => (event.address !== '' ? event.address : ''))
-      .filter((value: any) => value !== '')[0] || '';
+      .filter((value: any) => value !== '')[0] ||
+    parameter?.address ||
+    '';
 
   return (
     <>

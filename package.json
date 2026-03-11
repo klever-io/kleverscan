@@ -21,6 +21,7 @@
     "@klever/connect": "^0.1.1",
     "@klever/sdk-web": "^1.4.1",
     "@microlink/react-json-view": "^1.27.1",
+    "@monaco-editor/react": "^4.7.0",
     "@svgr/webpack": "^8.1.0",
     "@tanstack/react-query": "^5.90.20",
     "@tanstack/react-query-devtools": "^5.91.3",

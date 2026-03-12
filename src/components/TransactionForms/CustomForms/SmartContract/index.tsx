@@ -31,9 +31,9 @@ type FormData = {
   };
 };
 
-interface ABIMap {
+export interface ABIMap {
   functions?: ABIFunctionMap;
-  construct: ABIFunction;
+  construct?: ABIFunction;
   types?: Record<string, ABIType>;
 }
 
@@ -203,17 +203,16 @@ const getParsedArgumentsString = (
   abi: ABIMap | null,
 ): string => {
   const parsedArgs = (args || []).map(value => {
-    return parseArgument(value.value, value.raw_type, abi, value.type);
+    return parseArgument(value.value, value.raw_type, abi);
   });
 
   return parsedArgs.join('@');
 };
 
-const parseArgument = (
+export const parseArgument = (
   value: any,
   raw_type: string,
   abi: ABIMap | null,
-  jsType: string,
 ) => {
   let parsedValue = '';
 

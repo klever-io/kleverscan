@@ -7,6 +7,10 @@ import {
   ContractSourceTab,
   ContractVerifyTab,
 } from '@/components/SmartContracts/ContractVerification';
+import {
+  ContractReadTab,
+  ContractWriteTab,
+} from '@/components/SmartContracts/ContractInteraction';
 import SmartContractsTransactions from '@/components/SmartContracts/SmartContractsTransactions';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
@@ -86,6 +90,8 @@ const SmartContractInvoke: React.FC = () => {
     const tabs = [{ label: 'Transactions', value: 'transactions' }];
     if (hasVerifiedVersions) {
       tabs.push({ label: 'Contract Source', value: 'contract-source' });
+      tabs.push({ label: 'Read Contract', value: 'read-contract' });
+      tabs.push({ label: 'Write Contract', value: 'write-contract' });
     }
     if (isOwner) {
       tabs.push({ label: 'Verify Contract', value: 'verify' });
@@ -158,6 +164,20 @@ const SmartContractInvoke: React.FC = () => {
       case 'Contract Source':
         return contractInfo ? (
           <ContractSourceTab
+            contractAddress={contractAddress}
+            contractInfo={contractInfo}
+          />
+        ) : null;
+      case 'Read Contract':
+        return contractInfo ? (
+          <ContractReadTab
+            contractAddress={contractAddress}
+            contractInfo={contractInfo}
+          />
+        ) : null;
+      case 'Write Contract':
+        return contractInfo ? (
+          <ContractWriteTab
             contractAddress={contractAddress}
             contractInfo={contractInfo}
           />

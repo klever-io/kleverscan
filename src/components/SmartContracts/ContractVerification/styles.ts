@@ -10,13 +10,13 @@ export const StatusBadge = styled.span<{ status: ValidationJobStatus }>`
   font-size: 0.8rem;
   font-weight: 600;
   background: ${({ status, theme }) => {
-    if (status === 'completed') return theme.green || '#22c55e';
-    if (status === 'failed') return theme.error || '#ef4444';
-    return theme.black20 || '#e5e7eb';
+    if (status === 'completed') return theme.green;
+    if (status === 'failed') return theme.error;
+    return theme.black20;
   }};
-  color: ${({ status }) => {
-    if (status === 'pending' || status === 'running') return '#111827';
-    return '#fff';
+  color: ${({ status, theme }) => {
+    if (status === 'pending' || status === 'running') return theme.true.black;
+    return theme.true.white;
   }};
 `;
 
@@ -42,14 +42,14 @@ export const FormField = styled.div`
   input[type='text'],
   input[type='file'] {
     padding: 0.5rem 0.75rem;
-    border: 1px solid ${({ theme }) => theme.black20 || '#e5e7eb'};
+    border: 1px solid ${({ theme }) => theme.black20};
     border-radius: 8px;
     background: transparent;
     font-size: 0.875rem;
     outline: none;
 
     &:focus {
-      border-color: ${({ theme }) => theme.violet || '#7c3aed'};
+      border-color: ${({ theme }) => theme.violet};
     }
   }
 
@@ -64,8 +64,8 @@ export const SubmitButton = styled.button`
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
   border: none;
-  background: ${({ theme }) => theme.violet || '#7c3aed'};
-  color: #fff;
+  background: ${({ theme }) => theme.violet};
+  color: ${({ theme }) => theme.true.white};
   font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
@@ -100,9 +100,9 @@ export const JobRow = styled.div`
 `;
 
 export const ErrorBox = styled.pre`
-  background: ${({ theme }) => (theme.dark ? '#1f1f1f' : '#fef2f2')};
-  color: ${({ theme }) => theme.error || '#ef4444'};
-  border: 1px solid ${({ theme }) => theme.error || '#ef4444'};
+  background: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.error};
+  border: 1px solid ${({ theme }) => theme.error};
   border-radius: 8px;
   padding: 0.75rem;
   font-size: 0.8rem;
@@ -119,14 +119,14 @@ export const CodeBlockWrapper = styled.div`
 export const MonacoWrapper = styled.div`
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.black20 || '#e5e7eb'};
+  border: 1px solid ${({ theme }) => theme.black20};
 `;
 
 export const IdeLayout = styled.div`
   display: flex;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.black20 || '#e5e7eb'};
+  border: 1px solid ${({ theme }) => theme.black20};
   height: 520px;
 `;
 
@@ -135,8 +135,8 @@ export const IdeSidebar = styled.div`
   min-width: 220px;
   display: flex;
   flex-direction: column;
-  background: ${({ theme }) => (theme.dark ? '#1e1e1e' : '#f3f3f3')};
-  border-right: 1px solid ${({ theme }) => theme.black20 || '#e5e7eb'};
+  background: ${({ theme }) => theme.white};
+  border-right: 1px solid ${({ theme }) => theme.black20};
   overflow-y: auto;
 `;
 
@@ -146,7 +146,7 @@ export const IdeSidebarTitle = styled.div`
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: ${({ theme }) => (theme.dark ? '#bbb' : '#6b6b6b')};
+  color: ${({ theme }) => theme.gray800};
   user-select: none;
 `;
 
@@ -162,14 +162,14 @@ export const IdeFolderHeader = styled.button<{ open: boolean }>`
   padding: 0.25rem 0.5rem 0.25rem 0.5rem;
   border: none;
   background: transparent;
-  color: ${({ theme }) => (theme.dark ? '#ccc' : '#333')};
+  color: ${({ theme }) => theme.black};
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   user-select: none;
 
   &:hover {
-    background: ${({ theme }) => (theme.dark ? '#2a2d2e' : '#e8e8e8')};
+    background: ${({ theme }) => theme.black10};
   }
 
   &::before {
@@ -187,8 +187,8 @@ export const IdeFileItem = styled.button<{ active: boolean }>`
   padding: 0.2rem 0.5rem 0.2rem 1.75rem;
   border: none;
   background: ${({ active, theme }) =>
-    active ? (theme.dark ? '#37373d' : '#e4e6f1') : 'transparent'};
-  color: ${({ theme }) => (theme.dark ? '#ccc' : '#333')};
+    active ? theme.black20 : 'transparent'};
+  color: ${({ theme }) => theme.black};
   font-size: 0.8rem;
   cursor: pointer;
   text-align: left;
@@ -198,21 +198,15 @@ export const IdeFileItem = styled.button<{ active: boolean }>`
   text-overflow: ellipsis;
 
   &:hover {
-    background: ${({ active, theme }) =>
-      active
-        ? theme.dark
-          ? '#37373d'
-          : '#e4e6f1'
-        : theme.dark
-          ? '#2a2d2e'
-          : '#e8e8e8'};
+    background: ${({ theme }) => theme.black10};
   }
 `;
 
 export const IdeFileIcon = styled.span<{ type: 'rust' | 'json' }>`
   font-size: 0.75rem;
   flex-shrink: 0;
-  color: ${({ type }) => (type === 'rust' ? '#dea584' : '#f1c40f')};
+  color: ${({ type, theme }) =>
+    type === 'rust' ? theme.ide.rustIcon : theme.ide.jsonIcon};
 `;
 
 export const IdeEditorPane = styled.div`
@@ -224,7 +218,7 @@ export const IdeEditorPane = styled.div`
 
 export const IdeEditorTabBar = styled.div`
   display: flex;
-  background: ${({ theme }) => (theme.dark ? '#252526' : '#ececec')};
+  background: ${({ theme }) => theme.background};
   overflow-x: auto;
 `;
 
@@ -235,25 +229,16 @@ export const IdeEditorTab = styled.button<{ active: boolean }>`
   padding: 0.4rem 0.75rem;
   border: none;
   border-bottom: 2px solid
-    ${({ active, theme }) =>
-      active ? theme.violet || '#7c3aed' : 'transparent'};
-  background: ${({ active, theme }) =>
-    active ? (theme.dark ? '#1e1e1e' : '#fff') : 'transparent'};
-  color: ${({ active, theme }) =>
-    active ? (theme.dark ? '#fff' : '#333') : theme.dark ? '#888' : '#777'};
+    ${({ active, theme }) => (active ? theme.violet : 'transparent')};
+  background: ${({ active, theme }) => (active ? theme.white : 'transparent')};
+  color: ${({ active, theme }) => (active ? theme.black : theme.gray800)};
   font-size: 0.8rem;
   cursor: pointer;
   white-space: nowrap;
 
   &:hover {
     background: ${({ active, theme }) =>
-      active
-        ? theme.dark
-          ? '#1e1e1e'
-          : '#fff'
-        : theme.dark
-          ? '#2a2d2e'
-          : '#e8e8e8'};
+      active ? theme.white : theme.black10};
   }
 `;
 
@@ -261,10 +246,9 @@ export const FileTab = styled.button<{ selected: boolean }>`
   padding: 0.35rem 0.75rem;
   border-radius: 6px;
   border: 1px solid
-    ${({ selected, theme }) =>
-      selected ? theme.violet || '#7c3aed' : theme.black20 || '#e5e7eb'};
+    ${({ selected, theme }) => (selected ? theme.violet : theme.black20)};
   background: ${({ selected, theme }) =>
-    selected ? theme.violet || '#7c3aed' : theme.white};
+    selected ? theme.violet : theme.white};
   color: ${({ selected, theme }) =>
     selected ? theme.true.white : theme.black};
   font-size: 0.8rem;
@@ -327,7 +311,7 @@ export const DropdownTrigger = styled.button`
   gap: 0.4rem;
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.black20 || '#e5e7eb'};
+  border: 1px solid ${({ theme }) => theme.black20};
   background: ${({ theme }) => theme.white};
   color: ${({ theme }) => theme.black};
   font-size: 0.875rem;
@@ -336,7 +320,7 @@ export const DropdownTrigger = styled.button`
   min-width: 80px;
 
   &:focus {
-    border-color: ${({ theme }) => theme.violet || '#7c3aed'};
+    border-color: ${({ theme }) => theme.violet};
   }
 
   &::after {
@@ -350,17 +334,16 @@ export const DropdownMenu = styled.div<{ active: boolean }>`
   top: calc(100% + 4px);
   right: 0;
   min-width: 100%;
-  padding: 4px 8px;
   padding: 0.35rem;
   background: ${({ theme }) => theme.white};
-  border: 1px solid ${({ theme }) => theme.black20 || '#e5e7eb'};
+  border: 1px solid ${({ theme }) => theme.black20};
   border-radius: 8px;
   display: none;
   flex-direction: column;
   gap: 0.15rem;
   z-index: 10;
   animation: ${FadeIn} 0.1s ease-in-out;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px ${({ theme }) => theme.true.black10};
 
   ${({ active }) =>
     active &&
@@ -377,7 +360,7 @@ export const DropdownItem = styled.button<{ selected: boolean }>`
   border: none;
   border-radius: 6px;
   background: ${({ selected, theme }) =>
-    selected ? theme.violet || '#7c3aed' : 'transparent'};
+    selected ? theme.violet : 'transparent'};
   color: ${({ selected, theme }) =>
     selected ? theme.true.white : theme.black};
   font-size: 0.8rem;
@@ -389,14 +372,14 @@ export const DropdownItem = styled.button<{ selected: boolean }>`
 
   &:hover {
     background: ${({ selected, theme }) =>
-      selected ? theme.violet || '#7c3aed' : theme.black20 || '#e5e7eb'};
+      selected ? theme.violet : theme.black20};
   }
 `;
 
 export const VersionSelector = styled.select`
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.black20 || '#e5e7eb'};
+  border: 1px solid ${({ theme }) => theme.black20};
   background: transparent;
   color: ${({ theme }) => theme.black};
   font-size: 0.875rem;
@@ -404,7 +387,7 @@ export const VersionSelector = styled.select`
   outline: none;
 
   &:focus {
-    border-color: ${({ theme }) => theme.violet || '#7c3aed'};
+    border-color: ${({ theme }) => theme.violet};
   }
 `;
 

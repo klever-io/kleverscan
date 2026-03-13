@@ -1,33 +1,31 @@
+import { parseArgument } from '@/components/TransactionForms/CustomForms/SmartContract';
 import { useExtension } from '@/contexts/extension';
 import { ABI, ABIType } from '@/types/contracts';
 import { ContractInfo } from '@/types/smart-contract';
-import { parseArgument } from '@/components/TransactionForms/CustomForms/SmartContract';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { utils } from '@klever/sdk-web';
 
+import { HashComponent } from '@/components/Contract';
 import { buildTransaction } from '@/components/Contract/utils';
 import { web } from '@klever/sdk-web';
-import Link from 'next/link';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
-  InteractionSection,
+  CallValueRow,
+  CallValueSection,
+  ConnectWalletMessage,
+  EmptyState,
+  EndpointBody,
   EndpointCard,
   EndpointHeader,
-  EndpointBody,
+  InputField,
   InputGroup,
   InputLabel,
-  InputField,
-  WriteButton,
+  InteractionSection,
+  OutputRow,
   ResultBox,
   ResultLabel,
-  EmptyState,
-  ConnectWalletMessage,
-  TxHashLink,
   Spinner,
-  OutputRow,
-  CallValueSection,
-  CallValueRow,
+  WriteButton,
 } from './styles';
 
 interface EndpointInput {
@@ -66,13 +64,13 @@ const buildEncodedArgs = (
   abiTypes: Record<string, ABIType>,
 ): string[] => {
   const abi = { types: abiTypes };
-  return inputs
-    .map(input => {
-      const val = args[input.name] || '';
-      if (!val) return '';
-      return parseArgument(val, input.type, abi);
-    })
-    .filter(a => a !== '');
+  const missingInputs = inputs.filter(input => !args[input.name]?.trim());
+  if (missingInputs.length > 0) {
+    throw new Error(
+      `Missing required arguments: ${missingInputs.map(i => i.name).join(', ')}`,
+    );
+  }
+  return inputs.map(input => parseArgument(args[input.name], input.type, abi));
 };
 
 export function ContractWriteTab({
@@ -164,12 +162,22 @@ function WriteEndpointCard({
           ? `${endpoint.name}@${encodedArgs.join('@')}`
           : endpoint.name;
 
+      const parseTokenAmount = (amount: string, precision: number): number => {
+        const [whole, decimal = ''] = amount.split('.');
+        const paddedDecimal = decimal
+          .padEnd(precision, '0')
+          .slice(0, precision);
+        const combined = whole + paddedDecimal;
+        return parseInt(combined, 10);
+      };
+
       const parsedCallValue: Record<string, number> = {};
       if (hasPayable && callValue.amount && Number(callValue.amount) > 0) {
         const assetId = callValue.assetId || 'KLV';
         const precision = await getPrecision(assetId);
-        parsedCallValue[assetId] = Math.round(
-          Number(callValue.amount) * 10 ** precision,
+        parsedCallValue[assetId] = parseTokenAmount(
+          callValue.amount,
+          precision,
         );
       }
 
@@ -215,6 +223,8 @@ function WriteEndpointCard({
       </EndpointHeader>
       {open && (
         <EndpointBody>
+          {txHash && <HashComponent hash={txHash} setHash={setTxHash} />}
+
           {endpoint.inputs.map(input => (
             <InputGroup key={input.name}>
               <InputLabel>
@@ -271,19 +281,6 @@ function WriteEndpointCard({
             {loading && <Spinner />}
             {loading ? 'Sending...' : 'Write'}
           </WriteButton>
-
-          {txHash && (
-            <OutputRow>
-              <ResultLabel>Transaction Hash</ResultLabel>
-              <ResultBox>
-                <Link href={`/transaction/${txHash}`} legacyBehavior>
-                  <TxHashLink href={`/transaction/${txHash}`}>
-                    {txHash}
-                  </TxHashLink>
-                </Link>
-              </ResultBox>
-            </OutputRow>
-          )}
 
           {error && (
             <OutputRow>

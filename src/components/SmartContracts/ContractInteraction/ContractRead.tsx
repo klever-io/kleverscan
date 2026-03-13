@@ -174,18 +174,24 @@ function ReadEndpointCard({
   const [error, setError] = useState<string | null>(null);
 
   const handleQuery = async () => {
+    const missingRequired = endpoint.inputs.filter(
+      input => !args[input.name]?.trim(),
+    );
+    if (missingRequired.length > 0) {
+      setError(
+        `Missing required arguments: ${missingRequired.map(i => i.name).join(', ')}`,
+      );
+      return;
+    }
+
     setLoading(true);
     setResult(null);
     setError(null);
 
     try {
-      const encodedArgs: string[] = endpoint.inputs
-        .map(input => {
-          const val = args[input.name] || '';
-          if (!val) return '';
-          return encodeArg(abiTypes, val, input.type);
-        })
-        .filter(a => a !== '');
+      const encodedArgs: string[] = endpoint.inputs.map(input =>
+        encodeArg(abiTypes, args[input.name], input.type),
+      );
 
       const res = await api.post({
         route: 'vm/hex',

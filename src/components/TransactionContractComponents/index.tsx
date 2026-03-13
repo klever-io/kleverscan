@@ -102,6 +102,7 @@ import Link from 'next/link';
 import React, { PropsWithChildren, useState } from 'react';
 import Tooltip from '../Tooltip';
 import { PermissionOperations } from '../AccountPermission';
+import { IoOpenOutline } from 'react-icons/io5';
 
 interface IAssetTriggerTypeData {
   parameter: IAssetTriggerContract;
@@ -2761,7 +2762,14 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Contract Address</strong>
         </span>
         <CenteredRow>
-          <span>{scAddress}</span>
+          <Link
+            href={`/smart-contract/${scAddress}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {scAddress}
+            <IoOpenOutline size={20} />
+          </Link>
           <Copy data={scAddress} info="address"></Copy>
         </CenteredRow>
       </Row>

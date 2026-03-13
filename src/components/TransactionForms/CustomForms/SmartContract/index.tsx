@@ -329,7 +329,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const func: ABIFunction | undefined =
     scType === 1
-      ? abi?.constructor || {
+      ? abi?.construct || {
           arguments: {},
         }
       : scType === 2

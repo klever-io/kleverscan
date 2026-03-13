@@ -89,9 +89,14 @@ export function ContractSourceTab({
   const abiVersion = versions.find(v => v.version === selectedVersion);
 
   // For IDE mode: all viewable files (source + ABI) in one list
-  const abiContent = abiVersion?.abi
-    ? JSON.stringify(JSON.parse(abiVersion.abi), null, 2)
-    : '';
+  const abiContent = (() => {
+    if (!abiVersion?.abi) return '';
+    try {
+      return JSON.stringify(JSON.parse(abiVersion.abi), null, 2);
+    } catch {
+      return abiVersion.abi;
+    }
+  })();
   const ideActiveFile = selectedFile || fileNames[0] || '';
   const [srcFolderOpen, setSrcFolderOpen] = useState(true);
   const [outputFolderOpen, setOutputFolderOpen] = useState(true);

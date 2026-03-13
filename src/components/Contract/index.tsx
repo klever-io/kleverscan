@@ -33,6 +33,7 @@ import {
   LoadingBackground,
 } from './styles';
 import { contractsDescription } from './utils';
+import { useTheme } from '@/contexts/theme';
 
 export interface IContract {
   modalContractType?: { value: string };
@@ -49,6 +50,7 @@ export const HashComponent: React.FC<
   PropsWithChildren<IHashComponentProps>
 > = ({ hash, setHash }) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const { theme } = useTheme();
 
   useEffect(() => {
     (async () => {
@@ -70,13 +72,15 @@ export const HashComponent: React.FC<
           rel="noopener noreferrer"
         >
           Hash:{hash}
-          <IoOpenOutline />
+          <IoOpenOutline size={20} />
         </Link>
       ) : (
-        <InlineLoader color="white" />
+        <InlineLoader color={theme.black} />
       )}
       <IconsContainer>
-        {!loading && <Copy data={hash ? hash : ''} color="white" />}
+        {!loading && (
+          <Copy data={hash ? hash : ''} color={theme.black} svgSize={20} />
+        )}
         <CloseIcon onClick={() => setHash(null)} />
       </IconsContainer>
     </ExtraOptionContainer>

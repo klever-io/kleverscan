@@ -80,6 +80,7 @@ const OverviewDetails: React.FC<PropsWithChildren<IOverviewDetails>> = ({
           ) : (
             <CenteredRow>
               <span>{hash}</span>
+              <Copy data={hash} info="Hash" />
               <ReceiveBackground isOverflow={true}>
                 <QrCodeModal value={hash || ''} isOverflow={true} />
               </ReceiveBackground>

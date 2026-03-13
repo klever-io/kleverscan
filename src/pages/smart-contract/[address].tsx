@@ -101,6 +101,12 @@ const SmartContractInvoke: React.FC = () => {
 
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
 
+  useEffect(() => {
+    if (!tabHeaders.some(tab => tab.label === selectedTab)) {
+      setSelectedTab(tabHeaders[0].label);
+    }
+  }, [tabHeaders, selectedTab]);
+
   const requestBeforeYesterdayTransactions = async () => {
     try {
       const res =

@@ -49,7 +49,7 @@ export const LoadingBackground = styled.div`
 `;
 
 export const CloseIcon = styled(IoMdCloseCircle).attrs(props => ({
-  color: props.theme.true.white,
+  color: props.theme.black,
   size: 24,
 }))`
   min-width: 24px;
@@ -180,43 +180,41 @@ export const ExtraOptionContainer = styled.div`
   display: flex;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  border-radius: 12px;
-  padding-top: 1rem;
+  border-radius: 6px;
 
-  padding: 1rem 2rem;
+  padding: 0.6rem 0.75rem;
 
-  animation: ${ColorChangeAnimation} 2s infinite;
-
-  background-color: ${props => props.theme.purple};
-  box-shadow: 0 0 1rem 0
-    ${props => (props.theme.dark ? '#000' : lighten(0.8, '#000'))};
+  border: 1px solid ${props => props.theme.black};
+  background-color: ${props => props.theme.white};
 
   justify-content: flex-start;
   align-items: center;
 
-  gap: 1rem;
+  gap: 0.5rem;
 
   a {
-    color: ${props => props.theme.true.white};
-    font-size: 1.1rem;
-    letter-spacing: 0.05rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+
+    color: ${props => props.theme.black};
 
     display: flex;
-    gap: 0.25rem;
+    gap: 0.5rem;
+    align-items: center;
 
     text-decoration: none;
     animation: none;
 
     &:hover {
-      color: ${props => props.theme.true.white};
+      color: ${props => props.theme.black};
     }
 
     &:visited {
-      color: ${props => props.theme.true.white};
+      color: ${props => props.theme.black};
     }
 
     &:active {
-      color: ${props => props.theme.true.white};
+      color: ${props => props.theme.black};
     }
 
     svg {

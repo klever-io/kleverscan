@@ -371,6 +371,9 @@ export function ContractVerifyTab({
   onSubmitted: () => void;
 }) {
   const [showUpload, setShowUpload] = useState(!hasVerifiedVersions);
+  useEffect(() => {
+    setShowUpload(!hasVerifiedVersions);
+  }, [hasVerifiedVersions]);
 
   const activeJob =
     latestJob &&

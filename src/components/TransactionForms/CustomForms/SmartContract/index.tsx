@@ -203,7 +203,7 @@ const getParsedArgumentsString = (
   abi: ABIMap | null,
 ): string => {
   const parsedArgs = (args || []).map(value => {
-    return parseArgument(value.value, value.raw_type, abi);
+    return parseArgument(value.value, value.raw_type, abi, value.type);
   });
 
   return parsedArgs.join('@');
@@ -213,11 +213,13 @@ export const parseArgument = (
   value: any,
   raw_type: string,
   abi: ABIMap | null,
+  jsType?: string,
 ) => {
   let parsedValue = '';
 
   const required = !raw_type?.startsWith('Option');
-  let type = utils.getJSType(raw_type || '');
+  let type = jsType || utils.getJSType(raw_type || '');
+  if (type === 'struct') type = 'object';
 
   if (type === raw_type && abi?.types?.[raw_type]?.type === 'enum') {
     raw_type = 'u64';

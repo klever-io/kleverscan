@@ -67,7 +67,7 @@ const SmartContractInvoke: React.FC = () => {
   const isOwner =
     !!walletAddress && !!scData?.deployer && walletAddress === scData.deployer;
 
-  const { data: contractInfo } = useQuery({
+  const { data: contractInfo, refetch: refetchContractInfo } = useQuery({
     queryKey: ['contractInfo', contractAddress],
     queryFn: () => fetchContractInfo(contractAddress),
     enabled: !!contractAddress,
@@ -194,7 +194,10 @@ const SmartContractInvoke: React.FC = () => {
             contractAddress={contractAddress}
             latestJob={latestJob ?? null}
             hasVerifiedVersions={hasVerifiedVersions}
-            onSubmitted={() => refetchJob()}
+            onSubmitted={() => {
+              refetchJob();
+              refetchContractInfo();
+            }}
           />
         );
       default:

@@ -73,6 +73,43 @@ export interface SmartContractTransactionData {
   data?: string[];
 }
 
+export type ValidationJobStatus =
+  | 'pending'
+  | 'running'
+  | 'completed'
+  | 'failed';
+
+export interface ValidationJob {
+  id: number;
+  contractAddress: string;
+  kscVersion: string;
+  rustVersion: string;
+  status: ValidationJobStatus;
+  result: string;
+  error: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContractVersion {
+  id: number;
+  version: number;
+  abi: string;
+  byteCodeHash: string;
+  storagePath: string;
+  contractInfoId: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContractInfo {
+  id: number;
+  contractAddress: string;
+  contractVersions: ContractVersion[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ISmartContractResponse extends IResponse {
   pagination: IPagination;
   data: {

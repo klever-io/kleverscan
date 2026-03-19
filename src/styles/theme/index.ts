@@ -220,6 +220,11 @@ const theme = {
     border: '#2e2e2e',
   },
 
+  ide: {
+    rustIcon: '#dea584',
+    jsonIcon: '#f1c40f',
+  },
+
   ito: {
     darkGray: '#202025',
   },

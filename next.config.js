@@ -19,6 +19,8 @@ const defaultEnvs = [
   'DIRECTUS_STATIC_TOKEN',
   'DEFAULT_CDN_HOST',
   'GA_TRACKING_ID',
+  'DEFAULT_CONTRACT_VALIDATOR_KEY',
+  'DEFAULT_CONTRACT_VALIDATOR_URL',
 ];
 
 const getEnvs = () => {

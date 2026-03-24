@@ -464,31 +464,31 @@ export const smartContractInvokesTransactionsTableHeaders = [
   'SC Type',
 ];
 
-export enum contractTableHeaders {
-  'Asset Id',
-  'Amount',
-  'Name',
-  'Ticker',
-  'Reward Address',
-  'Can Delegate',
-  'BLS public key',
-  'Public Key',
-  'Bucket Id',
-  'Claim Type',
-  'Trigger Type',
-  'Description',
-  'Proposal Id',
-  'Buy Type',
-  'Order Id',
-  'Marketplace Id',
-  'Permission Name',
-  'Deposit Type',
-  'Id',
-  'Currency Id',
-  'Market Type',
-  'Price',
-  'Type',
-}
+export const contractTableHeaders = {
+  assetId: 'Asset Id',
+  amount: 'Amount',
+  name: 'Name',
+  ticker: 'Ticker',
+  rewardAddress: 'Reward Address',
+  canDelegate: 'Can Delegate',
+  blsPublicKey: 'BLS public key',
+  publicKey: 'Public Key',
+  bucketId: 'Bucket Id',
+  claimType: 'Claim Type',
+  triggerType: 'Trigger Type',
+  description: 'Description',
+  proposalId: 'Proposal Id',
+  buyType: 'Buy Type',
+  orderId: 'Order Id',
+  marketplaceId: 'Marketplace Id',
+  permissionName: 'Permission Name',
+  depositType: 'Deposit Type',
+  id: 'Id',
+  currencyId: 'Currency Id',
+  marketType: 'Market Type',
+  price: 'Price',
+  type: 'Type',
+};
 
 const oldContractLabels = {
   Transfer: ['Asset Id', 'Amount'],
@@ -564,95 +564,104 @@ export const getHeaderForCSV = (
   header: string[],
 ): string[] => {
   let newHeaders: string[] = [];
-  switch (Number(ContractsIndex[Number(router.query.type)])) {
+  switch (Number(router.query.type)) {
     case ContractsIndex.Transfer:
-      newHeaders = [contractTableHeaders[0], contractTableHeaders[1]];
+      newHeaders = [contractTableHeaders.assetId, contractTableHeaders.amount];
       break;
     case ContractsIndex['Create Asset']:
-      newHeaders = [contractTableHeaders[2], contractTableHeaders[3]];
+      newHeaders = [contractTableHeaders.name, contractTableHeaders.ticker];
       break;
     case ContractsIndex['Create Validator']:
-      newHeaders = [contractTableHeaders[4], contractTableHeaders[5]];
+      newHeaders = [
+        contractTableHeaders.rewardAddress,
+        contractTableHeaders.canDelegate,
+      ];
       break;
     case ContractsIndex['Config Validator']:
-      newHeaders = [contractTableHeaders[6]];
+      newHeaders = [contractTableHeaders.blsPublicKey];
       break;
     case ContractsIndex.Freeze:
-      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
+      newHeaders = [contractTableHeaders.assetId, contractTableHeaders.amount];
       break;
     case ContractsIndex.Unfreeze:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [contractTableHeaders.bucketId];
       break;
     case ContractsIndex.Delegate:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [contractTableHeaders.bucketId];
       break;
     case ContractsIndex.Undelegate:
-      newHeaders = [contractTableHeaders[8]];
+      newHeaders = [contractTableHeaders.bucketId];
       break;
     case ContractsIndex.Withdraw:
-      newHeaders = [contractTableHeaders[9], contractTableHeaders[1]];
+      newHeaders = [contractTableHeaders.assetId, contractTableHeaders.amount];
       break;
     case ContractsIndex.Claim:
       newHeaders = [
-        contractTableHeaders[10],
-        contractTableHeaders[9],
-        contractTableHeaders[1],
+        contractTableHeaders.claimType,
+        contractTableHeaders.assetId,
+        contractTableHeaders.amount,
       ];
       break;
     case ContractsIndex.Unjail:
       break;
     case ContractsIndex['Asset Trigger']:
-      newHeaders = [contractTableHeaders[11]];
+      newHeaders = [contractTableHeaders.triggerType];
       break;
     case ContractsIndex['Set Account Name']:
-      newHeaders = [contractTableHeaders[2]];
+      newHeaders = [contractTableHeaders.name];
       break;
     case ContractsIndex.Proposal:
-      newHeaders = [contractTableHeaders[12]];
+      newHeaders = [contractTableHeaders.description];
       break;
     case ContractsIndex.Vote:
-      newHeaders = [contractTableHeaders[13], contractTableHeaders[1]];
+      newHeaders = [
+        contractTableHeaders.proposalId,
+        contractTableHeaders.amount,
+      ];
       break;
     case ContractsIndex['Config ITO']:
-      newHeaders = [contractTableHeaders[9]];
+      newHeaders = [contractTableHeaders.assetId];
       break;
     case ContractsIndex['Set ITO']:
-      newHeaders = [contractTableHeaders[9]];
+      newHeaders = [contractTableHeaders.assetId];
       break;
     case ContractsIndex.Buy:
       newHeaders = [
-        contractTableHeaders[14],
-        contractTableHeaders[20],
-        contractTableHeaders[22],
-        contractTableHeaders[1],
+        contractTableHeaders.buyType,
+        contractTableHeaders.currencyId,
+        contractTableHeaders.price,
+        contractTableHeaders.amount,
       ];
       break;
     case ContractsIndex.Sell:
       newHeaders = [
-        contractTableHeaders[21],
-        contractTableHeaders[20],
-        contractTableHeaders[9],
-        contractTableHeaders[22],
-        contractTableHeaders[1],
+        contractTableHeaders.marketType,
+        contractTableHeaders.currencyId,
+        contractTableHeaders.assetId,
+        contractTableHeaders.price,
+        contractTableHeaders.amount,
       ];
       break;
     case ContractsIndex['Cancel Marketplace Order']:
-      newHeaders = [contractTableHeaders[15]];
+      newHeaders = [contractTableHeaders.orderId];
       break;
     case ContractsIndex['Create Marketplace']:
-      newHeaders = [contractTableHeaders[2]];
+      newHeaders = [contractTableHeaders.name];
       break;
     case ContractsIndex['Config Marketplace']:
-      newHeaders = [contractTableHeaders[16]];
+      newHeaders = [contractTableHeaders.marketplaceId];
       break;
     case ContractsIndex['Update Account Permission']:
-      newHeaders = [contractTableHeaders[17]];
+      newHeaders = [contractTableHeaders.permissionName];
       break;
     case ContractsIndex['Deposit']:
-      newHeaders = [contractTableHeaders[18], contractTableHeaders[19]];
+      newHeaders = [contractTableHeaders.depositType, contractTableHeaders.id];
       break;
     case ContractsIndex['ITO Trigger']:
-      newHeaders = [contractTableHeaders[11], contractTableHeaders[9]];
+      newHeaders = [
+        contractTableHeaders.triggerType,
+        contractTableHeaders.assetId,
+      ];
       break;
   }
   if (router?.query?.type) {
@@ -660,6 +669,8 @@ export const getHeaderForCSV = (
       .splice(0, header.length - 2)
       .concat(
         newHeaders,
+        'kApp Fee',
+        'Bandwidth Fee',
         'Multicontract',
         `Account's Transaction Number (Nonce)`,
       );
@@ -680,6 +691,7 @@ const getParsedAmount = async (parameter: any, assetId: string) => {
 export const getDefaultCells = async (
   tableRowData: ITransaction,
   isMulticontract: boolean,
+  contractIndex = 0,
 ): Promise<any[]> => {
   const {
     hash,
@@ -701,8 +713,8 @@ export const getDefaultCells = async (
   switch (contract[0].typeString) {
     case Contract.Transfer:
       try {
-        const coin = parameter?.assetId || 'KLV';
-        const asyncAmount = await getParsedAmount(parameter, coin);
+        assetId = parameter?.assetId || 'KLV';
+        const asyncAmount = await getParsedAmount(parameter, assetId);
         amountContract.push(asyncAmount);
         break;
       } catch (e) {
@@ -721,7 +733,7 @@ export const getDefaultCells = async (
       }
     case Contract.Withdraw:
       try {
-        const filteredReceipts = filterReceipts(receipts, contract[0].type);
+        const filteredReceipts = filterReceipts(receipts, contractIndex);
         assetId = parameter?.assetId || 'KLV';
         const asyncAmount = await getAmountFromReceipts(
           assetId,
@@ -736,12 +748,13 @@ export const getDefaultCells = async (
       }
     case Contract.Claim:
       try {
-        const filteredReceipts = filterReceipts(receipts, contract[0].type);
+        const filteredReceipts = filterReceipts(receipts, contractIndex);
         const claimReceipt = findReceipt(filteredReceipts, 17) as
           | IClaimReceipt
           | undefined;
+        assetId = claimReceipt?.assetId || '';
         const asyncAmount = await getAmountFromReceipts(
-          claimReceipt?.assetId || '',
+          assetId,
           17,
           filteredReceipts,
         );
@@ -991,12 +1004,6 @@ export const getContractCells = async (
       }
       break;
     case Contract.Unjail:
-      try {
-        cells.push(parsedkAppFee, parsedbandwidthFee);
-      } catch (e) {
-        console.error(Contract.Unjail, e);
-        throw new Error(`Error Getting Unjail Contract Cells: ${e}`);
-      }
       break;
     case Contract.AssetTrigger:
       try {
@@ -1139,7 +1146,8 @@ export const getContractCells = async (
       break;
     case Contract.ConfigMarketplace:
       try {
-        cells.push(parsedkAppFee, parsedbandwidthFee);
+        const marketplaceId = parameter?.marketplaceID || '';
+        cells.push(marketplaceId);
       } catch (e) {
         console.error(Contract.ConfigMarketplace, e);
         throw new Error(
@@ -1180,14 +1188,9 @@ export const getContractCells = async (
 
       break;
     default:
-      try {
-        cells.push(parsedkAppFee, parsedbandwidthFee);
-      } catch (e) {
-        console.error('Default', e);
-        throw new Error(`Error Getting Default Contract Cells: ${e}`);
-      }
+      break;
   }
 
-  cells.push(isMulticontract, nonce);
+  cells.push(parsedkAppFee, parsedbandwidthFee, isMulticontract, nonce);
   return cells;
 };

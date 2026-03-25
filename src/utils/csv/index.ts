@@ -38,8 +38,9 @@ const sanitizeRow = (parsedRow: any[]) => {
 const processDefaultRow = async (
   row: ITransaction,
   isMulticontract = false,
+  index = 0,
 ): Promise<string> => {
-  const parsedRow = await getDefaultCells(row, isMulticontract);
+  const parsedRow = await getDefaultCells(row, isMulticontract, index);
   return sanitizeRow(parsedRow);
 };
 
@@ -98,7 +99,11 @@ export const exportToCsv = async (
               ...rows[i],
               contract: [rows[i]?.contract[j]],
             };
-            csvFile += await processDefaultRow(rowWithFilteredContract, true);
+            csvFile += await processDefaultRow(
+              rowWithFilteredContract,
+              true,
+              j,
+            );
           }
         } else {
           csvFile += await processDefaultRow(rows[i]);

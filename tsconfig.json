@@ -12,7 +12,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "types": ["@types/gtag.js"],
+    "types": ["@types/gtag.js", "@types/jest"],
     "jsx": "react-jsx",
     "ignoreDeprecations": "5.0",
     "baseUrl": "src/",
@@ -23,11 +23,5 @@
     "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next-i18next.config.js"],
-  "exclude": [
-    "node_modules",
-    "cypress.config.ts",
-    "cypress",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+  "exclude": ["node_modules", "cypress.config.ts", "cypress"]
 }

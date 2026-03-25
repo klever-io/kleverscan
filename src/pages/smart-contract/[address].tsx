@@ -52,6 +52,9 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
+const isContractValidationEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
+
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
   const { isMobile } = useMobile();
@@ -70,13 +73,13 @@ const SmartContractInvoke: React.FC = () => {
   const { data: contractInfo, refetch: refetchContractInfo } = useQuery({
     queryKey: ['contractInfo', contractAddress],
     queryFn: () => fetchContractInfo(contractAddress),
-    enabled: !!contractAddress,
+    enabled: !!contractAddress && isContractValidationEnabled,
   });
 
   const { data: latestJob, refetch: refetchJob } = useQuery({
     queryKey: ['latestJob', contractAddress],
     queryFn: () => fetchLatestJob(contractAddress),
-    enabled: !!contractAddress && isOwner,
+    enabled: !!contractAddress && isOwner && isContractValidationEnabled,
     refetchInterval: query => {
       const status = query.state.data?.status;
       if (status === 'pending' || status === 'running') return 3000;
@@ -88,12 +91,12 @@ const SmartContractInvoke: React.FC = () => {
 
   const tabHeaders = useMemo(() => {
     const tabs = [{ label: 'Transactions', value: 'transactions' }];
-    if (hasVerifiedVersions) {
+    if (isContractValidationEnabled && hasVerifiedVersions) {
       tabs.push({ label: 'Contract Source', value: 'contract-source' });
       tabs.push({ label: 'Read Contract', value: 'read-contract' });
       tabs.push({ label: 'Write Contract', value: 'write-contract' });
     }
-    if (isOwner) {
+    if (isContractValidationEnabled && isOwner) {
       tabs.push({ label: 'Verify Contract', value: 'verify' });
     }
     return tabs;

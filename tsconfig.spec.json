@@ -1,4 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "include": []
+  "compilerOptions": {
+    "types": ["@types/jest", "@types/gtag.js", "@testing-library/jest-dom"]
+  },
+  "include": ["**/*.test.ts", "**/*.test.tsx", "jest.setup.js"]
 }

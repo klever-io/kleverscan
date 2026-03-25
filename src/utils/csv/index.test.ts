@@ -359,8 +359,7 @@ describe('getContractCells', () => {
     // Base cells: hash, block, created, sender, to, status, contractName (7)
     // Then: claimType, assetId, amount (3)
     // Then: kAppFee, bwFee, multicontract, nonce (4)
-    // claimType 0 is falsy so `parameter?.claimType || ''` yields ''
-    expect(cells[7]).toBe(''); // claimType (0 falls through to '')
+    expect(cells[7]).toBe(0); // claimType 0 (StakingClaim)
     expect(cells[8]).toBe('KFI'); // assetId from receipt
   });
 

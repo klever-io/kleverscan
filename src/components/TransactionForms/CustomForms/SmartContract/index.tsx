@@ -31,9 +31,9 @@ type FormData = {
   };
 };
 
-interface ABIMap {
+export interface ABIMap {
   functions?: ABIFunctionMap;
-  construct: ABIFunction;
+  construct?: ABIFunction;
   types?: Record<string, ABIType>;
 }
 
@@ -209,16 +209,17 @@ const getParsedArgumentsString = (
   return parsedArgs.join('@');
 };
 
-const parseArgument = (
+export const parseArgument = (
   value: any,
   raw_type: string,
   abi: ABIMap | null,
-  jsType: string,
+  jsType?: string,
 ) => {
   let parsedValue = '';
 
   const required = !raw_type?.startsWith('Option');
-  let type = utils.getJSType(raw_type || '');
+  let type = jsType || utils.getJSType(raw_type || '');
+  if (type === 'struct') type = 'object';
 
   if (type === raw_type && abi?.types?.[raw_type]?.type === 'enum') {
     raw_type = 'u64';
@@ -330,7 +331,7 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const func: ABIFunction | undefined =
     scType === 1
-      ? abi?.constructor || {
+      ? abi?.construct || {
           arguments: {},
         }
       : scType === 2

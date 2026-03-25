@@ -988,7 +988,7 @@ export const getContractCells = async (
     case Contract.Claim:
       try {
         const filteredReceipts = filterReceipts(receipts, index);
-        const claimType = parameter?.claimType || '';
+        const claimType = parameter?.claimType ?? '';
         const claimReceipt = findReceipt(filteredReceipts, 17) as
           | IClaimReceipt
           | undefined;

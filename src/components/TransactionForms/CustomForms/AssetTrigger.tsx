@@ -6,8 +6,9 @@ import { assetTriggerTypes } from '@/utils/contracts';
 import { isKVMAvailable } from '@/utils/kvm';
 import { getNetwork } from '@/utils/networkFunctions';
 import { deepCopyObject } from '@/utils/objectFunctions';
-import { IAssetTrigger } from '@klever/sdk-web';
 import React, { PropsWithChildren, useEffect } from 'react';
+
+type IAssetTrigger = Record<string, any>;
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '.';
 import FormInput from '../FormInput';

@@ -2,7 +2,8 @@ import api from '@/services/api';
 import { Service } from '@/types/index';
 import { ABI } from '@/types/contracts';
 import { ContractInfo } from '@/types/smart-contract';
-import { abiEncoder } from '@klever/sdk-web';
+import { encodeByType, bytesToHex } from '@klever/connect-contracts';
+import type { ContractABI } from '@klever/connect-contracts';
 import React, { useMemo, useState } from 'react';
 import {
   InteractionSection,
@@ -113,7 +114,17 @@ const encodeArg = (
   value: string,
   rawType: string,
 ): string => {
-  return abiEncoder.encodeWithABI({ types: abiTypes }, value, rawType);
+  try {
+    const encoded = encodeByType(
+      value,
+      rawType,
+      { types: abiTypes } as ContractABI,
+      false,
+    );
+    return bytesToHex(encoded);
+  } catch {
+    return '';
+  }
 };
 
 export function ContractReadTab({

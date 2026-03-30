@@ -14,7 +14,7 @@ import {
 import { useExtension } from '@/contexts/extension';
 import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
-import { web } from '@klever/sdk-web';
+import { Transaction } from '@klever/connect';
 import { useTranslation } from 'next-i18next';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -53,7 +53,7 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
     t,
   };
 
-  const { walletAddress } = useExtension();
+  const { walletAddress, wallet } = useExtension();
 
   const confirmProps = {
     ...stepsProps,
@@ -236,16 +236,18 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
           payload: parseTransaction,
         },
       ]);
-      const signedTx = await web.signTransaction(unsignedTx);
-      const response = await web.broadcastTransactions([signedTx]);
-      setTxHash(response.data.txsHashes[0]);
+      const signedTx = await wallet!.signTransaction(
+        Transaction.fromTransaction(unsignedTx as any),
+      );
+      const txHashes = await wallet!.broadcastTransactions([signedTx]);
+      setTxHash(txHashes[0]);
       window.scrollTo(0, 0);
       toast.success('Transaction broadcast successfully');
 
       gtagEvent('send_transaction_wizard', {
         event_category: 'transaction',
         event_label: 'send_transaction_wizard',
-        hash: response.data.txsHashes[0],
+        hash: txHashes[0],
         sender: walletAddress,
         transaction_type: 'ConfigITOContract',
       });

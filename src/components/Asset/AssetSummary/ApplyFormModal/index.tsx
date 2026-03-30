@@ -3,7 +3,8 @@ import { StyledArrow } from '@/components/Layout/Title/styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import api from '@/services/api';
 import { IAsset, Service } from '@/types';
-import { web } from '@klever/sdk-web';
+import { useExtension } from '@/contexts/extension';
+import { Transaction } from '@klever/connect';
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
@@ -68,6 +69,7 @@ export const ApplyFormModal: React.FC<
     defaultValues?.short_description || '',
   );
   const [transferValue, setTransferValue] = useState<number | null>(null);
+  const { wallet } = useExtension();
 
   const shortDescriptionRef = useRef<HTMLTextAreaElement>(null);
 
@@ -133,14 +135,16 @@ export const ApplyFormModal: React.FC<
     };
 
     try {
-      const unsignedTransaction = await web.buildTransaction([
+      const unsignedTransaction = await wallet!.buildTransaction([
         {
-          payload,
-          type: 0,
+          ...payload,
+          contractType: 0,
         },
       ]);
 
-      const signedTransaction = await web.signTransaction(unsignedTransaction);
+      const signedTransaction = await wallet!.signTransaction(
+        Transaction.fromTransaction(unsignedTransaction),
+      );
 
       const body = {
         id: asset.assetId,

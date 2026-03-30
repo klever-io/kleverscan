@@ -24,7 +24,7 @@ import {
   Title,
   TitleContainer,
 } from './styles';
-import { web } from '@klever/sdk-web';
+import { Transaction } from '@klever/connect';
 
 const ReactSelect = dynamic(() => import('react-select'), {
   ssr: false,
@@ -85,6 +85,7 @@ export const ParticipateModal: React.FC<
     walletAddress,
     connectExtension,
     checkKleverWebObject,
+    wallet,
   } = useExtension();
   const { t } = useTranslation('assets');
 
@@ -284,25 +285,27 @@ export const ParticipateModal: React.FC<
     try {
       setLoading(true);
       setTxHash('');
-      const unsignedTx = await web?.buildTransaction([
+      const unsignedTx = await wallet?.buildTransaction([
         {
-          type: 17, // Buy Order type
-          payload: payload,
+          contractType: 17, // Buy Order type
+          ...payload,
         },
       ]);
       if (!unsignedTx) {
         throw new Error('Transaction building failed.');
       }
-      const signedTx = await web.signTransaction(unsignedTx);
+      const signedTx = await wallet!.signTransaction(
+        Transaction.fromTransaction(unsignedTx),
+      );
       if (!signedTx) {
         throw new Error('Transaction signing was cancelled.');
       }
-      const response = await web?.broadcastTransactions([signedTx]);
-      if (!response?.data?.txsHashes?.length) {
+      const txHashes = await wallet!.broadcastTransactions([signedTx]);
+      if (!txHashes?.length) {
         throw new Error('Transaction broadcasting failed.');
       }
 
-      setTxHash(response.data.txsHashes[0]);
+      setTxHash(txHashes[0]);
       toast.success('Transaction successfully broadcasted.');
       closeModal();
     } catch (e: any) {

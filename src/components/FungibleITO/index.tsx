@@ -1,5 +1,6 @@
 import { IPackInfo, IPackItem } from '@/types/contracts';
-import { web } from '@klever/sdk-web';
+import { useExtension } from '@/contexts/extension';
+import { Transaction } from '@klever/connect';
 import { useTranslation } from 'next-i18next';
 import { PropsWithChildren, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -49,6 +50,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
   showcase,
 }) => {
   const { t } = useTranslation('assets');
+  const { wallet } = useExtension();
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [viewMore, setViewMore] = useState(false);
@@ -136,15 +138,17 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
 
     try {
       setLoading(true);
-      const unsignedTx = await web.buildTransaction([
+      const unsignedTx = await wallet!.buildTransaction([
         {
-          type: 17, // Buy Order type
-          payload: parsedPayload,
+          contractType: 17, // Buy Order type
+          ...parsedPayload,
         },
       ]);
-      const signedTx = await web.signTransaction(unsignedTx);
-      const response = await web.broadcastTransactions([signedTx]);
-      if (setTxHash) setTxHash(response.data.txsHashes[0]);
+      const signedTx = await wallet!.signTransaction(
+        Transaction.fromTransaction(unsignedTx),
+      );
+      const txHashes = await wallet!.broadcastTransactions([signedTx]);
+      if (setTxHash) setTxHash(txHashes[0]);
       toast.success(t('itos:successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');

@@ -134,15 +134,21 @@ export const ApplyFormModal: React.FC<
       amount,
     };
 
+    if (!wallet) {
+      toast.error('Wallet not connected. Please connect your wallet.');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const unsignedTransaction = await wallet!.buildTransaction([
+      const unsignedTransaction = await wallet.buildTransaction([
         {
           ...payload,
           contractType: 0,
         },
       ]);
 
-      const signedTransaction = await wallet!.signTransaction(
+      const signedTransaction = await wallet.signTransaction(
         Transaction.fromTransaction(unsignedTransaction),
       );
 

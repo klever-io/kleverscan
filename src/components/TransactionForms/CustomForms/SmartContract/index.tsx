@@ -21,9 +21,10 @@ const encodeABIValue = (
   value: unknown,
   type: string,
   isNested = true,
+  abi: ContractABI = emptyABI,
 ): string => {
   try {
-    return bytesToHex(encodeByType(value, type, emptyABI, isNested));
+    return bytesToHex(encodeByType(value, type, abi, isNested));
   } catch {
     return '';
   }
@@ -33,9 +34,12 @@ const encodeLengthPlusData = (
   value: string | unknown[],
   innerType: string,
   isNested = true,
+  abi: ContractABI = emptyABI,
 ): string => {
   if (typeof value !== 'string') {
-    const data = value.map(v => encodeABIValue(v, innerType, true)).join('');
+    const data = value
+      .map(v => encodeABIValue(v, innerType, true, abi))
+      .join('');
     if (!isNested) return data;
     const length = value.length.toString(16).padStart(8, '0');
     return length + data;
@@ -206,8 +210,12 @@ const parseAbiFunctions = (
     constructor = {
       arguments: parsedAbi.constructor.inputs.reduce((acc, input) => {
         const isOptional = input.type.toLowerCase().startsWith('option');
+        let type = getJSType(input.type);
+        if (type === input.type) {
+          type = types[input.type]?.type || 'object';
+        }
         acc[input.name] = {
-          type: getJSType(input.type),
+          type,
           required: !isOptional,
           raw_type: input.type,
         };
@@ -266,6 +274,10 @@ export const parseArgument = (
     return '';
   }
 
+  const contractABI = abi
+    ? ({ types: abi.types || {} } as ContractABI)
+    : emptyABI;
+
   if (type === 'object' && abi !== null) {
     let argument: Record<string, any> = {};
     try {
@@ -279,7 +291,12 @@ export const parseArgument = (
         ([key, v]) => {
           const objectValue = argument[v.name];
           const objectType = v.type;
-          const parsedValue = encodeABIValue(objectValue, objectType);
+          const parsedValue = encodeABIValue(
+            objectValue,
+            objectType,
+            true,
+            contractABI,
+          );
           return parsedValue;
         },
       );
@@ -302,11 +319,12 @@ export const parseArgument = (
       : raw_type;
     const innerType = nonOptionalType.split('<')[1].split('>')[0];
 
-    const parsedArray = (argument as any[]).map(value => {
-      return encodeABIValue(value, innerType);
-    });
-
-    parsedValue = encodeLengthPlusData(parsedArray, innerType) as string;
+    parsedValue = encodeLengthPlusData(
+      argument,
+      innerType,
+      true,
+      contractABI,
+    ) as string;
   } else if (type === 'variadic' && abi !== null) {
     let argument = [];
     try {

@@ -47,18 +47,24 @@ const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
       ...payload,
     };
 
+    if (!wallet) {
+      toast.error(t('assets:walletNotConnected'));
+      setLoading(false);
+      return;
+    }
+
     try {
-      const unsignedTx = await wallet!.buildTransaction([
+      const unsignedTx = await wallet.buildTransaction([
         {
           contractType: 17, // Buy Order type
           ...parsedPayload,
         },
       ]);
-      const signedTx = await wallet!.signTransaction(
+      const signedTx = await wallet.signTransaction(
         Transaction.fromTransaction(unsignedTx),
       );
-      const txHashes = await wallet!.broadcastTransactions([signedTx]);
-      if (setTxHash) setTxHash(txHashes[0]);
+      const txHashes = await wallet.broadcastTransactions([signedTx]);
+      if (setTxHash && txHashes?.[0]) setTxHash(txHashes[0]);
       toast.success(t('successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');

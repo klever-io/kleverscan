@@ -272,6 +272,7 @@ export const ParticipateModal: React.FC<
     }
     if (!walletAddress || !checkKleverWebObject()) {
       await connectExtension();
+      return;
     }
 
     const payload = {

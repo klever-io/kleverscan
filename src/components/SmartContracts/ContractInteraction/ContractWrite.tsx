@@ -156,6 +156,10 @@ function WriteEndpointCard({
     setError(null);
 
     try {
+      if (!wallet) {
+        throw new Error('Wallet not connected');
+      }
+
       const encodedArgs = buildEncodedArgs(endpoint.inputs, args, abiTypes);
 
       const metadata =
@@ -198,10 +202,10 @@ function WriteEndpointCard({
         [encodedMetadata],
       );
 
-      const signedTx = await wallet!.signTransaction(
+      const signedTx = await wallet.signTransaction(
         Transaction.fromTransaction(unsignedTx.result as any),
       );
-      const txHashes = await wallet!.broadcastTransactions([signedTx]);
+      const txHashes = await wallet.broadcastTransactions([signedTx]);
 
       const hash = txHashes?.[0] || unsignedTx.txHash;
       setTxHash(hash);

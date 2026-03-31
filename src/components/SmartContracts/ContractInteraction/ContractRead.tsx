@@ -114,17 +114,13 @@ const encodeArg = (
   value: string,
   rawType: string,
 ): string => {
-  try {
-    const encoded = encodeByType(
-      value,
-      rawType,
-      { types: abiTypes } as ContractABI,
-      false,
-    );
-    return bytesToHex(encoded);
-  } catch {
-    return '';
-  }
+  const encoded = encodeByType(
+    value,
+    rawType,
+    { types: abiTypes } as ContractABI,
+    false,
+  );
+  return bytesToHex(encoded);
 };
 
 export function ContractReadTab({

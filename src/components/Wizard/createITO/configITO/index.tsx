@@ -230,16 +230,21 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
       ...payload,
     };
     try {
+      if (!wallet) {
+        toast.error('Wallet not connected. Please connect your wallet.');
+        return;
+      }
+
       const { result: unsignedTx } = await buildTransaction([
         {
           type: getType(contractType),
           payload: parseTransaction,
         },
       ]);
-      const signedTx = await wallet!.signTransaction(
+      const signedTx = await wallet.signTransaction(
         Transaction.fromTransaction(unsignedTx as any),
       );
-      const txHashes = await wallet!.broadcastTransactions([signedTx]);
+      const txHashes = await wallet.broadcastTransactions([signedTx]);
       setTxHash(txHashes[0]);
       window.scrollTo(0, 0);
       toast.success('Transaction broadcast successfully');

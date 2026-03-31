@@ -51,19 +51,6 @@ jest.mock('react-dom', () => {
   };
 });
 
-jest.mock('@klever/sdk-web', () => {
-  const contracts = jest.requireActual('@klever/connect-contracts');
-
-  return {
-    abiEncoder: {
-      encodeWithABI: (abi: unknown, value: unknown, rawType: string) =>
-        contracts.bytesToHex(
-          contracts.encodeByType(value, rawType, abi, false),
-        ),
-    },
-  };
-}, { virtual: true });
-
 import { ContractReadTab } from '../ContractRead';
 
 const mockApiPost = api.post as jest.Mock;

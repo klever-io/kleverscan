@@ -7,7 +7,6 @@ import { TextDecoder, TextEncoder } from 'util';
 import React from 'react';
 import { toast } from 'react-toastify';
 import { ThemeProvider } from 'styled-components';
-import { web } from '@klever/sdk-web';
 
 Object.assign(global, { TextEncoder, TextDecoder });
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean })
@@ -117,57 +116,11 @@ jest.mock('@klever/connect', () => ({
     fromTransaction: jest.fn((tx: unknown) => tx),
   },
 }));
-jest.mock(
-  '@klever/sdk-web',
-  () => {
-    const contracts = jest.requireActual('@klever/connect-contracts');
-    const emptyAbi = { types: {} };
-
-    return {
-      abiEncoder: {
-        encodeABIValue: (
-          value: unknown,
-          rawType: string,
-          nested = false,
-        ) =>
-          contracts.bytesToHex(
-            contracts.encodeByType(value, rawType, emptyAbi, nested),
-          ),
-        encodeLengthPlusData: (value: string | string[], _innerType: string) => {
-          if (Array.isArray(value)) {
-            return value.length.toString(16).padStart(8, '0') + value.join('');
-          }
-
-          const bytes = new TextEncoder().encode(String(value));
-          return (
-            bytes.length.toString(16).padStart(8, '0') +
-            contracts.bytesToHex(bytes)
-          );
-        },
-      },
-      utils: {
-        getJSType: (type: string) => contracts.getJSType(type),
-      },
-      web: {
-        signTransaction: jest.fn(async (tx: unknown) => ({ signed: tx })),
-        broadcastTransactions: jest.fn(async () => ({
-          error: '',
-          data: { txsHashes: ['tx-hash-from-web'] },
-        })),
-      },
-    };
-  },
-  { virtual: true },
-);
 
 import { ContractWriteTab } from '../ContractWrite';
 
 const mockBuildTransaction = buildTransaction as jest.Mock;
 const mockGetPrecision = getPrecision as jest.Mock;
-const mockWeb = web as {
-  signTransaction: jest.Mock;
-  broadcastTransactions: jest.Mock;
-};
 let consoleErrorSpy: jest.SpyInstance;
 
 const renderWithTheme = (ui: React.ReactElement) =>
@@ -210,11 +163,6 @@ beforeEach(() => {
   });
   mockWallet.signTransaction.mockResolvedValue({ signed: 'wallet-transaction' });
   mockWallet.broadcastTransactions.mockResolvedValue(['wallet-hash']);
-  mockWeb.signTransaction.mockResolvedValue({ signed: 'web-transaction' });
-  mockWeb.broadcastTransactions.mockResolvedValue({
-    error: '',
-    data: { txsHashes: ['tx-hash-from-web'] },
-  });
 });
 
 describe('ContractWriteTab', () => {

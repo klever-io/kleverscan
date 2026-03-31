@@ -57,47 +57,6 @@ jest.mock('@/utils/hooks', () => ({
 jest.mock('@/utils/networkFunctions', () => ({
   getNetwork: jest.fn(() => 'mainnet'),
 }));
-jest.mock(
-  '@klever/sdk-web',
-  () => {
-    const contracts = jest.requireActual('@klever/connect-contracts');
-    const emptySdkAbi = { types: {} };
-
-    return {
-      abiEncoder: {
-        encodeABIValue: (
-          value: unknown,
-          type: string,
-          nested = false,
-        ): string => {
-          try {
-            return contracts.bytesToHex(
-              contracts.encodeByType(value, type, emptySdkAbi, nested),
-            );
-          } catch {
-            return '';
-          }
-        },
-        encodeLengthPlusData: (value: string | string[], _innerType: string) => {
-          if (Array.isArray(value)) {
-            return value.length.toString(16).padStart(8, '0') + value.join('');
-          }
-
-          const bytes = new TextEncoder().encode(String(value));
-          return (
-            bytes.length.toString(16).padStart(8, '0') +
-            contracts.bytesToHex(bytes)
-          );
-        },
-      },
-      utils: {
-        getJSType: (type: string) => contracts.getJSType(type),
-      },
-    };
-  },
-  { virtual: true },
-);
-
 import { parseArgument } from '../index';
 import type { ABIMap } from '../index';
 

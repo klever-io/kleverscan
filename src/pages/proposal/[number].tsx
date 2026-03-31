@@ -220,28 +220,31 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
   }, [txHash]);
 
   const handleVoteProposal = async (type: number) => {
+    if (!wallet) {
+      toast.error('Wallet not connected. Please connect your wallet.');
+      return;
+    }
+
     const payload = {
-      contractType: 'VoteContract',
       amount: totalFrozenBalance,
       proposalId: parseInt(router?.query?.number as string),
       type: type,
     };
 
-    const parsedPayload = JSON.parse(JSON.stringify(payload, null, '\t'));
+    const parsedPayload = JSON.parse(JSON.stringify(payload));
 
     try {
-      const { contractType, ...rest } = parsedPayload;
-      const voteTransaction = await wallet!.buildTransaction([
+      const voteTransaction = await wallet.buildTransaction([
         {
           contractType: getType('VoteContract'),
-          ...rest,
+          ...parsedPayload,
         },
       ]);
 
-      const signedTx = await wallet!.signTransaction(
+      const signedTx = await wallet.signTransaction(
         Transaction.fromTransaction(voteTransaction),
       );
-      const txHashes = await wallet!.broadcastTransactions([signedTx]);
+      const txHashes = await wallet.broadcastTransactions([signedTx]);
 
       setTxHash(txHashes[0]);
 

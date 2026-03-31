@@ -407,6 +407,12 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
       return;
     }
 
+    if (!wallet) {
+      toast.error('Wallet not connected. Please connect your wallet.');
+      setTxLoading(false);
+      return;
+    }
+
     setTxLoading(true);
     const parsedDataArray: string[] = [];
     const parsedPayloads = formPayloads.map(formPayload => {
@@ -446,7 +452,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         const senderAddress =
           senderAccount !== walletAddress ? senderAccount : walletAddress;
         if (signTxMultiSign.current) {
-          const signedTx = await wallet!.signTransaction(
+          const signedTx = await wallet.signTransaction(
             Transaction.fromTransaction(unsignedTx.result as any),
           );
           const signedJSON = signedTx.toJSON() as {
@@ -512,10 +518,10 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
           toast.success('Transaction built and signed');
         }
       } else {
-        const signedTx = await wallet!.signTransaction(
+        const signedTx = await wallet.signTransaction(
           Transaction.fromTransaction(unsignedTx.result as any),
         );
-        const txHashes = await wallet!.broadcastTransactions([signedTx]);
+        const txHashes = await wallet.broadcastTransactions([signedTx]);
         setTxHash(txHashes[0]);
         toast.success('Transaction broadcast successfully');
         gtagEvent('send_transaction', {

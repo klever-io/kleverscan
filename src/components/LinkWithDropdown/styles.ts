@@ -15,7 +15,6 @@ const FadeIn = keyframes`
 export const LinkWrapper = styled.div`
   position: relative;
   display: inline-block;
-  cursor: pointer;
 `;
 
 export const Dropdown = styled.div<DropdownProps>`
@@ -29,10 +28,10 @@ export const Dropdown = styled.div<DropdownProps>`
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
   border-radius: 12px;
-  width: 15rem;
-  padding: 1rem 0px;
+  max-width: 15rem;
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    left: -16rem;
+    width: 12rem;
+    left: 0;
   }
 `;
 
@@ -42,14 +41,6 @@ export const DropdownLink = styled.a`
   align-items: start;
   justify-items: start;
   text-decoration: none;
-`;
-
-export const DropdownLinkContainer = styled.div`
-  padding: 8px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.5rem;
 `;
 
 export const QrCodeDropdown = styled.div<{ active: boolean }>`
@@ -92,14 +83,17 @@ export const QrCodeTitle = styled.p`
   color: ${props => props.theme.black};
 `;
 export const DropdownActionItemPadding = styled.div`
-  padding: 1rem 0px;
-  border-bottom: 1px solid #3e3e40;
+  padding: 0.25rem 0px;
   width: 100%;
   justify-items: flex-start !important;
   display: flex;
   align-content: flex-start;
   flex-wrap: wrap;
   flex-direction: column;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #3e3e40;
+  }
 `;
 export const DropdownActionItem = styled.div<{
   secondary?: boolean;
@@ -109,9 +103,11 @@ export const DropdownActionItem = styled.div<{
   position: static;
   display: flex;
   align-items: center;
+  justify-content: flex-start !important;
   gap: 0.45rem;
   height: 2.5rem;
   font-size: 14px;
+  width: 100%;
   font-weight: 400;
   padding: 0.75rem;
   border: 1px solid transparent;
@@ -157,6 +153,7 @@ export const DropdownActionItem = styled.div<{
     css`
       &:hover {
         color: ${props => props.theme.violet};
+        background-color: ${props => props.theme.black10};
       }
     `}
 

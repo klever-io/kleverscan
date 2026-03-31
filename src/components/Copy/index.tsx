@@ -14,12 +14,13 @@ interface ICopyProps {
   color?: string;
 }
 
-const IconContainer = styled.button`
+const IconContainer = styled.button<{ $color?: string }>`
   cursor: pointer;
   line-height: 0;
+  color: ${({ $color }) => $color || '#7B7DB2'};
   svg {
     g {
-      fill: ${({ color }) => color};
+      fill: ${({ $color }) => $color};
     }
   }
 `;
@@ -51,7 +52,7 @@ const Copy: React.FC<PropsWithChildren<ICopyProps>> = ({
 
   return (
     <Fragment>
-      <IconContainer onClick={handleCopyInfo} style={style} color={color}>
+      <IconContainer onClick={handleCopyInfo} style={style} $color={color}>
         {children ? children : <CopyIcon style={{ zoom: `${size}` }} />}
       </IconContainer>
     </Fragment>

@@ -744,7 +744,7 @@ export const getDefaultCells = async (
           | IUnfreezeReceipt
           | undefined;
         assetId = parameter?.assetId || 'KLV';
-        const precision = (await getPrecision(assetId)) as number;
+        const precision = ((await getPrecision(assetId)) as number) ?? 6;
         amountContract.push(
           unfreezeReceipt?.value
             ? Number(unfreezeReceipt.value) / 10 ** precision
@@ -762,6 +762,7 @@ export const getDefaultCells = async (
           | IDelegateReceipt
           | undefined;
         assetId = 'KLV';
+        // KLV staking always uses 6 decimal places — staking is KLV-only
         amountContract.push(
           delegateReceipt?.amountDelegated
             ? Number(delegateReceipt.amountDelegated) / 10 ** 6
@@ -775,10 +776,13 @@ export const getDefaultCells = async (
     case Contract.Undelegate:
       try {
         const filteredReceipts = filterReceipts(receipts, contractIndex);
+        // Undelegate reuses receipt type 7 (IDelegateReceipt) — same receipt
+        // structure as Delegate per the Klever protocol receipt type table
         const delegateReceipt = findReceipt(filteredReceipts, 7) as
           | IDelegateReceipt
           | undefined;
         assetId = 'KLV';
+        // KLV staking always uses 6 decimal places — staking is KLV-only
         amountContract.push(
           delegateReceipt?.amountDelegated
             ? Number(delegateReceipt.amountDelegated) / 10 ** 6
@@ -1008,7 +1012,7 @@ export const getContractCells = async (
           | IUnfreezeReceipt
           | undefined;
         const assetId = parameter?.assetId || 'KLV';
-        const precision = (await getPrecision(assetId)) as number;
+        const precision = ((await getPrecision(assetId)) as number) ?? 6;
         const amount = unfreezeReceipt?.value
           ? Number(unfreezeReceipt.value) / 10 ** precision
           : 0;
@@ -1025,6 +1029,7 @@ export const getContractCells = async (
         const delegateReceipt = findReceipt(filteredReceipts, 7) as
           | IDelegateReceipt
           | undefined;
+        // KLV staking always uses 6 decimal places — staking is KLV-only
         const amount = delegateReceipt?.amountDelegated
           ? Number(delegateReceipt.amountDelegated) / 10 ** 6
           : 0;
@@ -1038,9 +1043,12 @@ export const getContractCells = async (
     case Contract.Undelegate:
       try {
         const filteredReceipts = filterReceipts(receipts, index);
+        // Undelegate reuses receipt type 7 (IDelegateReceipt) — same receipt
+        // structure as Delegate per the Klever protocol receipt type table
         const delegateReceipt = findReceipt(filteredReceipts, 7) as
           | IDelegateReceipt
           | undefined;
+        // KLV staking always uses 6 decimal places — staking is KLV-only
         const amount = delegateReceipt?.amountDelegated
           ? Number(delegateReceipt.amountDelegated) / 10 ** 6
           : 0;

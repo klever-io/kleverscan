@@ -9,7 +9,7 @@ interface ICopyProps {
   data?: string;
   info?: string;
   children?: React.ReactNode;
-  style?: Record<string, unknown>;
+  style?: React.CSSProperties;
   svgSize?: number;
   color?: string;
 }

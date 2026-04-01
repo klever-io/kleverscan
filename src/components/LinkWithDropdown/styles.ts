@@ -24,7 +24,7 @@ export const Dropdown = styled.div<DropdownProps>`
   top: 100%;
   left: 5rem;
   background-color: ${props => props.theme.dropdown.background};
-  border: 1px solid 515395;
+  border: 1px solid ${props => props.theme.card.border};
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 1;
   border-radius: 12px;
@@ -73,10 +73,6 @@ export const QrCodeDropdownContainer = styled.div`
   flex-direction: column;
 `;
 
-export const DropdownTitle = styled.div`
-  font-size: 1rem;
-  font-weight: 700;
-`;
 export const QrCodeTitle = styled.p`
   font-size: 1rem;
   font-weight: 700;

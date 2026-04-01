@@ -82,7 +82,7 @@ const LinkWithDropdown: React.FC<LinkWithDropdownProps> = ({
         )}
         <DropdownActionItemPadding>
           <DropdownActionItem>
-            <DropdownLink href={link} target="_blank">
+            <DropdownLink href={link} target="_blank" rel="noopener noreferrer">
               <MdOpenInNew size={'1.2rem'} />
               Open in New Tab
             </DropdownLink>

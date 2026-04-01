@@ -100,9 +100,9 @@ import {
 import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { PropsWithChildren, useState } from 'react';
+import AddressLink from '../AddressLink';
 import Tooltip from '../Tooltip';
 import { PermissionOperations } from '../AccountPermission';
-import { IoOpenOutline } from 'react-icons/io5';
 
 interface IAssetTriggerTypeData {
   parameter: IAssetTriggerContract;
@@ -285,12 +285,7 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>To</strong>
         </span>
         <span>
-          <CenteredRow>
-            <Link href={`/account/${parameter?.toAddress}`} legacyBehavior>
-              {parameter?.toAddress}
-            </Link>
-            <Copy data={parameter?.toAddress} />
-          </CenteredRow>
+          <AddressLink address={parameter?.toAddress} />
         </span>
       </Row>
       {getCorrectKDARoyalty()}
@@ -368,12 +363,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <CenteredRow>
-            <Link href={`/account/${ownerAddress}`} legacyBehavior>
-              {ownerAddress}
-            </Link>
-            <Copy data={ownerAddress} />
-          </CenteredRow>
+          <AddressLink address={ownerAddress} />
         </span>
       </Row>
       <Row>
@@ -439,13 +429,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
             <Panel>
               <CenteredRow>
                 <strong>Address:&nbsp;</strong>
-                <Link
-                  href={`/account/${parameter.royalties?.address}`}
-                  legacyBehavior
-                >
-                  {parameter.royalties?.address}
-                </Link>
-                <Copy data={parameter.royalties?.address}></Copy>
+                <AddressLink address={parameter.royalties?.address} />
               </CenteredRow>
               <CenteredRow>
                 <span>
@@ -530,10 +514,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
                 <div key={index}>
                   <CenteredRow>
                     <strong>Address:&nbsp;</strong>
-                    <Link href={`/account/${royalty.address}`} legacyBehavior>
-                      {royalty.address}
-                    </Link>
-                    <Copy data={royalty.address} />
+                    <AddressLink address={royalty.address} />
                   </CenteredRow>
                   <CenteredRow>
                     <span>
@@ -819,9 +800,7 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <Link href={`/account/${ownerAddress}`} legacyBehavior>
-            {ownerAddress}
-          </Link>
+          <AddressLink address={ownerAddress} />
         </span>
       </Row>
       {parameter?.config?.logo && (
@@ -870,15 +849,7 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Reward Address</strong>
         </span>
         <span>
-          <CenteredRow>
-            <Link
-              href={`/account/${parameter?.config?.rewardAddress}`}
-              legacyBehavior
-            >
-              {parameter?.config?.rewardAddress}
-            </Link>
-            <Copy data={parameter?.config?.rewardAddress} />
-          </CenteredRow>
+          <AddressLink address={parameter?.config?.rewardAddress} />
         </span>
       </Row>
       {renderMetadata()}
@@ -944,10 +915,7 @@ export const ValidatorConfig: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Reward Address</strong>
         </span>
         <span>
-          <CenteredRow>
-            <span>{parameter?.rewardAddress}</span>
-            <Copy data={parameter?.rewardAddress} info="address"></Copy>
-          </CenteredRow>
+          <AddressLink address={parameter?.rewardAddress} />
         </span>
       </Row>
       <Row>
@@ -1184,12 +1152,7 @@ export const Delegate: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>To</strong>
         </span>
         <span>
-          <CenteredRow>
-            <Link href={`/account/${parameter?.toAddress}`}>
-              {parameter?.toAddress}
-            </Link>
-            <Copy data={parameter?.toAddress} info="Address"></Copy>
-          </CenteredRow>
+          <AddressLink address={parameter?.toAddress} />
         </span>
       </Row>
       {delegateReceipt && (
@@ -1750,12 +1713,7 @@ export const ConfigITO: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <strong>Receiver</strong>
         </span>
-        <CenteredRow>
-          <Link href={`/account/${parameter?.receiverAddress}`}>
-            {parameter?.receiverAddress}
-          </Link>
-          <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
-        </CenteredRow>
+        <AddressLink address={parameter?.receiverAddress} />
       </Row>
       <Row>
         <span>
@@ -2339,7 +2297,9 @@ export const CreateMarketplace: React.FC<
         <span>
           <strong>Referral Address</strong>
         </span>
-        <span>{parameter?.referralAddress}</span>
+        <span>
+          <AddressLink address={parameter?.referralAddress} />
+        </span>
       </Row>
       <Row>
         <span>
@@ -2385,7 +2345,9 @@ export const ConfigMarketplace: React.FC<
         <span>
           <strong>Referral Address</strong>
         </span>
-        <span>{parameter?.referralAddress}</span>
+        <span>
+          <AddressLink address={parameter?.referralAddress} />
+        </span>
       </Row>
       <Row>
         <span>
@@ -2457,19 +2419,15 @@ export const UpdateAccountPermission: React.FC<
                   style={{ flexDirection: 'column', alignItems: 'start' }}
                   key={index}
                 >
-                  <span style={{ maxWidth: '100%' }}>
-                    <a href={`/account/${signer?.address}`}>
-                      <strong>{signer.address ?? ''}</strong>
-                    </a>
-                  </span>
-                  <span>
+                  <AddressLink address={signer?.address} />
+                  <CenteredRow>
                     {' '}
                     Weight:
                     <strong style={{ color: 'white' }}>
                       {' '}
                       {signer.weight ?? ''}
                     </strong>
-                  </span>
+                  </CenteredRow>
                 </div>
               ))}
             </FrozenContainer>
@@ -2610,15 +2568,7 @@ export const ITOTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
             <span>
               <strong>Receiver Address</strong>
             </span>
-            <CenteredRow>
-              <Link
-                href={`/account/${parameter?.receiverAddress}`}
-                legacyBehavior
-              >
-                {parameter?.receiverAddress}
-              </Link>
-              <Copy data={parameter?.receiverAddress} info="Bucket ID"></Copy>
-            </CenteredRow>
+            <AddressLink address={parameter?.receiverAddress} />
           </Row>
         );
       case ITOTriggerType.UpdateMaxAmount:
@@ -2761,17 +2711,7 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <strong>Contract Address</strong>
         </span>
-        <CenteredRow>
-          <Link
-            href={`/smart-contract/${scAddress}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {scAddress}
-            <IoOpenOutline size={20} />
-          </Link>
-          <Copy data={scAddress} info="address"></Copy>
-        </CenteredRow>
+        <AddressLink address={scAddress} isSmartContract />
       </Row>
       {Object.entries(parameter?.callValue || {}).length > 0 && (
         <Row>
@@ -2923,10 +2863,7 @@ const renderAssetTriggerTypeData: React.FC<
       <span>
         <strong>To</strong>
       </span>
-      <CenteredRow>
-        <Link href={`/account/${par?.toAddress}`}>{par?.toAddress}</Link>
-        <Copy data={par?.toAddress} info="address"></Copy>
-      </CenteredRow>
+      <AddressLink address={par?.toAddress} />
     </Row>
   );
 
@@ -2952,8 +2889,7 @@ const renderAssetTriggerTypeData: React.FC<
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>Admin Address</StrongWidth>
-                <span>{par.kdaPool.adminAddress}</span>
-                <Copy data={par.kdaPool.adminAddress} />
+                <AddressLink address={par.kdaPool.adminAddress} />
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>fRationKDA</StrongWidth>
@@ -2984,8 +2920,7 @@ const renderAssetTriggerTypeData: React.FC<
               <RoleWrapper>
                 <RoleDiv>
                   <StrongWidth>Address</StrongWidth>
-                  <span>{par.royalties.address || '--'}</span>
-                  <Copy data={par.royalties.address} />
+                  <AddressLink address={par.royalties.address} />
                 </RoleDiv>
                 <RoleDiv>
                   <StrongWidth>ITO Fixed</StrongWidth>
@@ -3072,8 +3007,7 @@ const renderAssetTriggerTypeData: React.FC<
                     <RoleWrapper>
                       <RoleDiv>
                         <StrongWidth>Address</StrongWidth>
-                        <span>{split.address || '--'}</span>
-                        <Copy data={split.address} />
+                        <AddressLink address={split.address} />
                       </RoleDiv>
                       <RoleDiv>
                         <StrongWidth>ITO Fixed</StrongWidth>
@@ -3142,10 +3076,7 @@ const renderAssetTriggerTypeData: React.FC<
             <RoleWrapper>
               <RoleDiv>
                 <RoleStrong>Address</RoleStrong>
-                <span style={{ marginRight: '0.5rem' }}>
-                  {par.role.address}
-                </span>
-                <Copy data={par.role.address} />
+                <AddressLink address={par.role.address} />
               </RoleDiv>
 
               <RoleDiv>

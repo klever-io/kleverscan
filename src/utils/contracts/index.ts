@@ -8,7 +8,13 @@ import {
 import { IKAppTransferReceipt } from '@/types/receipts';
 import { format, fromUnixTime } from 'date-fns';
 import { NextRouter } from 'next/router';
-import { IClaimReceipt, IReceipt, ITransaction } from '../../types';
+import {
+  IClaimReceipt,
+  IDelegateReceipt,
+  IReceipt,
+  ITransaction,
+  IUnfreezeReceipt,
+} from '../../types';
 import { getBuyAmount, getBuyPrice } from '../buyContractFunctions';
 import { filterReceipts, findReceipt, findReceiptWithSender } from '../findKey';
 import { getPrecision } from '../precisionFunctions';
@@ -584,13 +590,13 @@ export const getHeaderForCSV = (
       newHeaders = [contractTableHeaders.assetId, contractTableHeaders.amount];
       break;
     case ContractsIndex.Unfreeze:
-      newHeaders = [contractTableHeaders.bucketId];
+      newHeaders = [contractTableHeaders.amount, contractTableHeaders.bucketId];
       break;
     case ContractsIndex.Delegate:
-      newHeaders = [contractTableHeaders.bucketId];
+      newHeaders = [contractTableHeaders.amount, contractTableHeaders.bucketId];
       break;
     case ContractsIndex.Undelegate:
-      newHeaders = [contractTableHeaders.bucketId];
+      newHeaders = [contractTableHeaders.amount, contractTableHeaders.bucketId];
       break;
     case ContractsIndex.Withdraw:
       newHeaders = [contractTableHeaders.assetId, contractTableHeaders.amount];
@@ -729,6 +735,62 @@ export const getDefaultCells = async (
         break;
       } catch (e) {
         console.error(Contract.Freeze, e);
+        throw new Error();
+      }
+    case Contract.Unfreeze:
+      try {
+        const filteredReceipts = filterReceipts(receipts, contractIndex);
+        const unfreezeReceipt = findReceipt(filteredReceipts, 4) as
+          | IUnfreezeReceipt
+          | undefined;
+        assetId = parameter?.assetId || 'KLV';
+        const precision = ((await getPrecision(assetId)) as number) ?? 6;
+        amountContract.push(
+          unfreezeReceipt?.value
+            ? Number(unfreezeReceipt.value) / 10 ** precision
+            : 0,
+        );
+        break;
+      } catch (e) {
+        console.error(Contract.Unfreeze, e);
+        throw new Error();
+      }
+    case Contract.Delegate:
+      try {
+        const filteredReceipts = filterReceipts(receipts, contractIndex);
+        const delegateReceipt = findReceipt(filteredReceipts, 7) as
+          | IDelegateReceipt
+          | undefined;
+        assetId = 'KLV';
+        // KLV staking always uses 6 decimal places — staking is KLV-only
+        amountContract.push(
+          delegateReceipt?.amountDelegated
+            ? Number(delegateReceipt.amountDelegated) / 10 ** 6
+            : 0,
+        );
+        break;
+      } catch (e) {
+        console.error(Contract.Delegate, e);
+        throw new Error();
+      }
+    case Contract.Undelegate:
+      try {
+        const filteredReceipts = filterReceipts(receipts, contractIndex);
+        // Undelegate reuses receipt type 7 (IDelegateReceipt) — same receipt
+        // structure as Delegate per the Klever protocol receipt type table
+        const delegateReceipt = findReceipt(filteredReceipts, 7) as
+          | IDelegateReceipt
+          | undefined;
+        assetId = 'KLV';
+        // KLV staking always uses 6 decimal places — staking is KLV-only
+        amountContract.push(
+          delegateReceipt?.amountDelegated
+            ? Number(delegateReceipt.amountDelegated) / 10 ** 6
+            : 0,
+        );
+        break;
+      } catch (e) {
+        console.error(Contract.Undelegate, e);
         throw new Error();
       }
     case Contract.Withdraw:
@@ -945,8 +1007,17 @@ export const getContractCells = async (
       break;
     case Contract.Unfreeze:
       try {
-        let bucketID = parameter?.bucketID || '';
-        cells.push(bucketID);
+        const filteredReceipts = filterReceipts(receipts, index);
+        const unfreezeReceipt = findReceipt(filteredReceipts, 4) as
+          | IUnfreezeReceipt
+          | undefined;
+        const assetId = parameter?.assetId || 'KLV';
+        const precision = ((await getPrecision(assetId)) as number) ?? 6;
+        const amount = unfreezeReceipt?.value
+          ? Number(unfreezeReceipt.value) / 10 ** precision
+          : 0;
+        const bucketID = parameter?.bucketID || '';
+        cells.push(amount, bucketID);
       } catch (e) {
         console.error(Contract.Unfreeze, e);
         throw new Error(`Error Getting Unfreeze Contract Cells: ${e}`);
@@ -954,8 +1025,16 @@ export const getContractCells = async (
       break;
     case Contract.Delegate:
       try {
+        const filteredReceipts = filterReceipts(receipts, index);
+        const delegateReceipt = findReceipt(filteredReceipts, 7) as
+          | IDelegateReceipt
+          | undefined;
+        // KLV staking always uses 6 decimal places — staking is KLV-only
+        const amount = delegateReceipt?.amountDelegated
+          ? Number(delegateReceipt.amountDelegated) / 10 ** 6
+          : 0;
         const bucketID = parameter?.bucketID || '';
-        cells.push(bucketID);
+        cells.push(amount, bucketID);
       } catch (e) {
         console.error(Contract.Delegate, e);
         throw new Error(`Error Getting Delegate Contract Cells: ${e}`);
@@ -963,8 +1042,18 @@ export const getContractCells = async (
       break;
     case Contract.Undelegate:
       try {
+        const filteredReceipts = filterReceipts(receipts, index);
+        // Undelegate reuses receipt type 7 (IDelegateReceipt) — same receipt
+        // structure as Delegate per the Klever protocol receipt type table
+        const delegateReceipt = findReceipt(filteredReceipts, 7) as
+          | IDelegateReceipt
+          | undefined;
+        // KLV staking always uses 6 decimal places — staking is KLV-only
+        const amount = delegateReceipt?.amountDelegated
+          ? Number(delegateReceipt.amountDelegated) / 10 ** 6
+          : 0;
         const bucketID = parameter?.bucketID || '';
-        cells.push(bucketID);
+        cells.push(amount, bucketID);
       } catch (e) {
         console.error(Contract.Undelegate, e);
         throw new Error(`Error Getting Undelegate Contract Cells: ${e}`);

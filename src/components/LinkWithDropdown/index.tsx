@@ -1,5 +1,6 @@
 import { useContractModal } from '@/contexts/contractModal';
 import { useMobile } from '@/contexts/mobile';
+import { useTheme } from '@/contexts/theme';
 import { QRCodeSVG } from 'qrcode.react';
 import React, { ReactNode, useState } from 'react';
 import {
@@ -14,8 +15,6 @@ import {
   DropdownActionItem,
   DropdownActionItemPadding,
   DropdownLink,
-  DropdownLinkContainer,
-  DropdownTitle,
   LinkWrapper,
   QrCodeDropdown,
   QrCodeDropdownContainer,
@@ -36,6 +35,7 @@ const LinkWithDropdown: React.FC<LinkWithDropdownProps> = ({
   const { isMobile } = useMobile();
   const [qrCodeDropDown, setQrCodeDropDown] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const { theme } = useTheme();
   const { getInteractionsButtons } = useContractModal();
   const [TransferButton] = getInteractionsButtons([
     {
@@ -70,56 +70,58 @@ const LinkWithDropdown: React.FC<LinkWithDropdownProps> = ({
     >
       <div onClick={isMobile ? handleContextMenu : undefined}>{children}</div>
       <Dropdown show={showDropdown}>
-        <DropdownLinkContainer>
-          <DropdownTitle>Options</DropdownTitle>
-          {isMobile && (
-            <DropdownActionItemPadding>
-              <DropdownActionItem>
-                <DropdownLink href={link}>
-                  <MdOpenInBrowser size={'1.2rem'} />
-                  Open
-                </DropdownLink>
-              </DropdownActionItem>
-            </DropdownActionItemPadding>
-          )}
+        {isMobile && (
           <DropdownActionItemPadding>
             <DropdownActionItem>
-              <DropdownLink href={link} target="_blank">
-                <MdOpenInNew size={'1.2rem'} />
-                Open in New Tab
+              <DropdownLink href={link}>
+                <MdOpenInBrowser size={'1.2rem'} />
+                Open
               </DropdownLink>
             </DropdownActionItem>
           </DropdownActionItemPadding>
-          <Copy info="Wallet Address" data={address}>
-            <DropdownActionItemPadding>
-              <DropdownActionItem>
-                <MdContentCopy size={'1.2rem'} />
-                <p>Copy Address</p>
-              </DropdownActionItem>
-            </DropdownActionItemPadding>
-          </Copy>
-          <DropdownActionItemPadding>
-            <DropdownActionItem
-              onClick={() => {
-                setQrCodeDropDown(old => !old);
-              }}
-            >
-              <MdQrCode size={'1.2rem'} />
-              QR Code
-              <QrCodeDropdown active={qrCodeDropDown}>
-                <QrCodeDropdownContainer>
-                  <QrCodeTitle>View QR code</QrCodeTitle>
-                  <div>
-                    <QRCodeSVG height={165} width={165} value={address} />
-                  </div>
-                </QrCodeDropdownContainer>
-              </QrCodeDropdown>
+        )}
+        <DropdownActionItemPadding>
+          <DropdownActionItem>
+            <DropdownLink href={link} target="_blank" rel="noopener noreferrer">
+              <MdOpenInNew size={'1.2rem'} />
+              Open in New Tab
+            </DropdownLink>
+          </DropdownActionItem>
+        </DropdownActionItemPadding>
+        <DropdownActionItemPadding>
+          <Copy
+            info="Wallet Address"
+            data={address}
+            color={theme.black}
+            style={{ width: '100%' }}
+          >
+            <DropdownActionItem>
+              <MdContentCopy size={'1.2rem'} />
+              <p>Copy Address</p>
             </DropdownActionItem>
-          </DropdownActionItemPadding>
-          <DropdownActionItemPadding>
-            <TransferButton />
-          </DropdownActionItemPadding>
-        </DropdownLinkContainer>
+          </Copy>
+        </DropdownActionItemPadding>
+        <DropdownActionItemPadding>
+          <DropdownActionItem
+            onClick={() => {
+              setQrCodeDropDown(old => !old);
+            }}
+          >
+            <MdQrCode size={'1.2rem'} />
+            QR Code
+            <QrCodeDropdown active={qrCodeDropDown}>
+              <QrCodeDropdownContainer>
+                <QrCodeTitle>View QR code</QrCodeTitle>
+                <div>
+                  <QRCodeSVG height={165} width={165} value={address} />
+                </div>
+              </QrCodeDropdownContainer>
+            </QrCodeDropdown>
+          </DropdownActionItem>
+        </DropdownActionItemPadding>
+        <DropdownActionItemPadding>
+          <TransferButton />
+        </DropdownActionItemPadding>
       </Dropdown>
     </LinkWrapper>
   );

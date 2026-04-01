@@ -493,7 +493,55 @@ describe('header-data alignment', () => {
       type: '5',
       contractType: Contract.Unfreeze,
       contractNum: 5,
-      parameter: { bucketID: 'bucket1' },
+      parameter: { assetId: 'KLV', bucketID: 'bucket1' },
+      receipts: [
+        {
+          cID: 0,
+          assetId: 'KLV',
+          availableEpoch: 100,
+          bucketId: 'bucket1',
+          from: 'klv1sender',
+          type: 4,
+          typeString: 'Unfreeze',
+          value: '2000000',
+        },
+      ],
+    },
+    {
+      name: 'Delegate',
+      type: '6',
+      contractType: Contract.Delegate,
+      contractNum: 6,
+      parameter: { bucketID: 'bucket-delegate' },
+      receipts: [
+        {
+          cID: 0,
+          amountDelegated: '5000000',
+          bucketId: 'bucket-delegate',
+          delegate: 'klv1validator',
+          from: 'klv1sender',
+          type: 7,
+          typeString: 'Delegate',
+        },
+      ],
+    },
+    {
+      name: 'Undelegate',
+      type: '7',
+      contractType: Contract.Undelegate,
+      contractNum: 7,
+      parameter: { bucketID: 'bucket-undelegate' },
+      receipts: [
+        {
+          cID: 0,
+          amountDelegated: '3000000',
+          bucketId: 'bucket-undelegate',
+          delegate: 'klv1validator',
+          from: 'klv1sender',
+          type: 7,
+          typeString: 'Delegate',
+        },
+      ],
     },
   ];
 

@@ -6,6 +6,7 @@ import api from '@/services/api';
 import { CenteredRow, RowContent } from '@/styles/common';
 import { IAssetsBuckets, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
@@ -161,9 +162,7 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
     const sections: IRowSection[] = [
       {
         element: props => (
-          <Link href={`/asset/${asset?.assetId}`} key={asset?.assetId}>
-            {asset?.assetId}
-          </Link>
+          <ExplorerLink type="asset" value={asset?.assetId} compact />
         ),
         span: 1,
       },
@@ -224,9 +223,12 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
           <>
             {bucket?.delegation?.length && bucket?.delegation?.length > 0 ? (
               <>
-                <Link href={`/validator/${bucket?.delegation}`}>
-                  {parseAddress(bucket?.delegation, 22)}
-                </Link>
+                <ExplorerLink
+                  type="validator"
+                  value={bucket?.delegation}
+                  label={parseAddress(bucket?.delegation, 22)}
+                  compact
+                />
               </>
             ) : (
               <>{getDelegation()}</>

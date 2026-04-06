@@ -2,8 +2,13 @@ import { IMultisignData } from '@/components/MultsignComponent/MultSign';
 import api from '@/services/api';
 import { Service } from '@/types';
 import { ITransaction as ITransactionDecoded } from '@/types/index';
-import { ITransaction } from '@klever/sdk-web';
 import { toast } from 'react-toastify';
+
+interface ITransaction {
+  RawData: Record<string, unknown>;
+  Signature?: string[];
+  [key: string]: unknown;
+}
 
 export const requestMultisign = async (walletAddress: string): Promise<any> => {
   try {

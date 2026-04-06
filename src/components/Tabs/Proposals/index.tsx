@@ -19,6 +19,7 @@ import {
 import { setQueryAndRouter } from '@/utils';
 import { parseAddress } from '@/utils/parseValues';
 import { passViewportStyles } from '@/utils/viewportStyles';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -191,9 +192,12 @@ const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
       {
         element: props => (
           <DoubleRow {...props} key={proposer}>
-            <Link href={`/account/${proposer}`} data-testid="proposal-link">
-              <Mono>{parseAddress(proposer, 16)}</Mono>
-            </Link>
+            <ExplorerLink
+              type="account"
+              value={proposer}
+              label={parseAddress(proposer, 16)}
+              compact
+            />
             <Status
               status={proposalStatusColorAndText.color}
               key={proposalStatus}

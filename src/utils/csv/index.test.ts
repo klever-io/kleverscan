@@ -14,6 +14,35 @@ jest.mock('../receiptsFunctions', () => ({
   getAmountFromReceipts: jest.fn().mockResolvedValue(100.5),
 }));
 
+jest.mock('../transactionListSections', () => ({
+  AssetTriggerSections: jest.fn(() => []),
+  BuySections: jest.fn(() => []),
+  CancelMarketOrderSections: jest.fn(() => []),
+  ClaimSections: jest.fn(() => []),
+  ConfigITOSections: jest.fn(() => []),
+  ConfigMarketplaceSections: jest.fn(() => []),
+  CreateAssetSections: jest.fn(() => []),
+  CreateMarketplaceSections: jest.fn(() => []),
+  CreateValidatorSections: jest.fn(() => []),
+  DelegateSections: jest.fn(() => []),
+  DepositSections: jest.fn(() => []),
+  FreezeSections: jest.fn(() => []),
+  IITOTriggerSections: jest.fn(() => []),
+  ProposalSections: jest.fn(() => []),
+  SellSections: jest.fn(() => []),
+  SetAccountNameSections: jest.fn(() => []),
+  SetITOPricesSections: jest.fn(() => []),
+  SmartContractSections: jest.fn(() => []),
+  TransferSections: jest.fn(() => []),
+  UndelegateSections: jest.fn(() => []),
+  UnfreezeSections: jest.fn(() => []),
+  UnjailSections: jest.fn(() => []),
+  UpdateAccountPermissionContractSections: jest.fn(() => []),
+  ValidatorConfigSections: jest.fn(() => []),
+  VoteSections: jest.fn(() => []),
+  WithdrawSections: jest.fn(() => []),
+}));
+
 const mockRouter = (type?: string) => ({ query: type ? { type } : {} }) as any;
 
 const makeTx = (

@@ -74,6 +74,7 @@ import { ButtonExpand } from '@/views/transactions/detail';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import ExplorerLink from '@/components/ExplorerLink';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, {
@@ -88,7 +89,7 @@ import nextI18nextConfig from '../../../next-i18next.config';
 import getAccount from '@/services/requests/searchBar/account';
 import { useExtension } from '@/contexts/extension';
 import { getType, buildTransaction } from '@/components/Contract/utils';
-import { web } from '@klever/sdk-web';
+import { Transaction } from '@klever/connect';
 import { gtagEvent } from '@/utils/gtag';
 import { toast } from 'react-toastify';
 import { HashComponent } from '@/components/Contract';
@@ -101,10 +102,12 @@ const ProposalVoters = (props: IProposalVoters) => {
       {
         element: props => (
           <CenteredRow key={voter}>
-            <Link href={`/account/${voter}`} legacyBehavior>
-              {parseAddress(voter, 24)}
-            </Link>
-            <Copy data={voter} info="voter"></Copy>
+            <ExplorerLink
+              type="account"
+              value={voter}
+              label={parseAddress(voter, 24)}
+              compact
+            />
           </CenteredRow>
         ),
         span: 2,
@@ -171,7 +174,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
   });
   const { getInteractionsButtons } = useContractModal();
 
-  const { walletAddress } = useExtension();
+  const { walletAddress, wallet } = useExtension();
   const [totalFrozenBalance, setTotalFrozenBalance] = useState<number>(0);
   const buttonVoteTooltip = 'You need more KFI in staking to vote.';
 
@@ -220,36 +223,34 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
   }, [txHash]);
 
   const handleVoteProposal = async (type: number) => {
+    if (!wallet) {
+      toast.error('Wallet not connected. Please connect your wallet.');
+      return;
+    }
+
     const payload = {
-      contractType: 'VoteContract',
       amount: totalFrozenBalance,
       proposalId: parseInt(router?.query?.number as string),
       type: type,
     };
 
-    const payloadText = JSON.stringify(payload, null, '\t');
+    const parsedPayload = JSON.parse(JSON.stringify(payload));
 
     try {
-      const voteTransaction = await web.buildTransaction([
+      const voteTransaction = await wallet.buildTransaction([
         {
-          type: getType('VoteContract'),
-          payload: JSON.parse(payloadText),
+          contractType: getType('VoteContract'),
+          ...parsedPayload,
         },
       ]);
 
-      const signedTx = await web.signTransaction(voteTransaction);
-      const response = await web.broadcastTransactions([signedTx]);
+      const signedTx = await wallet.signTransaction(
+        Transaction.fromTransaction(voteTransaction),
+      );
+      const txHashes = await wallet.broadcastTransactions([signedTx]);
 
-      setTxHash(response.data.txsHashes[0]);
+      setTxHash(txHashes[0]);
 
-      if (response.error) {
-        const messageError = response.error;
-        if (messageError.includes('no signatures provided')) {
-          throw new Error(messageError.split(': ')[2]);
-        } else {
-          throw new Error(messageError);
-        }
-      }
       toast.success('Transaction broadcast successfully');
     } catch (e) {
       console.warn(`%c ${e}`, 'color: red');

@@ -1,11 +1,10 @@
 import { PropsWithChildren, useEffect, useState } from 'react';
-import Copy from '@/components/Copy';
+import ExplorerLink from '@/components/ExplorerLink';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import { IBalance, IHolders, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseAddress, parseHolders } from '@/utils/parseValues';
-import Link from 'next/link';
 import React from 'react';
 import {
   AddressContainer,
@@ -55,11 +54,12 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
       {
         element: props => (
           <AddressContainer key={address}>
-            <Link href={`/account/${address}`} legacyBehavior>
-              {parseAddress(address, 40)}
-            </Link>
-
-            <Copy info="Address" data={address} />
+            <ExplorerLink
+              type="account"
+              value={address}
+              label={parseAddress(address, 40)}
+              compact
+            />
           </AddressContainer>
         ),
         span: 1,

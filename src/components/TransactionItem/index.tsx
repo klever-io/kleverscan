@@ -16,6 +16,7 @@ import {
 } from '@/views/home';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
+import ExplorerLink from '@/components/ExplorerLink';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { ITransaction } from '../../types';
@@ -130,9 +131,13 @@ const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
         </TransactionData>
         <TransactionData>
           <p>
-            <Link href={`/transaction/${hash}`}>
-              {isMobile ? `${hash.slice(0, 15)}...` : `${hash.slice(0, 30)}...`}
-            </Link>
+            <ExplorerLink
+              type="transaction"
+              value={hash}
+              label={
+                isMobile ? `${hash.slice(0, 15)}...` : `${hash.slice(0, 30)}...`
+              }
+            />
           </p>
           <TransactionAmount>
             <span>{shouldRenderAssetId()}</span>
@@ -141,24 +146,33 @@ const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
         <TransactionData>
           <p>
             <span>
-              <Link href={`/account/${sender}`} className="clean-style">
-                {t('From')}:{' '}
-                {isMobile ? parseAddress(sender, 12) : parseAddress(sender, 26)}
-              </Link>
+              {t('From')}:{' '}
+              <ExplorerLink
+                type="account"
+                value={sender}
+                label={
+                  isMobile ? parseAddress(sender, 12) : parseAddress(sender, 26)
+                }
+              />
             </span>
           </p>
 
-          <Link
-            href={`/account/${contractFilter?.parameter?.toAddress}`}
-            className="clean-style"
-          >
+          <span>
             {t('To')}:{' '}
-            {contractFilter?.parameter?.toAddress
-              ? isMobile
-                ? parseAddress(contractFilter?.parameter?.toAddress, 12)
-                : parseAddress(contractFilter?.parameter?.toAddress, 15)
-              : '--'}
-          </Link>
+            {contractFilter?.parameter?.toAddress ? (
+              <ExplorerLink
+                type="account"
+                value={contractFilter.parameter.toAddress}
+                label={
+                  isMobile
+                    ? parseAddress(contractFilter.parameter.toAddress, 12)
+                    : parseAddress(contractFilter.parameter.toAddress, 15)
+                }
+              />
+            ) : (
+              '--'
+            )}
+          </span>
         </TransactionData>
       </TransactionContainerContent>
     </TransactionRow>

@@ -1,7 +1,8 @@
 import { PropsWithChildren } from 'react';
 import { IMultisignData, IMultisignRawData } from '..';
-import { ITransaction, web } from '@klever/sdk-web';
+import { Transaction } from '@klever/connect';
 import api from '@/services/api';
+import { useExtension } from '@/contexts/extension';
 import { Service } from '@/types';
 import { toast } from 'react-toastify';
 import {
@@ -12,6 +13,12 @@ import {
   MultisignButton,
 } from '../../styles';
 import DropFileCard from '@/components/DropFileCard';
+interface ITransaction {
+  RawData: Record<string, unknown>;
+  Signature?: string[];
+  [key: string]: unknown;
+}
+
 interface IMultisignButtons {
   setSignBcastTransaction: React.Dispatch<React.SetStateAction<boolean>>;
   multiSignData: IMultisignData;
@@ -35,6 +42,7 @@ export const ButtonsComponent: React.FC<
   multiSignDataRef,
   refetchMultisignData,
 }) => {
+  const { wallet } = useExtension();
   const multisignTotalWeight =
     multiSignData?.signers?.filter(e => e.signed)?.length || 0;
 
@@ -44,7 +52,7 @@ export const ButtonsComponent: React.FC<
   ): ITransaction => {
     const JSONContractFile = raw;
     if (JSONContractFile?.Signature?.[0]) {
-      JSONContractFile?.Signature.push(signedTx?.Signature[0]);
+      JSONContractFile?.Signature.push(signedTx?.Signature?.[0] as string);
       return JSONContractFile;
     }
     return signedTx;
@@ -189,10 +197,13 @@ export const ButtonsComponent: React.FC<
     try {
       if (multiSignData?.raw) {
         const buildedTx = { ...multiSignData?.raw };
-        const signedTx = await web.signTransaction(buildedTx);
+        const signedTx = await wallet!.signTransaction(
+          Transaction.fromTransaction(buildedTx as any),
+        );
+        const signedJSON = signedTx.toJSON() as ITransaction;
         const parsedWithSignatures = addNewSignatures(
-          signedTx,
-          multiSignData?.raw,
+          signedJSON,
+          multiSignData?.raw as unknown as ITransaction,
         );
 
         const parseMultisignTransaction = {
@@ -243,26 +254,29 @@ export const ButtonsComponent: React.FC<
     setSignBcastTransaction(true);
     try {
       if (multiSignData?.raw) {
-        let broadcastRes;
         if (multiSignData?.fromJSON) {
-          broadcastRes = await web.broadcastTransactions([
-            multiSignData?.raw as ITransaction,
+          const broadcastRes = await wallet!.broadcastTransactions([
+            Transaction.fromTransaction(multiSignData?.raw as any),
           ]);
+          toast.success('Transaction broadcast successfully');
+          setTxHash(multiSignData.hash);
+          window.scrollTo(0, 0);
+          refetchMultisignData();
         } else {
-          broadcastRes = await api.post({
+          const broadcastRes = await api.post({
             route: `broadcast/${multiSignData.hash}`,
             service: Service.MULTISIGN,
           });
-        }
 
-        if (broadcastRes.error) {
-          toast.error(broadcastRes.error);
-          return;
+          if (broadcastRes.error) {
+            toast.error(broadcastRes.error);
+            return;
+          }
+          toast.success('Transaction broadcast successfully');
+          setTxHash(multiSignData.hash);
+          window.scrollTo(0, 0);
+          refetchMultisignData();
         }
-        toast.success('Transaction broadcast successfully');
-        setTxHash(multiSignData.hash);
-        window.scrollTo(0, 0);
-        refetchMultisignData();
       }
     } catch (error) {
       toast.error('Something went wrong, please try again');
@@ -278,7 +292,7 @@ export const ButtonsComponent: React.FC<
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${multiSignData?.address} - Nonce: ${multiSignData?.raw?.RawData?.Nonce ?? 'unknown'}.json`;
+    link.download = `${multiSignData?.address} - Nonce: ${(multiSignData?.raw?.RawData as Record<string, unknown>)?.Nonce ?? 'unknown'}.json`;
 
     link.click();
     window.URL.revokeObjectURL(url);

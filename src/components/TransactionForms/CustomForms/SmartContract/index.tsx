@@ -2,7 +2,8 @@ import { useMulticontract } from '@/contexts/contract/multicontract';
 import { ABI, ABIType } from '@/types/contracts';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { getNetwork } from '@/utils/networkFunctions';
-import { abiEncoder, utils } from '@klever/sdk-web';
+import { encodeByType, bytesToHex, getJSType } from '@klever/connect-contracts';
+import type { ContractABI } from '@klever/connect-contracts';
 import React, { PropsWithChildren, useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -13,6 +14,43 @@ import { smartContractTooltips as tooltip } from '../utils/tooltips';
 import { ArgumentsSection } from './ArgumentsSection';
 import { CallValueSection } from './CallValueSection';
 import { PropertiesSection } from './PropertiesSection';
+
+const emptyABI = { types: {} } as ContractABI;
+
+const encodeABIValue = (
+  value: unknown,
+  type: string,
+  isNested = true,
+  abi: ContractABI = emptyABI,
+): string => {
+  try {
+    return bytesToHex(encodeByType(value, type, abi, isNested));
+  } catch {
+    return '';
+  }
+};
+
+const encodeLengthPlusData = (
+  value: string | unknown[],
+  innerType: string,
+  isNested = true,
+  abi: ContractABI = emptyABI,
+): string => {
+  if (typeof value !== 'string') {
+    const data = value
+      .map(v => encodeABIValue(v, innerType, true, abi))
+      .join('');
+    if (!isNested) return data;
+    const length = value.length.toString(16).padStart(8, '0');
+    return length + data;
+  } else {
+    const byteArr = new TextEncoder().encode(value);
+    const dataHex = bytesToHex(byteArr);
+    if (!isNested) return dataHex;
+    const length = byteArr.length.toString(16).padStart(8, '0');
+    return length + dataHex;
+  }
+};
 
 interface Argument {
   value: string | number | any[] | Record<string, any>;
@@ -146,7 +184,7 @@ const parseAbiFunctions = (
     const funcName = endpoint.name;
     const inputs = endpoint.inputs.reduce((acc, input) => {
       const isOptional = input.type.startsWith('Option');
-      let type = utils.getJSType(input.type);
+      let type = getJSType(input.type);
       if (type === input.type) {
         type = types[input.type]?.type || 'object';
       }
@@ -172,8 +210,12 @@ const parseAbiFunctions = (
     constructor = {
       arguments: parsedAbi.constructor.inputs.reduce((acc, input) => {
         const isOptional = input.type.toLowerCase().startsWith('option');
+        let type = getJSType(input.type);
+        if (type === input.type) {
+          type = types[input.type]?.type || 'object';
+        }
         acc[input.name] = {
-          type: utils.getJSType(input.type),
+          type,
           required: !isOptional,
           raw_type: input.type,
         };
@@ -218,7 +260,7 @@ export const parseArgument = (
   let parsedValue = '';
 
   const required = !raw_type?.startsWith('Option');
-  let type = jsType || utils.getJSType(raw_type || '');
+  let type = jsType || getJSType(raw_type || '');
   if (type === 'struct') type = 'object';
 
   if (type === raw_type && abi?.types?.[raw_type]?.type === 'enum') {
@@ -231,6 +273,10 @@ export const parseArgument = (
   if (value === null || value === undefined) {
     return '';
   }
+
+  const contractABI = abi
+    ? ({ types: abi.types || {} } as ContractABI)
+    : emptyABI;
 
   if (type === 'object' && abi !== null) {
     let argument: Record<string, any> = {};
@@ -245,9 +291,11 @@ export const parseArgument = (
         ([key, v]) => {
           const objectValue = argument[v.name];
           const objectType = v.type;
-          const parsedValue = abiEncoder.encodeABIValue(
+          const parsedValue = encodeABIValue(
             objectValue,
             objectType,
+            true,
+            contractABI,
           );
           return parsedValue;
         },
@@ -265,22 +313,17 @@ export const parseArgument = (
     if (!Array.isArray(argument) || argument?.length === 0) {
       return '';
     }
-    const parsedArray = (argument as any[]).map(value => {
-      const isOptional = raw_type.toLowerCase().startsWith('option');
+    const isOptional = raw_type.toLowerCase().startsWith('option');
+    const nonOptionalType = isOptional
+      ? (raw_type.match(/<(.*)>/) || [])[1]
+      : raw_type;
+    const innerType = nonOptionalType.split('<')[1].split('>')[0];
 
-      const nonOptionalType = isOptional
-        ? (raw_type.match(/<(.*)>/) || [])[1]
-        : raw_type;
-
-      const arrayType = nonOptionalType.split('<')[1].split('>')[0];
-      return abiEncoder.encodeABIValue(value, arrayType);
-    });
-
-    const innerType = type.slice(type.indexOf('<') + 1, type.length - 1);
-
-    parsedValue = abiEncoder.encodeLengthPlusData(
-      parsedArray,
+    parsedValue = encodeLengthPlusData(
+      argument,
       innerType,
+      true,
+      contractABI,
     ) as string;
   } else if (type === 'variadic' && abi !== null) {
     let argument = [];
@@ -293,9 +336,12 @@ export const parseArgument = (
     if (!Array.isArray(argument) || argument?.length === 0) {
       return '';
     }
-    parsedValue = abiEncoder.encodeABIValue([argument], raw_type);
+    parsedValue = encodeABIValue([argument], raw_type);
   } else {
-    parsedValue = abiEncoder.encodeABIValue(value, raw_type, !required);
+    const valueType = required
+      ? raw_type
+      : (raw_type.match(/<(.*)>/) || [])[1] || raw_type;
+    parsedValue = encodeABIValue(value, valueType, !required);
   }
 
   if (parsedValue === '') {

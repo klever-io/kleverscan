@@ -2,8 +2,8 @@ import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { IInnerTableProps, IRewardsAssets, IRowSection } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
-import Link from 'next/link';
 import React, { useState } from 'react';
 import {
   ArrowExpand,
@@ -38,11 +38,7 @@ const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
 
     const sections: IRowSection[] = [
       {
-        element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
-            {assetId}
-          </Link>
-        ),
+        element: props => <ExplorerLink type="asset" value={assetId} compact />,
         span: 1,
       },
       {

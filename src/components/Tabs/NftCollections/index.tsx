@@ -3,6 +3,7 @@ import Table, { ITable } from '@/components/Table';
 import { CustomLink, DoubleRow } from '@/styles/common';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types';
 import { toLocaleFixed } from '@/utils/formatFunctions';
+import ExplorerLink from '@/components/ExplorerLink';
 import Link from 'next/link';
 import React, { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,9 +37,7 @@ const NftCollections: React.FC<PropsWithChildren<INftCollections>> = ({
       {
         element: props => (
           <DoubleRow>
-            <Link key={assetId} href={`/asset/${assetId}`}>
-              {assetId}
-            </Link>
+            <ExplorerLink type="asset" value={assetId} compact />
           </DoubleRow>
         ),
         span: 1,

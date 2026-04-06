@@ -31,7 +31,7 @@ import {
 import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
-import Link from 'next/link';
+import ExplorerLink from '@/components/ExplorerLink';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
@@ -79,9 +79,7 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`} legacyBehavior>
-            {String(nonce)}
-          </Link>
+          <ExplorerLink type="block" value={String(nonce)} compact />
           <span>{epoch}</span>
         </DoubleRow>
       ),
@@ -101,13 +99,12 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={producerOwnerAddress + timestamp}>
-          <Link
-            href={`/validator/${producerOwnerAddress}`}
-            key={producerOwnerAddress}
-            legacyBehavior
-          >
-            {parseAddress(producerName, 16)}
-          </Link>
+          <ExplorerLink
+            type="validator"
+            value={producerOwnerAddress}
+            label={parseAddress(producerName, 16)}
+            compact
+          />
           <span key={timestamp}>{formatDate(timestamp)}</span>
         </DoubleRow>
       ),

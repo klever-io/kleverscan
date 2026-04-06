@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/theme';
 import { getRawTxTheme } from '@/pages/transaction/[hash]';
 import { ISftAsset } from '@/types';
 import { AssetCardContent } from '@/views/assets';
@@ -5,7 +6,6 @@ import { Row } from '@/views/assets/detail';
 import { CardRaw } from '@/views/transactions/detail';
 import dynamic from 'next/dynamic';
 import { PropsWithChildren, useMemo } from 'react';
-import { useTheme } from 'styled-components';
 
 interface INonceDetails {
   sft: (ISftAsset & { nonce?: string }) | undefined;

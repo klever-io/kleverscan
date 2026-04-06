@@ -1,19 +1,12 @@
 import { PropsWithChildren } from 'react';
 import { Accounts as Icon } from '@/assets/title-icons';
-import Copy from '@/components/Copy';
+import ExplorerLink from '@/components/ExplorerLink';
 import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import {
-  Card,
-  CardContainer,
-  CenteredRow,
-  Container,
-  Header,
-  Mono,
-} from '@/styles/common';
+import { Card, CardContainer, Container, Header } from '@/styles/common';
 import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -22,7 +15,6 @@ import { getAge } from '@/utils/timeFunctions';
 import { TableContainer } from '@/views/accounts';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { GetServerSideProps } from 'next';
@@ -197,13 +189,12 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
     const sections: IRowSection[] = [
       {
         element: props => (
-          <CenteredRow key={address}>
-            <Link href={`/account/${address}`} data-testid="account-link">
-              <Mono>{isMobile ? parseAddress(address, 24) : address}</Mono>
-            </Link>
-
-            <Copy info="Address" data={address} />
-          </CenteredRow>
+          <ExplorerLink
+            type="account"
+            value={address}
+            label={isMobile ? parseAddress(address, 24) : address}
+            compact
+          />
         ),
         span: 2,
       },

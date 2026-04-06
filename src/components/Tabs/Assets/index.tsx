@@ -8,6 +8,7 @@ import { AssetType, AssetTypeString } from '@/types/assets';
 import { IAccountAsset, IInnerTableProps, IRowSection } from '@/types/index';
 import { parseApr, setQueryAndRouter } from '@/utils';
 import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -235,11 +236,7 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
     const sections: IRowSection[] = [
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
-        element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
-            {assetId}
-          </Link>
-        ),
+        element: props => <ExplorerLink type="asset" value={assetId} compact />,
         span: 1,
       },
       {

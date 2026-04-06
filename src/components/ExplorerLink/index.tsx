@@ -45,8 +45,12 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
   label,
   compact,
 }) => {
+  if (!value) {
+    return <span>{label || '--'}</span>;
+  }
+
   const href = `${routes[type]}/${value}`;
-  const displayText = label || value || '--';
+  const displayText = label || value;
   const text = monoTypes.includes(type) ? (
     <Mono>{displayText}</Mono>
   ) : (

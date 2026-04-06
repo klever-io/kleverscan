@@ -159,17 +159,19 @@ const TransactionItem: React.FC<PropsWithChildren<ITransaction>> = ({
 
           <span>
             {t('To')}:{' '}
-            <ExplorerLink
-              type="account"
-              value={contractFilter?.parameter?.toAddress}
-              label={
-                contractFilter?.parameter?.toAddress
-                  ? isMobile
-                    ? parseAddress(contractFilter?.parameter?.toAddress, 12)
-                    : parseAddress(contractFilter?.parameter?.toAddress, 15)
-                  : '--'
-              }
-            />
+            {contractFilter?.parameter?.toAddress ? (
+              <ExplorerLink
+                type="account"
+                value={contractFilter.parameter.toAddress}
+                label={
+                  isMobile
+                    ? parseAddress(contractFilter.parameter.toAddress, 12)
+                    : parseAddress(contractFilter.parameter.toAddress, 15)
+                }
+              />
+            ) : (
+              '--'
+            )}
           </span>
         </TransactionData>
       </TransactionContainerContent>

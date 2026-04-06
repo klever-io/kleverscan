@@ -347,9 +347,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <span>
             <strong>Asset ID</strong>
           </span>
-          <Link href={`/asset/${createAssetReceipt?.assetId}`} legacyBehavior>
-            {createAssetReceipt?.assetId}
-          </Link>
+          <ExplorerLink type="asset" value={createAssetReceipt?.assetId} />
         </Row>
       )}
       <Row>

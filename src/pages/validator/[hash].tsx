@@ -52,7 +52,7 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import dynamic from 'next/dynamic';
 import Image from 'next/legacy/image';
-import Link from 'next/link';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
@@ -252,15 +252,10 @@ const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
           <span>
             <CenteredRow>
               {router.query.hash ? (
-                <>
-                  <Link href={`/account/${router.query.hash}`} legacyBehavior>
-                    {router.query.hash}
-                  </Link>
-                  <Copy
-                    data={router.query.hash as string}
-                    info="ownerAddress"
-                  ></Copy>
-                </>
+                <ExplorerLink
+                  type="account"
+                  value={router.query.hash as string}
+                />
               ) : (
                 <Skeleton />
               )}
@@ -431,12 +426,12 @@ const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
     const sections: IRowSection[] = [
       {
         element: props => (
-          <CenteredRow key={id}>
-            <Link href={`/account/${address}`} key={address} legacyBehavior>
-              {parseAddress(address || '', 24)}
-            </Link>
-            <Copy data={address} info="address"></Copy>
-          </CenteredRow>
+          <ExplorerLink
+            type="account"
+            value={address}
+            label={parseAddress(address || '', 24)}
+            compact
+          />
         ),
         span: 2,
       },

@@ -13,6 +13,7 @@ import { IBlockResponse } from '@/types/blocks';
 import { ContractsName, ITransferContract } from '@/types/contracts';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
+import ExplorerLink from '@/components/ExplorerLink';
 import Link from 'next/link';
 import { SetStateAction } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
@@ -114,9 +115,7 @@ export const TransactionRowSections = (
         .parameter as unknown as ITransferContract;
       return parameter?.toAddress ? (
         <UnderlineSpan onClick={() => setShowTooltip(false)}>
-          <Link href={`/account/${parameter?.toAddress}`} legacyBehavior>
-            {parameter?.toAddress}
-          </Link>
+          <ExplorerLink type="account" value={parameter?.toAddress} compact />
         </UnderlineSpan>
       ) : (
         <span>--</span>
@@ -144,9 +143,7 @@ export const TransactionRowSections = (
       {
         element: props => (
           <HashSpan onClick={() => setShowTooltip(false)}>
-            <Link href={`/transaction/${transaction.hash}`} legacyBehavior>
-              {transaction.hash}
-            </Link>
+            <ExplorerLink type="transaction" value={transaction.hash} compact />
           </HashSpan>
         ),
         span: 1,
@@ -157,9 +154,7 @@ export const TransactionRowSections = (
           <SpanWrapper>
             From:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
-              <Link href={`/account/${transaction.sender}`} legacyBehavior>
-                {transaction.sender}
-              </Link>
+              <ExplorerLink type="account" value={transaction.sender} compact />
             </UnderlineSpan>
           </SpanWrapper>
         ),
@@ -308,9 +303,7 @@ export const AccountRowSections = (
             style={{ maxWidth: '20rem' }}
             onClick={() => setShowTooltip(false)}
           >
-            <Link href={`/account/${account.address}`} legacyBehavior>
-              {account.address}
-            </Link>
+            <ExplorerLink type="account" value={account.address} compact />
           </HashSpan>
         ),
         span: 2,
@@ -392,10 +385,12 @@ export const BlockRowSections = (
           <SpanWrapper>
             Nonce:{' '}
             <HashSpan onClick={() => setShowTooltip(false)}>
-              <Link
-                href={`/block/${block.nonce}`}
-                legacyBehavior
-              >{`#${block.nonce}`}</Link>
+              <ExplorerLink
+                type="block"
+                value={String(block.nonce)}
+                label={`#${block.nonce}`}
+                compact
+              />
             </HashSpan>
           </SpanWrapper>
         ),
@@ -410,13 +405,12 @@ export const BlockRowSections = (
           <SpanWrapper>
             Miner:{' '}
             <UnderlineSpan onClick={() => setShowTooltip(false)}>
-              {' '}
-              <Link
-                href={`account/${block.producerOwnerAddress}`}
-                legacyBehavior
-              >
-                {block.producerName || block.producerOwnerAddress}
-              </Link>
+              <ExplorerLink
+                type="account"
+                value={block.producerOwnerAddress}
+                label={block.producerName || block.producerOwnerAddress}
+                compact
+              />
             </UnderlineSpan>
           </SpanWrapper>
         ),
@@ -487,9 +481,11 @@ export const SmartContractRowSections = (
             style={{ maxWidth: '20rem' }}
             onClick={() => setShowTooltip(false)}
           >
-            <Link href={`/smart-contract/${sc.contractAddress}`} legacyBehavior>
-              {sc.contractAddress}
-            </Link>
+            <ExplorerLink
+              type="smart-contract"
+              value={sc.contractAddress}
+              compact
+            />
           </HashSpan>
         ),
         span: 2,

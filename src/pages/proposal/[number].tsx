@@ -74,6 +74,7 @@ import { ButtonExpand } from '@/views/transactions/detail';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import ExplorerLink from '@/components/ExplorerLink';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, {
@@ -101,10 +102,12 @@ const ProposalVoters = (props: IProposalVoters) => {
       {
         element: props => (
           <CenteredRow key={voter}>
-            <Link href={`/account/${voter}`} legacyBehavior>
-              {parseAddress(voter, 24)}
-            </Link>
-            <Copy data={voter} info="voter"></Copy>
+            <ExplorerLink
+              type="account"
+              value={voter}
+              label={parseAddress(voter, 24)}
+              compact
+            />
           </CenteredRow>
         ),
         span: 2,

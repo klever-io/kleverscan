@@ -17,6 +17,7 @@ import {
   SectionCards,
   TransactionContainer,
 } from '@/views/home';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -74,19 +75,17 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`} legacyBehavior>
-            {String(nonce)}
-          </Link>
-          <Link
-            href={`/validator/${producerOwnerAddress}`}
-            key={producerOwnerAddress}
-          >
-            {producerName && !producerNameIsAddress ? (
-              producerName
-            ) : (
-              <Mono>{parseAddress(producerOwnerAddress, 24)}</Mono>
-            )}
-          </Link>
+          <ExplorerLink type="block" value={String(nonce)} compact />
+          <ExplorerLink
+            type="validator"
+            value={producerOwnerAddress}
+            label={
+              producerName && !producerNameIsAddress
+                ? producerName
+                : parseAddress(producerOwnerAddress, 24)
+            }
+            compact
+          />
         </DoubleRow>
       ),
       span: 1,
@@ -159,13 +158,12 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
               size={36}
             />
           </Link>
-          <Link
-            href={`/validator/${producerOwnerAddress}`}
-            key={producerOwnerAddress}
-            legacyBehavior
-          >
-            <ValidatorName>{parseAddress(producerName, 24)}</ValidatorName>
-          </Link>
+          <ExplorerLink
+            type="validator"
+            value={producerOwnerAddress}
+            label={parseAddress(producerName, 24)}
+            compact
+          />
         </CenteredRow>
       ),
       span: 2,
@@ -173,9 +171,7 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={nonce + epoch}>
-          <Link href={`/block/${nonce}`} legacyBehavior>
-            {String(nonce)}
-          </Link>
+          <ExplorerLink type="block" value={String(nonce)} compact />
         </DoubleRow>
       ),
       span: 1,

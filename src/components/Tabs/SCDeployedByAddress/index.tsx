@@ -1,4 +1,5 @@
 import { Copy } from '@/assets/icons';
+import ExplorerLink from '@/components/ExplorerLink';
 import Filters from '@/components/SmartContracts/SmartContractFilters';
 import Table, { ITable } from '@/components/Table';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
@@ -7,7 +8,6 @@ import { SmartContractsList } from '@/types/smart-contract';
 import { smartContractsTableHeaders } from '@/utils/contracts';
 import { formatDate } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
-import Link from 'next/link';
 import React, { PropsWithChildren } from 'react';
 
 interface ISCDeployedByAddress {
@@ -37,13 +37,12 @@ const SCDeployedByAddress: React.FC<
               <span>{name || '- -'}</span>
             </CenteredRow>
             <CenteredRow>
-              <Link
-                href={`/smart-contract/${contractAddress}`}
-                key={contractAddress}
-              >
-                <Mono>{parseAddress(contractAddress, 25)}</Mono>
-              </Link>
-              <Copy data={contractAddress} info="contractAddress" />
+              <ExplorerLink
+                type="smart-contract"
+                value={contractAddress}
+                label={parseAddress(contractAddress, 25)}
+                compact
+              />
             </CenteredRow>
           </DoubleRow>
         ),
@@ -62,10 +61,12 @@ const SCDeployedByAddress: React.FC<
       {
         element: props => (
           <CenteredRow key={contractAddress}>
-            <Link href={`/account/${deployer}`} key={contractAddress}>
-              <Mono>{parseAddress(deployer, 25)}</Mono>
-            </Link>
-            <Copy data={deployer} info="deployer" />
+            <ExplorerLink
+              type="account"
+              value={deployer}
+              label={parseAddress(deployer, 25)}
+              compact
+            />
           </CenteredRow>
         ),
         span: 1,

@@ -9,6 +9,7 @@ import {
 } from '@/types/index';
 import { parseApr, setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
@@ -139,11 +140,7 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
     const sections: IRowSection[] = [
       { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
       {
-        element: props => (
-          <Link key={assetId} href={`/asset/${assetId}`} legacyBehavior>
-            {assetId}
-          </Link>
-        ),
+        element: props => <ExplorerLink type="asset" value={assetId} compact />,
         span: 1,
       },
       {

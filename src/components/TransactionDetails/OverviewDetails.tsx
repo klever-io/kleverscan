@@ -17,7 +17,7 @@ import React, { PropsWithChildren, useState } from 'react';
 
 import KappFee from './KappFee';
 import TokenOperations from './TokenOperations';
-import AddressLink from '../AddressLink';
+import ExplorerLink from '../ExplorerLink';
 
 interface IKdaFee {
   amount: number;
@@ -162,7 +162,7 @@ const OverviewDetails: React.FC<PropsWithChildren<IOverviewDetails>> = ({
             <Skeleton />
           ) : (
             <span>
-              <AddressLink address={sender} />
+              <ExplorerLink type="account" value={sender} />
             </span>
           )}
         </Row>

@@ -1,6 +1,6 @@
 import { Assets as Icon } from '@/assets/title-icons';
 import AssetsPools from '@/components/AssetsPools';
-import Copy from '@/components/Copy';
+import ExplorerLink from '@/components/ExplorerLink';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -8,7 +8,7 @@ import Table, { ITable } from '@/components/Table';
 import Tabs, { ITabs } from '@/components/Tabs';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
-import { CenteredRow, Container, DoubleRow, Header } from '@/styles/common';
+import { Container, DoubleRow, Header } from '@/styles/common';
 import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -147,16 +147,8 @@ const Assets: React.FC<PropsWithChildren> = () => {
       {
         element: props => (
           <DoubleRow {...props} key={assetId}>
-            <Link href={`/asset/${assetId}`} key={assetId}>
-              {name}
-            </Link>
-
-            <CenteredRow>
-              <Link href={`/asset/${assetId}`} key={assetId} legacyBehavior>
-                {assetId}
-              </Link>
-              <Copy info="Asset ID" data={assetId} />
-            </CenteredRow>
+            <ExplorerLink type="asset" value={assetId} label={name} compact />
+            <ExplorerLink type="asset" value={assetId} compact />
           </DoubleRow>
         ),
         span: 1,

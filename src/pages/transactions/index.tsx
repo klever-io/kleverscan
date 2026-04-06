@@ -1,5 +1,5 @@
 import { Transactions as Icon } from '@/assets/title-icons';
-import Copy from '@/components/Copy';
+import ExplorerLink from '@/components/ExplorerLink';
 import Title from '@/components/Layout/Title';
 import LinkWithDropdown from '@/components/LinkWithDropdown';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
@@ -268,12 +268,12 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={hash}>
-          <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`} data-testid="transaction-link">
-              <Mono>{parseAddress(hash, 24)}</Mono>
-            </Link>
-            <Copy info="TXHash" data={hash} />
-          </CenteredRow>
+          <ExplorerLink
+            type="transaction"
+            value={hash}
+            label={parseAddress(hash, 24)}
+            compact
+          />
           <CenteredRow>
             <TimestampInfo>
               {formatDate(timestamp || Date.now(), {
@@ -291,9 +291,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`} className="address">
-            {blockNum || 0}
-          </Link>
+          <ExplorerLink type="block" value={String(blockNum || 0)} compact />
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
           </span>

@@ -100,7 +100,7 @@ import {
 import { TFunction, useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { PropsWithChildren, useState } from 'react';
-import AddressLink from '../AddressLink';
+import ExplorerLink from '../ExplorerLink';
 import Tooltip from '../Tooltip';
 import { PermissionOperations } from '../AccountPermission';
 
@@ -285,7 +285,7 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>To</strong>
         </span>
         <span>
-          <AddressLink address={parameter?.toAddress} />
+          <ExplorerLink type="account" value={parameter?.toAddress} />
         </span>
       </Row>
       {getCorrectKDARoyalty()}
@@ -363,7 +363,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <AddressLink address={ownerAddress} />
+          <ExplorerLink type="account" value={ownerAddress} />
         </span>
       </Row>
       <Row>
@@ -429,7 +429,10 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
             <Panel>
               <CenteredRow>
                 <strong>Address:&nbsp;</strong>
-                <AddressLink address={parameter.royalties?.address} />
+                <ExplorerLink
+                  type="account"
+                  value={parameter.royalties?.address}
+                />
               </CenteredRow>
               <CenteredRow>
                 <span>
@@ -514,7 +517,7 @@ export const CreateAsset: React.FC<PropsWithChildren<IIndexedContract>> = ({
                 <div key={index}>
                   <CenteredRow>
                     <strong>Address:&nbsp;</strong>
-                    <AddressLink address={royalty.address} />
+                    <ExplorerLink type="account" value={royalty.address} />
                   </CenteredRow>
                   <CenteredRow>
                     <span>
@@ -800,7 +803,7 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Owner</strong>
         </span>
         <span>
-          <AddressLink address={ownerAddress} />
+          <ExplorerLink type="account" value={ownerAddress} />
         </span>
       </Row>
       {parameter?.config?.logo && (
@@ -849,7 +852,10 @@ export const CreateValidator: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Reward Address</strong>
         </span>
         <span>
-          <AddressLink address={parameter?.config?.rewardAddress} />
+          <ExplorerLink
+            type="account"
+            value={parameter?.config?.rewardAddress}
+          />
         </span>
       </Row>
       {renderMetadata()}
@@ -915,7 +921,7 @@ export const ValidatorConfig: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>Reward Address</strong>
         </span>
         <span>
-          <AddressLink address={parameter?.rewardAddress} />
+          <ExplorerLink type="account" value={parameter?.rewardAddress} />
         </span>
       </Row>
       <Row>
@@ -1152,7 +1158,7 @@ export const Delegate: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>To</strong>
         </span>
         <span>
-          <AddressLink address={parameter?.toAddress} />
+          <ExplorerLink type="account" value={parameter?.toAddress} />
         </span>
       </Row>
       {delegateReceipt && (
@@ -1713,7 +1719,7 @@ export const ConfigITO: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <strong>Receiver</strong>
         </span>
-        <AddressLink address={parameter?.receiverAddress} />
+        <ExplorerLink type="account" value={parameter?.receiverAddress} />
       </Row>
       <Row>
         <span>
@@ -2298,7 +2304,7 @@ export const CreateMarketplace: React.FC<
           <strong>Referral Address</strong>
         </span>
         <span>
-          <AddressLink address={parameter?.referralAddress} />
+          <ExplorerLink type="account" value={parameter?.referralAddress} />
         </span>
       </Row>
       <Row>
@@ -2346,7 +2352,7 @@ export const ConfigMarketplace: React.FC<
           <strong>Referral Address</strong>
         </span>
         <span>
-          <AddressLink address={parameter?.referralAddress} />
+          <ExplorerLink type="account" value={parameter?.referralAddress} />
         </span>
       </Row>
       <Row>
@@ -2419,7 +2425,7 @@ export const UpdateAccountPermission: React.FC<
                   style={{ flexDirection: 'column', alignItems: 'start' }}
                   key={index}
                 >
-                  <AddressLink address={signer?.address} />
+                  <ExplorerLink type="account" value={signer?.address} />
                   <CenteredRow>
                     {' '}
                     Weight:
@@ -2568,7 +2574,7 @@ export const ITOTrigger: React.FC<PropsWithChildren<IIndexedContract>> = ({
             <span>
               <strong>Receiver Address</strong>
             </span>
-            <AddressLink address={parameter?.receiverAddress} />
+            <ExplorerLink type="account" value={parameter?.receiverAddress} />
           </Row>
         );
       case ITOTriggerType.UpdateMaxAmount:
@@ -2711,7 +2717,7 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <strong>Contract Address</strong>
         </span>
-        <AddressLink address={scAddress} isSmartContract />
+        <ExplorerLink type="smart-contract" value={scAddress} />
       </Row>
       {Object.entries(parameter?.callValue || {}).length > 0 && (
         <Row>
@@ -2863,7 +2869,7 @@ const renderAssetTriggerTypeData: React.FC<
       <span>
         <strong>To</strong>
       </span>
-      <AddressLink address={par?.toAddress} />
+      <ExplorerLink type="account" value={par?.toAddress} />
     </Row>
   );
 
@@ -2889,7 +2895,7 @@ const renderAssetTriggerTypeData: React.FC<
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>Admin Address</StrongWidth>
-                <AddressLink address={par.kdaPool.adminAddress} />
+                <ExplorerLink type="account" value={par.kdaPool.adminAddress} />
               </RoleDiv>
               <RoleDiv>
                 <StrongWidth>fRationKDA</StrongWidth>
@@ -2920,7 +2926,7 @@ const renderAssetTriggerTypeData: React.FC<
               <RoleWrapper>
                 <RoleDiv>
                   <StrongWidth>Address</StrongWidth>
-                  <AddressLink address={par.royalties.address} />
+                  <ExplorerLink type="account" value={par.royalties.address} />
                 </RoleDiv>
                 <RoleDiv>
                   <StrongWidth>ITO Fixed</StrongWidth>
@@ -3007,7 +3013,7 @@ const renderAssetTriggerTypeData: React.FC<
                     <RoleWrapper>
                       <RoleDiv>
                         <StrongWidth>Address</StrongWidth>
-                        <AddressLink address={split.address} />
+                        <ExplorerLink type="account" value={split.address} />
                       </RoleDiv>
                       <RoleDiv>
                         <StrongWidth>ITO Fixed</StrongWidth>
@@ -3076,7 +3082,7 @@ const renderAssetTriggerTypeData: React.FC<
             <RoleWrapper>
               <RoleDiv>
                 <RoleStrong>Address</RoleStrong>
-                <AddressLink address={par.role.address} />
+                <ExplorerLink type="account" value={par.role.address} />
               </RoleDiv>
 
               <RoleDiv>

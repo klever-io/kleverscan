@@ -67,7 +67,13 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
   return (
     <CenteredRow>
       <Link href={href}>{text}</Link>
-      <a href={href} target="_blank" rel="noopener noreferrer">
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Open ${type} in a new tab`}
+        title="Open in a new tab"
+      >
         <IoOpenOutline size={20} />
       </a>
       <Copy data={value} info={type} />

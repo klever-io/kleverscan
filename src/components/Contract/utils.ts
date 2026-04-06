@@ -2,59 +2,23 @@ import { IPackItem } from '@/types/contracts';
 import { ICollectionList } from '@/types/index';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { getPrecision } from '@/utils/precisionFunctions';
-import {
-  IAssetTrigger,
-  IBuyOrder,
-  ICancelMarketOrder,
-  IClaim,
-  IConfigITO,
-  IConfigMarketplace,
-  IConfigValidator,
-  IContractRequest,
-  ICreateAsset,
-  ICreateMarketplace,
-  ICreateValidator,
-  IDelegate,
-  IDeposit,
-  IFreeze,
-  IITOTrigger,
-  IProposal,
-  ISellOrder,
-  ISetAccountName,
-  ISetITOPrices,
-  ITransaction,
-  ITransfer,
-  ITxOptionsRequest,
-  IUndelegate,
-  IUnfreeze,
-  IUnjail,
-  IUpdateAccountPermission,
-  IVotes,
-  IWithdraw,
-  TransactionType,
-} from '@klever/sdk-web';
+import { TXType } from '@klever/connect';
 
-const getType = (rawType: string): TransactionType => {
+interface ITransaction {
+  RawData: Record<string, unknown>;
+  Signature?: string[];
+  [key: string]: unknown;
+}
+
+const getType = (rawType: string): number => {
   let type = rawType.substring(0, rawType.length - 8);
 
   switch (type) {
-    case 'Vote':
-      type = 'Votes';
-      break;
-    case 'ValidatorConfig':
-      type = 'ConfigValidator';
-      break;
-    case 'Buy':
-      type = 'BuyOrder';
-      break;
-    case 'Sell':
-      type = 'SellOrder';
-      break;
     case 'Smart':
       type = 'SmartContract';
       break;
   }
-  return TransactionType[type as keyof typeof TransactionType];
+  return TXType[type as keyof typeof TXType];
 };
 
 const parsePackInfoPrecision = async (payload: any) => {
@@ -593,38 +557,23 @@ interface IAccountNonce {
   error: string;
   code: string;
 }
-type IPayload =
-  | ITransfer
-  | ICreateAsset
-  | ICreateValidator
-  | IConfigValidator
-  | IFreeze
-  | IUnfreeze
-  | IDelegate
-  | IUndelegate
-  | IWithdraw
-  | IClaim
-  | IUnjail
-  | IAssetTrigger
-  | ISetAccountName
-  | IProposal
-  | IVotes
-  | IConfigITO
-  | ISetITOPrices
-  | IBuyOrder
-  | ISellOrder
-  | ICancelMarketOrder
-  | ICreateMarketplace
-  | IConfigMarketplace
-  | IUpdateAccountPermission
-  | IDeposit
-  | IITOTrigger;
 interface ITxRequest {
-  type: TransactionType;
+  type: number;
   sender: string;
   nonce: number;
-  contracts: IPayload[];
+  contracts: Record<string, unknown>[];
   data?: string[];
+  permID?: number;
+  kdaFee?: string;
+}
+
+interface IContractRequest {
+  type: number;
+  payload: Record<string, unknown>;
+}
+
+interface ITxOptionsRequest {
+  nonce?: number;
   permID?: number;
   kdaFee?: string;
 }

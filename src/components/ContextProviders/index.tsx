@@ -6,6 +6,7 @@ import { MulticontractProvider } from '@/contexts/contract/multicontract';
 import { WizardProvider } from '@/contexts/contract/wizard';
 import { ContractModalProvider } from '@/contexts/contractModal';
 import { ExtensionProvider } from '@/contexts/extension';
+import { KleverProvider } from '@klever/connect-react';
 import { InputSearchProvider } from '@/contexts/inputSearch';
 import { MobileProvider } from '@/contexts/mobile';
 import { ParticipateProvider } from '@/contexts/participate';
@@ -28,25 +29,35 @@ const ContextProviders: React.FC<PropsWithChildren> = ({ children }) => {
     <QueryClientProvider client={queryClient}>
       <ToastContainer />
       <MobileProvider>
-        <ExtensionProvider>
-          <ModalsProvider>
-            <NetworkParamsProvider>
-              <FeesProvider>
-                <MulticontractProvider>
-                  <ContractProvider>
-                    <InputSearchProvider>
-                      <ParticipateProvider>
-                        <ContractModalProvider>
-                          <WizardProvider>{children}</WizardProvider>
-                        </ContractModalProvider>
-                      </ParticipateProvider>
-                    </InputSearchProvider>
-                  </ContractProvider>
-                </MulticontractProvider>
-              </FeesProvider>
-            </NetworkParamsProvider>
-          </ModalsProvider>
-        </ExtensionProvider>
+        <KleverProvider
+          config={{
+            network: process.env.DEFAULT_API_HOST?.includes('mainnet')
+              ? 'mainnet'
+              : process.env.DEFAULT_API_HOST?.includes('devnet')
+                ? 'devnet'
+                : 'testnet',
+          }}
+        >
+          <ExtensionProvider>
+            <ModalsProvider>
+              <NetworkParamsProvider>
+                <FeesProvider>
+                  <MulticontractProvider>
+                    <ContractProvider>
+                      <InputSearchProvider>
+                        <ParticipateProvider>
+                          <ContractModalProvider>
+                            <WizardProvider>{children}</WizardProvider>
+                          </ContractModalProvider>
+                        </ParticipateProvider>
+                      </InputSearchProvider>
+                    </ContractProvider>
+                  </MulticontractProvider>
+                </FeesProvider>
+              </NetworkParamsProvider>
+            </ModalsProvider>
+          </ExtensionProvider>
+        </KleverProvider>
       </MobileProvider>
     </QueryClientProvider>
   );

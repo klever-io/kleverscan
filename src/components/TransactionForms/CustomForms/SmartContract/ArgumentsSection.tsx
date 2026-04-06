@@ -1,5 +1,5 @@
 import { ABIType, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
-import { utils } from '@klever/sdk-web';
+import { getJSType } from '@klever/connect-contracts';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
@@ -38,7 +38,7 @@ const getInitialValue = (
   types?: Record<string, ABIType>,
   inner = false,
 ) => {
-  const type = utils.getJSType(rawType);
+  const type = getJSType(rawType);
   if (type === 'number') {
     return inner ? 0 : NaN;
   }
@@ -85,7 +85,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
     if (args) {
       const replaceArguments = Object.keys(args).map(key => {
         const rawType = args[key].raw_type;
-        const type = utils.getJSType(rawType || '');
+        const type = getJSType(rawType || '');
         const arg = {
           name: key,
           type: args[key].type,
@@ -182,7 +182,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
             onChange={(newValue: any) => {
               if (newValue?.value) {
                 append({
-                  type: utils.getJSType(newValue.value),
+                  type: getJSType(newValue.value),
                   raw_type: newValue.value,
                   value: getInitialValue(newValue.value, types),
                 });
@@ -190,7 +190,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
             }}
             value={null}
             options={RUST_TYPES_WITH_OPTION.map(type => ({
-              label: `${type} (${utils.getJSType(type)})`,
+              label: `${type} (${getJSType(type)})`,
               value: type,
             }))}
             placeholder="Add Argument"

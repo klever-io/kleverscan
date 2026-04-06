@@ -6,8 +6,9 @@ import {
 } from '@/components/TransactionForms/styles';
 import { useExtension } from '@/contexts/extension';
 import { validateImgUrl } from '@/utils/imageValidate';
-import { ICreateAsset } from '@klever/sdk-web';
 import { PropsWithChildren, useEffect, useState } from 'react';
+
+type ICreateAsset = Record<string, any>;
 import { useFormContext } from 'react-hook-form';
 import { ISectionProps } from '..';
 import { assetsTooltip as tooltip } from '../../utils/tooltips';

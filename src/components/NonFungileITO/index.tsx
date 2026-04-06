@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { web } from '@klever/sdk-web';
+import { useExtension } from '@/contexts/extension';
+import { Transaction } from '@klever/connect';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
 import { useState } from 'react';
@@ -25,6 +26,7 @@ const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
   showcase,
 }) => {
   const { t } = useTranslation('itos');
+  const { wallet } = useExtension();
 
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(true);
@@ -45,16 +47,24 @@ const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
       ...payload,
     };
 
+    if (!wallet) {
+      toast.error(t('assets:walletNotConnected'));
+      setLoading(false);
+      return;
+    }
+
     try {
-      const unsignedTx = await web.buildTransaction([
+      const unsignedTx = await wallet.buildTransaction([
         {
-          type: 17, // Buy Order type
-          payload: parsedPayload,
+          contractType: 17, // Buy Order type
+          ...parsedPayload,
         },
       ]);
-      const signedTx = await web.signTransaction(unsignedTx);
-      const response = await web.broadcastTransactions([signedTx]);
-      if (setTxHash) setTxHash(response.data.txsHashes[0]);
+      const signedTx = await wallet.signTransaction(
+        Transaction.fromTransaction(unsignedTx),
+      );
+      const txHashes = await wallet.broadcastTransactions([signedTx]);
+      if (setTxHash && txHashes?.[0]) setTxHash(txHashes[0]);
       toast.success(t('successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');

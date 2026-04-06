@@ -47,7 +47,7 @@ import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { TransactionType } from '@klever/sdk-web';
+import { TXType } from '@klever/connect';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
 import React, { PropsWithChildren } from 'react';
@@ -103,7 +103,7 @@ export const getAssetsAndCurrenciesList = (
   if ('currencyID' in contract.parameter && contract.parameter.currencyID) {
     assets.push(contract.parameter.currencyID);
   }
-  if (contract?.type === TransactionType.Claim) {
+  if (contract?.type === TXType.Claim) {
     const claimReceipt = findReceipt(transaction.receipts, 17) as
       | IClaimReceipt
       | undefined;
@@ -111,7 +111,7 @@ export const getAssetsAndCurrenciesList = (
       assets.push(claimReceipt.assetIdReceived);
     }
   }
-  if (contract?.type === TransactionType.BuyOrder) {
+  if (contract?.type === TXType.Buy) {
     const buyContract = transaction.contract[0]
       ?.parameter as IBuyContractPayload;
 
@@ -130,7 +130,7 @@ export const getTransactionPrecision = (
 ): number | undefined => {
   if (contract.parameter === undefined) return;
 
-  if (contract?.type === TransactionType.Claim) {
+  if (contract?.type === TXType.Claim) {
     const claimReceipt = findReceipt(transaction.receipts, 17) as
       | IClaimReceipt
       | undefined;
@@ -138,7 +138,7 @@ export const getTransactionPrecision = (
       return assetPrecisions[claimReceipt.assetIdReceived];
     }
   }
-  if (contract?.type === TransactionType.BuyOrder) {
+  if (contract?.type === TXType.Buy) {
     const buyContract = transaction.contract[0]
       ?.parameter as IBuyContractPayload;
     if (buyContract.buyType === 'ITOBuy' && buyContract?.id) {

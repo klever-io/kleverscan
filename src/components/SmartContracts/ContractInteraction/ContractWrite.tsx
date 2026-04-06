@@ -6,7 +6,7 @@ import { getPrecision } from '@/utils/precisionFunctions';
 
 import { HashComponent } from '@/components/Contract';
 import { buildTransaction } from '@/components/Contract/utils';
-import { web } from '@klever/sdk-web';
+import { Transaction } from '@klever/connect';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -80,7 +80,7 @@ export function ContractWriteTab({
   contractAddress: string;
   contractInfo: ContractInfo;
 }) {
-  const { walletAddress } = useExtension();
+  const { walletAddress, wallet } = useExtension();
   const versions = contractInfo.contractVersions ?? [];
   const latestVersion = versions[versions.length - 1];
 
@@ -133,6 +133,7 @@ function WriteEndpointCard({
   endpoint: Endpoint;
   abiTypes: Record<string, ABIType>;
 }) {
+  const { wallet } = useExtension();
   const [open, setOpen] = useState(false);
   const [args, setArgs] = useState<Record<string, string>>({});
   const [callValue, setCallValue] = useState<{
@@ -155,6 +156,10 @@ function WriteEndpointCard({
     setError(null);
 
     try {
+      if (!wallet) {
+        throw new Error('Wallet not connected');
+      }
+
       const encodedArgs = buildEncodedArgs(endpoint.inputs, args, abiTypes);
 
       const metadata =
@@ -197,14 +202,12 @@ function WriteEndpointCard({
         [encodedMetadata],
       );
 
-      const signedTx = await web.signTransaction(unsignedTx.result);
-      const response = await web.broadcastTransactions([signedTx]);
+      const signedTx = await wallet.signTransaction(
+        Transaction.fromTransaction(unsignedTx.result as any),
+      );
+      const txHashes = await wallet.broadcastTransactions([signedTx]);
 
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
-      const hash = response?.data?.txsHashes?.[0] || unsignedTx.txHash;
+      const hash = txHashes?.[0] || unsignedTx.txHash;
       setTxHash(hash);
       toast.success('Transaction sent successfully');
     } catch (err: any) {

@@ -19,7 +19,7 @@ import {
 import { contractOptions as allContractOptions } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { gtagEvent } from '@/utils/gtag';
-import { web } from '@klever/sdk-web';
+import { Transaction } from '@klever/connect';
 import { useRouter } from 'next/router';
 import React, {
   createContext,
@@ -114,7 +114,8 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const { setWarningOpen, setShowPayloadOpen } = useModal();
 
-  const { extensionInstalled, walletAddress, setOpenDrawer } = useExtension();
+  const { extensionInstalled, walletAddress, setOpenDrawer, wallet } =
+    useExtension();
 
   const router = useRouter();
 
@@ -406,6 +407,12 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
       return;
     }
 
+    if (!wallet) {
+      toast.error('Wallet not connected. Please connect your wallet.');
+      setTxLoading(false);
+      return;
+    }
+
     setTxLoading(true);
     const parsedDataArray: string[] = [];
     const parsedPayloads = formPayloads.map(formPayload => {
@@ -445,8 +452,14 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
         const senderAddress =
           senderAccount !== walletAddress ? senderAccount : walletAddress;
         if (signTxMultiSign.current) {
-          const signedTx = await web.signTransaction(unsignedTx.result);
-          const { RawData, Signature } = signedTx;
+          const signedTx = await wallet.signTransaction(
+            Transaction.fromTransaction(unsignedTx.result as any),
+          );
+          const signedJSON = signedTx.toJSON() as {
+            RawData: Record<string, unknown>;
+            Signature: string[];
+          };
+          const { RawData, Signature } = signedJSON;
 
           parseMultisignTransaction = {
             hash: unsignedTx.txHash,
@@ -505,22 +518,16 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
           toast.success('Transaction built and signed');
         }
       } else {
-        const signedTx = await web.signTransaction(unsignedTx.result);
-        const response = await web.broadcastTransactions([signedTx]);
-        if (response.error) {
-          const messageError = response.error;
-          if (messageError.includes('no signatures provided')) {
-            throw new Error(messageError.split(': ')[2]);
-          } else {
-            throw new Error(messageError);
-          }
-        }
-        setTxHash(response.data.txsHashes[0]);
+        const signedTx = await wallet.signTransaction(
+          Transaction.fromTransaction(unsignedTx.result as any),
+        );
+        const txHashes = await wallet.broadcastTransactions([signedTx]);
+        setTxHash(txHashes[0]);
         toast.success('Transaction broadcast successfully');
         gtagEvent('send_transaction', {
           event_category: 'transaction',
           event_label: 'send_transaction',
-          hash: response.data.txsHashes[0],
+          hash: txHashes[0],
           sender: senderAccount,
           transaction_type: selectedContractType,
         });

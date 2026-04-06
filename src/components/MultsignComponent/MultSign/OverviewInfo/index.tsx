@@ -89,7 +89,7 @@ export const OverviewInfo: React.FC<PropsWithChildren<IMultisignOverview>> = ({
         multiSignData?.decodedTx?.kAppFee,
       kda: multiSignData?.decodedTx?.kdaFee?.kda || 'KLV',
     },
-    signature: multiSignData?.raw?.Signature,
+    signature: multiSignData?.raw?.Signature as string[] | undefined,
     ThresholdComponent:
       multisignTotalWeight > 0 ? ThresholdComponent : undefined,
     precisionTransaction: precision,

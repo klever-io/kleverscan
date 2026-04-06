@@ -1,6 +1,5 @@
 import { PropsWithChildren } from 'react';
 import { base64ToHex, isHex } from '@/utils/formatFunctions';
-import { web } from '@klever/sdk-web';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -66,7 +65,7 @@ const FormVerifySignature: React.FC<PropsWithChildren> = () => {
     event.preventDefault();
     try {
       const validateSignature = base64ToHex(formValues.signature);
-      const validateResponse = await web.validateSignature(
+      const validateResponse = await window.kleverWeb!.validateSignature(
         formValues.message,
         validateSignature,
         formValues.address,

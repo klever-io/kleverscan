@@ -1,4 +1,8 @@
-import { ITransaction } from '@klever/sdk-web';
+interface ITransaction {
+  RawData: Record<string, unknown>;
+  Signature?: string[];
+  [key: string]: unknown;
+}
 
 const ApiBroadcastTransactions = async (txs: any) => {
   const res = await fetch(

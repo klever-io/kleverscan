@@ -1,6 +1,5 @@
 import { PropsWithChildren } from 'react';
 import { PurpleArrowRight } from '@/assets/icons';
-import Copy from '@/components/Copy';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import {
   CustomFieldWrapper,
@@ -26,6 +25,7 @@ import {
   SectionCards,
   TransactionContainer,
 } from '@/views/home';
+import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -83,10 +83,12 @@ export const homeTransactionsRowSections = (
       element: props => (
         <DoubleRow {...props} key={hash}>
           <CenteredRow className="bucketIdCopy">
-            <Link href={`/transaction/${hash}`}>
-              <Mono>{parseAddress(hash, 24)}</Mono>
-            </Link>
-            <Copy info="TXHash" data={hash} />
+            <ExplorerLink
+              type="transaction"
+              value={hash}
+              label={parseAddress(hash, 24)}
+              compact
+            />
           </CenteredRow>
           <CenteredRow>
             <TimestampInfo>{formatDate(timestamp || Date.now())}</TimestampInfo>
@@ -101,9 +103,7 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`} className="address">
-            {blockNum || 0}
-          </Link>
+          <ExplorerLink type="block" value={String(blockNum || 0)} compact />
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
           </span>
@@ -114,9 +114,12 @@ export const homeTransactionsRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`} className="address">
-            <Mono>{parseAddress(sender, 16)}</Mono>
-          </Link>
+          <ExplorerLink
+            type="account"
+            value={sender}
+            label={parseAddress(sender, 16)}
+            compact
+          />
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
       ),
@@ -203,10 +206,12 @@ export const homeTransactionsTabletRowSections = (
             </Status>
           </CenteredRow>
           <CenteredRow>
-            <Link href={`/transaction/${hash}`}>
-              <Mono>{parseAddress(hash, 16)}</Mono>
-            </Link>
-            <Copy info="TXHash" data={hash} svgSize={16} />
+            <ExplorerLink
+              type="transaction"
+              value={hash}
+              label={parseAddress(hash, 24)}
+              compact
+            />
           </CenteredRow>
         </DoubleRow>
       ),
@@ -248,9 +253,7 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
-          <Link href={`/block/${blockNum || 0}`} className="address">
-            {blockNum || 0}
-          </Link>
+          <ExplorerLink type="block" value={String(blockNum || 0)} compact />
           <span>
             {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
           </span>
@@ -261,9 +264,12 @@ export const homeTransactionsTabletRowSections = (
     {
       element: props => (
         <DoubleRow {...props} key={sender}>
-          <Link href={`/account/${sender}`} className="address">
-            <Mono>{parseAddress(sender, 16)}</Mono>
-          </Link>
+          <ExplorerLink
+            type="account"
+            value={sender}
+            label={parseAddress(sender, 16)}
+            compact
+          />
           {toAddressSectionElement(toAddress)}
         </DoubleRow>
       ),

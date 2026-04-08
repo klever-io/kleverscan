@@ -20,5 +20,13 @@ const customJestConfig = {
   ],
 };
 
-// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
-module.exports = createJestConfig(customJestConfig);
+// We need to override transformIgnorePatterns after next/jest sets its defaults,
+// so that @klever ESM packages (and their ESM deps) get transformed by jest.
+module.exports = async () => {
+  const jestConfig = await createJestConfig(customJestConfig)();
+  jestConfig.transformIgnorePatterns = [
+    '/node_modules/(?!(@klever|@scure|@noble)/)',
+    '^.+\\.module\\.(css|sass|scss)$',
+  ];
+  return jestConfig;
+};

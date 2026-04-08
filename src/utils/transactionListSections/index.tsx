@@ -1,3 +1,4 @@
+import ExplorerLink from '@/components/ExplorerLink';
 import { CenteredRow } from '@/styles/common';
 import {
   IAssetTriggerContract,
@@ -39,7 +40,6 @@ import {
   IWithdrawReceipt,
 } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
-import Link from 'next/link';
 import { hexToString } from '../convertString';
 import { findReceipt } from '../findKey';
 import { formatAmount, toLocaleFixed } from '../formatFunctions';
@@ -81,17 +81,12 @@ const TransferSections = ({ par, precision }: IProps): React.ReactElement[] => {
   return [
     <CenteredRow key={parameter?.assetId + String(parameter?.amount)}>
       {formatAmountField(parameter?.amount, precision)}{' '}
-      {parameter?.assetId ? (
-        <Link href={`/asset/${assetId}`} legacyBehavior>
-          {parameter?.assetId}
-        </Link>
-      ) : (
-        <>
-          <Link href={`/asset/${assetId}`} legacyBehavior>
-            {assetId}
-          </Link>
-        </>
-      )}
+      <ExplorerLink
+        type="asset"
+        value={assetId}
+        label={parameter?.assetId || assetId}
+        compact
+      />
     </CenteredRow>,
   ];
 };
@@ -116,11 +111,13 @@ const CreateValidatorSections = ({ par }: IProps): React.ReactElement[] => {
   const parameter = par as unknown as ICreateValidatorContract;
 
   return [
-    <span key={parameter?.ownerAddress}>
-      <Link href={`/account/${parameter?.ownerAddress}`} legacyBehavior>
-        {parseAddress(parameter?.ownerAddress, 16)}
-      </Link>
-    </span>,
+    <ExplorerLink
+      key={parameter?.ownerAddress}
+      type="account"
+      value={parameter?.ownerAddress}
+      label={parseAddress(parameter?.ownerAddress, 16)}
+      compact
+    />,
     <span key={String(parameter?.config?.name)}>
       {parameter?.config?.name}
     </span>,
@@ -408,9 +405,13 @@ const SellSections = ({ par, precision }: IProps): React.ReactElement[] => {
 
   return [
     <span key={parameter?.marketType}>{parameter?.marketType}</span>,
-    <Link href={`/asset/${assetId}`} key={assetId}>
-      <span key={assetId}>{parameter?.assetId}</span>
-    </Link>,
+    <ExplorerLink
+      key={assetId}
+      type="asset"
+      value={assetId}
+      label={parameter?.assetId}
+      compact
+    />,
     <span key={parameter?.price}>
       {parameter?.price && formatAmountField(parameter?.price, precision)}{' '}
       {parameter?.price && currencyID}

@@ -1,8 +1,9 @@
 import { parseRoles } from '@/components/Wizard/utils';
 import { getNetwork } from '@/utils/networkFunctions';
 import { isKVMAvailable } from '@/utils/kvm';
-import { ICreateAsset } from '@klever/sdk-web';
 import React, { PropsWithChildren } from 'react';
+
+type ICreateAsset = Record<string, any>;
 import { useFormContext } from 'react-hook-form';
 import { IContractProps } from '..';
 import FormInput from '../../FormInput';

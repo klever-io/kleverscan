@@ -1929,98 +1929,97 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@klever/connect-contracts@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect-contracts/-/connect-contracts-0.1.1.tgz"
-  integrity sha512-/feovYB8UwEcoAh4xMP0KT8B7zrF7IsUhatlI1PiiqDQmxtYKPC/roZcUBf6C45nZM4u6JG1NQ/D89uIY5BMWg==
+"@klever/connect-contracts@0.2.1", "@klever/connect-contracts@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@klever/connect-contracts/-/connect-contracts-0.2.1.tgz#80e7e113e1f29128dd0fe437b40f1b97ff440621"
+  integrity sha512-Vw6leUNeCWIBipAERpL6aJxaKLIG7s7VGIr/NSIUb81fsU4QmoHGijKav3Rw7XWc8TpA6iTAefsOEJHph+9d6Q==
   dependencies:
-    "@klever/connect-core" "0.1.1"
-    "@klever/connect-encoding" "0.1.1"
-    "@klever/connect-provider" "0.1.1"
-    "@klever/connect-transactions" "0.1.1"
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-encoding" "0.1.3"
+    "@klever/connect-provider" "0.2.0"
+    "@klever/connect-transactions" "0.1.5"
 
-"@klever/connect-core@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect-core/-/connect-core-0.1.1.tgz"
-  integrity sha512-lDZ0t1+XNYxmjNoFlgH9SX+BuNCiBkchZDXG6J+6fEC1iBAWXExQL4jpAsRj6Qq0i9esREtL3saF0vfZNdUzvw==
+"@klever/connect-core@0.1.3", "@klever/connect-core@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@klever/connect-core/-/connect-core-0.1.3.tgz#b2f56d914b5deeeea166943db154a706f551b4b4"
+  integrity sha512-CVb93afmcNirS+rQq62/Jv+mmikoTWczK5TDBBX45DB6F0BRHLsdlIHEopj2I9Yt38dayPO0J5iVk8p2OZf0eQ==
   dependencies:
-    "@klever/connect-encoding" "0.1.1"
+    "@klever/connect-encoding" "0.1.3"
 
-"@klever/connect-crypto@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect-crypto/-/connect-crypto-0.1.1.tgz"
-  integrity sha512-392ICcj/Rm7n8hpd1ztuaEEUB41hi7It0qf0vg29NVtYdpxNFb5Lc8FZO3jEKC5vlK9mzEuIAsq4tXbvATS4jg==
+"@klever/connect-crypto@0.1.3", "@klever/connect-crypto@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@klever/connect-crypto/-/connect-crypto-0.1.3.tgz#b67f82298e413182ca2ce3d5236569d9263aa244"
+  integrity sha512-r6LDeg3gf1VHcac0uHFzved1cxftIDl9v9WDREWkrjshnurdXNBdTGr/YzzABR46pu/h6GI9HkxpQ3278qgTxQ==
   dependencies:
-    "@klever/connect-core" "0.1.1"
-    "@klever/connect-encoding" "0.1.1"
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-encoding" "0.1.3"
     "@noble/ed25519" "^2.0.0"
     "@noble/hashes" "^1.3.3"
     "@scure/base" "^2.0.0"
+    "@scure/bip32" "^1.3.0"
     "@scure/bip39" "^1.2.1"
 
-"@klever/connect-encoding@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect-encoding/-/connect-encoding-0.1.1.tgz"
-  integrity sha512-fZhc69cjqow6FgamWnAsef4O0SZQxv5b/dLKm3EPEAETGaDL3cO+nWSTCgwzjLON4CAj13DN57yaNIIgNuLqTw==
+"@klever/connect-encoding@0.1.3", "@klever/connect-encoding@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@klever/connect-encoding/-/connect-encoding-0.1.3.tgz#e0e85671d97fe375bb9cf92319539ad15450bcb7"
+  integrity sha512-NXnQUB5J5haKoJQHhbCEbYzk2FxS7VhNlZtUZWJ6UdcG7FVP0XWbQzw1Jh1BYEA5LhNgtJ23V0YKKSZUqd4Uew==
   dependencies:
     "@noble/hashes" "^1.3.3"
     "@scure/base" "^2.0.0"
 
-"@klever/connect-provider@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect-provider/-/connect-provider-0.1.1.tgz"
-  integrity sha512-ZR8wVwWZ4AK59tjUqKXMYmp8KqF7Vg1l424H2hOxU5l8ubNxw5PEWXs+k636fpusvh/BjnJ8QDGhc3elfQWMoQ==
+"@klever/connect-provider@0.2.0", "@klever/connect-provider@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@klever/connect-provider/-/connect-provider-0.2.0.tgz#1aba1a88a12d73c131bbb3a1c4f2b0f626498d6b"
+  integrity sha512-aDB7bovkwKLQddzmBOkLHAJTMkWPDSh/2d6i04WeFCU19gQcCgvKYQDJSZKQ+MYYjAQdH9NREuuxXSv5qwN/PQ==
   dependencies:
-    "@klever/connect-core" "0.1.1"
-    "@klever/connect-crypto" "0.1.1"
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-crypto" "0.1.3"
 
-"@klever/connect-transactions@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect-transactions/-/connect-transactions-0.1.1.tgz"
-  integrity sha512-cxil7f4Irr8DKBBjSl4U96Dw+CiOLHntOxMg0yTdSkPa/UpyvAkAv70fQ4Frk59nmPW8DIZvgCUsmsW19ZJx4g==
+"@klever/connect-react@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@klever/connect-react/-/connect-react-0.1.7.tgz#aed2e100e4bffe633688e45fd96d96fc3fb3ccee"
+  integrity sha512-bn99zPvtXgh1XrVZoFOIP/sO3Yjk4wdriEymWV6WYcFT5snekj+SmLO+gkyhtksbDiSfZugIlTshnh9Th3pVgw==
   dependencies:
-    "@klever/connect-core" "0.1.1"
-    "@klever/connect-crypto" "0.1.1"
-    "@klever/connect-encoding" "0.1.1"
-    "@klever/connect-provider" "0.1.1"
+    "@klever/connect" "0.1.6"
+    "@klever/connect-contracts" "0.2.1"
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-provider" "0.2.0"
+    "@klever/connect-transactions" "0.1.5"
+    "@klever/connect-wallet" "0.2.1"
 
-"@klever/connect-wallet@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect-wallet/-/connect-wallet-0.1.1.tgz"
-  integrity sha512-prCrE2AMLmvwq5yEJ/aDHTwwV3CgBpuOJNZPSFCf518oWIXfWhGHZszq+RkzKz2bzNl/T7dvKeTyfjIwY2w7MA==
+"@klever/connect-transactions@0.1.5", "@klever/connect-transactions@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@klever/connect-transactions/-/connect-transactions-0.1.5.tgz#51a7fe63540922f33eae9bab45decbad4658fb6d"
+  integrity sha512-30QFaO00yDpFMonrC+D5XhGrIZSUrW7QDqjvqLmRtP75Ni2sf5MZjmjVV8QynGS0bPNJBqxvzihKMFh84Cd/7w==
   dependencies:
-    "@klever/connect-core" "0.1.1"
-    "@klever/connect-crypto" "0.1.1"
-    "@klever/connect-encoding" "0.1.1"
-    "@klever/connect-provider" "0.1.1"
-    "@klever/connect-transactions" "0.1.1"
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-crypto" "0.1.3"
+    "@klever/connect-encoding" "0.1.3"
+    "@klever/connect-provider" "0.2.0"
 
-"@klever/connect@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.npmjs.org/@klever/connect/-/connect-0.1.1.tgz"
-  integrity sha512-+TaimMY1NzmkRgWF/RMOzjDEDeT98hDFitSeYW69ye74IZV54GvCz75je23wDpkDzLcAJ7jLpVAgAlk5xfzI/Q==
+"@klever/connect-wallet@0.2.1", "@klever/connect-wallet@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@klever/connect-wallet/-/connect-wallet-0.2.1.tgz#cbf161208bf58e62cc2014c1ce7cfe0137b4dd5b"
+  integrity sha512-Rt+ZygsjRx+koKCOl7nq2g3wrhD7f6Ra9N05aBl3N2h4vVJ8J1Vtfb15KH21vMTMC1D/R/x3SJeHQXr4Zj8aiQ==
   dependencies:
-    "@klever/connect-contracts" "0.1.1"
-    "@klever/connect-core" "0.1.1"
-    "@klever/connect-crypto" "0.1.1"
-    "@klever/connect-encoding" "0.1.1"
-    "@klever/connect-provider" "0.1.1"
-    "@klever/connect-transactions" "0.1.1"
-    "@klever/connect-wallet" "0.1.1"
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-crypto" "0.1.3"
+    "@klever/connect-encoding" "0.1.3"
+    "@klever/connect-provider" "0.2.0"
+    "@klever/connect-transactions" "0.1.5"
 
-"@klever/kleverweb@^1.3.2":
-  version "1.3.2"
-  resolved "https://registry.npmjs.org/@klever/kleverweb/-/kleverweb-1.3.2.tgz"
-  integrity sha512-ToHSw+qbArlI5xEG0hqmWbtDB0FYk5UxCCAPV4bDiMbXn8WolgjJkUvYZI6g3jq9tLkAo5fEbb3V8anpx4FuRw==
-
-"@klever/sdk-web@^1.4.1":
-  version "1.4.1"
-  resolved "https://registry.npmjs.org/@klever/sdk-web/-/sdk-web-1.4.1.tgz"
-  integrity sha512-U0W/G71VjlII/nsOUxf3oSgTAfRIZN9rSvVZtV5FznURbgPDr7vbg11U19Ls07NWqAMUkQ6j9tL4nsu8v2chkg==
+"@klever/connect@0.1.6", "@klever/connect@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@klever/connect/-/connect-0.1.6.tgz#c2242d061bef0011040f40492e19989a02a61e83"
+  integrity sha512-QKFGCBWvPs06trCEbt1T75XWJoiicozNy56mRdm0cl/gJ3fGHt0kwrridHUga1EQ28AWoqoCGJegEKnNSu+vyw==
   dependencies:
-    "@klever/kleverweb" "^1.3.2"
-    bech32 "^2.0.0"
-    buffer "^6.0.3"
+    "@klever/connect-contracts" "0.2.1"
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-crypto" "0.1.3"
+    "@klever/connect-encoding" "0.1.3"
+    "@klever/connect-provider" "0.2.0"
+    "@klever/connect-transactions" "0.1.5"
+    "@klever/connect-wallet" "0.2.1"
 
 "@microlink/react-json-view@^1.27.1":
   version "1.27.1"
@@ -2097,12 +2096,19 @@
   resolved "https://registry.yarnpkg.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-16.1.6.tgz#60c27323c30f35722b20fd6d62449fbb768e46d9"
   integrity sha512-NRfO39AIrzBnixKbjuo2YiYhB6o9d8v/ymU9m/Xk8cyVk+k7XylniXkHwjs4s70wedVffc6bQNbufk5v0xEm0A==
 
+"@noble/curves@~1.9.0":
+  version "1.9.7"
+  resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.9.7.tgz#79d04b4758a43e4bca2cbdc62e7771352fa6b951"
+  integrity sha512-gbKGcRUYIjA3/zCCNaWDciTMFI0dCkvou3TL8Zmy5Nc7sJ47a0jtOeZoTaMxkuqRo9cRhjOdZJXegxYE5FN/xw==
+  dependencies:
+    "@noble/hashes" "1.8.0"
+
 "@noble/ed25519@^2.0.0":
   version "2.3.0"
   resolved "https://registry.npmjs.org/@noble/ed25519/-/ed25519-2.3.0.tgz"
   integrity sha512-M7dvXL2B92/M7dw9+gzuydL8qn/jiqNHaoR3Q+cb1q1GHV7uwE17WCyFMG+Y+TZb5izcaXk5TdJRrDUxHXL78A==
 
-"@noble/hashes@^1.3.3", "@noble/hashes@~1.8.0":
+"@noble/hashes@1.8.0", "@noble/hashes@^1.3.3", "@noble/hashes@~1.8.0":
   version "1.8.0"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.8.0.tgz"
   integrity sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==
@@ -2215,6 +2221,15 @@
   version "1.2.6"
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.2.6.tgz"
   integrity sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==
+
+"@scure/bip32@^1.3.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@scure/bip32/-/bip32-1.7.0.tgz#b8683bab172369f988f1589640e53c4606984219"
+  integrity sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw==
+  dependencies:
+    "@noble/curves" "~1.9.0"
+    "@noble/hashes" "~1.8.0"
+    "@scure/base" "~1.2.5"
 
 "@scure/bip39@^1.2.1":
   version "1.6.0"
@@ -3775,14 +3790,6 @@ buffer@^5.7.1:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
-
-buffer@^6.0.3:
-  version "6.0.3"
-  resolved "https://registry.npmjs.org/buffer/-/buffer-6.0.3.tgz"
-  integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
-  dependencies:
-    base64-js "^1.3.1"
-    ieee754 "^1.2.1"
 
 cachedir@^2.3.0:
   version "2.4.0"
@@ -6080,7 +6087,7 @@ iconv-lite@0.6.3:
   dependencies:
     safer-buffer ">= 2.1.2 < 3.0.0"
 
-ieee754@^1.1.13, ieee754@^1.2.1:
+ieee754@^1.1.13:
   version "1.2.1"
   resolved "https://registry.npmjs.org/ieee754/-/ieee754-1.2.1.tgz"
   integrity sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==

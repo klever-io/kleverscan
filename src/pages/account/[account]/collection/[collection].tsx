@@ -24,6 +24,7 @@ import {
   setQueryAndRouter,
   storageViewMode,
 } from '@/utils';
+import ExplorerLink from '@/components/ExplorerLink';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -272,13 +273,12 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
           },
           {
             element: props => (
-              <Link href={`/account/${address}`} key={address} legacyBehavior>
-                {isMobile
-                  ? parseAddress(address, 14)
-                  : address || isTablet
-                    ? parseAddress(address, 20)
-                    : address}
-              </Link>
+              <ExplorerLink
+                type="account"
+                value={address}
+                label={parseAddress(address, isMobile ? 14 : 20)}
+                compact
+              />
             ),
             span: 1,
           },

@@ -9,7 +9,6 @@ import {
 } from '@/services/requests/multisign';
 import { ITransaction as ITransactionDecoded } from '@/types/index';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { ITransaction } from '@klever/sdk-web';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -20,6 +19,12 @@ import { DecodedRawData } from './DecodedRawData';
 import { OverviewInfo } from './OverviewInfo';
 import { ButtonsComponent } from './ButtonsComponent';
 import { EmptyTransaction } from './EmptyTransaction';
+
+interface ITransaction {
+  RawData: Record<string, unknown>;
+  Signature?: string[];
+  [key: string]: unknown;
+}
 
 interface IMultisignSigenrers {
   address: string;

@@ -1,4 +1,5 @@
 import Copy from '@/components/Copy';
+import ExplorerLink from '@/components/ExplorerLink';
 import Table, { ITable } from '@/components/Table';
 import { smartContractsTableRequest } from '@/services/requests/smartContracts';
 import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
@@ -7,7 +8,6 @@ import { SmartContractsList } from '@/types/smart-contract';
 import { smartContractsTableHeaders } from '@/utils/contracts';
 import { formatDate } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { PropsWithChildren } from 'react';
 import Filters from '../SmartContractFilters';
@@ -40,14 +40,12 @@ const smartContractsListRowSections = (
             <span>{name || '- -'}</span>
           </CenteredRow>
           <CenteredRow>
-            <Link
-              href={`/smart-contract/${contractAddress}`}
-              key={contractAddress}
-              data-testid="smart-contract-link"
-            >
-              <Mono>{parseAddress(contractAddress, 25)}</Mono>
-            </Link>
-            <Copy data={contractAddress} info="contractAddress" />
+            <ExplorerLink
+              type="smart-contract"
+              value={contractAddress}
+              label={parseAddress(contractAddress, 25)}
+              compact
+            />
           </CenteredRow>
         </DoubleRow>
       ),
@@ -66,10 +64,12 @@ const smartContractsListRowSections = (
     {
       element: props => (
         <CenteredRow>
-          <Link href={`/account/${deployer}`} key={contractAddress}>
-            <Mono>{parseAddress(deployer, 25)}</Mono>
-          </Link>
-          <Copy data={deployer} info="deployer" />
+          <ExplorerLink
+            type="account"
+            value={deployer}
+            label={parseAddress(deployer, 25)}
+            compact
+          />
         </CenteredRow>
       ),
       span: 1,

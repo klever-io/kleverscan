@@ -346,6 +346,7 @@ export const CenteredRow = styled.div`
 
 export const Mono = styled.span`
   font-family: 'Fira Mono', monospace;
+  font-weight: 400;
 `;
 
 export const FrozenContainer = styled.div`

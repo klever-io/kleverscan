@@ -1987,10 +1987,20 @@
     "@klever/connect-transactions" "0.1.4"
     "@klever/connect-wallet" "0.2.0"
 
-"@klever/connect-transactions@0.1.4", "@klever/connect-transactions@^0.1.4":
+"@klever/connect-transactions@0.1.4":
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/@klever/connect-transactions/-/connect-transactions-0.1.4.tgz#c8325a440c721e686b3f18268e6cf8988f52beb7"
   integrity sha512-I+dlclHxVlkR+3qdVyiTkJWVr5LlJpjBB9SCnCoLYa901ykiMMRzBkaipDgTyRxfc2Tr1ajUlyLO34d46jmHyg==
+  dependencies:
+    "@klever/connect-core" "0.1.3"
+    "@klever/connect-crypto" "0.1.3"
+    "@klever/connect-encoding" "0.1.3"
+    "@klever/connect-provider" "0.2.0"
+
+"@klever/connect-transactions@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@klever/connect-transactions/-/connect-transactions-0.1.5.tgz#51a7fe63540922f33eae9bab45decbad4658fb6d"
+  integrity sha512-30QFaO00yDpFMonrC+D5XhGrIZSUrW7QDqjvqLmRtP75Ni2sf5MZjmjVV8QynGS0bPNJBqxvzihKMFh84Cd/7w==
   dependencies:
     "@klever/connect-core" "0.1.3"
     "@klever/connect-crypto" "0.1.3"

@@ -51,6 +51,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
+import ExplorerLink from '@/components/ExplorerLink';
 
 const isContractValidationEnabled =
   process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
@@ -78,11 +79,11 @@ const SmartContractInvoke: React.FC = () => {
 
   const { data: latestJob, refetch: refetchJob } = useQuery({
     queryKey: ['latestJob', contractAddress],
-    queryFn: () => fetchLatestJob(contractAddress),
+    queryFn: () => fetchLatestJob(contractAddress, refetchContractInfo),
     enabled: !!contractAddress && isOwner && isContractValidationEnabled,
     refetchInterval: query => {
       const status = query.state.data?.status;
-      if (status === 'pending' || status === 'running') return 3000;
+      if (status === 'pending' || status === 'running') return 10000;
       return false;
     },
   });
@@ -199,7 +200,6 @@ const SmartContractInvoke: React.FC = () => {
             hasVerifiedVersions={hasVerifiedVersions}
             onSubmitted={() => {
               refetchJob();
-              refetchContractInfo();
             }}
           />
         );
@@ -240,12 +240,14 @@ const SmartContractInvoke: React.FC = () => {
               <strong>Owner</strong>
             </span>
             <span>
-              <CenteredRow>
-                <Link href={`/account/${scData?.deployer}`}>
-                  {parseAddress(scData?.deployer || '', isMobile ? 35 : NaN)}
-                </Link>
-                <Copy data={scData?.deployer} info="Owner" />
-              </CenteredRow>
+              <ExplorerLink
+                type="account"
+                value={scData?.deployer || ''}
+                label={parseAddress(
+                  scData?.deployer || '',
+                  isMobile ? 35 : NaN,
+                )}
+              />
             </span>
           </Row>
           <Row>
@@ -253,12 +255,11 @@ const SmartContractInvoke: React.FC = () => {
               <strong>Address</strong>
             </span>
             <span>
-              <CenteredRow>
-                <Link href={`/account/${contractAddress}`}>
-                  {parseAddress(contractAddress, isMobile ? 35 : NaN)}
-                </Link>
-                <Copy data={contractAddress} info="Contract Address" />
-              </CenteredRow>
+              <ExplorerLink
+                type="account"
+                value={contractAddress}
+                label={parseAddress(contractAddress, isMobile ? 35 : NaN)}
+              />
             </span>
           </Row>
           <Row>

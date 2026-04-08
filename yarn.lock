@@ -1929,15 +1929,15 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@klever/connect-contracts@0.2.0", "@klever/connect-contracts@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@klever/connect-contracts/-/connect-contracts-0.2.0.tgz#0757e44845ae176da1ef4624feac28e6535a0110"
-  integrity sha512-F1mwYgXhF8KOJpPfGLV39Efau/NcPNnvf16Sc62vaqbKGhqu97B+IKXyAXuB6Nnk7TU7OpTKMZ6UeQqi+938gQ==
+"@klever/connect-contracts@0.2.1", "@klever/connect-contracts@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@klever/connect-contracts/-/connect-contracts-0.2.1.tgz#80e7e113e1f29128dd0fe437b40f1b97ff440621"
+  integrity sha512-Vw6leUNeCWIBipAERpL6aJxaKLIG7s7VGIr/NSIUb81fsU4QmoHGijKav3Rw7XWc8TpA6iTAefsOEJHph+9d6Q==
   dependencies:
     "@klever/connect-core" "0.1.3"
     "@klever/connect-encoding" "0.1.3"
     "@klever/connect-provider" "0.2.0"
-    "@klever/connect-transactions" "0.1.4"
+    "@klever/connect-transactions" "0.1.5"
 
 "@klever/connect-core@0.1.3", "@klever/connect-core@^0.1.3":
   version "0.1.3"
@@ -1975,29 +1975,19 @@
     "@klever/connect-core" "0.1.3"
     "@klever/connect-crypto" "0.1.3"
 
-"@klever/connect-react@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@klever/connect-react/-/connect-react-0.1.6.tgz#9388c2bfcff4bf3af48efbe4c08f3eef190fa6b2"
-  integrity sha512-F0+Sb85dfy0Q9sp9+M1U2+mFh+Kkk7usGZqOYLiGfFqUZ2xkipkI9lr20yMMB/Pa0JS5z73BC0ccTdzeHTpy2A==
+"@klever/connect-react@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@klever/connect-react/-/connect-react-0.1.7.tgz#aed2e100e4bffe633688e45fd96d96fc3fb3ccee"
+  integrity sha512-bn99zPvtXgh1XrVZoFOIP/sO3Yjk4wdriEymWV6WYcFT5snekj+SmLO+gkyhtksbDiSfZugIlTshnh9Th3pVgw==
   dependencies:
-    "@klever/connect" "0.1.5"
-    "@klever/connect-contracts" "0.2.0"
+    "@klever/connect" "0.1.6"
+    "@klever/connect-contracts" "0.2.1"
     "@klever/connect-core" "0.1.3"
     "@klever/connect-provider" "0.2.0"
-    "@klever/connect-transactions" "0.1.4"
-    "@klever/connect-wallet" "0.2.0"
+    "@klever/connect-transactions" "0.1.5"
+    "@klever/connect-wallet" "0.2.1"
 
-"@klever/connect-transactions@0.1.4":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@klever/connect-transactions/-/connect-transactions-0.1.4.tgz#c8325a440c721e686b3f18268e6cf8988f52beb7"
-  integrity sha512-I+dlclHxVlkR+3qdVyiTkJWVr5LlJpjBB9SCnCoLYa901ykiMMRzBkaipDgTyRxfc2Tr1ajUlyLO34d46jmHyg==
-  dependencies:
-    "@klever/connect-core" "0.1.3"
-    "@klever/connect-crypto" "0.1.3"
-    "@klever/connect-encoding" "0.1.3"
-    "@klever/connect-provider" "0.2.0"
-
-"@klever/connect-transactions@^0.1.5":
+"@klever/connect-transactions@0.1.5", "@klever/connect-transactions@^0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@klever/connect-transactions/-/connect-transactions-0.1.5.tgz#51a7fe63540922f33eae9bab45decbad4658fb6d"
   integrity sha512-30QFaO00yDpFMonrC+D5XhGrIZSUrW7QDqjvqLmRtP75Ni2sf5MZjmjVV8QynGS0bPNJBqxvzihKMFh84Cd/7w==
@@ -2007,29 +1997,29 @@
     "@klever/connect-encoding" "0.1.3"
     "@klever/connect-provider" "0.2.0"
 
-"@klever/connect-wallet@0.2.0", "@klever/connect-wallet@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@klever/connect-wallet/-/connect-wallet-0.2.0.tgz#df4d502a46b9967698c04713f937a67d671d22e3"
-  integrity sha512-s/3s/mEPEH6Gq5vfJG4cnqfR1QBieo1e8pngD+c8buBQ7deDhGLTC4lYlAym/FB171gQAFjZmIbwJMymL/5zpg==
+"@klever/connect-wallet@0.2.1", "@klever/connect-wallet@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@klever/connect-wallet/-/connect-wallet-0.2.1.tgz#cbf161208bf58e62cc2014c1ce7cfe0137b4dd5b"
+  integrity sha512-Rt+ZygsjRx+koKCOl7nq2g3wrhD7f6Ra9N05aBl3N2h4vVJ8J1Vtfb15KH21vMTMC1D/R/x3SJeHQXr4Zj8aiQ==
   dependencies:
     "@klever/connect-core" "0.1.3"
     "@klever/connect-crypto" "0.1.3"
     "@klever/connect-encoding" "0.1.3"
     "@klever/connect-provider" "0.2.0"
-    "@klever/connect-transactions" "0.1.4"
+    "@klever/connect-transactions" "0.1.5"
 
-"@klever/connect@0.1.5", "@klever/connect@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@klever/connect/-/connect-0.1.5.tgz#781bc54980890842c7abbada06148a19e813c4a0"
-  integrity sha512-iz/8cPNCXr5KNv8pkrweUvRNHQ8tnjMRwgGs0ASYUHaBAMUKOi6U1TfJDhKlmfO/HLULiv1uzfVsqyID9kcUIA==
+"@klever/connect@0.1.6", "@klever/connect@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@klever/connect/-/connect-0.1.6.tgz#c2242d061bef0011040f40492e19989a02a61e83"
+  integrity sha512-QKFGCBWvPs06trCEbt1T75XWJoiicozNy56mRdm0cl/gJ3fGHt0kwrridHUga1EQ28AWoqoCGJegEKnNSu+vyw==
   dependencies:
-    "@klever/connect-contracts" "0.2.0"
+    "@klever/connect-contracts" "0.2.1"
     "@klever/connect-core" "0.1.3"
     "@klever/connect-crypto" "0.1.3"
     "@klever/connect-encoding" "0.1.3"
     "@klever/connect-provider" "0.2.0"
-    "@klever/connect-transactions" "0.1.4"
-    "@klever/connect-wallet" "0.2.0"
+    "@klever/connect-transactions" "0.1.5"
+    "@klever/connect-wallet" "0.2.1"
 
 "@microlink/react-json-view@^1.27.1":
   version "1.27.1"

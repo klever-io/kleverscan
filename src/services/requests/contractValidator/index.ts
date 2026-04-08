@@ -4,11 +4,16 @@ const BASE = '/api/contract-validator';
 
 export const fetchLatestJob = async (
   contractAddress: string,
+  refetchContractInfo: () => void,
 ): Promise<ValidationJob | null> => {
   const res = await fetch(`${BASE}/${contractAddress}/jobs/latest`);
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to fetch latest job');
   const data = await res.json();
+  if (data.job?.status === 'completed') {
+    // Refetch contract info to get the latest verified version
+    refetchContractInfo();
+  }
   return data.job as ValidationJob;
 };
 
@@ -53,9 +58,10 @@ export const submitValidation = async (
 
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(
-      data.message || data.error || 'Validation submission failed',
-    );
+    const err = new Error(data.message || 'Validation submission failed', {
+      cause: data?.error || undefined,
+    }) as Error;
+    throw err;
   }
   return data;
 };

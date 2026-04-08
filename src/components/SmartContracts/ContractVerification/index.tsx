@@ -429,6 +429,7 @@ function UploadForm({
   const [kscVersion, setKscVersion] = useState('');
   const [rustVersion, setRustVersion] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -441,6 +442,7 @@ function UploadForm({
       toast.error('KSC version is required');
       return;
     }
+    setSubmitError(null);
     setSubmitting(true);
     try {
       await submitValidation(contractAddress, file, kscVersion, rustVersion);
@@ -448,6 +450,7 @@ function UploadForm({
       onSubmitted();
     } catch (err: any) {
       toast.error(err.message || 'Submission failed');
+      if (err.cause) setSubmitError(err.cause);
     } finally {
       setSubmitting(false);
     }
@@ -456,6 +459,7 @@ function UploadForm({
   return (
     <form onSubmit={handleSubmit}>
       <UploadCard>
+        {submitError && <ErrorBox>{submitError}</ErrorBox>}
         <FormField>
           <label>Contract ZIP file</label>
           <input type="file" accept=".zip" ref={fileRef} />

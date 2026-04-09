@@ -132,6 +132,7 @@ export const ResultLabel = styled.span`
 export const EmptyState = styled.div`
   padding: 2rem;
   text-align: center;
+  color: ${({ theme }) => theme.black};
   opacity: 0.6;
   font-size: 0.9rem;
 `;

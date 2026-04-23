@@ -108,6 +108,7 @@ export interface ContractInfo {
   contractVersions: ContractVersion[];
   createdAt: string;
   updatedAt: string;
+  sourceUpToDate?: boolean;
 }
 
 export interface ISmartContractResponse extends IResponse {

@@ -21,11 +21,13 @@ export const StatusBadge = styled.span<{ status: ValidationJobStatus }>`
 `;
 
 export const VerificationBadge = styled.span<{ verified: boolean }>`
+  min-height: 34px;
+
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.75rem;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 0.8rem;
   font-weight: 600;
   background: ${({ verified, theme }) =>
@@ -294,17 +296,21 @@ export const SourceToolbar = styled.div`
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+  min-height: 60px;
 `;
 
 export const SelectorGroup = styled.div<{ pushRight?: boolean }>`
+  min-height: 60px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 0.25rem;
   ${({ pushRight }) => pushRight && 'margin-left: auto;'}
 `;
 
 export const SelectorLabel = styled.span`
   font-size: 0.875rem;
+  min-height: 24px;
   color: ${({ theme }) => theme.black};
 
   display: flex;
@@ -342,6 +348,7 @@ export const DropdownTrigger = styled.button`
   cursor: pointer;
   outline: none;
   min-width: 80px;
+  min-height: 34px;
   white-space: nowrap;
 
   &:focus {

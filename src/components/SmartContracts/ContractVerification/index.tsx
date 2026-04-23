@@ -73,10 +73,7 @@ export function ContractSourceTab({
   const [selectedVersion, setSelectedVersion] = useState(latestVersion);
   const [selectedFile, setSelectedFile] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'source' | 'abi'>('source');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem('contractSourceViewMode');
-    return saved === 'ide' || saved === 'tabs' ? saved : 'tabs';
-  });
+  const [viewMode, setViewMode] = useState<ViewMode>('tabs');
 
   const { data: sourceFiles, isLoading } = useQuery({
     queryKey: ['sourceFiles', contractAddress, selectedVersion],
@@ -137,6 +134,15 @@ export function ContractSourceTab({
     isLatestVersionSelected &&
     typeof contractInfo.sourceUpToDate === 'boolean';
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const saved = window.localStorage.getItem('contractSourceViewMode');
+    if (saved === 'ide' || saved === 'tabs') {
+      setViewMode(saved);
+    }
+  }, []);
+
   return (
     <SourceSection>
       <SourceToolbar>
@@ -186,7 +192,9 @@ export function ContractSourceTab({
             align="right"
             onChange={mode => {
               setViewMode(mode);
-              localStorage.setItem('contractSourceViewMode', mode);
+              if (typeof window !== 'undefined') {
+                window.localStorage.setItem('contractSourceViewMode', mode);
+              }
             }}
           />
         </SelectorGroup>

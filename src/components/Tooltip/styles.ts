@@ -25,6 +25,10 @@ export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
     white-space: normal;
   }
 
+  > svg {
+    display: block;
+  }
+
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     div {
       max-width: 100vw;

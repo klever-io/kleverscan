@@ -42,7 +42,7 @@ export const ButtonsComponent: React.FC<
   multiSignDataRef,
   refetchMultisignData,
 }) => {
-  const { wallet } = useExtension();
+  const { wallet, walletAddress } = useExtension();
   const multisignTotalWeight =
     multiSignData?.signers?.filter(e => e.signed)?.length || 0;
 
@@ -208,7 +208,7 @@ export const ButtonsComponent: React.FC<
 
         const parseMultisignTransaction = {
           hash: multiSignData?.hash,
-          address: multiSignData?.address,
+          address: walletAddress,
           raw: parsedWithSignatures,
         };
 

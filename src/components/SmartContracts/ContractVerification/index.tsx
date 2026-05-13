@@ -20,8 +20,10 @@ import React, {
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { dracula, xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import { toast } from 'react-toastify';
+import { AiFillCheckCircle, AiFillExclamationCircle } from 'react-icons/ai';
 import {
   StatusBadge,
+  VerificationBadge,
   UploadCard,
   FormField,
   SubmitButton,
@@ -35,11 +37,6 @@ import {
   SourceToolbar,
   SelectorGroup,
   SelectorLabel,
-  VersionSelector,
-  DropdownContainer,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   EmptyState,
   Spinner,
   IdeLayout,
@@ -53,6 +50,8 @@ import {
   IdeEditorTabBar,
   IdeEditorTab,
 } from './styles';
+import Tooltip from '@/components/Tooltip';
+import SelectorDropdown from './SelectorDropdown';
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react'));
 
@@ -75,8 +74,6 @@ export function ContractSourceTab({
   const [selectedFile, setSelectedFile] = useState<string>('');
   const [activeTab, setActiveTab] = useState<'source' | 'abi'>('source');
   const [viewMode, setViewMode] = useState<ViewMode>('tabs');
-  const [viewDropdownOpen, setViewDropdownOpen] = useState(false);
-  const viewDropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: sourceFiles, isLoading } = useQuery({
     queryKey: ['sourceFiles', contractAddress, selectedVersion],
@@ -113,19 +110,14 @@ export function ContractSourceTab({
     tabs: 'File tabs',
     ide: 'IDE',
   };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        viewDropdownRef.current &&
-        !viewDropdownRef.current.contains(e.target as Node)
-      ) {
-        setViewDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const versionOptions = [...versions].reverse().map(v => ({
+    value: v.version,
+    label: `v${v.version} — ${new Date(v.createdAt).toLocaleDateString()}`,
+  }));
+  const viewOptions = (['tabs', 'ide'] as ViewMode[]).map(mode => ({
+    value: mode,
+    label: viewModeLabels[mode],
+  }));
 
   const selectIdeFile = (name: string) => {
     setSelectedFile(name);
@@ -136,53 +128,75 @@ export function ContractSourceTab({
     }
   };
 
+  const isLatestVersionSelected = selectedVersion === latestVersion;
+  const showVerificationBadge =
+    versions.length > 0 &&
+    isLatestVersionSelected &&
+    typeof contractInfo.sourceUpToDate === 'boolean';
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const saved = window.localStorage.getItem('contractSourceViewMode');
+    if (saved === 'ide' || saved === 'tabs') {
+      setViewMode(saved);
+    }
+  }, []);
+
   return (
     <SourceSection>
       <SourceToolbar>
         {versions.length > 1 && (
           <SelectorGroup>
             <SelectorLabel>Version</SelectorLabel>
-            <VersionSelector
+            <SelectorDropdown
               value={selectedVersion}
-              onChange={e => {
-                setSelectedVersion(Number(e.target.value));
+              options={versionOptions}
+              onChange={version => {
+                setSelectedVersion(version);
                 setSelectedFile('');
               }}
-            >
-              {[...versions].reverse().map(v => (
-                <option key={v.version} value={v.version}>
-                  v{v.version} — {new Date(v.createdAt).toLocaleDateString()}
-                </option>
-              ))}
-            </VersionSelector>
+            />
+          </SelectorGroup>
+        )}
+
+        {showVerificationBadge && (
+          <SelectorGroup>
+            <SelectorLabel>
+              <span>Source Code Verified</span>
+              <Tooltip
+                msg={`This contract's deployed bytecode matches its submitted source code.\nSource code verification does not imply the contract is safe to interact with.`}
+              />
+            </SelectorLabel>
+            <VerificationBadge verified={!!contractInfo.sourceUpToDate}>
+              {contractInfo.sourceUpToDate ? (
+                <>
+                  <AiFillCheckCircle />
+                  Verified
+                </>
+              ) : (
+                <>
+                  <AiFillExclamationCircle />
+                  Outdated
+                </>
+              )}
+            </VerificationBadge>
           </SelectorGroup>
         )}
 
         <SelectorGroup pushRight>
           <SelectorLabel>View</SelectorLabel>
-          <DropdownContainer ref={viewDropdownRef}>
-            <DropdownTrigger
-              type="button"
-              onClick={() => setViewDropdownOpen(o => !o)}
-            >
-              {viewModeLabels[viewMode]}
-            </DropdownTrigger>
-            <DropdownMenu active={viewDropdownOpen}>
-              {(['tabs', 'ide'] as ViewMode[]).map(mode => (
-                <DropdownItem
-                  key={mode}
-                  type="button"
-                  selected={viewMode === mode}
-                  onClick={() => {
-                    setViewMode(mode);
-                    setViewDropdownOpen(false);
-                  }}
-                >
-                  {viewModeLabels[mode]}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </DropdownContainer>
+          <SelectorDropdown
+            value={viewMode}
+            options={viewOptions}
+            align="right"
+            onChange={mode => {
+              setViewMode(mode);
+              if (typeof window !== 'undefined') {
+                window.localStorage.setItem('contractSourceViewMode', mode);
+              }
+            }}
+          />
         </SelectorGroup>
       </SourceToolbar>
 

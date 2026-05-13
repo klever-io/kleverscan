@@ -20,6 +20,28 @@ export const StatusBadge = styled.span<{ status: ValidationJobStatus }>`
   }};
 `;
 
+export const VerificationBadge = styled.span<{ verified: boolean }>`
+  min-height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: ${({ verified, theme }) =>
+    verified ? theme.green : theme.warning.background};
+  color: ${({ verified, theme }) =>
+    verified ? theme.true.white : theme.warning.text};
+  border: 1px solid
+    ${({ verified, theme }) => (verified ? theme.green : theme.warning.text)};
+
+  svg {
+    font-size: 0.95rem;
+  }
+`;
+
 export const UploadCard = styled.div`
   display: flex;
   flex-direction: column;
@@ -274,18 +296,26 @@ export const SourceToolbar = styled.div`
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+  min-height: 60px;
 `;
 
 export const SelectorGroup = styled.div<{ pushRight?: boolean }>`
+  min-height: 60px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 0.25rem;
   ${({ pushRight }) => pushRight && 'margin-left: auto;'}
 `;
 
 export const SelectorLabel = styled.span`
   font-size: 0.875rem;
+  min-height: 24px;
   color: ${({ theme }) => theme.black};
+
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
 `;
 
 const FadeIn = keyframes`
@@ -318,6 +348,8 @@ export const DropdownTrigger = styled.button`
   cursor: pointer;
   outline: none;
   min-width: 80px;
+  min-height: 34px;
+  white-space: nowrap;
 
   &:focus {
     border-color: ${({ theme }) => theme.violet};
@@ -329,10 +361,13 @@ export const DropdownTrigger = styled.button`
   }
 `;
 
-export const DropdownMenu = styled.div<{ active: boolean }>`
+export const DropdownMenu = styled.div<{
+  active: boolean;
+  align?: 'left' | 'right';
+}>`
   position: absolute;
   top: calc(100% + 4px);
-  right: 0;
+  ${({ align = 'left' }) => (align === 'right' ? 'right: 0;' : 'left: 0;')}
   min-width: 100%;
   padding: 0.35rem;
   background: ${({ theme }) => theme.white};
@@ -373,21 +408,6 @@ export const DropdownItem = styled.button<{ selected: boolean }>`
   &:hover {
     background: ${({ selected, theme }) =>
       selected ? theme.violet : theme.black20};
-  }
-`;
-
-export const VersionSelector = styled.select`
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid ${({ theme }) => theme.black20};
-  background: transparent;
-  color: ${({ theme }) => theme.black};
-  font-size: 0.875rem;
-  cursor: pointer;
-  outline: none;
-
-  &:focus {
-    border-color: ${({ theme }) => theme.violet};
   }
 `;
 

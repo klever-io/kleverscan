@@ -71,7 +71,11 @@ const SmartContractInvoke: React.FC = () => {
   const isOwner =
     !!walletAddress && !!scData?.deployer && walletAddress === scData.deployer;
 
-  const { data: contractInfo, refetch: refetchContractInfo } = useQuery({
+  const {
+    data: contractInfo,
+    isLoading: isContractInfoLoading,
+    refetch: refetchContractInfo,
+  } = useQuery({
     queryKey: ['contractInfo', contractAddress],
     queryFn: () => fetchContractInfo(contractAddress),
     enabled: !!contractAddress && isContractValidationEnabled,
@@ -167,11 +171,24 @@ const SmartContractInvoke: React.FC = () => {
     },
   ];
 
-  const SelectedComponent = () => {
+  const renderSelectedTab = () => {
     switch (selectedTab) {
       case 'Transactions':
         return <SmartContractsTransactions contractAddress={contractAddress} />;
       case 'Contract Source':
+        if (isContractInfoLoading)
+          return (
+            <div
+              style={{
+                padding: '2rem',
+                textAlign: 'center',
+                opacity: 0.6,
+                fontSize: '0.9rem',
+              }}
+            >
+              Loading contract data...
+            </div>
+          );
         return contractInfo ? (
           <ContractSourceTab
             contractAddress={contractAddress}
@@ -319,7 +336,7 @@ const SmartContractInvoke: React.FC = () => {
             </CardHeaderItem>
           ))}
         </CardHeader>
-        <SelectedComponent />
+        {renderSelectedTab()}
       </CardTabContainer>
     </Container>
   );

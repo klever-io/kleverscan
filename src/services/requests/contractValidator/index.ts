@@ -24,7 +24,11 @@ export const fetchContractInfo = async (
   if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to fetch contract info');
   const data = await res.json();
-  return data.contractInfo as ContractInfo;
+  if (!data.contractInfo) return null;
+  return {
+    ...(data.contractInfo as ContractInfo),
+    sourceUpToDate: data.sourceUpToDate,
+  };
 };
 
 export const fetchSourceFiles = async (

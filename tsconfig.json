@@ -9,7 +9,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "types": ["@types/gtag.js", "@types/jest"],
@@ -18,6 +18,7 @@
     "baseUrl": "src/",
     "paths": {
       "react": ["../node_modules/@types/react"],
+      "react-hook-form": ["../node_modules/react-hook-form/dist/index.d.ts"],
       "@/*": ["./*"]
     },
     "incremental": true

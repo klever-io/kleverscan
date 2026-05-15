@@ -24,8 +24,10 @@ export const CreateAssetSplitRoyalties: React.FC<
   const {
     control,
     register,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'splitRoyalties',

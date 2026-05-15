@@ -19,7 +19,7 @@ import {
 export const CreateAssetStakingStep: React.FC<
   PropsWithChildren<IWizardComponents>
 > = ({ handleStep, t }) => {
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const [staking, setStaking] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 

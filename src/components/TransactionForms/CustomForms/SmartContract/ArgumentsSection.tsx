@@ -74,7 +74,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
 }) => {
   const [isVariadic, setIsVariadic] = useState(false);
   const [argument, setArgument] = useState({});
-  const { control, getValues, watch } = useFormContext();
+  const { control, getValues, watch } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove, replace } = useFieldArray({
     control,

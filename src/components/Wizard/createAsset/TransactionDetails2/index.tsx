@@ -13,7 +13,7 @@ export const TransactionDetails2: React.FC<{
   additionalFields?: boolean;
 }> = ({ assetType, additionalFields }) => {
   const { t } = useTranslation('wizards');
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const name = watch('name');
   const ticker = watch('ticker');
   const maxSupply = watch('maxSupply');

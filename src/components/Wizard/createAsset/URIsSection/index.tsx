@@ -27,8 +27,10 @@ export const URIsSection: React.FC<PropsWithChildren<IAssetInformations>> = ({
   const {
     control,
     register,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'uris',

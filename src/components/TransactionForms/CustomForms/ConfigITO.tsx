@@ -196,7 +196,7 @@ const WhitelistConfigSection: React.FC<PropsWithChildren<ISectionProps>> = ({
 export const WhitelistSection: React.FC<
   PropsWithChildren<{ top?: number }>
 > = ({ top }) => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,
@@ -242,7 +242,7 @@ export const WhitelistSection: React.FC<
 export const PackInfoSection: React.FC<
   PropsWithChildren<{ top?: number; collection?: ICollectionList }>
 > = ({ top, collection }) => {
-  const { control, watch, trigger } = useFormContext();
+  const { control, watch, trigger } = useFormContext<any>();
   const {
     fields,
     append: appendPackInfo,
@@ -345,7 +345,7 @@ const PackSection = ({
   asset?: ICollectionList;
   currency?: IAsset;
 }) => {
-  const { control, getValues, setValue, watch } = useFormContext();
+  const { control, getValues, setValue, watch } = useFormContext<any>();
 
   const fieldArray = useFieldArray({
     control,
@@ -450,7 +450,7 @@ const NFTPackItems = ({
   currency,
   asset,
 }: any) => {
-  const { control, setValue } = useFormContext();
+  const { control, setValue } = useFormContext<any>();
   const { fields, remove: removePack, replace } = fieldArray;
 
   const lastPack = packIndex === fields?.length - 1;
@@ -496,7 +496,7 @@ const FungibleMultiPackItems = ({
   currency,
   asset,
 }: any) => {
-  const { control, setValue, trigger } = useFormContext();
+  const { control, setValue, trigger } = useFormContext<any>();
   const { fields, remove: removePack, replace } = fieldArray;
 
   useEffect(() => {
@@ -578,7 +578,7 @@ const SinglePackItem = ({
   currency,
   asset,
 }: any) => {
-  const { control, setValue } = useFormContext();
+  const { control, setValue } = useFormContext<any>();
   const { fields, remove: removePack, replace } = fieldArray;
 
   useEffect(() => {

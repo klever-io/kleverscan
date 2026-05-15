@@ -14,7 +14,7 @@ export const SelectStakingTypeComponent: React.FC<
   PropsWithChildren<IWizardStakingComponents>
 > = ({ handleStep, setCurrentStep }) => {
   const { t } = useTranslation('wizards');
-  const { setValue } = useFormContext();
+  const { setValue } = useFormContext<any>();
 
   const buttonsProps = {
     handleStep,

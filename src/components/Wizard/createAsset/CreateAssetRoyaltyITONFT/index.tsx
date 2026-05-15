@@ -10,8 +10,10 @@ export const CreateAssetRoyaltyITONFT: React.FC<PropsWithChildren<any>> = ({
   const {
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const ticker = watch('ticker');
   let errorTransferFixed = errors?.royalties?.percentTransferFixed;

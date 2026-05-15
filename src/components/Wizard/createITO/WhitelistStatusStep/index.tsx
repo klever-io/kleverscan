@@ -18,9 +18,11 @@ export const WhitelistStatusStep: React.FC<
   statusOptions;
   const {
     setValue,
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const whitelistStatus = watch('whitelistStatus');
   let error = errors?.whitelistStatus;
 

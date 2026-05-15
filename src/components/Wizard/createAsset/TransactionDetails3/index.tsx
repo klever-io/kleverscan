@@ -11,7 +11,7 @@ export const TransactionDetails3: React.FC<
   PropsWithChildren<{ assetType?: number }>
 > = ({ assetType }) => {
   const { t } = useTranslation(['wizards', 'common']);
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const properties = watch('properties');
   const assetText = assetType === 0 ? 'TOKEN' : 'NFT';
 

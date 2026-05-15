@@ -31,8 +31,10 @@ export const CreateITOThirdStep: React.FC<
     setValue,
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const { walletAddress } = useExtension();
 

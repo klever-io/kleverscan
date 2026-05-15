@@ -20,7 +20,7 @@ import { assetsTooltip as tooltip } from '../../utils/tooltips';
 export const SplitRoyaltiesSection: React.FC<
   PropsWithChildren<ISectionProps>
 > = ({ isFungible }) => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,

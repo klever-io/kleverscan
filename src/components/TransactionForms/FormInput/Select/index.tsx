@@ -47,7 +47,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   defaultValue,
   ...rest
 }) => {
-  const { register, setValue, getValues } = useFormContext();
+  const { register, setValue, getValues } = useFormContext<any>();
 
   const { isMultiContract } = useMulticontract();
 

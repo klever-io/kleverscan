@@ -34,8 +34,10 @@ export const CreateAssetOwnerAddressStep: React.FC<
     setValue,
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   useEffect(() => {
     const getWallet = walletAddress;

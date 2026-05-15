@@ -18,7 +18,7 @@ import { WhitelistStatusStep } from '../WhitelistStatusStep';
 export const CreateWhiteListSettingsSteps: React.FC<
   PropsWithChildren<IAssetITOInformations>
 > = ({ informations: { assetType }, handleStep, t }) => {
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const [whitelist, setPackInfo] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const buttonsProps = {

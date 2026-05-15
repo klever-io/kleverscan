@@ -90,7 +90,7 @@ const UpdateAccountPermission: React.FC<PropsWithChildren<IContractProps>> = ({
 };
 
 const PermissionsSection: React.FC<PropsWithChildren> = () => {
-  const { control, watch, setValue } = useFormContext();
+  const { control, watch, setValue } = useFormContext<any>();
 
   const {
     fields,
@@ -249,7 +249,7 @@ interface SignersSectionProps {
 const SignersSection: React.FC<PropsWithChildren<SignersSectionProps>> = ({
   permissionIndex,
 }) => {
-  const { control } = useFormContext();
+  const { control } = useFormContext<any>();
   const {
     fields,
     append: appendSigner,

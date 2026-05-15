@@ -19,8 +19,10 @@ export const CreateAssetMaxSupplyStep: React.FC<
     watch,
     register,
     setValue,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const [inputValue, setInputValue] = useState('');
   const [iAgree, setIAgree] = useState(false);
   const [isEqual, setIsEqual] = useState(false);

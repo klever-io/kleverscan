@@ -18,8 +18,10 @@ export const CreateAssetInitialSupplyStep: React.FC<
     watch,
     register,
     setValue,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const [inputValue, setInputValue] = useState('');
   const ticker = watch('ticker');
   const formInitialSupply = watch('initialSupply');

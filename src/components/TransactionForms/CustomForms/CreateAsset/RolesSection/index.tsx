@@ -19,7 +19,7 @@ import { removeWrapper } from '../../utils';
 import { assetsTooltip as tooltip } from '../../utils/tooltips';
 
 export const RolesSection: React.FC<PropsWithChildren> = () => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,

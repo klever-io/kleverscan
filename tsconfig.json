@@ -17,12 +17,17 @@
     "ignoreDeprecations": "5.0",
     "baseUrl": "src/",
     "paths": {
-      "react": ["../node_modules/@types/react"],
-      "react-hook-form": ["../node_modules/react-hook-form/dist/index.d.ts"],
       "@/*": ["./*"]
     },
     "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "next-i18next.config.js"],
-  "exclude": ["node_modules", "cypress.config.ts", "cypress"]
+  "exclude": [
+    "node_modules",
+    "cypress.config.ts",
+    "cypress",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }

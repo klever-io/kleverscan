@@ -18,7 +18,7 @@ export const CreateAssetPropertiesStep: React.FC<
   isLastStep = false,
   t,
 }) => {
-  const { register } = useFormContext();
+  const { register } = useFormContext<any>();
   const buttonsProps = {
     handleStep,
     next: true,

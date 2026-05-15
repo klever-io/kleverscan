@@ -14,7 +14,7 @@ import { ButtonsComponent } from '../ButtonsComponent';
 export const CreatePrecisionStep: React.FC<
   PropsWithChildren<IWizardComponents>
 > = ({ handleStep, t }) => {
-  const { setValue, watch } = useFormContext();
+  const { setValue, watch } = useFormContext<any>();
   const precisionWatcher = watch('precision');
   const [precision, setPrecision] = useState<number>(precisionWatcher);
   const ticker = watch('ticker');

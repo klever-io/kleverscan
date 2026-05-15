@@ -17,7 +17,7 @@ export const CreatePackCurrencyID: React.FC<
   PropsWithChildren<IWizardComponents>
 > = ({ handleStep, previousStep, t }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { control, watch, register } = useFormContext();
+  const { control, watch, register } = useFormContext<any>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'packInfo',

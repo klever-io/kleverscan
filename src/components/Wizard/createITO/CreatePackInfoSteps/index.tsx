@@ -15,7 +15,7 @@ import { CreatePackCurrencyID } from '../CreatePackCurrencyID';
 export const CreatePackInfoSteps: React.FC<
   PropsWithChildren<IAssetITOInformations>
 > = ({ informations: { assetType }, handleStep, t }) => {
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const [packInfo, setPackInfo] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const buttonsProps = {

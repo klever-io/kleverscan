@@ -20,8 +20,10 @@ export const CreateAssetRoyaltyTransferPerc: React.FC<
     control,
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'transferPercentage',

@@ -23,7 +23,7 @@ interface URIProps {
 export const URIsSection: React.FC<PropsWithChildren<URIProps>> = ({
   tooltip: customTooltip,
 }) => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,

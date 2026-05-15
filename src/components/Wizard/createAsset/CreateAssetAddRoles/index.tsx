@@ -27,10 +27,12 @@ export const CreateAssetAddRoles: React.FC<
   const {
     watch,
     register,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const ticker = watch('ticker');
-  const { control } = useFormContext();
+  const { control } = useFormContext<any>();
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'roles',

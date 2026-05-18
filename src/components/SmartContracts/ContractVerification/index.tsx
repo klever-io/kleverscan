@@ -1,9 +1,13 @@
 import {
   fetchSourceFiles,
+  submitAuditReport,
   submitValidation,
 } from '@/services/requests/contractValidator';
 import {
+  AuditReport,
   ContractInfo,
+  ContractVersion,
+  SmartContractDetailsData,
   ValidationJob,
   ValidationJobStatus,
 } from '@/types/smart-contract';
@@ -22,33 +26,40 @@ import { dracula, xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import { toast } from 'react-toastify';
 import { AiFillCheckCircle, AiFillExclamationCircle } from 'react-icons/ai';
 import {
-  StatusBadge,
-  VerificationBadge,
-  UploadCard,
-  FormField,
-  SubmitButton,
-  JobStatusCard,
-  JobRow,
-  ErrorBox,
+  AuditExternalLink,
+  AuditReportDate,
+  AuditReportLabel,
+  AuditReportList,
+  AuditReportRow,
+  AuditSection,
+  AuditSectionTitle,
   CodeBlockWrapper,
+  EmptyState,
+  ErrorBox,
   FileTab,
   FileTabs,
-  SourceSection,
-  SourceToolbar,
-  SelectorGroup,
-  SelectorLabel,
-  EmptyState,
-  Spinner,
+  FormField,
+  IdeEditorPane,
+  IdeEditorTab,
+  IdeEditorTabBar,
+  IdeFileIcon,
+  IdeFileItem,
+  IdeFolder,
+  IdeFolderHeader,
   IdeLayout,
   IdeSidebar,
   IdeSidebarTitle,
-  IdeFolder,
-  IdeFolderHeader,
-  IdeFileItem,
-  IdeFileIcon,
-  IdeEditorPane,
-  IdeEditorTabBar,
-  IdeEditorTab,
+  JobRow,
+  JobStatusCard,
+  SelectorGroup,
+  SelectorLabel,
+  SourceSection,
+  SourceToolbar,
+  Spinner,
+  StatusBadge,
+  SubmitButton,
+  UploadCard,
+  VerificationBadge,
 } from './styles';
 import Tooltip from '@/components/Tooltip';
 import SelectorDropdown from './SelectorDropdown';
@@ -85,7 +96,6 @@ export function ContractSourceTab({
   const activeFile = selectedFile || fileNames[0] || '';
   const abiVersion = versions.find(v => v.version === selectedVersion);
 
-  // For IDE mode: all viewable files (source + ABI) in one list
   const abiContent = (() => {
     if (!abiVersion?.abi) return '';
     try {
@@ -98,7 +108,6 @@ export function ContractSourceTab({
   const [srcFolderOpen, setSrcFolderOpen] = useState(true);
   const [outputFolderOpen, setOutputFolderOpen] = useState(true);
 
-  // Determine what's shown in IDE mode
   const ideSelectedIsAbi = ideActiveFile === '__abi__';
   const ideValue = ideSelectedIsAbi
     ? abiContent
@@ -427,6 +436,280 @@ export function ContractVerifyTab({
         </EmptyState>
       )}
     </div>
+  );
+}
+
+// --- Tab content: Submit audit report (owner only) ---
+
+export function ContractSubmitAuditTab({
+  contractAddress,
+  contractInfo,
+  scData,
+  onSubmitted,
+}: {
+  contractAddress: string;
+  contractInfo: ContractInfo | null;
+  scData?: SmartContractDetailsData;
+  onSubmitted: () => void;
+}) {
+  const versions = contractInfo?.contractVersions ?? [];
+  const hasVerifiedVersions = versions.length > 0;
+  const latestVersion = versions[versions.length - 1];
+
+  // Blockchain-level versions built from deploy hash + upgrades (used when not verified).
+  // Ordered latest first so the default selection is the most recent deployment.
+  const blockchainVersionOptions = (() => {
+    if (!scData?.deployTxHash) return [];
+    const upgrades = scData.upgrades ?? [];
+    const opts: { value: string; label: string }[] = upgrades
+      .map((u, i) => ({
+        value: u.upgradeTxHash,
+        label: `Upgrade ${i + 1} — ${new Date(u.timestamp * 1000).toLocaleDateString()}`,
+      }))
+      .reverse();
+    opts.push({
+      value: scData.deployTxHash,
+      label: `Deploy — ${new Date(scData.timestamp * 1000).toLocaleDateString()}`,
+    });
+    return opts;
+  })();
+
+  const [selectedVersionId, setSelectedVersionId] = useState<number>(
+    latestVersion?.id ?? 0,
+  );
+  const [selectedTxHash, setSelectedTxHash] = useState<string>(
+    () => blockchainVersionOptions[0]?.value ?? '',
+  );
+  const [link, setLink] = useState('');
+  const [label, setLabel] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const selectedVersion = versions.find(v => v.id === selectedVersionId);
+  const txHash = hasVerifiedVersions
+    ? (selectedVersion?.transactionHash ?? '')
+    : selectedTxHash;
+  const currentAudit = selectedVersion?.auditReports?.[0] ?? null;
+
+  useEffect(() => {
+    setLink(currentAudit?.link ?? '');
+    setLabel(currentAudit?.label ?? '');
+  }, [currentAudit?.id, selectedVersionId]);
+
+  const versionOptions = [...versions].reverse().map(v => ({
+    value: v.id,
+    label: `v${v.version} — ${new Date(v.createdAt).toLocaleDateString()}`,
+  }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!txHash.trim()) {
+      toast.error('Transaction hash is required');
+      return;
+    }
+    if (!link.trim() || !label.trim()) {
+      toast.error('Link and label are required');
+      return;
+    }
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      await submitAuditReport(contractAddress, txHash, link, label);
+      toast.success('Audit report submitted successfully');
+      onSubmitted();
+    } catch (err: any) {
+      toast.error(err.message || 'Submission failed');
+      setSubmitError(err.message || 'Submission failed');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <UploadCard>
+        <JobStatusCard style={{ padding: 0, marginBottom: '0.5rem' }}>
+          {hasVerifiedVersions ? (
+            <>
+              {versions.length > 1 && (
+                <JobRow>
+                  <strong>Version</strong>
+                  <SelectorDropdown
+                    value={selectedVersionId}
+                    options={versionOptions}
+                    onChange={id => setSelectedVersionId(id)}
+                  />
+                </JobRow>
+              )}
+              {currentAudit && (
+                <JobRow>
+                  <strong>Current</strong>
+                  <AuditExternalLink
+                    href={currentAudit.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {currentAudit.label} ↗
+                  </AuditExternalLink>
+                  <AuditReportDate>
+                    {new Date(currentAudit.submittedAt).toLocaleDateString()}
+                  </AuditReportDate>
+                </JobRow>
+              )}
+            </>
+          ) : (
+            <JobRow>
+              <strong>Version</strong>
+              {blockchainVersionOptions.length > 0 ? (
+                <SelectorDropdown
+                  value={selectedTxHash}
+                  options={blockchainVersionOptions}
+                  onChange={hash => setSelectedTxHash(hash)}
+                />
+              ) : (
+                <EmptyState style={{ padding: 0 }}>
+                  Contract data not available
+                </EmptyState>
+              )}
+            </JobRow>
+          )}
+        </JobStatusCard>
+
+        {submitError && <ErrorBox>{submitError}</ErrorBox>}
+        <FormField>
+          <label>Audit report URL</label>
+          <input
+            type="text"
+            placeholder="https://..."
+            value={link}
+            onChange={e => setLink(e.target.value)}
+          />
+        </FormField>
+        <FormField>
+          <label>Auditor / report name</label>
+          <input
+            type="text"
+            placeholder="e.g. Audited by XYZ Security"
+            value={label}
+            onChange={e => setLabel(e.target.value)}
+            maxLength={255}
+          />
+        </FormField>
+        <SubmitButton type="submit" disabled={submitting}>
+          {submitting
+            ? 'Submitting...'
+            : currentAudit
+              ? 'Update audit report'
+              : 'Submit audit report'}
+        </SubmitButton>
+      </UploadCard>
+    </form>
+  );
+}
+
+// --- Tab content: Contract audits (all users) ---
+
+export function ContractAuditsTab({
+  auditReports,
+  scData,
+}: {
+  auditReports: AuditReport[];
+  scData?: SmartContractDetailsData;
+}) {
+  const versionList = (() => {
+    if (!scData?.deployTxHash) return [];
+    const upgrades = scData.upgrades ?? [];
+    const opts: { txHash: string; label: string }[] = upgrades
+      .map((u, i) => ({
+        txHash: u.upgradeTxHash,
+        label: `Upgrade ${i + 1} — ${new Date(u.timestamp * 1000).toLocaleDateString()}`,
+      }))
+      .reverse();
+    opts.push({
+      txHash: scData.deployTxHash,
+      label: `Deploy — ${new Date(scData.timestamp * 1000).toLocaleDateString()}`,
+    });
+    return opts;
+  })();
+
+  const reports = auditReports;
+
+  if (reports.length === 0) {
+    return (
+      <EmptyState>
+        No security audit reports have been submitted for this contract.
+      </EmptyState>
+    );
+  }
+
+  const byTxHash = new Map<string, AuditReport[]>();
+  for (const r of reports) {
+    const list = byTxHash.get(r.txHash) ?? [];
+    list.push(r);
+    byTxHash.set(r.txHash, list);
+  }
+
+  const versionsWithAudits = versionList.filter(v => byTxHash.has(v.txHash));
+  const knownHashes = new Set(versionList.map(v => v.txHash));
+  const unknownReports = reports.filter(r => !knownHashes.has(r.txHash));
+
+  return (
+    <>
+      {versionsWithAudits.map(v => (
+        <AuditSection key={v.txHash}>
+          <AuditSectionTitle>{v.label}</AuditSectionTitle>
+          <AuditReportList>
+            {(byTxHash.get(v.txHash) ?? []).map(
+              (report: AuditReport, index: number) => (
+                <AuditReportRow key={report.id}>
+                  <AuditReportLabel>
+                    {index === 0 ? (
+                      <strong>{report.label}</strong>
+                    ) : (
+                      report.label
+                    )}
+                  </AuditReportLabel>
+                  <AuditExternalLink
+                    href={report.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Report ↗
+                  </AuditExternalLink>
+                  <AuditReportDate>
+                    {new Date(report.submittedAt).toLocaleDateString()}
+                  </AuditReportDate>
+                </AuditReportRow>
+              ),
+            )}
+          </AuditReportList>
+        </AuditSection>
+      ))}
+      {unknownReports.length > 0 && (
+        <AuditSection>
+          <AuditSectionTitle>Other versions</AuditSectionTitle>
+          <AuditReportList>
+            {unknownReports.map((report: AuditReport, index: number) => (
+              <AuditReportRow key={report.id}>
+                <AuditReportLabel>
+                  {index === 0 ? <strong>{report.label}</strong> : report.label}
+                </AuditReportLabel>
+                <AuditExternalLink
+                  href={report.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Report ↗
+                </AuditExternalLink>
+                <AuditReportDate>
+                  {new Date(report.submittedAt).toLocaleDateString()}
+                </AuditReportDate>
+              </AuditReportRow>
+            ))}
+          </AuditReportList>
+        </AuditSection>
+      )}
+    </>
   );
 }
 

@@ -4,7 +4,9 @@ import Copy from '@/components/Copy';
 import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
 import Title from '@/components/Layout/Title';
 import {
+  ContractAuditsTab,
   ContractSourceTab,
+  ContractSubmitAuditTab,
   ContractVerifyTab,
 } from '@/components/SmartContracts/ContractVerification';
 import {
@@ -72,7 +74,7 @@ const SmartContractInvoke: React.FC = () => {
     !!walletAddress && !!scData?.deployer && walletAddress === scData.deployer;
 
   const {
-    data: contractInfo,
+    data: contractInfoResult,
     isLoading: isContractInfoLoading,
     refetch: refetchContractInfo,
   } = useQuery({
@@ -80,6 +82,9 @@ const SmartContractInvoke: React.FC = () => {
     queryFn: () => fetchContractInfo(contractAddress),
     enabled: !!contractAddress && isContractValidationEnabled,
   });
+
+  const contractInfo = contractInfoResult?.contractInfo ?? null;
+  const contractAudits = contractInfoResult?.auditReports ?? [];
 
   const { data: latestJob, refetch: refetchJob } = useQuery({
     queryKey: ['latestJob', contractAddress],
@@ -93,9 +98,13 @@ const SmartContractInvoke: React.FC = () => {
   });
 
   const hasVerifiedVersions = (contractInfo?.contractVersions?.length ?? 0) > 0;
+  const hasAuditReports = contractAudits.length > 0;
 
   const tabHeaders = useMemo(() => {
     const tabs = [{ label: 'Transactions', value: 'transactions' }];
+    if (isContractValidationEnabled && hasAuditReports) {
+      tabs.push({ label: 'Contract Audits', value: 'contract-audits' });
+    }
     if (isContractValidationEnabled && hasVerifiedVersions) {
       tabs.push({ label: 'Contract Source', value: 'contract-source' });
       tabs.push({ label: 'Read Contract', value: 'read-contract' });
@@ -104,8 +113,11 @@ const SmartContractInvoke: React.FC = () => {
     if (isContractValidationEnabled && isOwner) {
       tabs.push({ label: 'Verify Contract', value: 'verify' });
     }
+    if (isContractValidationEnabled && isOwner) {
+      tabs.push({ label: 'Submit Audit', value: 'submit-audit' });
+    }
     return tabs;
-  }, [hasVerifiedVersions, isOwner]);
+  }, [hasVerifiedVersions, hasAuditReports, isOwner]);
 
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
 
@@ -175,6 +187,10 @@ const SmartContractInvoke: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
         return <SmartContractsTransactions contractAddress={contractAddress} />;
+      case 'Contract Audits':
+        return (
+          <ContractAuditsTab auditReports={contractAudits} scData={scData} />
+        );
       case 'Contract Source':
         if (isContractInfoLoading)
           return (
@@ -218,6 +234,15 @@ const SmartContractInvoke: React.FC = () => {
             onSubmitted={() => {
               refetchJob();
             }}
+          />
+        );
+      case 'Submit Audit':
+        return (
+          <ContractSubmitAuditTab
+            contractAddress={contractAddress}
+            contractInfo={contractInfo ?? null}
+            scData={scData}
+            onSubmitted={refetchContractInfo}
           />
         );
       default:

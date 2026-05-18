@@ -1,4 +1,8 @@
-import { ContractInfo, ValidationJob } from '@/types/smart-contract';
+import {
+  AuditReport,
+  ContractInfo,
+  ValidationJob,
+} from '@/types/smart-contract';
 
 const BASE = '/api/contract-validator';
 
@@ -17,17 +21,29 @@ export const fetchLatestJob = async (
   return data.job as ValidationJob;
 };
 
+export interface ContractInfoResult {
+  contractInfo: ContractInfo | null;
+  auditReports: AuditReport[];
+  sourceUpToDate: boolean;
+}
+
 export const fetchContractInfo = async (
   contractAddress: string,
-): Promise<ContractInfo | null> => {
+): Promise<ContractInfoResult> => {
   const res = await fetch(`${BASE}/${contractAddress}/info`);
-  if (res.status === 404) return null;
   if (!res.ok) throw new Error('Failed to fetch contract info');
   const data = await res.json();
-  if (!data.contractInfo) return null;
+  const auditReports = (data.auditReports ?? []) as AuditReport[];
+  const contractInfo = data.contractInfo
+    ? ({
+        ...(data.contractInfo as ContractInfo),
+        sourceUpToDate: data.sourceUpToDate,
+      } as ContractInfo)
+    : null;
   return {
-    ...(data.contractInfo as ContractInfo),
-    sourceUpToDate: data.sourceUpToDate,
+    contractInfo,
+    auditReports,
+    sourceUpToDate: data.sourceUpToDate ?? false,
   };
 };
 
@@ -68,4 +84,32 @@ export const submitValidation = async (
     throw err;
   }
   return data;
+};
+
+export const fetchContractAudits = async (
+  contractAddress: string,
+): Promise<AuditReport[]> => {
+  const res = await fetch(`${BASE}/${contractAddress}/audits`);
+  if (!res.ok) throw new Error('Failed to fetch audit reports');
+  const data = await res.json();
+  return (data.data ?? []) as AuditReport[];
+};
+
+export const submitAuditReport = async (
+  contractAddress: string,
+  txHash: string,
+  link: string,
+  label: string,
+): Promise<AuditReport> => {
+  const res = await fetch(
+    `${BASE}/${contractAddress}/versions/${txHash}/audits`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ link, label }),
+    },
+  );
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || 'Audit submission failed');
+  return data.data as AuditReport;
 };

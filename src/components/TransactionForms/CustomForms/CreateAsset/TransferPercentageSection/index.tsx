@@ -23,7 +23,7 @@ interface IPrecisionProps {
 export const TransferPercentageSection: React.FC<
   PropsWithChildren<IPrecisionProps>
 > = ({ precision }) => {
-  const { control, trigger, getValues } = useFormContext();
+  const { control, trigger, getValues } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove } = useFieldArray({
     control,

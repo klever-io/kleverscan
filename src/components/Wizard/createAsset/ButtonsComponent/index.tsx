@@ -28,7 +28,7 @@ export const ButtonsComponent: React.FC<
   isRow = true,
 }) => {
   const { t } = useTranslation('wizards');
-  const { trigger } = useFormContext();
+  const { trigger } = useFormContext<any>();
   const handleClick = () => {
     trigger();
     if (next && handleStep) {

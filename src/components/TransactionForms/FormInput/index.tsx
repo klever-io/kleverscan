@@ -204,12 +204,14 @@ const FormInput: React.FC<
   const { isMultiContract } = useMulticontract();
   const {
     register,
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
     unregister,
     setValue,
     getValues,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const error = name && (errors[name] || (apiError && { message: apiError }));
 

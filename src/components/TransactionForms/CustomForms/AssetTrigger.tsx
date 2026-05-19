@@ -119,7 +119,7 @@ const MintForm: React.FC<{
   walletAddress: string;
 }> = ({ collection, walletAddress }) => {
   const hasInternalId = collection.value?.split('/').length > 1;
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const watchCollectionAssetId = watch('collectionAssetId');
   const { paramsList } = useNetworkParams();
   const maxNFTMintPerTx = Number(
@@ -159,7 +159,7 @@ const UpdateMetadataForm: React.FC<{
   walletAddress: string;
   setMetadata: (metadata: string) => void;
 }> = ({ collection, walletAddress, setMetadata }) => {
-  const { getValues } = useFormContext();
+  const { getValues } = useFormContext<any>();
   const metadataState = React.useRef({ name: '', metadata: '' });
 
   const updateNonNFTMetadata = () => {
@@ -365,7 +365,7 @@ const KDAFeePoolForm: React.FC<{
   collection: ICollectionList;
   walletAddress: string;
 }> = ({ collection, walletAddress }) => {
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const quotient = watch('kdaPool.quotient');
 
   const assetName = collection.label || collection.value || 'KDA';

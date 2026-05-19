@@ -18,9 +18,11 @@ export const CreateITOSixStep: React.FC<
 > = ({ informations: { currentStep, title, description }, handleStep, t }) => {
   const {
     register,
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const collection = watch('collection');
   const { data, isLoading } = useQuery({
     queryKey: ['collection', collection],
@@ -65,7 +67,6 @@ export const CreateITOSixStep: React.FC<
             align={'right'}
             {...register('maxAmount', {
               validate: validateInput,
-              pattern: { value: /\d+/g, message: 'Value must be only numbers' },
               valueAsNumber: true,
             })}
           />

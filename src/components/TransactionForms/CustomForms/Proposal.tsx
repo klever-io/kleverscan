@@ -100,7 +100,7 @@ interface IParametersProps {
 export const ParametersSection: React.FC<
   PropsWithChildren<IParametersProps>
 > = ({ paramsList = [] }) => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext<any>();
   const router = useRouter();
 
   const { fields, append, remove } = useFieldArray({

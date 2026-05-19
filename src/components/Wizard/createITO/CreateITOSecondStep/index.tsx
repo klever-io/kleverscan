@@ -20,9 +20,11 @@ export const CreateITOSecondStep: React.FC<
 }) => {
   const { setSelectedContractType } = useMulticontract();
   const {
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const collection = watch('collection');
 

@@ -56,9 +56,11 @@ export const NamedKDASelect: React.FC<
   const { walletAddress } = useExtension();
 
   const {
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const collection = watch('collection');
 
@@ -192,10 +194,12 @@ const CollectionIDField: React.FC<
 
   const {
     setValue,
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
     getValues,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const collectionName: string = (watch(name) || '').split('/')[0];
   const collectionAssetId =

@@ -20,7 +20,7 @@ interface IAllowedAssets {
 export const CallValueSection: React.FC<PropsWithChildren<IAllowedAssets>> = ({
   allowedAssets,
 }) => {
-  const { control, getValues } = useFormContext();
+  const { control, getValues } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove, replace } = useFieldArray({
     control,

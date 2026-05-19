@@ -21,8 +21,10 @@ export const CreateAssetNameStep: React.FC<
   const {
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const name = watch('name');
 
   let error = errors?.name;

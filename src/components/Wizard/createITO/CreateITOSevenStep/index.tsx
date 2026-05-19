@@ -18,9 +18,11 @@ export const CreateITOSevenStep: React.FC<
   const {
     register,
     setValue,
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const status = watch('status');
   const collection = watch('collection');
   let error = errors?.status;

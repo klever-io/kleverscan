@@ -10,7 +10,7 @@ import {
 
 export const TransactionDetails: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('wizards');
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const address = watch('ownerAddress');
   return (
     <ReviewContainer>

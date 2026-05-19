@@ -17,9 +17,11 @@ export const CreateITOFourthStep: React.FC<
   const {
     register,
     setValue,
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const handlerStartTime = (e: { target: { checked: boolean } }) => {
     setValue('startTimeStartNow', e.target.checked);

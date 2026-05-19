@@ -17,8 +17,10 @@ export const StakingStepsGenericAprFprThree: React.FC<
   const {
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const stakingTypeNum = watch('staking.interestType');
   const stakingType = stakingTypeNum === 0 ? 'APR' : 'FPR';
@@ -50,7 +52,6 @@ export const StakingStepsGenericAprFprThree: React.FC<
           type="number"
           placeholder="0"
           {...register('staking.minEpochsToWithdraw', {
-            pattern: { value: /\d+/g, message: 'Value must be only numbers' },
             valueAsNumber: true,
           })}
           align={'center'}

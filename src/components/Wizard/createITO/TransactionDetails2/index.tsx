@@ -11,7 +11,7 @@ import { PropsWithChildren } from 'react';
 
 export const TransactionDetails2: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('wizards');
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const receiverAddress = watch('receiverAddress');
   const startTime = watch('startTime');
   const startTimeNow = watch('startTimeStartNow');

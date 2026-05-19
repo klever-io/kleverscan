@@ -100,6 +100,16 @@ const isInIPv6Range = (
   return address >> shift === range >> shift;
 };
 
+const bigintToIPv4 = (value: bigint): string => {
+  const n = Number(value & BigInt(0xffffffff));
+  return [
+    (n >>> 24) & 0xff,
+    (n >>> 16) & 0xff,
+    (n >>> 8) & 0xff,
+    n & 0xff,
+  ].join('.');
+};
+
 const isPrivateIPv6 = (address: string): boolean => {
   const parsed = parseIPv6(address);
 
@@ -107,11 +117,23 @@ const isPrivateIPv6 = (address: string): boolean => {
     return true;
   }
 
-  const mappedIPv4 = address
+  // ::ffff:d.d.d.d — IPv4-mapped dotted-quad form
+  const mappedIPv4Dotted = address
     .toLowerCase()
     .match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-  if (mappedIPv4) {
-    return isPrivateIPv4(mappedIPv4[1]);
+  if (mappedIPv4Dotted) {
+    return isPrivateIPv4(mappedIPv4Dotted[1]);
+  }
+
+  // ::ffff:0:0/96 — IPv4-mapped hex form (e.g. ::ffff:7f00:1 = 127.0.0.1)
+  // group 5 (bits 32-47) = 0xffff, prefix 96 → range BigInt('0xffff') << 32n
+  if (isInIPv6Range(parsed, BigInt('0xffff') << BigInt(32), BigInt(96))) {
+    return isPrivateIPv4(bigintToIPv4(parsed));
+  }
+
+  // 64:ff9b::/96 — NAT64 (embeds IPv4 in low 32 bits)
+  if (isInIPv6Range(parsed, BigInt('0x0064ff9b') << BigInt(96), BigInt(96))) {
+    return isPrivateIPv4(bigintToIPv4(parsed));
   }
 
   return IPV6_SPECIAL_RANGES.some(([range, prefixLength]) =>
@@ -148,8 +170,11 @@ export const assertPublicHttpUrl = async (rawUrl: string): Promise<URL> => {
     throw new PublicUrlValidationError();
   }
 
-  if (net.isIP(parsedUrl.hostname)) {
-    if (isPrivateAddress(parsedUrl.hostname)) {
+  // WHATWG URL returns "[::1]" for IPv6 literals; strip brackets before net.isIP
+  const host = parsedUrl.hostname.replace(/^\[|\]$/g, '');
+
+  if (net.isIP(host)) {
+    if (isPrivateAddress(host)) {
       throw new PublicUrlValidationError();
     }
 
@@ -159,7 +184,7 @@ export const assertPublicHttpUrl = async (rawUrl: string): Promise<URL> => {
   let addresses: dns.LookupAddress[];
 
   try {
-    addresses = await dnsLookup(parsedUrl.hostname, {
+    addresses = await dnsLookup(host, {
       all: true,
       verbatim: true,
     });

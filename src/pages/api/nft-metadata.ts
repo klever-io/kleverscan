@@ -10,8 +10,11 @@ const MAX_REDIRECTS = 3;
 const isRedirectStatus = (status: number): boolean =>
   [301, 302, 303, 307, 308].includes(status);
 
-const isJsonContentType = (contentType: string | null): boolean =>
-  Boolean(contentType && /(^|[/+])json($|;)/i.test(contentType));
+const isJsonContentType = (ct: string | null): boolean => {
+  if (!ct) return false;
+  const type = ct.split(',')[0].trim().split(';')[0].trim().toLowerCase();
+  return type === 'application/json' || type.endsWith('+json');
+};
 
 const fetchPublicUrl = async (
   rawUrl: string,
@@ -119,6 +122,7 @@ export default async function handler(
     }
 
     const data = await readJsonWithLimit(response);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     res.status(200).json(data);
   } catch (error) {
     console.error('Error fetching NFT metadata:', error);

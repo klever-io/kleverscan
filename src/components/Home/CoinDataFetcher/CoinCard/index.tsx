@@ -78,7 +78,7 @@ interface IPropsRenderCoinsCard {
 }
 
 interface ICoinTimes {
-  [name: string]: number | string;
+  [name: string]: 1 | 30 | 180;
 }
 
 const swapExchangeInfo = [
@@ -118,11 +118,11 @@ const RenderCoinsCard: React.FC<
   } = props;
   const { shortname, name, price, variation, marketCap, prices } = coin;
   const { t } = useTranslation('common', { keyPrefix: 'Cards' });
-  const [daysSelected, setDaysSelected] = useState<string | number>(1);
+  const [daysSelected, setDaysSelected] = useState<1 | 30 | 180>(1);
   const [switchCardLoading, setSwitchCardLoading] = useState(false);
-  const timeGraph = [1, 30, 180];
+  const timeGraph: Array<1 | 30 | 180> = [1, 30, 180];
 
-  const handleClick = async (time: string | number) => {
+  const handleClick = async (time: 1 | 30 | 180) => {
     coinDays.current = {
       ...coinDays.current,
       [shortname]: time,

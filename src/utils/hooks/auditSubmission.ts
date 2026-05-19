@@ -30,22 +30,31 @@ export function useAuditSubmission({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!txHash.trim()) {
+    const normalizedTxHash = txHash.trim();
+    const normalizedLink = link.trim();
+    const normalizedLabel = label.trim();
+
+    if (!normalizedTxHash) {
       toast.error('Transaction hash is required');
       return;
     }
-    if (!link.trim() || !label.trim()) {
+    if (!normalizedLink || !normalizedLabel) {
       toast.error('Link and label are required');
       return;
     }
-    if (!isSafeUrl(link.trim())) {
+    if (!isSafeUrl(normalizedLink)) {
       toast.error('Please enter a valid https:// URL');
       return;
     }
     setSubmitError(null);
     setSubmitting(true);
     try {
-      await submitAuditReport(contractAddress, txHash, link, label);
+      await submitAuditReport(
+        contractAddress,
+        normalizedTxHash,
+        normalizedLink,
+        normalizedLabel,
+      );
       toast.success('Audit report submitted successfully');
       onSubmitted();
     } catch (err: unknown) {

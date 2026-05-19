@@ -17,13 +17,11 @@ export type Query = {
 };
 
 export enum Service {
-  PROXY,
-  NODE,
-  GECKO,
-  EXPLORER,
-  MULTISIGN,
-  CDN,
-  KPRICES,
+  PROXY = 0,
+  NODE = 1,
+  EXPLORER = 3,
+  MULTISIGN = 4,
+  CDN = 5,
 }
 
 export interface IDropdownItem {

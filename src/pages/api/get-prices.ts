@@ -1,30 +1,57 @@
-import { getHost } from '@/services/api';
 import { NextApiRequest, NextApiResponse } from 'next';
+
+const API_KEY = process.env.DEFAULT_APIKEY_KPRICES;
+const KPRICES_HOST =
+  process.env.DEFAULT_KPRICES_HOST || 'https://apis.internal.klever.io/kprices';
+const API_PORT = process.env.DEFAULT_API_PORT || '';
+const ALLOWED_BASES = ['KLV', 'KFI'] as const;
+
+type AllowedBase = (typeof ALLOWED_BASES)[number];
+
+const getKpricesUrl = (): string => {
+  const host = KPRICES_HOST.endsWith('/')
+    ? KPRICES_HOST.slice(0, -1)
+    : KPRICES_HOST;
+  const port = API_PORT ? `:${API_PORT}` : '';
+
+  return `${host}${port}/v2/prices`;
+};
+
+const getBase = (base: unknown): AllowedBase | null => {
+  if (
+    typeof base === 'string' &&
+    ALLOWED_BASES.includes(base.toUpperCase() as AllowedBase)
+  ) {
+    return base.toUpperCase() as AllowedBase;
+  }
+
+  return null;
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<void> {
+  if (req.method !== 'GET') {
+    return res.status(405).json({
+      data: null,
+      error: 'Method not allowed',
+      code: 'method_not_allowed',
+    });
+  }
+
   try {
-    if (!req.body) {
+    const base = getBase(req.query.base);
+
+    if (!base) {
       return res.status(400).json({
         data: null,
-        error: 'Ivalid body request',
-        code: 'invalid_request',
+        error: 'Invalid base asset',
+        code: 'invalid_base',
       });
     }
 
-    const { route, service, method, query, body } = req.body;
-
-    if (!route || !service || !method) {
-      return res.status(400).json({
-        data: null,
-        error: 'Required parameters are missing',
-        code: 'missing_parameters',
-      });
-    }
-
-    if (!process.env.DEFAULT_APIKEY_KPRICES) {
+    if (!API_KEY) {
       return res.status(500).json({
         data: null,
         error: 'Required environment variable is missing',
@@ -32,20 +59,16 @@ export default async function handler(
       });
     }
 
-    const request: RequestInit = {
-      method,
+    const response = await fetch(getKpricesUrl(), {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-apikey': process.env.DEFAULT_APIKEY_KPRICES!,
+        'x-apikey': API_KEY,
         Accept: 'application/json',
       },
-    };
+      body: JSON.stringify([{ base, quote: 'USD' }]),
+    });
 
-    if (method === 'POST') {
-      request['body'] = JSON.stringify(body);
-    }
-
-    const response = await fetch(getHost(route, query, service, 'v2'), request);
     if (!response.ok) {
       res.status(500).json(await response.json());
     } else {

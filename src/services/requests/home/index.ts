@@ -282,11 +282,7 @@ const homeNodes = async (): Promise<
 
 const homeKlvDataCall = async (): Promise<IGeckoResponse | undefined> => {
   try {
-    const res = await api.get({
-      route: 'coins/klever',
-      service: Service.GECKO,
-      useApiProxy: true,
-    });
+    const res = await api.coinGeckoCoin({ base: 'KLV' });
 
     if (!res.error || res.error === '') {
       return res;
@@ -301,9 +297,9 @@ const homeKlvChartCall = async (
   days?: IDaysCoins,
 ): Promise<IGeckoChartResponse | undefined> => {
   try {
-    const res = await api.get({
-      route: `coins/klever/market_chart?vs_currency=usd&days=${days?.KLV || 1}`,
-      service: Service.GECKO,
+    const res = await api.coinGeckoMarketChart({
+      base: 'KLV',
+      days: days?.KLV,
     });
 
     if (!res.error || res.error === '') {
@@ -316,10 +312,7 @@ const homeKlvChartCall = async (
 
 const homeKfiDataCall = async (): Promise<IGeckoResponse | undefined> => {
   try {
-    const res = await api.get({
-      route: 'coins/klever-finance',
-      service: Service.GECKO,
-    });
+    const res = await api.coinGeckoCoin({ base: 'KFI' });
 
     if (!res.error || res.error === '') {
       return res;
@@ -345,11 +338,9 @@ const homeKfiChartCall = async (
   days?: IDaysCoins,
 ): Promise<IGeckoChartResponse | undefined> => {
   try {
-    const res = await api.get({
-      route: `coins/klever-finance/market_chart?vs_currency=usd&days=${
-        days?.KFI || 1
-      }`,
-      service: Service.GECKO,
+    const res = await api.coinGeckoMarketChart({
+      base: 'KFI',
+      days: days?.KFI,
     });
 
     if (!res.error || res.error === '') {
@@ -475,17 +466,7 @@ const homeKfiPriceCall = async (): Promise<
   HomeKFiPriceCallInterface | undefined
 > => {
   try {
-    const response = await api.post({
-      route: `prices`,
-      service: Service.KPRICES,
-      body: [
-        {
-          base: 'KFI',
-          quote: 'USD',
-        },
-      ],
-      useApiPrice: true,
-    });
+    const response = await api.price({ base: 'KFI' });
 
     if (!response.error || response.error === '') {
       const kfiPriceData: HomeKFiPriceCallInterface = {

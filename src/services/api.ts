@@ -23,8 +23,6 @@ export interface IProps {
   body?: any;
   apiVersion?: string;
   service?: Service;
-  useApiProxy?: boolean;
-  useApiPrice?: boolean;
   requestMode?: RequestMode;
   tries?: number;
 }
@@ -32,6 +30,21 @@ export interface IProps {
 export interface IAssetInfoRequestProps {
   assetId: string;
   tries?: number;
+}
+
+export interface IPriceRequestProps {
+  base: 'KLV' | 'KFI';
+  tries?: number;
+}
+
+export interface ICoinGeckoRequestProps {
+  base: 'KLV' | 'KFI';
+  tries?: number;
+}
+
+export interface ICoinGeckoMarketChartRequestProps
+  extends ICoinGeckoRequestProps {
+  days?: string | number;
 }
 
 const pagination = {
@@ -60,7 +73,6 @@ export const getHost = (
       process.env.DEFAULT_API_HOST || 'https://api.testnet.klever.org',
     [Service.NODE]:
       process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.org',
-    [Service.GECKO]: 'https://api.coingecko.com/api/v3',
     [Service.MULTISIGN]:
       process.env.DEFAULT_API_MULTISIGN ||
       'https://multisign.testnet.klever.org',
@@ -69,9 +81,6 @@ export const getHost = (
       (typeof window !== 'undefined' ? window.location.origin : undefined) ||
       'https://testnet.kleverscan.org',
     [Service.CDN]: process.env.DEFAULT_CDN_HOST || 'https://cdn.klever.io',
-    [Service.KPRICES]:
-      process.env.DEFAULT_KPRICES_HOST ||
-      'https://apis.internal.klever.io/kprices',
   };
 
   let host = hostService[service || 0];
@@ -82,7 +91,7 @@ export const getHost = (
     host = host.substring(0, host.length - 1);
   }
 
-  if (service === Service.PROXY || service === Service.KPRICES) {
+  if (service === Service.PROXY) {
     if (port) {
       port = `:${port}`;
     }
@@ -124,58 +133,35 @@ export const withoutBody = async (
   method: Method,
 ): Promise<any> => {
   const request = async () => {
-    if (props.useApiProxy) {
-      try {
-        // use next api as proxy for get requests, to avoid gecko errors (when fetching prices)
-        const response = await fetch('/api/proxy', {
-          method: Method.POST,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...getProps(props),
-            method: method.toString(),
-          }),
-        });
+    try {
+      const { route, query, service, apiVersion } = getProps(props);
+      const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
-        return response.json();
-      } catch (error) {
-        return { data: null, error, code: 'internal_error', pagination };
-      }
-    } else if (!props.useApiProxy) {
-      try {
-        const { route, query, service, apiVersion } = getProps(props);
-        const requestMode: RequestMode = props?.requestMode ?? 'cors';
+      const response = await fetch(getHost(route, query, service, apiVersion), {
+        method: method.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: requestMode,
+      });
 
-        const response = await fetch(
-          getHost(route, query, service, apiVersion),
-          {
-            method: method.toString(),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            mode: requestMode,
-          },
-        );
-
-        if (!response.ok) {
-          return {
-            data: null,
-            error: (await response.json()).error,
-            code: 'internal_error',
-            pagination,
-          };
-        }
-
-        return response.json();
-      } catch (error) {
+      if (!response.ok) {
         return {
           data: null,
-          error,
+          error: (await response.json()).error,
           code: 'internal_error',
           pagination,
         };
       }
+
+      return response.json();
+    } catch (error) {
+      return {
+        data: null,
+        error,
+        code: 'internal_error',
+        pagination,
+      };
     }
   };
 
@@ -193,92 +179,51 @@ export const withoutBody = async (
 
 export const withBody = async (props: IProps, method: Method): Promise<any> => {
   const request = async () => {
-    if (props.useApiPrice) {
-      try {
-        const response = await fetch('/api/get-prices', {
-          method: Method.POST,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...getProps(props),
-            method: method.toString(),
-          }),
-        });
+    try {
+      const { route, body, query, service, apiVersion } = getProps(props);
+      const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
-        return response.json();
+      const response = await fetch(getHost(route, query, service, apiVersion), {
+        method: method.toString(),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        mode: requestMode,
+      });
+      let resJson;
+
+      try {
+        resJson = await response.json();
       } catch (error) {
-        return { data: null, error, code: 'internal_error', pagination };
-      }
-    }
-    if (props.useApiProxy) {
-      try {
-        // use next api as proxy for post requests, to avoid cors from api-gateway (when fetching prices)
-        const response = await fetch('/api/proxy', {
-          method: method.toString(),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...getProps(props),
-            method: method.toString(),
-          }),
-        });
-
-        return response.json();
-      } catch (error) {
-        return { data: null, error, code: 'internal_error', pagination };
-      }
-    } else if (!props.useApiProxy) {
-      try {
-        const { route, body, query, service, apiVersion } = getProps(props);
-        const requestMode: RequestMode = props?.requestMode ?? 'cors';
-
-        const response = await fetch(
-          getHost(route, query, service, apiVersion),
-          {
-            method: method.toString(),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-            mode: requestMode,
-          },
-        );
-        let resJson;
-
-        try {
-          resJson = await response.json();
-        } catch (error) {
-          if (!response.ok) {
-            return {
-              data: null,
-              error: 'Could not parse response',
-              code: 'internal_error',
-              pagination,
-            };
-          }
-
-          return {
-            data: null,
-            error: '',
-            code: '',
-          };
-        }
-
         if (!response.ok) {
           return {
             data: null,
-            error: resJson.error,
+            error: 'Could not parse response',
             code: 'internal_error',
             pagination,
           };
         }
 
-        return resJson;
-      } catch (error) {
-        return { data: null, error, code: 'internal_error', pagination };
+        return {
+          data: null,
+          error: '',
+          code: '',
+        };
       }
+
+      if (!response.ok) {
+        return {
+          data: null,
+          error: resJson.error,
+          code: 'internal_error',
+          pagination,
+        };
+      }
+
+      return resJson;
+    } catch (error) {
+      return { data: null, error, code: 'internal_error', pagination };
     }
   };
 
@@ -293,6 +238,105 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
 
   return result;
 };
+
+export const withPrice = async (props: IPriceRequestProps): Promise<any> => {
+  const request = async () => {
+    try {
+      const response = await fetch(
+        `/api/get-prices?base=${encodeURIComponent(props.base)}`,
+        {
+          method: Method.GET,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error', pagination };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+    props.tries || 3,
+  );
+
+  return result;
+};
+
+export const withCoinGeckoCoin = async (
+  props: ICoinGeckoRequestProps,
+): Promise<any> => {
+  const request = async () => {
+    try {
+      const response = await fetch(
+        `/api/coingecko/coin?base=${encodeURIComponent(props.base)}`,
+        {
+          method: Method.GET,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error', pagination };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+    props.tries || 3,
+  );
+
+  return result;
+};
+
+export const withCoinGeckoMarketChart = async (
+  props: ICoinGeckoMarketChartRequestProps,
+): Promise<any> => {
+  const request = async () => {
+    try {
+      const query = new URLSearchParams({
+        base: props.base,
+        days: String(props.days || 1),
+      });
+      const response = await fetch(`/api/coingecko/market-chart?${query}`, {
+        method: Method.GET,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      return response.json();
+    } catch (error) {
+      return { data: null, error, code: 'internal_error', pagination };
+    }
+  };
+
+  let result: any;
+
+  await asyncDoIf(
+    res => (result = res),
+    err => (result = Promise.resolve(err)),
+    () => request(),
+    props.tries || 3,
+  );
+
+  return result;
+};
+
 export const withAssetInfo = async (
   props: IAssetInfoRequestProps,
 ): Promise<any> => {
@@ -402,6 +446,13 @@ const api = {
     withTimeout(withText(props, Method.GET)),
   assetInfo: async (props: IAssetInfoRequestProps): Promise<any> =>
     withTimeout(withAssetInfo(props)),
+  price: async (props: IPriceRequestProps): Promise<any> =>
+    withTimeout(withPrice(props)),
+  coinGeckoCoin: async (props: ICoinGeckoRequestProps): Promise<any> =>
+    withTimeout(withCoinGeckoCoin(props)),
+  coinGeckoMarketChart: async (
+    props: ICoinGeckoMarketChartRequestProps,
+  ): Promise<any> => withTimeout(withCoinGeckoMarketChart(props)),
 };
 
 export default api;

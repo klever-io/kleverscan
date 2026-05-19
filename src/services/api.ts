@@ -44,7 +44,7 @@ export interface ICoinGeckoRequestProps {
 
 export interface ICoinGeckoMarketChartRequestProps
   extends ICoinGeckoRequestProps {
-  days?: string | number;
+  days?: 1 | 30 | 180;
 }
 
 const pagination = {

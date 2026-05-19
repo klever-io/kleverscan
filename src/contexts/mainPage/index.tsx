@@ -16,7 +16,7 @@ import { createContext, PropsWithChildren, useContext, useRef } from 'react';
 import { useQueries } from '@tanstack/react-query';
 
 export interface IDaysCoins {
-  [coinName: string]: string | number;
+  [coinName: string]: 1 | 30 | 180;
 }
 export interface IHomeData {
   livePeakTPS: string;

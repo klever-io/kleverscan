@@ -1,22 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-
-const COINGECKO_HOST = 'https://api.coingecko.com/api/v3';
-const COIN_IDS = {
-  KLV: 'klever',
-  KFI: 'klever-finance',
-} as const;
-
-type CoinBase = keyof typeof COIN_IDS;
-
-const getCoinBase = (base: unknown): CoinBase | null => {
-  if (typeof base !== 'string') {
-    return null;
-  }
-
-  const normalizedBase = base.toUpperCase() as CoinBase;
-
-  return normalizedBase in COIN_IDS ? normalizedBase : null;
-};
+import { COINGECKO_HOST, COIN_IDS, getCoinBase } from './_shared';
 
 export default async function handler(
   req: NextApiRequest,

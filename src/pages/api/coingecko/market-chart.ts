@@ -1,24 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { COINGECKO_HOST, COIN_IDS, getCoinBase } from './_shared';
 
-const COINGECKO_HOST = 'https://api.coingecko.com/api/v3';
-const COIN_IDS = {
-  KLV: 'klever',
-  KFI: 'klever-finance',
-} as const;
 const ALLOWED_DAYS = ['1', '30', '180'] as const;
-
-type CoinBase = keyof typeof COIN_IDS;
 type AllowedDays = (typeof ALLOWED_DAYS)[number];
-
-const getCoinBase = (base: unknown): CoinBase | null => {
-  if (typeof base !== 'string') {
-    return null;
-  }
-
-  const normalizedBase = base.toUpperCase() as CoinBase;
-
-  return normalizedBase in COIN_IDS ? normalizedBase : null;
-};
 
 const getDays = (days: unknown): AllowedDays | null => {
   if (typeof days !== 'string') {

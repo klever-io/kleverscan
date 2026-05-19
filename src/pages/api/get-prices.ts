@@ -1,30 +1,55 @@
-import { getHost } from '@/services/api';
 import { NextApiRequest, NextApiResponse } from 'next';
+
+const API_KEY = process.env.DEFAULT_APIKEY_KPRICES;
+const KPRICES_HOST =
+  process.env.DEFAULT_KPRICES_HOST || 'https://apis.internal.klever.io/kprices';
+const ALLOWED_BASES = ['KLV', 'KFI'] as const;
+
+type AllowedBase = (typeof ALLOWED_BASES)[number];
+
+const getKpricesUrl = (): string => {
+  const host = KPRICES_HOST.endsWith('/')
+    ? KPRICES_HOST.slice(0, -1)
+    : KPRICES_HOST;
+
+  return `${host}/v2/prices`;
+};
+
+const getBase = (base: unknown): AllowedBase | null => {
+  if (
+    typeof base === 'string' &&
+    ALLOWED_BASES.includes(base.toUpperCase() as AllowedBase)
+  ) {
+    return base.toUpperCase() as AllowedBase;
+  }
+
+  return null;
+};
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<void> {
+  if (req.method !== 'GET') {
+    return res.status(405).json({
+      data: null,
+      error: 'Method not allowed',
+      code: 'method_not_allowed',
+    });
+  }
+
   try {
-    if (!req.body) {
+    const base = getBase(req.query.base);
+
+    if (!base) {
       return res.status(400).json({
         data: null,
-        error: 'Ivalid body request',
-        code: 'invalid_request',
+        error: 'Invalid base asset',
+        code: 'invalid_base',
       });
     }
 
-    const { route, service, method, query, body } = req.body;
-
-    if (!route || !service || !method) {
-      return res.status(400).json({
-        data: null,
-        error: 'Required parameters are missing',
-        code: 'missing_parameters',
-      });
-    }
-
-    if (!process.env.DEFAULT_APIKEY_KPRICES) {
+    if (!API_KEY) {
       return res.status(500).json({
         data: null,
         error: 'Required environment variable is missing',
@@ -32,26 +57,32 @@ export default async function handler(
       });
     }
 
-    const request: RequestInit = {
-      method,
+    const response = await fetch(getKpricesUrl(), {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-apikey': process.env.DEFAULT_APIKEY_KPRICES!,
+        'x-apikey': API_KEY,
         Accept: 'application/json',
       },
-    };
+      body: JSON.stringify([{ base, quote: 'USD' }]),
+      signal: AbortSignal.timeout(5000),
+    });
 
-    if (method === 'POST') {
-      request['body'] = JSON.stringify(body);
-    }
-
-    const response = await fetch(getHost(route, query, service, 'v2'), request);
     if (!response.ok) {
-      res.status(500).json(await response.json());
-    } else {
-      res.status(200).json(await response.json());
+      return res.status(502).json({
+        data: null,
+        error: 'Failed to fetch prices',
+        code: 'upstream_error',
+      });
     }
+
+    return res.status(200).json(await response.json());
   } catch (error) {
-    res.status(500).json({ data: null, error, code: 'internal_error' });
+    console.error('get-prices error:', error);
+    return res.status(500).json({
+      data: null,
+      error: 'Internal server error',
+      code: 'internal_error',
+    });
   }
 }

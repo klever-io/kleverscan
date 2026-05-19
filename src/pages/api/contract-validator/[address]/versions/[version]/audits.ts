@@ -24,8 +24,23 @@ export default async function handler(
     return;
   }
 
+  if (!/^[0-9a-fA-F]{64}$/.test(version)) {
+    res.status(400).json({ message: 'Invalid transaction hash format' });
+    return;
+  }
+
   if (!validatorUrl) {
     res.status(500).json({ message: 'Contract validator URL not configured' });
+    return;
+  }
+
+  const { link, label } = req.body || {};
+  if (typeof link !== 'string' || !link.trim()) {
+    res.status(400).json({ message: 'Audit link is required' });
+    return;
+  }
+  if (typeof label !== 'string' || !label.trim()) {
+    res.status(400).json({ message: 'Audit label is required' });
     return;
   }
 
@@ -33,7 +48,7 @@ export default async function handler(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10_000);
     const response = await fetch(
-      `${validatorUrl}/contract/${address}/versions/${version}/audits`,
+      `${validatorUrl}/contract/${encodeURIComponent(address)}/versions/${encodeURIComponent(version)}/audits`,
       {
         method: 'POST',
         headers: {

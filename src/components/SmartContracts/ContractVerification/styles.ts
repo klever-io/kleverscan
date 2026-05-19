@@ -62,6 +62,7 @@ export const FormField = styled.div`
   }
 
   input[type='text'],
+  input[type='url'],
   input[type='file'] {
     padding: 0.5rem 0.75rem;
     border: 1px solid ${({ theme }) => theme.black20};
@@ -489,8 +490,12 @@ export const AuditReportRow = styled.div`
   gap: 0.75rem;
   flex-wrap: wrap;
   font-size: 0.875rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
   border-bottom: 1px solid ${({ theme }) => theme.black10};
+  border-radius: 6px;
+
+  background: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.black};
 
   &:last-child {
     border-bottom: none;
@@ -508,8 +513,22 @@ export const AuditExternalLink = styled.a`
   }
 `;
 
+export const AuditLinkButton = styled.button`
+  font-size: 0.8rem;
+  color: ${({ theme }) => theme.violet};
+  text-decoration: none;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 export const AuditReportLabel = styled.span`
-  flex: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -520,4 +539,53 @@ export const AuditReportDate = styled.span`
   font-size: 0.8rem;
   opacity: 0.6;
   flex-shrink: 0;
+`;
+
+export const ModalCancelButton = styled.button`
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.black20};
+  background: transparent;
+  color: ${({ theme }) => theme.card.text};
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.7;
+  }
+`;
+
+export const AuditLinkModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  z-index: 6;
+  backdrop-filter: brightness(0.3);
+`;
+
+export const AuditLinkModalTitle = styled.h3`
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: ${({ theme }) => theme.true.white};
+`;
+
+export const AuditLinkModalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem;
+  width: clamp(300px, 90vw, 480px);
+  border-radius: 1rem;
+  background-color: ${({ theme }) => theme.card.background};
+  color: ${({ theme }) => theme.card.text};
+`;
+
+export const AuditLinkModalButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
 `;

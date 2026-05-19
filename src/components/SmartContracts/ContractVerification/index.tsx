@@ -26,7 +26,11 @@ import { dracula, xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import { toast } from 'react-toastify';
 import { AiFillCheckCircle, AiFillExclamationCircle } from 'react-icons/ai';
 import {
-  AuditExternalLink,
+  AuditLinkButton,
+  AuditLinkModalButtons,
+  AuditLinkModalContent,
+  AuditLinkModalOverlay,
+  AuditLinkModalTitle,
   AuditReportDate,
   AuditReportLabel,
   AuditReportList,
@@ -51,6 +55,7 @@ import {
   IdeSidebarTitle,
   JobRow,
   JobStatusCard,
+  ModalCancelButton,
   SelectorGroup,
   SelectorLabel,
   SourceSection,
@@ -65,6 +70,15 @@ import Tooltip from '@/components/Tooltip';
 import SelectorDropdown from './SelectorDropdown';
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react'));
+
+function isSafeUrl(url: string): boolean {
+  try {
+    const { protocol } = new URL(url);
+    return protocol === 'https:' || protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
 
 type ViewMode = 'tabs' | 'ide';
 
@@ -484,6 +498,9 @@ export function ContractSubmitAuditTab({
   const [label, setLabel] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [pendingExternalUrl, setPendingExternalUrl] = useState<string | null>(
+    null,
+  );
 
   const selectedVersion = versions.find(v => v.id === selectedVersionId);
   const txHash = hasVerifiedVersions
@@ -495,6 +512,23 @@ export function ContractSubmitAuditTab({
     setLink(currentAudit?.link ?? '');
     setLabel(currentAudit?.label ?? '');
   }, [currentAudit?.id, selectedVersionId]);
+
+  useEffect(() => {
+    if (hasVerifiedVersions) {
+      if (!versions.some(v => v.id === selectedVersionId)) {
+        setSelectedVersionId(latestVersion?.id ?? 0);
+      }
+    } else if (!selectedTxHash && blockchainVersionOptions.length > 0) {
+      setSelectedTxHash(blockchainVersionOptions[0].value);
+    }
+  }, [
+    hasVerifiedVersions,
+    latestVersion?.id,
+    versions,
+    selectedVersionId,
+    selectedTxHash,
+    blockchainVersionOptions,
+  ]);
 
   const versionOptions = [...versions].reverse().map(v => ({
     value: v.id,
@@ -511,99 +545,139 @@ export function ContractSubmitAuditTab({
       toast.error('Link and label are required');
       return;
     }
+    if (!isSafeUrl(link.trim())) {
+      toast.error('Please enter a valid https:// URL');
+      return;
+    }
     setSubmitError(null);
     setSubmitting(true);
     try {
       await submitAuditReport(contractAddress, txHash, link, label);
       toast.success('Audit report submitted successfully');
       onSubmitted();
-    } catch (err: any) {
-      toast.error(err.message || 'Submission failed');
-      setSubmitError(err.message || 'Submission failed');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Submission failed';
+      toast.error(message);
+      setSubmitError(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <UploadCard>
-        <JobStatusCard style={{ padding: 0, marginBottom: '0.5rem' }}>
-          {hasVerifiedVersions ? (
-            <>
-              {versions.length > 1 && (
-                <JobRow>
-                  <strong>Version</strong>
+    <>
+      <form onSubmit={handleSubmit}>
+        <UploadCard>
+          <JobStatusCard style={{ padding: 0, marginBottom: '0.5rem' }}>
+            {hasVerifiedVersions ? (
+              <>
+                {versions.length > 1 && (
+                  <JobRow>
+                    <strong>Version</strong>
+                    <SelectorDropdown
+                      value={selectedVersionId}
+                      options={versionOptions}
+                      onChange={id => setSelectedVersionId(id)}
+                    />
+                  </JobRow>
+                )}
+                {currentAudit && (
+                  <JobRow>
+                    <strong>Current</strong>
+                    {isSafeUrl(currentAudit.link) && (
+                      <AuditLinkButton
+                        type="button"
+                        onClick={() => setPendingExternalUrl(currentAudit.link)}
+                      >
+                        {currentAudit.label} ↗
+                      </AuditLinkButton>
+                    )}
+                    <AuditReportDate>
+                      {new Date(currentAudit.submittedAt).toLocaleDateString()}
+                    </AuditReportDate>
+                  </JobRow>
+                )}
+              </>
+            ) : (
+              <JobRow>
+                <strong>Version</strong>
+                {blockchainVersionOptions.length > 0 ? (
                   <SelectorDropdown
-                    value={selectedVersionId}
-                    options={versionOptions}
-                    onChange={id => setSelectedVersionId(id)}
+                    value={selectedTxHash}
+                    options={blockchainVersionOptions}
+                    onChange={hash => setSelectedTxHash(hash)}
                   />
-                </JobRow>
-              )}
-              {currentAudit && (
-                <JobRow>
-                  <strong>Current</strong>
-                  <AuditExternalLink
-                    href={currentAudit.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {currentAudit.label} ↗
-                  </AuditExternalLink>
-                  <AuditReportDate>
-                    {new Date(currentAudit.submittedAt).toLocaleDateString()}
-                  </AuditReportDate>
-                </JobRow>
-              )}
-            </>
-          ) : (
-            <JobRow>
-              <strong>Version</strong>
-              {blockchainVersionOptions.length > 0 ? (
-                <SelectorDropdown
-                  value={selectedTxHash}
-                  options={blockchainVersionOptions}
-                  onChange={hash => setSelectedTxHash(hash)}
-                />
-              ) : (
-                <EmptyState style={{ padding: 0 }}>
-                  Contract data not available
-                </EmptyState>
-              )}
-            </JobRow>
-          )}
-        </JobStatusCard>
+                ) : (
+                  <EmptyState style={{ padding: 0 }}>
+                    Contract data not available
+                  </EmptyState>
+                )}
+              </JobRow>
+            )}
+          </JobStatusCard>
 
-        {submitError && <ErrorBox>{submitError}</ErrorBox>}
-        <FormField>
-          <label>Audit report URL</label>
-          <input
-            type="text"
-            placeholder="https://..."
-            value={link}
-            onChange={e => setLink(e.target.value)}
-          />
-        </FormField>
-        <FormField>
-          <label>Auditor / report name</label>
-          <input
-            type="text"
-            placeholder="e.g. Audited by XYZ Security"
-            value={label}
-            onChange={e => setLabel(e.target.value)}
-            maxLength={255}
-          />
-        </FormField>
-        <SubmitButton type="submit" disabled={submitting}>
-          {submitting
-            ? 'Submitting...'
-            : currentAudit
-              ? 'Update audit report'
-              : 'Submit audit report'}
-        </SubmitButton>
-      </UploadCard>
-    </form>
+          {submitError && <ErrorBox>{submitError}</ErrorBox>}
+          <FormField>
+            <label>Audit report URL</label>
+            <input
+              type="url"
+              placeholder="https://..."
+              value={link}
+              onChange={e => setLink(e.target.value)}
+            />
+          </FormField>
+          <FormField>
+            <label>Auditor / report name</label>
+            <input
+              type="text"
+              placeholder="e.g. Audited by XYZ Security"
+              value={label}
+              onChange={e => setLabel(e.target.value)}
+              maxLength={255}
+            />
+          </FormField>
+          <SubmitButton type="submit" disabled={submitting}>
+            {submitting
+              ? 'Submitting...'
+              : currentAudit
+                ? 'Update audit report'
+                : 'Submit audit report'}
+          </SubmitButton>
+        </UploadCard>
+      </form>
+      {pendingExternalUrl && (
+        <AuditLinkModalOverlay onClick={() => setPendingExternalUrl(null)}>
+          <AuditLinkModalContent onClick={e => e.stopPropagation()}>
+            <AuditSectionTitle>External Link Warning</AuditSectionTitle>
+            <p style={{ margin: 0, fontSize: '0.875rem' }}>
+              This link has not been verified by Klever. External links may be
+              harmful — proceed with caution.
+            </p>
+            <AuditLinkModalButtons>
+              <ModalCancelButton
+                type="button"
+                onClick={() => setPendingExternalUrl(null)}
+              >
+                Cancel
+              </ModalCancelButton>
+              <SubmitButton
+                type="button"
+                onClick={() => {
+                  window.open(
+                    pendingExternalUrl,
+                    '_blank',
+                    'noopener,noreferrer',
+                  );
+                  setPendingExternalUrl(null);
+                }}
+              >
+                Open Link
+              </SubmitButton>
+            </AuditLinkModalButtons>
+          </AuditLinkModalContent>
+        </AuditLinkModalOverlay>
+      )}
+    </>
   );
 }
 
@@ -616,6 +690,10 @@ export function ContractAuditsTab({
   auditReports: AuditReport[];
   scData?: SmartContractDetailsData;
 }) {
+  const [pendingExternalUrl, setPendingExternalUrl] = useState<string | null>(
+    null,
+  );
+
   const versionList = (() => {
     if (!scData?.deployTxHash) return [];
     const upgrades = scData.upgrades ?? [];
@@ -632,9 +710,7 @@ export function ContractAuditsTab({
     return opts;
   })();
 
-  const reports = auditReports;
-
-  if (reports.length === 0) {
+  if (auditReports.length === 0) {
     return (
       <EmptyState>
         No security audit reports have been submitted for this contract.
@@ -642,8 +718,13 @@ export function ContractAuditsTab({
     );
   }
 
+  const sorted = [...auditReports].sort(
+    (a, b) =>
+      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
+  );
+
   const byTxHash = new Map<string, AuditReport[]>();
-  for (const r of reports) {
+  for (const r of sorted) {
     const list = byTxHash.get(r.txHash) ?? [];
     list.push(r);
     byTxHash.set(r.txHash, list);
@@ -651,7 +732,7 @@ export function ContractAuditsTab({
 
   const versionsWithAudits = versionList.filter(v => byTxHash.has(v.txHash));
   const knownHashes = new Set(versionList.map(v => v.txHash));
-  const unknownReports = reports.filter(r => !knownHashes.has(r.txHash));
+  const unknownReports = sorted.filter(r => !knownHashes.has(r.txHash));
 
   return (
     <>
@@ -669,13 +750,13 @@ export function ContractAuditsTab({
                       report.label
                     )}
                   </AuditReportLabel>
-                  <AuditExternalLink
-                    href={report.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    View Report ↗
-                  </AuditExternalLink>
+                  {isSafeUrl(report.link) && (
+                    <AuditLinkButton
+                      onClick={() => setPendingExternalUrl(report.link)}
+                    >
+                      View Report ↗
+                    </AuditLinkButton>
+                  )}
                   <AuditReportDate>
                     {new Date(report.submittedAt).toLocaleDateString()}
                   </AuditReportDate>
@@ -694,13 +775,13 @@ export function ContractAuditsTab({
                 <AuditReportLabel>
                   {index === 0 ? <strong>{report.label}</strong> : report.label}
                 </AuditReportLabel>
-                <AuditExternalLink
-                  href={report.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Report ↗
-                </AuditExternalLink>
+                {isSafeUrl(report.link) && (
+                  <AuditLinkButton
+                    onClick={() => setPendingExternalUrl(report.link)}
+                  >
+                    View Report ↗
+                  </AuditLinkButton>
+                )}
                 <AuditReportDate>
                   {new Date(report.submittedAt).toLocaleDateString()}
                 </AuditReportDate>
@@ -708,6 +789,38 @@ export function ContractAuditsTab({
             ))}
           </AuditReportList>
         </AuditSection>
+      )}
+      {pendingExternalUrl && (
+        <AuditLinkModalOverlay onClick={() => setPendingExternalUrl(null)}>
+          <AuditLinkModalContent onClick={e => e.stopPropagation()}>
+            <AuditLinkModalTitle>External Link Warning</AuditLinkModalTitle>
+            <p style={{ margin: 0, fontSize: '0.875rem' }}>
+              This link has not been verified by Klever. External links may be
+              harmful — proceed with caution.
+            </p>
+            <AuditLinkModalButtons>
+              <ModalCancelButton
+                type="button"
+                onClick={() => setPendingExternalUrl(null)}
+              >
+                Cancel
+              </ModalCancelButton>
+              <SubmitButton
+                type="button"
+                onClick={() => {
+                  window.open(
+                    pendingExternalUrl,
+                    '_blank',
+                    'noopener,noreferrer',
+                  );
+                  setPendingExternalUrl(null);
+                }}
+              >
+                Open Link
+              </SubmitButton>
+            </AuditLinkModalButtons>
+          </AuditLinkModalContent>
+        </AuditLinkModalOverlay>
       )}
     </>
   );
@@ -745,9 +858,11 @@ function UploadForm({
       await submitValidation(contractAddress, file, kscVersion, rustVersion);
       toast.success('Validation queued successfully');
       onSubmitted();
-    } catch (err: any) {
-      toast.error(err.message || 'Submission failed');
-      if (err.cause) setSubmitError(err.cause);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Submission failed';
+      toast.error(message);
+      if (err instanceof Error && err.cause)
+        setSubmitError(err.cause as string);
     } finally {
       setSubmitting(false);
     }

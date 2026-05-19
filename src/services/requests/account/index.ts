@@ -244,17 +244,7 @@ export const accountCall = async (
 
 export const pricesCall = async (): Promise<number | undefined> => {
   try {
-    const response = await api.post({
-      route: 'prices',
-      service: Service.KPRICES,
-      body: [
-        {
-          base: 'KLV',
-          quote: 'USD',
-        },
-      ],
-      useApiPrice: true,
-    });
+    const response = await api.price({ base: 'KLV' });
 
     if (!response.error || response.error === '') {
       return response[0]?.price_usd;

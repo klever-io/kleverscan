@@ -30,7 +30,7 @@ export const ConfirmTransaction: React.FC<
   fromAdvancedSteps,
   t,
 }) => {
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const name = watch('name');
   const ticker = watch('ticker');
   const maxSupply = watch('maxSupply');

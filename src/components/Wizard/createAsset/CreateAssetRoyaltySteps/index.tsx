@@ -18,7 +18,7 @@ import {
 export const CreateAssetRoyaltySteps: React.FC<
   PropsWithChildren<IWizardComponents>
 > = ({ handleStep, isNFT = false, t }) => {
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const [royalties, setRoyalties] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 

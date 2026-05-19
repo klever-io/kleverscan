@@ -36,6 +36,15 @@ import { CreateITOThirdStep } from '../CreateITOThirdStep';
 import { CreatePackInfoSteps } from '../CreatePackInfoSteps';
 import { CreateWhiteListSettingsSteps } from '../CreateWhiteListSettingsSteps';
 
+type ConfigITOFormData = Omit<
+  ConfigITOData,
+  'kda' | 'startTime' | 'endTime'
+> & {
+  collection: string;
+  startTime?: string;
+  endTime: string;
+};
+
 export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
   setAddAdvanced,
   addAdvancedSteps,
@@ -148,7 +157,7 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
   ]);
   const [activeStep, setActiveStep] = useState(steps[0]);
 
-  const methods = useForm({
+  const methods = useForm<ConfigITOFormData>({
     mode: 'all',
     defaultValues: {
       ...propertiesCommonDefaultValuesITO,
@@ -164,7 +173,7 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
   const status = watch('status');
   const startTimeNow = watch('startTimeStartNow');
 
-  const itoTimeFormatted = (time: string, isInfinity = false): string => {
+  const itoTimeFormatted = (time?: string, isInfinity = false): string => {
     if (!time && isInfinity) {
       return infinitySymbol;
     }
@@ -204,7 +213,7 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
     status || 1,
   ];
 
-  const onSubmit = async (data: ConfigITOData) => {
+  const onSubmit = async (data: ConfigITOFormData) => {
     if (data.startTimeStartNow) {
       delete data.startTimeStartNow;
       delete data.startTime;

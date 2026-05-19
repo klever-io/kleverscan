@@ -78,11 +78,13 @@ export const KDASelect: React.FC<PropsWithChildren<IKDASelect>> = props => {
   const {
     register,
     setValue,
-    formState: { errors },
+    formState: { errors: formErrors },
     getValues,
     trigger,
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const watchCollectionAssetId = watch('collectionAssetId');
   const watchCollection = watch('collection');
@@ -338,9 +340,11 @@ const CollectionIDField: React.FC<
   const {
     register,
     setValue,
-    formState: { errors },
+    formState: { errors: formErrors },
     watch,
-  } = useFormContext();
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const watchCollection: string = watch('collection');
   const watchCollectionAssetId = watch('collectionAssetId');

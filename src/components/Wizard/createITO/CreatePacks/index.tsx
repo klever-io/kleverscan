@@ -23,8 +23,10 @@ export const CreatePacks: React.FC<PropsWithChildren<IPackInfoITO>> = ({
     control,
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
   const { t } = useTranslation('wizards');
   const { fields, append, remove } = useFieldArray({
     control,

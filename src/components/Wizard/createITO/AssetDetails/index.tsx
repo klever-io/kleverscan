@@ -14,7 +14,7 @@ import { parseAddress } from '@/utils/parseValues';
 
 export const AssetDetails: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('wizards');
-  const { watch } = useFormContext();
+  const { watch } = useFormContext<any>();
   const collection = watch('collection');
   const { data, isLoading } = useQuery({
     queryKey: ['collection', collection],

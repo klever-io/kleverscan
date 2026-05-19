@@ -21,7 +21,7 @@ interface IStakingSectionProps {
 export const StakingSection: React.FC<
   PropsWithChildren<IStakingSectionProps>
 > = ({ assetTrigger = false, isFPR: isFPRProp }) => {
-  const { watch, setValue } = useFormContext();
+  const { watch, setValue } = useFormContext<any>();
   const isFPR = watch('staking.interestType');
 
   useEffect(() => {

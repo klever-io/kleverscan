@@ -16,8 +16,10 @@ export const CreateAssetTickerStep: React.FC<
   const {
     register,
     watch,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   const ticker = watch('ticker');
   let error = errors?.ticker;

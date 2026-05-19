@@ -14,8 +14,10 @@ export const WhitelistDefaultLimitStep: React.FC<
 > = ({ handleStep, t }) => {
   const {
     register,
-    formState: { errors },
-  } = useFormContext();
+    formState: { errors: formErrors },
+  } = useFormContext<any>();
+
+  const errors = formErrors as any;
 
   let error = errors?.whitelistDefaultLimit;
 

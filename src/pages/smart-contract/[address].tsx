@@ -100,7 +100,7 @@ const SmartContractInvoke: React.FC = () => {
     if (latestJob?.status === 'completed') {
       refetchContractInfo();
     }
-  }, [latestJob?.status]);
+  }, [latestJob?.status, refetchContractInfo]);
 
   const hasVerifiedVersions = (contractInfo?.contractVersions?.length ?? 0) > 0;
   const hasAuditReports = contractAudits.length > 0;

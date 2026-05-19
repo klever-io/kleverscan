@@ -19,6 +19,11 @@ export default async function handler(
     return;
   }
 
+  if (!/^klv1[0-9a-z]{58}$/.test(address)) {
+    res.status(400).json({ message: 'Invalid contract address format' });
+    return;
+  }
+
   if (typeof version !== 'string' || !version) {
     res.status(400).json({ message: 'Invalid transaction hash' });
     return;
@@ -44,6 +49,24 @@ export default async function handler(
     return;
   }
 
+  if (link.length > 2048) {
+    res.status(400).json({ message: 'Audit link too long (max 2048 chars)' });
+    return;
+  }
+
+  if (label.length > 255) {
+    res.status(400).json({ message: 'Audit label too long (max 255 chars)' });
+    return;
+  }
+
+  try {
+    const { protocol } = new URL(link);
+    if (protocol !== 'http:' && protocol !== 'https:') throw new Error();
+  } catch {
+    res.status(400).json({ message: 'Audit link must use http or https' });
+    return;
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10_000);
   try {
@@ -55,7 +78,7 @@ export default async function handler(
           'Content-Type': 'application/json',
           'X-API-KEY': API_KEY,
         },
-        body: JSON.stringify(req.body),
+        body: JSON.stringify({ link, label }),
         signal: controller.signal,
       },
     );

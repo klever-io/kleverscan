@@ -18,6 +18,7 @@ import React, {
   Suspense,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -68,6 +69,8 @@ import {
 } from './styles';
 import Tooltip from '@/components/Tooltip';
 import SelectorDropdown from './SelectorDropdown';
+import { buildBlockchainVersions } from './utils';
+import { IoOpenOutline } from 'react-icons/io5';
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react'));
 
@@ -78,6 +81,81 @@ function isSafeUrl(url: string): boolean {
   } catch {
     return false;
   }
+}
+
+function ExternalLinkConfirmModal({
+  url,
+  onClose,
+}: {
+  url: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <AuditLinkModalOverlay onClick={onClose}>
+      <AuditLinkModalContent
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ext-link-modal-title"
+        onClick={e => e.stopPropagation()}
+      >
+        <AuditLinkModalTitle id="ext-link-modal-title">
+          External Link Warning
+        </AuditLinkModalTitle>
+        <p style={{ margin: 0, fontSize: '0.875rem' }}>
+          This link has not been verified by Klever. External links may be
+          harmful — proceed with caution.
+        </p>
+        <AuditLinkModalButtons>
+          <ModalCancelButton type="button" onClick={onClose}>
+            Cancel
+          </ModalCancelButton>
+          <SubmitButton
+            type="button"
+            onClick={() => {
+              window.open(url, '_blank', 'noopener,noreferrer');
+              onClose();
+            }}
+          >
+            Open Link
+          </SubmitButton>
+        </AuditLinkModalButtons>
+      </AuditLinkModalContent>
+    </AuditLinkModalOverlay>
+  );
+}
+
+function AuditReportItem({
+  report,
+  isPrimary,
+  onOpenLink,
+}: {
+  report: AuditReport;
+  isPrimary: boolean;
+  onOpenLink: (url: string) => void;
+}) {
+  return (
+    <AuditReportRow>
+      <AuditReportLabel>
+        {isPrimary ? <strong>{report.label}</strong> : report.label}
+      </AuditReportLabel>
+      {isSafeUrl(report.link) && (
+        <AuditLinkButton onClick={() => onOpenLink(report.link)}>
+          View Report <IoOpenOutline size={20} />
+        </AuditLinkButton>
+      )}
+      <AuditReportDate>
+        {new Date(report.submittedAt).toLocaleDateString()}
+      </AuditReportDate>
+    </AuditReportRow>
+  );
 }
 
 type ViewMode = 'tabs' | 'ide';
@@ -470,23 +548,14 @@ export function ContractSubmitAuditTab({
   const hasVerifiedVersions = versions.length > 0;
   const latestVersion = versions[versions.length - 1];
 
-  // Blockchain-level versions built from deploy hash + upgrades (used when not verified).
-  // Ordered latest first so the default selection is the most recent deployment.
-  const blockchainVersionOptions = (() => {
-    if (!scData?.deployTxHash) return [];
-    const upgrades = scData.upgrades ?? [];
-    const opts: { value: string; label: string }[] = upgrades
-      .map((u, i) => ({
-        value: u.upgradeTxHash,
-        label: `Upgrade ${i + 1} — ${new Date(u.timestamp * 1000).toLocaleDateString()}`,
-      }))
-      .reverse();
-    opts.push({
-      value: scData.deployTxHash,
-      label: `Deploy — ${new Date(scData.timestamp * 1000).toLocaleDateString()}`,
-    });
-    return opts;
-  })();
+  const blockchainVersionOptions = useMemo(
+    () =>
+      buildBlockchainVersions(scData).map(v => ({
+        value: v.txHash,
+        label: v.label,
+      })),
+    [scData],
+  );
 
   const [selectedVersionId, setSelectedVersionId] = useState<number>(
     latestVersion?.id ?? 0,
@@ -506,12 +575,22 @@ export function ContractSubmitAuditTab({
   const txHash = hasVerifiedVersions
     ? (selectedVersion?.transactionHash ?? '')
     : selectedTxHash;
-  const currentAudit = selectedVersion?.auditReports?.[0] ?? null;
+  const currentAudit = selectedVersion?.auditReports
+    ? ([...selectedVersion.auditReports].sort(
+        (a, b) =>
+          new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
+      )[0] ?? null)
+    : null;
 
   useEffect(() => {
     setLink(currentAudit?.link ?? '');
     setLabel(currentAudit?.label ?? '');
-  }, [currentAudit?.id, selectedVersionId]);
+  }, [
+    currentAudit?.id,
+    currentAudit?.link,
+    currentAudit?.label,
+    selectedVersionId,
+  ]);
 
   useEffect(() => {
     if (hasVerifiedVersions) {
@@ -646,36 +725,10 @@ export function ContractSubmitAuditTab({
         </UploadCard>
       </form>
       {pendingExternalUrl && (
-        <AuditLinkModalOverlay onClick={() => setPendingExternalUrl(null)}>
-          <AuditLinkModalContent onClick={e => e.stopPropagation()}>
-            <AuditSectionTitle>External Link Warning</AuditSectionTitle>
-            <p style={{ margin: 0, fontSize: '0.875rem' }}>
-              This link has not been verified by Klever. External links may be
-              harmful — proceed with caution.
-            </p>
-            <AuditLinkModalButtons>
-              <ModalCancelButton
-                type="button"
-                onClick={() => setPendingExternalUrl(null)}
-              >
-                Cancel
-              </ModalCancelButton>
-              <SubmitButton
-                type="button"
-                onClick={() => {
-                  window.open(
-                    pendingExternalUrl,
-                    '_blank',
-                    'noopener,noreferrer',
-                  );
-                  setPendingExternalUrl(null);
-                }}
-              >
-                Open Link
-              </SubmitButton>
-            </AuditLinkModalButtons>
-          </AuditLinkModalContent>
-        </AuditLinkModalOverlay>
+        <ExternalLinkConfirmModal
+          url={pendingExternalUrl}
+          onClose={() => setPendingExternalUrl(null)}
+        />
       )}
     </>
   );
@@ -694,21 +747,7 @@ export function ContractAuditsTab({
     null,
   );
 
-  const versionList = (() => {
-    if (!scData?.deployTxHash) return [];
-    const upgrades = scData.upgrades ?? [];
-    const opts: { txHash: string; label: string }[] = upgrades
-      .map((u, i) => ({
-        txHash: u.upgradeTxHash,
-        label: `Upgrade ${i + 1} — ${new Date(u.timestamp * 1000).toLocaleDateString()}`,
-      }))
-      .reverse();
-    opts.push({
-      txHash: scData.deployTxHash,
-      label: `Deploy — ${new Date(scData.timestamp * 1000).toLocaleDateString()}`,
-    });
-    return opts;
-  })();
+  const versionList = buildBlockchainVersions(scData);
 
   if (auditReports.length === 0) {
     return (
@@ -742,25 +781,12 @@ export function ContractAuditsTab({
           <AuditReportList>
             {(byTxHash.get(v.txHash) ?? []).map(
               (report: AuditReport, index: number) => (
-                <AuditReportRow key={report.id}>
-                  <AuditReportLabel>
-                    {index === 0 ? (
-                      <strong>{report.label}</strong>
-                    ) : (
-                      report.label
-                    )}
-                  </AuditReportLabel>
-                  {isSafeUrl(report.link) && (
-                    <AuditLinkButton
-                      onClick={() => setPendingExternalUrl(report.link)}
-                    >
-                      View Report ↗
-                    </AuditLinkButton>
-                  )}
-                  <AuditReportDate>
-                    {new Date(report.submittedAt).toLocaleDateString()}
-                  </AuditReportDate>
-                </AuditReportRow>
+                <AuditReportItem
+                  key={report.id}
+                  report={report}
+                  isPrimary={index === 0}
+                  onOpenLink={setPendingExternalUrl}
+                />
               ),
             )}
           </AuditReportList>
@@ -771,56 +797,21 @@ export function ContractAuditsTab({
           <AuditSectionTitle>Other versions</AuditSectionTitle>
           <AuditReportList>
             {unknownReports.map((report: AuditReport, index: number) => (
-              <AuditReportRow key={report.id}>
-                <AuditReportLabel>
-                  {index === 0 ? <strong>{report.label}</strong> : report.label}
-                </AuditReportLabel>
-                {isSafeUrl(report.link) && (
-                  <AuditLinkButton
-                    onClick={() => setPendingExternalUrl(report.link)}
-                  >
-                    View Report ↗
-                  </AuditLinkButton>
-                )}
-                <AuditReportDate>
-                  {new Date(report.submittedAt).toLocaleDateString()}
-                </AuditReportDate>
-              </AuditReportRow>
+              <AuditReportItem
+                key={report.id}
+                report={report}
+                isPrimary={index === 0}
+                onOpenLink={setPendingExternalUrl}
+              />
             ))}
           </AuditReportList>
         </AuditSection>
       )}
       {pendingExternalUrl && (
-        <AuditLinkModalOverlay onClick={() => setPendingExternalUrl(null)}>
-          <AuditLinkModalContent onClick={e => e.stopPropagation()}>
-            <AuditLinkModalTitle>External Link Warning</AuditLinkModalTitle>
-            <p style={{ margin: 0, fontSize: '0.875rem' }}>
-              This link has not been verified by Klever. External links may be
-              harmful — proceed with caution.
-            </p>
-            <AuditLinkModalButtons>
-              <ModalCancelButton
-                type="button"
-                onClick={() => setPendingExternalUrl(null)}
-              >
-                Cancel
-              </ModalCancelButton>
-              <SubmitButton
-                type="button"
-                onClick={() => {
-                  window.open(
-                    pendingExternalUrl,
-                    '_blank',
-                    'noopener,noreferrer',
-                  );
-                  setPendingExternalUrl(null);
-                }}
-              >
-                Open Link
-              </SubmitButton>
-            </AuditLinkModalButtons>
-          </AuditLinkModalContent>
-        </AuditLinkModalOverlay>
+        <ExternalLinkConfirmModal
+          url={pendingExternalUrl}
+          onClose={() => setPendingExternalUrl(null)}
+        />
       )}
     </>
   );

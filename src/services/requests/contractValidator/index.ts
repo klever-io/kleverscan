@@ -95,7 +95,13 @@ export const submitAuditReport = async (
       body: JSON.stringify({ link, label }),
     },
   );
-  const data = await res.json();
+  const text = await res.text();
+  let data: { message?: string; data?: AuditReport } = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    data = { message: text };
+  }
   if (!res.ok) throw new Error(data.message || 'Audit submission failed');
   return data.data as AuditReport;
 };

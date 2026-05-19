@@ -19,14 +19,19 @@ export default async function handler(
     return;
   }
 
+  if (!/^klv1[0-9a-z]{58}$/.test(address)) {
+    res.status(400).json({ message: 'Invalid contract address format' });
+    return;
+  }
+
   if (!validatorUrl) {
     res.status(500).json({ message: 'Contract validator URL not configured' });
     return;
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10_000);
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10_000);
     const response = await fetch(
       `${validatorUrl}/contract/${encodeURIComponent(address)}/audits`,
       {
@@ -34,7 +39,6 @@ export default async function handler(
         signal: controller.signal,
       },
     );
-    clearTimeout(timeoutId);
 
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -43,7 +47,9 @@ export default async function handler(
       return;
     }
     const text = await response.text();
-    res.status(response.status).send(text || '');
+    res.status(response.status).json({
+      message: text || 'Upstream validator returned non-JSON response',
+    });
   } catch (error) {
     if ((error as Error).name === 'AbortError') {
       res.status(504).json({ message: 'Upstream validator timeout' });
@@ -51,5 +57,7 @@ export default async function handler(
     }
     console.error('Contract validator proxy error:', error);
     res.status(502).json({ message: 'Upstream validator request failed' });
+  } finally {
+    clearTimeout(timeoutId);
   }
 }

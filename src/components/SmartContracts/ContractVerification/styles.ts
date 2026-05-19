@@ -437,32 +437,6 @@ export const Spinner = styled.span`
 
 // --- Audit styles ---
 
-export const AuditStatusBadge = styled.button<{ audited: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  min-height: 34px;
-  transition: opacity 0.2s;
-  background: ${({ audited, theme }) =>
-    audited ? theme.green : 'transparent'};
-  color: ${({ audited, theme }) => (audited ? theme.true.white : theme.black)};
-  border: 1px solid
-    ${({ audited, theme }) => (audited ? theme.green : theme.black20)};
-
-  svg {
-    font-size: 0.95rem;
-  }
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
 export const AuditSection = styled.div`
   border-top: 1px solid ${({ theme }) => theme.black20};
   padding-top: 1rem;
@@ -502,21 +476,13 @@ export const AuditReportRow = styled.div`
   }
 `;
 
-export const AuditExternalLink = styled.a`
-  font-size: 0.8rem;
-  color: ${({ theme }) => theme.violet};
-  text-decoration: none;
-  flex-shrink: 0;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
 export const AuditLinkButton = styled.button`
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: ${({ theme }) => theme.violet};
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   flex-shrink: 0;
   cursor: pointer;
   border: none;

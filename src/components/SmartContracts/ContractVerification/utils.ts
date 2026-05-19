@@ -1,5 +1,14 @@
 import { SmartContractDetailsData } from '@/types/smart-contract';
 
+export function isSafeUrl(url: string): boolean {
+  try {
+    const { protocol } = new URL(url);
+    return protocol === 'https:' || protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
 export function buildBlockchainVersions(
   scData?: SmartContractDetailsData,
 ): { txHash: string; label: string }[] {

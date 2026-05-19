@@ -69,19 +69,11 @@ import {
 } from './styles';
 import Tooltip from '@/components/Tooltip';
 import SelectorDropdown from './SelectorDropdown';
-import { buildBlockchainVersions } from './utils';
+import { buildBlockchainVersions, isSafeUrl } from './utils';
+import { useAuditSubmission } from '@/utils/hooks/auditSubmission';
 import { IoOpenOutline } from 'react-icons/io5';
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react'));
-
-function isSafeUrl(url: string): boolean {
-  try {
-    const { protocol } = new URL(url);
-    return protocol === 'https:' || protocol === 'http:';
-  } catch {
-    return false;
-  }
-}
 
 function ExternalLinkConfirmModal({
   url,
@@ -563,13 +555,6 @@ export function ContractSubmitAuditTab({
   const [selectedTxHash, setSelectedTxHash] = useState<string>(
     () => blockchainVersionOptions[0]?.value ?? '',
   );
-  const [link, setLink] = useState('');
-  const [label, setLabel] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [pendingExternalUrl, setPendingExternalUrl] = useState<string | null>(
-    null,
-  );
 
   const selectedVersion = versions.find(v => v.id === selectedVersionId);
   const txHash = hasVerifiedVersions
@@ -582,15 +567,22 @@ export function ContractSubmitAuditTab({
       )[0] ?? null)
     : null;
 
-  useEffect(() => {
-    setLink(currentAudit?.link ?? '');
-    setLabel(currentAudit?.label ?? '');
-  }, [
-    currentAudit?.id,
-    currentAudit?.link,
-    currentAudit?.label,
-    selectedVersionId,
-  ]);
+  const {
+    link,
+    setLink,
+    label,
+    setLabel,
+    submitting,
+    submitError,
+    pendingExternalUrl,
+    setPendingExternalUrl,
+    handleSubmit,
+  } = useAuditSubmission({
+    contractAddress,
+    txHash,
+    currentAudit,
+    onSubmitted,
+  });
 
   useEffect(() => {
     if (hasVerifiedVersions) {
@@ -613,35 +605,6 @@ export function ContractSubmitAuditTab({
     value: v.id,
     label: `v${v.version} — ${new Date(v.createdAt).toLocaleDateString()}`,
   }));
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!txHash.trim()) {
-      toast.error('Transaction hash is required');
-      return;
-    }
-    if (!link.trim() || !label.trim()) {
-      toast.error('Link and label are required');
-      return;
-    }
-    if (!isSafeUrl(link.trim())) {
-      toast.error('Please enter a valid https:// URL');
-      return;
-    }
-    setSubmitError(null);
-    setSubmitting(true);
-    try {
-      await submitAuditReport(contractAddress, txHash, link, label);
-      toast.success('Audit report submitted successfully');
-      onSubmitted();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Submission failed';
-      toast.error(message);
-      setSubmitError(message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   return (
     <>

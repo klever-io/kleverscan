@@ -3,7 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 const API_KEY = process.env.DEFAULT_APIKEY_KPRICES;
 const KPRICES_HOST =
   process.env.DEFAULT_KPRICES_HOST || 'https://apis.internal.klever.io/kprices';
-const API_PORT = process.env.DEFAULT_API_PORT || '';
 const ALLOWED_BASES = ['KLV', 'KFI'] as const;
 
 type AllowedBase = (typeof ALLOWED_BASES)[number];
@@ -12,9 +11,8 @@ const getKpricesUrl = (): string => {
   const host = KPRICES_HOST.endsWith('/')
     ? KPRICES_HOST.slice(0, -1)
     : KPRICES_HOST;
-  const port = API_PORT ? `:${API_PORT}` : '';
 
-  return `${host}${port}/v2/prices`;
+  return `${host}/v2/prices`;
 };
 
 const getBase = (base: unknown): AllowedBase | null => {
@@ -67,14 +65,24 @@ export default async function handler(
         Accept: 'application/json',
       },
       body: JSON.stringify([{ base, quote: 'USD' }]),
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!response.ok) {
-      res.status(500).json(await response.json());
-    } else {
-      res.status(200).json(await response.json());
+      return res.status(502).json({
+        data: null,
+        error: 'Failed to fetch prices',
+        code: 'upstream_error',
+      });
     }
+
+    return res.status(200).json(await response.json());
   } catch (error) {
-    res.status(500).json({ data: null, error, code: 'internal_error' });
+    console.error('get-prices error:', error);
+    return res.status(500).json({
+      data: null,
+      error: 'Internal server error',
+      code: 'internal_error',
+    });
   }
 }

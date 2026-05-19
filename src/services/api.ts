@@ -87,7 +87,7 @@ export const getHost = (
   port = process.env.DEFAULT_API_PORT || ''; // for reference: used to be 443
   let urlParam = '';
 
-  if (host.substr(host.length - 1) === '/') {
+  if (host.at(-1) === '/') {
     host = host.substring(0, host.length - 1);
   }
 

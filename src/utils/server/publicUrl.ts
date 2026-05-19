@@ -22,6 +22,8 @@ const PRIVATE_IPV4_RANGES: Array<[number, number]> = [
 const IPV6_SPECIAL_RANGES: Array<[bigint, bigint]> = [
   [BigInt(0), BigInt(128)],
   [BigInt(1), BigInt(128)],
+  [BigInt('0x2001') << BigInt(112), BigInt(32)], // Teredo 2001::/32
+  [BigInt('0x2002') << BigInt(112), BigInt(16)], // 6to4 2002::/16
   [BigInt('0xfc00') << BigInt(112), BigInt(7)],
   [BigInt('0xfe80') << BigInt(112), BigInt(10)],
   [BigInt('0xff00') << BigInt(112), BigInt(8)],

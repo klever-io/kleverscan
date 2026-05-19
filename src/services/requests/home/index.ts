@@ -291,7 +291,6 @@ const homeKlvDataCall = async (): Promise<IGeckoResponse | undefined> => {
     console.error(error);
   }
 };
-7;
 
 const homeKlvChartCall = async (
   days?: IDaysCoins,

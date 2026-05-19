@@ -58,20 +58,24 @@ const readJsonWithLimit = async (response: Response): Promise<unknown> => {
   const chunks: Uint8Array[] = [];
   let totalBytes = 0;
 
-  while (true) {
-    const { done, value } = await reader.read();
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
 
-    if (done) {
-      break;
+      if (done) {
+        break;
+      }
+
+      totalBytes += value.byteLength;
+
+      if (totalBytes > MAX_METADATA_BYTES) {
+        throw new Error('Metadata response is too large');
+      }
+
+      chunks.push(value);
     }
-
-    totalBytes += value.byteLength;
-
-    if (totalBytes > MAX_METADATA_BYTES) {
-      throw new Error('Metadata response is too large');
-    }
-
-    chunks.push(value);
+  } finally {
+    reader.releaseLock();
   }
 
   const buffer = new Uint8Array(totalBytes);

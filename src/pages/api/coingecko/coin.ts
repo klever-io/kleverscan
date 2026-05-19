@@ -46,6 +46,7 @@ export default async function handler(
       headers: {
         Accept: 'application/json',
       },
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!response.ok) {

@@ -613,7 +613,7 @@ export function ContractSubmitAuditTab({
           <JobStatusCard style={{ padding: 0, marginBottom: '0.5rem' }}>
             {hasVerifiedVersions ? (
               <>
-                {versions.length > 1 && (
+                {versions.length > 0 && (
                   <JobRow>
                     <strong>Version</strong>
                     <SelectorDropdown

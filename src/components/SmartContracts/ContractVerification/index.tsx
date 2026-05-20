@@ -1,9 +1,13 @@
 import {
   fetchSourceFiles,
+  submitAuditReport,
   submitValidation,
 } from '@/services/requests/contractValidator';
 import {
+  AuditReport,
   ContractInfo,
+  ContractVersion,
+  SmartContractDetailsData,
   ValidationJob,
   ValidationJobStatus,
 } from '@/types/smart-contract';
@@ -14,6 +18,7 @@ import React, {
   Suspense,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -22,38 +27,128 @@ import { dracula, xcode } from 'react-syntax-highlighter/dist/cjs/styles/hljs';
 import { toast } from 'react-toastify';
 import { AiFillCheckCircle, AiFillExclamationCircle } from 'react-icons/ai';
 import {
-  StatusBadge,
-  VerificationBadge,
-  UploadCard,
-  FormField,
-  SubmitButton,
-  JobStatusCard,
-  JobRow,
-  ErrorBox,
+  AuditLinkButton,
+  AuditLinkModalButtons,
+  AuditLinkModalContent,
+  AuditLinkModalOverlay,
+  AuditLinkModalTitle,
+  AuditReportDate,
+  AuditReportLabel,
+  AuditReportList,
+  AuditReportRow,
+  AuditSection,
+  AuditSectionTitle,
   CodeBlockWrapper,
+  EmptyState,
+  ErrorBox,
   FileTab,
   FileTabs,
-  SourceSection,
-  SourceToolbar,
-  SelectorGroup,
-  SelectorLabel,
-  EmptyState,
-  Spinner,
+  FormField,
+  IdeEditorPane,
+  IdeEditorTab,
+  IdeEditorTabBar,
+  IdeFileIcon,
+  IdeFileItem,
+  IdeFolder,
+  IdeFolderHeader,
   IdeLayout,
   IdeSidebar,
   IdeSidebarTitle,
-  IdeFolder,
-  IdeFolderHeader,
-  IdeFileItem,
-  IdeFileIcon,
-  IdeEditorPane,
-  IdeEditorTabBar,
-  IdeEditorTab,
+  JobRow,
+  JobStatusCard,
+  ModalCancelButton,
+  SelectorGroup,
+  SelectorLabel,
+  SourceSection,
+  SourceToolbar,
+  Spinner,
+  StatusBadge,
+  SubmitButton,
+  UploadCard,
+  VerificationBadge,
 } from './styles';
 import Tooltip from '@/components/Tooltip';
 import SelectorDropdown from './SelectorDropdown';
+import { buildBlockchainVersions, isSafeUrl } from './utils';
+import { useAuditSubmission } from '@/utils/hooks/auditSubmission';
+import { IoOpenOutline } from 'react-icons/io5';
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react'));
+
+function ExternalLinkConfirmModal({
+  url,
+  onClose,
+}: {
+  url: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [onClose]);
+
+  return (
+    <AuditLinkModalOverlay onClick={onClose}>
+      <AuditLinkModalContent
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ext-link-modal-title"
+        onClick={e => e.stopPropagation()}
+      >
+        <AuditLinkModalTitle id="ext-link-modal-title">
+          External Link Warning
+        </AuditLinkModalTitle>
+        <p style={{ margin: 0, fontSize: '0.875rem' }}>
+          This link has not been verified by Klever. External links may be
+          harmful — proceed with caution.
+        </p>
+        <AuditLinkModalButtons>
+          <ModalCancelButton type="button" onClick={onClose}>
+            Cancel
+          </ModalCancelButton>
+          <SubmitButton
+            type="button"
+            onClick={() => {
+              window.open(url, '_blank', 'noopener,noreferrer');
+              onClose();
+            }}
+          >
+            Open Link
+          </SubmitButton>
+        </AuditLinkModalButtons>
+      </AuditLinkModalContent>
+    </AuditLinkModalOverlay>
+  );
+}
+
+function AuditReportItem({
+  report,
+  isPrimary,
+  onOpenLink,
+}: {
+  report: AuditReport;
+  isPrimary: boolean;
+  onOpenLink: (url: string) => void;
+}) {
+  return (
+    <AuditReportRow>
+      <AuditReportLabel>
+        {isPrimary ? <strong>{report.label}</strong> : report.label}
+      </AuditReportLabel>
+      {isSafeUrl(report.link) && (
+        <AuditLinkButton onClick={() => onOpenLink(report.link)}>
+          View Report <IoOpenOutline size={20} />
+        </AuditLinkButton>
+      )}
+      <AuditReportDate>
+        {new Date(report.submittedAt).toLocaleDateString()}
+      </AuditReportDate>
+    </AuditReportRow>
+  );
+}
 
 type ViewMode = 'tabs' | 'ide';
 
@@ -85,7 +180,6 @@ export function ContractSourceTab({
   const activeFile = selectedFile || fileNames[0] || '';
   const abiVersion = versions.find(v => v.version === selectedVersion);
 
-  // For IDE mode: all viewable files (source + ABI) in one list
   const abiContent = (() => {
     if (!abiVersion?.abi) return '';
     try {
@@ -98,7 +192,6 @@ export function ContractSourceTab({
   const [srcFolderOpen, setSrcFolderOpen] = useState(true);
   const [outputFolderOpen, setOutputFolderOpen] = useState(true);
 
-  // Determine what's shown in IDE mode
   const ideSelectedIsAbi = ideActiveFile === '__abi__';
   const ideValue = ideSelectedIsAbi
     ? abiContent
@@ -430,6 +523,263 @@ export function ContractVerifyTab({
   );
 }
 
+// --- Tab content: Submit audit report (owner only) ---
+
+export function ContractSubmitAuditTab({
+  contractAddress,
+  contractInfo,
+  scData,
+  onSubmitted,
+}: {
+  contractAddress: string;
+  contractInfo: ContractInfo | null;
+  scData?: SmartContractDetailsData;
+  onSubmitted: () => void;
+}) {
+  const versions = contractInfo?.contractVersions ?? [];
+  const hasVerifiedVersions = versions.length > 0;
+  const latestVersion = versions[versions.length - 1];
+
+  const blockchainVersionOptions = useMemo(
+    () =>
+      buildBlockchainVersions(scData).map(v => ({
+        value: v.txHash,
+        label: v.label,
+      })),
+    [scData],
+  );
+
+  const [selectedVersionId, setSelectedVersionId] = useState<number>(
+    latestVersion?.id ?? 0,
+  );
+  const [selectedTxHash, setSelectedTxHash] = useState<string>(
+    () => blockchainVersionOptions[0]?.value ?? '',
+  );
+
+  const selectedVersion = versions.find(v => v.id === selectedVersionId);
+  const txHash = hasVerifiedVersions
+    ? (selectedVersion?.transactionHash ?? '')
+    : selectedTxHash;
+  const currentAudit = selectedVersion?.auditReports
+    ? ([...selectedVersion.auditReports].sort(
+        (a, b) =>
+          new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
+      )[0] ?? null)
+    : null;
+
+  const {
+    link,
+    setLink,
+    label,
+    setLabel,
+    submitting,
+    submitError,
+    pendingExternalUrl,
+    setPendingExternalUrl,
+    handleSubmit,
+  } = useAuditSubmission({
+    contractAddress,
+    txHash,
+    currentAudit,
+    onSubmitted,
+  });
+
+  useEffect(() => {
+    if (hasVerifiedVersions) {
+      if (!versions.some(v => v.id === selectedVersionId)) {
+        setSelectedVersionId(latestVersion?.id ?? 0);
+      }
+    } else if (!selectedTxHash && blockchainVersionOptions.length > 0) {
+      setSelectedTxHash(blockchainVersionOptions[0].value);
+    }
+  }, [
+    hasVerifiedVersions,
+    latestVersion?.id,
+    versions,
+    selectedVersionId,
+    selectedTxHash,
+    blockchainVersionOptions,
+  ]);
+
+  const versionOptions = [...versions].reverse().map(v => ({
+    value: v.id,
+    label: `v${v.version} — ${new Date(v.createdAt).toLocaleDateString()}`,
+  }));
+
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <UploadCard>
+          <JobStatusCard style={{ padding: 0, marginBottom: '0.5rem' }}>
+            {hasVerifiedVersions ? (
+              <>
+                {versions.length > 1 && (
+                  <JobRow>
+                    <strong>Version</strong>
+                    <SelectorDropdown
+                      value={selectedVersionId}
+                      options={versionOptions}
+                      onChange={id => setSelectedVersionId(id)}
+                    />
+                  </JobRow>
+                )}
+                {currentAudit && (
+                  <JobRow>
+                    <strong>Current</strong>
+                    {isSafeUrl(currentAudit.link) && (
+                      <AuditLinkButton
+                        type="button"
+                        onClick={() => setPendingExternalUrl(currentAudit.link)}
+                      >
+                        {currentAudit.label} ↗
+                      </AuditLinkButton>
+                    )}
+                    <AuditReportDate>
+                      {new Date(currentAudit.submittedAt).toLocaleDateString()}
+                    </AuditReportDate>
+                  </JobRow>
+                )}
+              </>
+            ) : (
+              <JobRow>
+                <strong>Version</strong>
+                {blockchainVersionOptions.length > 0 ? (
+                  <SelectorDropdown
+                    value={selectedTxHash}
+                    options={blockchainVersionOptions}
+                    onChange={hash => setSelectedTxHash(hash)}
+                  />
+                ) : (
+                  <EmptyState style={{ padding: 0 }}>
+                    Contract data not available
+                  </EmptyState>
+                )}
+              </JobRow>
+            )}
+          </JobStatusCard>
+
+          {submitError && <ErrorBox>{submitError}</ErrorBox>}
+          <FormField>
+            <label>Audit report URL</label>
+            <input
+              type="url"
+              placeholder="https://..."
+              value={link}
+              onChange={e => setLink(e.target.value)}
+            />
+          </FormField>
+          <FormField>
+            <label>Auditor / report name</label>
+            <input
+              type="text"
+              placeholder="e.g. Audited by XYZ Security"
+              value={label}
+              onChange={e => setLabel(e.target.value)}
+              maxLength={255}
+            />
+          </FormField>
+          <SubmitButton type="submit" disabled={submitting}>
+            {submitting
+              ? 'Submitting...'
+              : currentAudit
+                ? 'Update audit report'
+                : 'Submit audit report'}
+          </SubmitButton>
+        </UploadCard>
+      </form>
+      {pendingExternalUrl && (
+        <ExternalLinkConfirmModal
+          url={pendingExternalUrl}
+          onClose={() => setPendingExternalUrl(null)}
+        />
+      )}
+    </>
+  );
+}
+
+// --- Tab content: Contract audits (all users) ---
+
+export function ContractAuditsTab({
+  auditReports,
+  scData,
+}: {
+  auditReports: AuditReport[];
+  scData?: SmartContractDetailsData;
+}) {
+  const [pendingExternalUrl, setPendingExternalUrl] = useState<string | null>(
+    null,
+  );
+
+  const versionList = buildBlockchainVersions(scData);
+
+  if (auditReports.length === 0) {
+    return (
+      <EmptyState>
+        No security audit reports have been submitted for this contract.
+      </EmptyState>
+    );
+  }
+
+  const sorted = [...auditReports].sort(
+    (a, b) =>
+      new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
+  );
+
+  const byTxHash = new Map<string, AuditReport[]>();
+  for (const r of sorted) {
+    const list = byTxHash.get(r.txHash) ?? [];
+    list.push(r);
+    byTxHash.set(r.txHash, list);
+  }
+
+  const versionsWithAudits = versionList.filter(v => byTxHash.has(v.txHash));
+  const knownHashes = new Set(versionList.map(v => v.txHash));
+  const unknownReports = sorted.filter(r => !knownHashes.has(r.txHash));
+
+  return (
+    <>
+      {versionsWithAudits.map(v => (
+        <AuditSection key={v.txHash}>
+          <AuditSectionTitle>{v.label}</AuditSectionTitle>
+          <AuditReportList>
+            {(byTxHash.get(v.txHash) ?? []).map(
+              (report: AuditReport, index: number) => (
+                <AuditReportItem
+                  key={report.id}
+                  report={report}
+                  isPrimary={index === 0}
+                  onOpenLink={setPendingExternalUrl}
+                />
+              ),
+            )}
+          </AuditReportList>
+        </AuditSection>
+      ))}
+      {unknownReports.length > 0 && (
+        <AuditSection>
+          <AuditSectionTitle>Other versions</AuditSectionTitle>
+          <AuditReportList>
+            {unknownReports.map((report: AuditReport, index: number) => (
+              <AuditReportItem
+                key={report.id}
+                report={report}
+                isPrimary={index === 0}
+                onOpenLink={setPendingExternalUrl}
+              />
+            ))}
+          </AuditReportList>
+        </AuditSection>
+      )}
+      {pendingExternalUrl && (
+        <ExternalLinkConfirmModal
+          url={pendingExternalUrl}
+          onClose={() => setPendingExternalUrl(null)}
+        />
+      )}
+    </>
+  );
+}
+
 // --- Internal sub-components ---
 
 function UploadForm({
@@ -462,9 +812,11 @@ function UploadForm({
       await submitValidation(contractAddress, file, kscVersion, rustVersion);
       toast.success('Validation queued successfully');
       onSubmitted();
-    } catch (err: any) {
-      toast.error(err.message || 'Submission failed');
-      if (err.cause) setSubmitError(err.cause);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Submission failed';
+      toast.error(message);
+      if (err instanceof Error && err.cause)
+        setSubmitError(err.cause as string);
     } finally {
       setSubmitting(false);
     }

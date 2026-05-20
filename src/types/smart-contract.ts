@@ -45,7 +45,11 @@ export interface SmartContractDetailsData {
   deployer: string;
   deployTxHash: string;
   timestamp: number;
-  upgrades?: string[];
+  upgrades?: Array<{
+    upgradeTxHash: string;
+    upgrader: string;
+    timestamp: number;
+  }>;
   properties?: {
     payable?: boolean;
     payableBySC?: boolean;
@@ -91,13 +95,24 @@ export interface ValidationJob {
   updatedAt: string;
 }
 
+export interface AuditReport {
+  id: number;
+  txHash: string;
+  link: string;
+  label: string;
+  submittedAt: string;
+  updatedAt: string;
+}
+
 export interface ContractVersion {
   id: number;
   version: number;
   abi: string;
   byteCodeHash: string;
+  transactionHash: string;
   storagePath: string;
   contractInfoId: number;
+  auditReports?: AuditReport[];
   createdAt: string;
   updatedAt: string;
 }

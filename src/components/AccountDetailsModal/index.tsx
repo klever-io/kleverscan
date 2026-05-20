@@ -167,7 +167,10 @@ export const AccountDetailsModal: React.FC<
     const currentTarget = e.currentTarget as HTMLElement;
 
     // If the related target is within the modal, don't close
-    if (relatedTarget && currentTarget.contains(relatedTarget)) {
+    if (
+      relatedTarget instanceof Node &&
+      currentTarget.contains(relatedTarget)
+    ) {
       return;
     }
 

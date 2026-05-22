@@ -72,6 +72,7 @@ import SelectorDropdown from './SelectorDropdown';
 import { buildBlockchainVersions, isSafeUrl } from './utils';
 import { useAuditSubmission } from '@/utils/hooks/auditSubmission';
 import { IoOpenOutline } from 'react-icons/io5';
+import { useExtension } from '@/contexts/extension';
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react'));
 
@@ -794,6 +795,7 @@ function UploadForm({
   const [rustVersion, setRustVersion] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { wallet, walletAddress } = useExtension();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -806,10 +808,32 @@ function UploadForm({
       toast.error('KSC version is required');
       return;
     }
+    if (!wallet || !walletAddress) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    let signature: string;
+    try {
+      const sigMessage = `Submit validation for contract ${contractAddress}`;
+      const sig = await wallet.signMessage(sigMessage);
+      signature = sig.toBase64();
+    } catch {
+      toast.error('Wallet signing was rejected or failed');
+      return;
+    }
+
     setSubmitError(null);
     setSubmitting(true);
     try {
-      await submitValidation(contractAddress, file, kscVersion, rustVersion);
+      await submitValidation(
+        contractAddress,
+        file,
+        kscVersion,
+        rustVersion,
+        walletAddress,
+        signature,
+      );
       toast.success('Validation queued successfully');
       onSubmitted();
     } catch (err: unknown) {

@@ -1,4 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { verifySignature, cryptoProvider } from '@klever/connect-crypto';
+import { keccak_256 } from '@noble/hashes/sha3';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
 
@@ -7,6 +9,21 @@ export const config = {
     bodyParser: false,
   },
 };
+
+// Remove this prepare when this is done in the connect-crypto.
+const KLV_MSG_PREFIX = '\x17Klever Signed Message:\n';
+
+function prepareKlvMessage(message: string): Uint8Array {
+  const msgBytes = Buffer.from(message, 'utf8');
+  const prepared = new Uint8Array(
+    Buffer.concat([
+      Buffer.from(KLV_MSG_PREFIX, 'utf8'),
+      Buffer.from(String(msgBytes.length), 'utf8'),
+      msgBytes,
+    ]),
+  );
+  return keccak_256(prepared);
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,6 +44,43 @@ export default async function handler(
 
   if (!validatorUrl) {
     res.status(500).json({ message: 'Contract validator URL not configured' });
+    return;
+  }
+
+  const walletAddress = req.headers['x-wallet-address'];
+  const walletSignature = req.headers['x-wallet-signature'];
+
+  if (
+    typeof walletAddress !== 'string' ||
+    !/^klv1[0-9a-z]{58}$/.test(walletAddress)
+  ) {
+    res.status(401).json({ message: 'Missing or invalid wallet address' });
+    return;
+  }
+  if (typeof walletSignature !== 'string' || !walletSignature) {
+    res.status(401).json({ message: 'Missing wallet signature' });
+    return;
+  }
+
+  const sigMessage = `Submit validation for contract ${address}`;
+  const messageBytes = prepareKlvMessage(sigMessage);
+  const signatureBytes = new Uint8Array(Buffer.from(walletSignature, 'base64'));
+
+  let signatureValid = false;
+  try {
+    const publicKeyBytes = await cryptoProvider.addressToBytes(walletAddress);
+    signatureValid = await verifySignature(
+      messageBytes,
+      signatureBytes,
+      publicKeyBytes,
+    );
+  } catch {
+    res.status(401).json({ message: 'Signature verification failed' });
+    return;
+  }
+
+  if (!signatureValid) {
+    res.status(401).json({ message: 'Invalid wallet signature' });
     return;
   }
 

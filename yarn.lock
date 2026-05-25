@@ -1946,12 +1946,32 @@
   dependencies:
     "@klever/connect-encoding" "0.1.3"
 
-"@klever/connect-crypto@0.1.3", "@klever/connect-crypto@^0.1.3":
+"@klever/connect-core@0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@klever/connect-core/-/connect-core-0.1.4.tgz#109462717810be6df161d40306c7548eb7da3b92"
+  integrity sha512-nV5Ua/sbcWn2qhh31q/BHMxyFwN8OtuUea1buM/zO/E/p2t7tSdAwYi7kMFTXoJIu6FneLOAWcv7s+P5xXB3zA==
+  dependencies:
+    "@klever/connect-encoding" "0.1.3"
+
+"@klever/connect-crypto@0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@klever/connect-crypto/-/connect-crypto-0.1.3.tgz#b67f82298e413182ca2ce3d5236569d9263aa244"
   integrity sha512-r6LDeg3gf1VHcac0uHFzved1cxftIDl9v9WDREWkrjshnurdXNBdTGr/YzzABR46pu/h6GI9HkxpQ3278qgTxQ==
   dependencies:
     "@klever/connect-core" "0.1.3"
+    "@klever/connect-encoding" "0.1.3"
+    "@noble/ed25519" "^2.0.0"
+    "@noble/hashes" "^1.3.3"
+    "@scure/base" "^2.0.0"
+    "@scure/bip32" "^1.3.0"
+    "@scure/bip39" "^1.2.1"
+
+"@klever/connect-crypto@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@klever/connect-crypto/-/connect-crypto-0.2.0.tgz#1589781534fe877647c29f0daaaed24609f64ee3"
+  integrity sha512-GSJ4ehmRvcVQfibpCguSDgrl4oWpi8h1mBGW71eFUJimaIr5ZoUB445KPkvWmxbU2CpyRXr8wfq0zlygWfkV1g==
+  dependencies:
+    "@klever/connect-core" "0.1.4"
     "@klever/connect-encoding" "0.1.3"
     "@noble/ed25519" "^2.0.0"
     "@noble/hashes" "^1.3.3"

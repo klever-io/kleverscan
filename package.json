@@ -21,7 +21,7 @@
     "@klever/connect": "^0.1.6",
     "@klever/connect-contracts": "^0.2.1",
     "@klever/connect-core": "^0.1.3",
-    "@klever/connect-crypto": "^0.1.3",
+    "@klever/connect-crypto": "^0.2.0",
     "@klever/connect-encoding": "^0.1.3",
     "@klever/connect-provider": "^0.2.0",
     "@klever/connect-react": "^0.1.7",

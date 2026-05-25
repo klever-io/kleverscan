@@ -1,29 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { verifySignature, cryptoProvider } from '@klever/connect-crypto';
-import { keccak_256 } from '@noble/hashes/sha3';
+import {
+  verifyWalletSignedMessage,
+  cryptoProvider,
+} from '@klever/connect-crypto';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-// Remove this prepare when this is done in the connect-crypto.
-const KLV_MSG_PREFIX = '\x17Klever Signed Message:\n';
-
-function prepareKlvMessage(message: string): Uint8Array {
-  const msgBytes = Buffer.from(message, 'utf8');
-  const prepared = new Uint8Array(
-    Buffer.concat([
-      Buffer.from(KLV_MSG_PREFIX, 'utf8'),
-      Buffer.from(String(msgBytes.length), 'utf8'),
-      msgBytes,
-    ]),
-  );
-  return keccak_256(prepared);
-}
 
 export default async function handler(
   req: NextApiRequest,
@@ -63,14 +44,13 @@ export default async function handler(
   }
 
   const sigMessage = `Submit validation for contract ${address}`;
-  const messageBytes = prepareKlvMessage(sigMessage);
   const signatureBytes = new Uint8Array(Buffer.from(walletSignature, 'base64'));
 
   let signatureValid = false;
   try {
     const publicKeyBytes = await cryptoProvider.addressToBytes(walletAddress);
-    signatureValid = await verifySignature(
-      messageBytes,
+    signatureValid = await verifyWalletSignedMessage(
+      sigMessage,
       signatureBytes,
       publicKeyBytes,
     );

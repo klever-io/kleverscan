@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { EventEmitter } from 'events';
-import { keccak_256 } from '@noble/hashes/sha3';
 
 const CONTRACT_ADDRESS =
   'klv1qqqqqqqqqqqqqpgq0mkvrke3yjeyzafm0mwz6zqjsvppsel0veys5m7dwn';
@@ -11,14 +10,14 @@ const SIG_HEX =
 const SIG_B64 = Buffer.from(SIG_HEX, 'hex').toString('base64');
 
 jest.mock('@klever/connect-crypto', () => ({
-  verifySignature: jest.fn(),
+  verifyWalletSignedMessage: jest.fn(),
   cryptoProvider: { addressToBytes: jest.fn() },
 }));
 
 import handler from '../validate';
-import { verifySignature, cryptoProvider } from '@klever/connect-crypto';
+import { verifyWalletSignedMessage, cryptoProvider } from '@klever/connect-crypto';
 
-const mockedVerify = verifySignature as jest.Mock;
+const mockedVerify = verifyWalletSignedMessage as jest.Mock;
 const mockedAddressToBytes = cryptoProvider.addressToBytes as jest.Mock;
 
 // Emits 'data' + 'end' after all pending microtasks (crypto awaits) complete.
@@ -144,20 +143,10 @@ describe('POST /api/contract-validator/[address]/validate', () => {
       const { res } = makeRes();
       await handler(makeStreamReq(), res);
 
-      // Handler uses KLV signing protocol: keccak256("\x17Klever Signed Message:\n" + len + msg)
       const expectedMessage = `Submit validation for contract ${CONTRACT_ADDRESS}`;
-      const msgBytes = Buffer.from(expectedMessage, 'utf8');
-      const prepared = new Uint8Array(
-        Buffer.concat([
-          Buffer.from('\x17Klever Signed Message:\n', 'utf8'),
-          Buffer.from(String(msgBytes.length), 'utf8'),
-          msgBytes,
-        ]),
-      );
-      const expectedMsgBytes = keccak_256(prepared);
       const expectedSigBytes = new Uint8Array(Buffer.from(SIG_B64, 'base64'));
       expect(mockedVerify).toHaveBeenCalledWith(
-        expectedMsgBytes,
+        expectedMessage,
         expectedSigBytes,
         new Uint8Array(32),
       );

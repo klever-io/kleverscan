@@ -813,18 +813,19 @@ function UploadForm({
       return;
     }
 
+    setSubmitError(null);
+    setSubmitting(true);
+
     let signature: string;
     try {
       const sigMessage = `Submit validation for contract ${contractAddress}`;
       const sig = await wallet.signMessage(sigMessage);
       signature = sig.toBase64();
     } catch {
+      setSubmitting(false);
       toast.error('Wallet signing was rejected or failed');
       return;
     }
-
-    setSubmitError(null);
-    setSubmitting(true);
     try {
       await submitValidation(
         contractAddress,

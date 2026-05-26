@@ -43,17 +43,29 @@ export default async function handler(
     return;
   }
 
-  const sigMessage = `Submit validation for contract ${address}`;
   const signatureBytes = new Uint8Array(Buffer.from(walletSignature, 'base64'));
+
+  const windowMs = 2 * 60 * 1000;
+  const now = Date.now();
+  const currentWindow = Math.floor(now / windowMs) * windowMs;
+  const previousWindow = currentWindow - windowMs;
 
   let signatureValid = false;
   try {
     const publicKeyBytes = await cryptoProvider.addressToBytes(walletAddress);
-    signatureValid = await verifyWalletSignedMessage(
-      sigMessage,
-      signatureBytes,
-      publicKeyBytes,
-    );
+    for (const ts of [currentWindow, previousWindow]) {
+      const sigMessage = `Submit validation for contract ${address} at ${ts}`;
+      if (
+        await verifyWalletSignedMessage(
+          sigMessage,
+          signatureBytes,
+          publicKeyBytes,
+        )
+      ) {
+        signatureValid = true;
+        break;
+      }
+    }
   } catch {
     res.status(401).json({ message: 'Signature verification failed' });
     return;

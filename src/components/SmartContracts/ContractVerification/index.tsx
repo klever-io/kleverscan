@@ -818,7 +818,9 @@ function UploadForm({
 
     let signature: string;
     try {
-      const sigMessage = `Submit validation for contract ${contractAddress}`;
+      const windowMs = 2 * 60 * 1000;
+      const roundedTs = Math.floor(Date.now() / windowMs) * windowMs;
+      const sigMessage = `Submit validation for contract ${contractAddress} at ${roundedTs}`;
       const sig = await wallet.signMessage(sigMessage);
       signature = sig.toBase64();
     } catch {

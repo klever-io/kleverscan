@@ -134,7 +134,7 @@ describe('POST /api/contract-validator/[address]/validate', () => {
       expect(json).toHaveBeenCalledWith({ message: 'Missing wallet signature' });
     });
 
-    it('verifies using the message tied to the contract address in the URL', async () => {
+    it('verifies using a time-windowed message tied to the contract address', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         status: 200,
         headers: { get: () => 'application/json' },
@@ -143,17 +143,18 @@ describe('POST /api/contract-validator/[address]/validate', () => {
       const { res } = makeRes();
       await handler(makeStreamReq(), res);
 
-      const expectedMessage = `Submit validation for contract ${CONTRACT_ADDRESS}`;
       const expectedSigBytes = new Uint8Array(Buffer.from(SIG_B64, 'base64'));
       expect(mockedVerify).toHaveBeenCalledWith(
-        expectedMessage,
+        expect.stringMatching(
+          new RegExp(`^Submit validation for contract ${CONTRACT_ADDRESS} at \\d+$`),
+        ),
         expectedSigBytes,
         new Uint8Array(32),
       );
     });
 
     it('returns 401 when signature does not match', async () => {
-      mockedVerify.mockResolvedValueOnce(false);
+      mockedVerify.mockResolvedValueOnce(false).mockResolvedValueOnce(false);
       const { res, status, json } = makeRes();
       await handler(makeStreamReq(), res);
       expect(status).toHaveBeenCalledWith(401);

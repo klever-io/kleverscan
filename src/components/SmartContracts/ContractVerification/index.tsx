@@ -565,6 +565,10 @@ export function ContractSubmitAuditTab({
       )[0] ?? null)
     : null;
 
+  const versionTxHash = hasVerifiedVersions
+    ? (selectedVersion?.transactionHash ?? '')
+    : selectedTxHash;
+
   const {
     link,
     setLink,
@@ -580,6 +584,7 @@ export function ContractSubmitAuditTab({
     contractAddress,
     currentAudit,
     onSubmitted,
+    versionTxHash,
   });
 
   const { wallet } = useExtension();

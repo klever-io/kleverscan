@@ -757,6 +757,7 @@ type Constructor = {
 export interface ABI {
   name: string;
   constructor: Constructor;
+  upgradeConstructor?: Constructor;
   endpoints: Endpoint[];
   types: Record<string, ABIType>;
 }

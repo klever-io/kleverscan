@@ -16,10 +16,12 @@ export function useAuditSubmission({
   contractAddress,
   currentAudit,
   onSubmitted,
+  versionTxHash,
 }: {
   contractAddress: string;
   currentAudit: AuditReport | null;
   onSubmitted: () => void;
+  versionTxHash: string;
 }) {
   const [link, setLink] = useState('');
   const [label, setLabel] = useState('');
@@ -110,6 +112,7 @@ export function useAuditSubmission({
             signedTransaction: JSON.stringify(signedTransaction),
             link: normalizedLink,
             label: normalizedLabel,
+            versionTxHash,
           }),
         },
       );

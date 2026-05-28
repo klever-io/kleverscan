@@ -2,7 +2,7 @@ import { ABIType, RUST_TYPES_WITH_OPTION } from '@/types/contracts';
 import { getJSType } from '@klever/connect-contracts';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { HiTrash } from 'react-icons/hi';
 import { ABIFunctionArguments } from '.';
@@ -74,6 +74,7 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
 }) => {
   const [isVariadic, setIsVariadic] = useState(false);
   const [argument, setArgument] = useState({});
+  const prevArgsRef = useRef<string | undefined>(undefined);
   const { control, getValues, watch } = useFormContext<any>();
   const router = useRouter();
   const { fields, append, remove, replace } = useFieldArray({
@@ -82,32 +83,35 @@ export const ArgumentsSection: React.FC<PropsWithChildren<IArguments>> = ({
   });
 
   useEffect(() => {
-    if (args) {
-      const replaceArguments = Object.keys(args).map(key => {
-        const rawType = args[key].raw_type;
-        const type = getJSType(rawType || '');
-        const arg = {
-          name: key,
-          type: args[key].type,
-          raw_type: args[key].raw_type,
-          value: getInitialValue(args[key].raw_type, types),
-          required: type !== 'checkbox' && args[key].required,
-          options: types?.[args[key].raw_type]?.variants?.map(variant => {
-            return {
-              label: variant.name,
-              value: variant.discriminant,
-            };
-          }),
-        };
-        if (type === 'variadic') {
-          setIsVariadic(true);
-          setArgument(arg);
-        }
-        return arg;
-      });
-      replace(replaceArguments);
-      handleInputChange({} as any);
-    }
+    if (!args) return;
+    const argsKey = JSON.stringify(args);
+    if (argsKey === prevArgsRef.current) return;
+    prevArgsRef.current = argsKey;
+
+    const replaceArguments = Object.keys(args).map(key => {
+      const rawType = args[key].raw_type;
+      const type = getJSType(rawType || '');
+      const arg = {
+        name: key,
+        type: args[key].type,
+        raw_type: args[key].raw_type,
+        value: getInitialValue(args[key].raw_type, types),
+        required: type !== 'checkbox' && args[key].required,
+        options: types?.[args[key].raw_type]?.variants?.map(variant => {
+          return {
+            label: variant.name,
+            value: variant.discriminant,
+          };
+        }),
+      };
+      if (type === 'variadic') {
+        setIsVariadic(true);
+        setArgument(arg);
+      }
+      return arg;
+    });
+    replace(replaceArguments);
+    handleInputChange({} as any);
   }, [args]);
 
   return (

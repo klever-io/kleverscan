@@ -24,11 +24,18 @@ export default async function handler(
     return;
   }
 
-  const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  let body: unknown;
+  try {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } catch {
+    res.status(400).json({ message: 'Invalid request body' });
+    return;
+  }
 
-  const { signedTransaction, link, label } = body ?? {};
+  const { signedTransaction, link, label, versionTxHash } =
+    (body as Record<string, unknown>) ?? {};
 
-  if (!signedTransaction) {
+  if (typeof signedTransaction !== 'string' || !signedTransaction) {
     res.status(400).json({ message: 'signedTransaction is required' });
     return;
   }
@@ -40,9 +47,29 @@ export default async function handler(
     res.status(400).json({ message: 'label is required' });
     return;
   }
+  if (
+    typeof versionTxHash !== 'string' ||
+    !/^[0-9a-fA-F]{64}$/.test(versionTxHash)
+  ) {
+    res
+      .status(400)
+      .json({
+        message:
+          'versionTxHash is required and must be a valid 64-hex transaction hash',
+      });
+    return;
+  }
+
+  let parsedTx: unknown;
+  try {
+    parsedTx = JSON.parse(signedTransaction);
+  } catch {
+    res.status(400).json({ message: 'signedTransaction is not valid JSON' });
+    return;
+  }
 
   const { error, status, hash } = await broadcastTXandCheckStatus(
-    JSON.parse(signedTransaction),
+    parsedTx as Parameters<typeof broadcastTXandCheckStatus>[0],
   );
 
   if (error || status !== 'success') {
@@ -50,14 +77,18 @@ export default async function handler(
   }
 
   const response = await fetch(
-    `${VALIDATOR_URL}/contract/${encodeURIComponent(address)}/versions/${encodeURIComponent(hash)}/audits`,
+    `${VALIDATOR_URL}/contract/${encodeURIComponent(address)}/versions/${encodeURIComponent(versionTxHash)}/audits`,
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-API-KEY': VALIDATOR_API_KEY,
       },
-      body: JSON.stringify({ link: link.trim(), label: label.trim() }),
+      body: JSON.stringify({
+        link: link.trim(),
+        label: label.trim(),
+        payment_tx_hash: hash,
+      }),
     },
   );
 

@@ -177,7 +177,7 @@ const parseConstructorInputs = (
   payableInTokens: string[] | undefined,
   types: Record<string, ABIType>,
 ): ABIFunction => {
-  if (!inputs?.length) return { arguments: {} };
+  if (!inputs?.length) return { arguments: {}, allowedAssets: payableInTokens };
   return {
     arguments: inputs.reduce((acc, input) => {
       const isOptional = input.type.toLowerCase().startsWith('option');

@@ -1,6 +1,5 @@
 import {
   fetchSourceFiles,
-  submitAuditReport,
   submitValidation,
 } from '@/services/requests/contractValidator';
 import {
@@ -41,6 +40,7 @@ import {
   CodeBlockWrapper,
   EmptyState,
   ErrorBox,
+  FeeInfo,
   FileTab,
   FileTabs,
   FormField,
@@ -558,15 +558,16 @@ export function ContractSubmitAuditTab({
   );
 
   const selectedVersion = versions.find(v => v.id === selectedVersionId);
-  const txHash = hasVerifiedVersions
-    ? (selectedVersion?.transactionHash ?? '')
-    : selectedTxHash;
   const currentAudit = selectedVersion?.auditReports
     ? ([...selectedVersion.auditReports].sort(
         (a, b) =>
           new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
       )[0] ?? null)
     : null;
+
+  const versionTxHash = hasVerifiedVersions
+    ? (selectedVersion?.transactionHash ?? '')
+    : selectedTxHash;
 
   const {
     link,
@@ -575,15 +576,18 @@ export function ContractSubmitAuditTab({
     setLabel,
     submitting,
     submitError,
+    transferValue,
     pendingExternalUrl,
     setPendingExternalUrl,
     handleSubmit,
   } = useAuditSubmission({
     contractAddress,
-    txHash,
     currentAudit,
     onSubmitted,
+    versionTxHash,
   });
+
+  const { wallet } = useExtension();
 
   useEffect(() => {
     if (hasVerifiedVersions) {
@@ -679,12 +683,19 @@ export function ContractSubmitAuditTab({
               maxLength={255}
             />
           </FormField>
-          <SubmitButton type="submit" disabled={submitting}>
-            {submitting
-              ? 'Submitting...'
-              : currentAudit
-                ? 'Update audit report'
-                : 'Submit audit report'}
+          {transferValue != null && (
+            <FeeInfo>
+              Submitting requires a payment of <span>{transferValue} KLV</span>
+            </FeeInfo>
+          )}
+          <SubmitButton type="submit" disabled={submitting || !wallet}>
+            {!wallet
+              ? 'Connect wallet to submit'
+              : submitting
+                ? 'Submitting...'
+                : currentAudit
+                  ? 'Update audit report'
+                  : 'Submit audit report'}
           </SubmitButton>
         </UploadCard>
       </form>

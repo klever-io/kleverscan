@@ -1,12 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import {
+  verifyWalletSignedMessage,
+  cryptoProvider,
+} from '@klever/connect-crypto';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export default async function handler(
   req: NextApiRequest,
@@ -27,6 +25,54 @@ export default async function handler(
 
   if (!validatorUrl) {
     res.status(500).json({ message: 'Contract validator URL not configured' });
+    return;
+  }
+
+  const walletAddress = req.headers['x-wallet-address'];
+  const walletSignature = req.headers['x-wallet-signature'];
+
+  if (
+    typeof walletAddress !== 'string' ||
+    !/^klv1[0-9a-z]{58}$/.test(walletAddress)
+  ) {
+    res.status(401).json({ message: 'Missing or invalid wallet address' });
+    return;
+  }
+  if (typeof walletSignature !== 'string' || !walletSignature) {
+    res.status(401).json({ message: 'Missing wallet signature' });
+    return;
+  }
+
+  const signatureBytes = new Uint8Array(Buffer.from(walletSignature, 'base64'));
+
+  const windowMs = 2 * 60 * 1000;
+  const now = Date.now();
+  const currentWindow = Math.floor(now / windowMs) * windowMs;
+  const previousWindow = currentWindow - windowMs;
+
+  let signatureValid = false;
+  try {
+    const publicKeyBytes = await cryptoProvider.addressToBytes(walletAddress);
+    for (const ts of [currentWindow, previousWindow]) {
+      const sigMessage = `Submit validation for contract ${address} at ${ts}`;
+      if (
+        await verifyWalletSignedMessage(
+          sigMessage,
+          signatureBytes,
+          publicKeyBytes,
+        )
+      ) {
+        signatureValid = true;
+        break;
+      }
+    }
+  } catch {
+    res.status(401).json({ message: 'Signature verification failed' });
+    return;
+  }
+
+  if (!signatureValid) {
+    res.status(401).json({ message: 'Invalid wallet signature' });
     return;
   }
 

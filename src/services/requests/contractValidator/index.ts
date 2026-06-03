@@ -60,6 +60,8 @@ export const submitValidation = async (
   file: File,
   kscVersion: string,
   rustVersion: string,
+  walletAddress: string,
+  signature: string,
 ): Promise<{ jobId: number; message: string }> => {
   const formData = new FormData();
   formData.append('file', file);
@@ -68,6 +70,10 @@ export const submitValidation = async (
 
   const res = await fetch(`${BASE}/${contractAddress}/validate`, {
     method: 'POST',
+    headers: {
+      'X-Wallet-Address': walletAddress,
+      'X-Wallet-Signature': signature,
+    },
     body: formData,
   });
 

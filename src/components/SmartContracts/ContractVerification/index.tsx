@@ -1,6 +1,5 @@
 import {
   fetchSourceFiles,
-  submitAuditReport,
   submitValidation,
 } from '@/services/requests/contractValidator';
 import {
@@ -41,6 +40,7 @@ import {
   CodeBlockWrapper,
   EmptyState,
   ErrorBox,
+  FeeInfo,
   FileTab,
   FileTabs,
   FormField,
@@ -72,6 +72,7 @@ import SelectorDropdown from './SelectorDropdown';
 import { buildBlockchainVersions, isSafeUrl } from './utils';
 import { useAuditSubmission } from '@/utils/hooks/auditSubmission';
 import { IoOpenOutline } from 'react-icons/io5';
+import { useExtension } from '@/contexts/extension';
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react'));
 
@@ -557,15 +558,16 @@ export function ContractSubmitAuditTab({
   );
 
   const selectedVersion = versions.find(v => v.id === selectedVersionId);
-  const txHash = hasVerifiedVersions
-    ? (selectedVersion?.transactionHash ?? '')
-    : selectedTxHash;
   const currentAudit = selectedVersion?.auditReports
     ? ([...selectedVersion.auditReports].sort(
         (a, b) =>
           new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime(),
       )[0] ?? null)
     : null;
+
+  const versionTxHash = hasVerifiedVersions
+    ? (selectedVersion?.transactionHash ?? '')
+    : selectedTxHash;
 
   const {
     link,
@@ -574,15 +576,18 @@ export function ContractSubmitAuditTab({
     setLabel,
     submitting,
     submitError,
+    transferValue,
     pendingExternalUrl,
     setPendingExternalUrl,
     handleSubmit,
   } = useAuditSubmission({
     contractAddress,
-    txHash,
     currentAudit,
     onSubmitted,
+    versionTxHash,
   });
+
+  const { wallet } = useExtension();
 
   useEffect(() => {
     if (hasVerifiedVersions) {
@@ -678,12 +683,19 @@ export function ContractSubmitAuditTab({
               maxLength={255}
             />
           </FormField>
-          <SubmitButton type="submit" disabled={submitting}>
-            {submitting
-              ? 'Submitting...'
-              : currentAudit
-                ? 'Update audit report'
-                : 'Submit audit report'}
+          {transferValue != null && (
+            <FeeInfo>
+              Submitting requires a payment of <span>{transferValue} KLV</span>
+            </FeeInfo>
+          )}
+          <SubmitButton type="submit" disabled={submitting || !wallet}>
+            {!wallet
+              ? 'Connect wallet to submit'
+              : submitting
+                ? 'Submitting...'
+                : currentAudit
+                  ? 'Update audit report'
+                  : 'Submit audit report'}
           </SubmitButton>
         </UploadCard>
       </form>
@@ -794,6 +806,7 @@ function UploadForm({
   const [rustVersion, setRustVersion] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { wallet, walletAddress } = useExtension();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -806,10 +819,35 @@ function UploadForm({
       toast.error('KSC version is required');
       return;
     }
+    if (!wallet || !walletAddress) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
     setSubmitError(null);
     setSubmitting(true);
+
+    let signature: string;
     try {
-      await submitValidation(contractAddress, file, kscVersion, rustVersion);
+      const windowMs = 2 * 60 * 1000;
+      const roundedTs = Math.floor(Date.now() / windowMs) * windowMs;
+      const sigMessage = `Submit validation for contract ${contractAddress} at ${roundedTs}`;
+      const sig = await wallet.signMessage(sigMessage);
+      signature = sig.toBase64();
+    } catch {
+      setSubmitting(false);
+      toast.error('Wallet signing was rejected or failed');
+      return;
+    }
+    try {
+      await submitValidation(
+        contractAddress,
+        file,
+        kscVersion,
+        rustVersion,
+        walletAddress,
+        signature,
+      );
       toast.success('Validation queued successfully');
       onSubmitted();
     } catch (err: unknown) {

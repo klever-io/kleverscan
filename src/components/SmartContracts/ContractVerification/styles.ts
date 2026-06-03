@@ -555,3 +555,19 @@ export const AuditLinkModalButtons = styled.div`
   gap: 1rem;
   justify-content: flex-end;
 `;
+
+export const FeeInfo = styled.p`
+  font-size: 0.85rem;
+  color: ${({ theme }) => theme.darkText};
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0.5rem 0 0;
+
+  span {
+    font-weight: 700;
+    color: ${({ theme }) => theme.black};
+  }
+`;

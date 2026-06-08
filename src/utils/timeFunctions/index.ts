@@ -34,7 +34,7 @@ export const getAge = (dateInput: Date, t?: TFunction): string => {
   } else if (min > 59 && hour <= 23) {
     val = hour;
     suffix = t ? t('Date.Time.hour') : 'hour';
-  } else if (hour > 24) {
+  } else if (hour >= 24) {
     val = day;
     suffix = t ? t('Date.Time.day') : 'day';
   }

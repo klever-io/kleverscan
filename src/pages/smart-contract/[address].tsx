@@ -57,6 +57,10 @@ import nextI18nextConfig from '../../../next-i18next.config';
 const isContractValidationEnabled =
   process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
 
+const isAuditEnabled =
+  isContractValidationEnabled &&
+  process.env.NEXT_PUBLIC_ENABLE_AUDIT === 'true';
+
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
   const { isMobile } = useMobile();
@@ -107,7 +111,7 @@ const SmartContractInvoke: React.FC = () => {
 
   const tabHeaders = useMemo(() => {
     const tabs = [{ label: 'Transactions', value: 'transactions' }];
-    if (isContractValidationEnabled && hasAuditReports) {
+    if (isAuditEnabled && hasAuditReports) {
       tabs.push({ label: 'Contract Audits', value: 'contract-audits' });
     }
     if (isContractValidationEnabled && hasVerifiedVersions) {
@@ -118,7 +122,7 @@ const SmartContractInvoke: React.FC = () => {
     if (isContractValidationEnabled && isOwner) {
       tabs.push({ label: 'Verify Contract', value: 'verify' });
     }
-    if (isContractValidationEnabled && isOwner) {
+    if (isAuditEnabled && isOwner) {
       tabs.push({ label: 'Submit Audit', value: 'submit-audit' });
     }
     return tabs;

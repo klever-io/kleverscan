@@ -14,9 +14,7 @@ jobs:
 
     steps:
       - name: Set Timezone
-        uses: szenius/set-timezone@v1.0
-        with:
-          timezoneLinux: 'America/Sao_Paulo'
+        run: sudo timedatectl set-timezone America/Sao_Paulo
 
       - name: Checkout Code
         uses: actions/checkout@v3

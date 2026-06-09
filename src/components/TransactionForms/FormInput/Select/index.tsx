@@ -75,21 +75,19 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
 
   useEffect(() => {
     if (value !== undefined && options !== undefined && options.length > 0) {
-      let selected = options?.find(item => item.value === value);
-      if (selectFilter && selected) {
-        selected = selectFilter(selected);
+      let newSelected = options?.find(item => item.value === value);
+      if (selectFilter && newSelected) {
+        newSelected = selectFilter(newSelected);
       }
-      selected && setSelected(selected);
+      if (newSelected) {
+        setSelected(prev =>
+          prev?.value === newSelected.value && prev?.label === newSelected.label
+            ? prev
+            : newSelected,
+        );
+      }
     }
   }, [value, options]);
-  useEffect(() => {
-    if (defaultValue && parseInt(defaultValue)) {
-      setSelected({
-        value: parseInt(defaultValue),
-        label: defaultValue,
-      });
-    }
-  }, [defaultValue]);
 
   useEffect(() => {
     if (defaultValue && parseInt(defaultValue)) {

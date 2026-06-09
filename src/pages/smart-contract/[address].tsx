@@ -1,16 +1,19 @@
 import { Transactions } from '@/assets/cards';
 import { RedFailed, WhiteTick } from '@/assets/icons';
-import Copy from '@/components/Copy';
+import ExplorerLink from '@/components/ExplorerLink';
 import { DefaultCards } from '@/components/Home/CardDataFetcher/HomeDataCards';
 import Title from '@/components/Layout/Title';
-import {
-  ContractSourceTab,
-  ContractVerifyTab,
-} from '@/components/SmartContracts/ContractVerification';
 import {
   ContractReadTab,
   ContractWriteTab,
 } from '@/components/SmartContracts/ContractInteraction';
+import {
+  ContractAuditsTab,
+  ContractSourceTab,
+  ContractSubmitAuditTab,
+  ContractVerifyTab,
+} from '@/components/SmartContracts/ContractVerification';
+import { EmptyState } from '@/components/SmartContracts/ContractVerification/styles';
 import SmartContractsTransactions from '@/components/SmartContracts/SmartContractsTransactions';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
@@ -47,14 +50,16 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
-import ExplorerLink from '@/components/ExplorerLink';
 
 const isContractValidationEnabled =
   process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
+
+const isAuditEnabled =
+  isContractValidationEnabled &&
+  process.env.NEXT_PUBLIC_ENABLE_AUDIT === 'true';
 
 const SmartContractInvoke: React.FC = () => {
   const router = useRouter();
@@ -72,7 +77,7 @@ const SmartContractInvoke: React.FC = () => {
     !!walletAddress && !!scData?.deployer && walletAddress === scData.deployer;
 
   const {
-    data: contractInfo,
+    data: contractInfoResult,
     isLoading: isContractInfoLoading,
     refetch: refetchContractInfo,
   } = useQuery({
@@ -81,9 +86,12 @@ const SmartContractInvoke: React.FC = () => {
     enabled: !!contractAddress && isContractValidationEnabled,
   });
 
+  const contractInfo = contractInfoResult?.contractInfo ?? null;
+  const contractAudits = contractInfoResult?.auditReports ?? [];
+
   const { data: latestJob, refetch: refetchJob } = useQuery({
     queryKey: ['latestJob', contractAddress],
-    queryFn: () => fetchLatestJob(contractAddress, refetchContractInfo),
+    queryFn: () => fetchLatestJob(contractAddress),
     enabled: !!contractAddress && isOwner && isContractValidationEnabled,
     refetchInterval: query => {
       const status = query.state.data?.status;
@@ -92,10 +100,20 @@ const SmartContractInvoke: React.FC = () => {
     },
   });
 
+  useEffect(() => {
+    if (latestJob?.status === 'completed') {
+      refetchContractInfo();
+    }
+  }, [latestJob?.status, refetchContractInfo]);
+
   const hasVerifiedVersions = (contractInfo?.contractVersions?.length ?? 0) > 0;
+  const hasAuditReports = contractAudits.length > 0;
 
   const tabHeaders = useMemo(() => {
     const tabs = [{ label: 'Transactions', value: 'transactions' }];
+    if (isAuditEnabled && hasAuditReports) {
+      tabs.push({ label: 'Contract Audits', value: 'contract-audits' });
+    }
     if (isContractValidationEnabled && hasVerifiedVersions) {
       tabs.push({ label: 'Contract Source', value: 'contract-source' });
       tabs.push({ label: 'Read Contract', value: 'read-contract' });
@@ -104,8 +122,11 @@ const SmartContractInvoke: React.FC = () => {
     if (isContractValidationEnabled && isOwner) {
       tabs.push({ label: 'Verify Contract', value: 'verify' });
     }
+    if (isAuditEnabled && isOwner) {
+      tabs.push({ label: 'Submit Audit', value: 'submit-audit' });
+    }
     return tabs;
-  }, [hasVerifiedVersions, isOwner]);
+  }, [hasVerifiedVersions, hasAuditReports, isOwner]);
 
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
 
@@ -175,20 +196,13 @@ const SmartContractInvoke: React.FC = () => {
     switch (selectedTab) {
       case 'Transactions':
         return <SmartContractsTransactions contractAddress={contractAddress} />;
+      case 'Contract Audits':
+        return (
+          <ContractAuditsTab auditReports={contractAudits} scData={scData} />
+        );
       case 'Contract Source':
         if (isContractInfoLoading)
-          return (
-            <div
-              style={{
-                padding: '2rem',
-                textAlign: 'center',
-                opacity: 0.6,
-                fontSize: '0.9rem',
-              }}
-            >
-              Loading contract data...
-            </div>
-          );
+          return <EmptyState>Loading contract data...</EmptyState>;
         return contractInfo ? (
           <ContractSourceTab
             contractAddress={contractAddress}
@@ -218,6 +232,15 @@ const SmartContractInvoke: React.FC = () => {
             onSubmitted={() => {
               refetchJob();
             }}
+          />
+        );
+      case 'Submit Audit':
+        return (
+          <ContractSubmitAuditTab
+            contractAddress={contractAddress}
+            contractInfo={contractInfo ?? null}
+            scData={scData}
+            onSubmitted={refetchContractInfo}
           />
         );
       default:

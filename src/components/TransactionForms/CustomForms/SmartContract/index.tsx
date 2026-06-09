@@ -72,6 +72,7 @@ type FormData = {
 export interface ABIMap {
   functions?: ABIFunctionMap;
   construct?: ABIFunction;
+  upgradeConstruct?: ABIFunction;
   types?: Record<string, ABIType>;
 }
 
@@ -171,9 +172,33 @@ const parseAbiStructs = (abi: string): Record<string, ABIType> => {
   return result;
 };
 
+const parseConstructorInputs = (
+  inputs: { name: string; type: string }[],
+  payableInTokens: string[] | undefined,
+  types: Record<string, ABIType>,
+): ABIFunction => {
+  if (!inputs?.length) return { arguments: {}, allowedAssets: payableInTokens };
+  return {
+    arguments: inputs.reduce((acc, input) => {
+      const isOptional = input.type.toLowerCase().startsWith('option');
+      let type = getJSType(input.type);
+      if (type === input.type) {
+        type = types[input.type]?.type || 'object';
+      }
+      acc[input.name] = { type, required: !isOptional, raw_type: input.type };
+      return acc;
+    }, {} as ABIFunctionArguments),
+    allowedAssets: payableInTokens,
+  };
+};
+
 const parseAbiFunctions = (
   abi: string,
-): { functions: ABIFunctionMap; constructor: ABIFunction } => {
+): {
+  functions: ABIFunctionMap;
+  constructor: ABIFunction;
+  upgradeConstructor: ABIFunction;
+} => {
   const parsedAbi: ABI = JSON.parse(abi);
   const types: Record<string, ABIType> = parsedAbi.types || {};
 
@@ -202,30 +227,19 @@ const parseAbiFunctions = (
     functions[funcName].allowedAssets = endpoint.payableInTokens;
   });
 
-  let constructor: ABIFunction = {
-    arguments: {},
-  };
+  const constructor = parseConstructorInputs(
+    parsedAbi.constructor.inputs,
+    parsedAbi.constructor.payableInTokens,
+    types,
+  );
 
-  if (parsedAbi.constructor.inputs?.length > 0) {
-    constructor = {
-      arguments: parsedAbi.constructor.inputs.reduce((acc, input) => {
-        const isOptional = input.type.toLowerCase().startsWith('option');
-        let type = getJSType(input.type);
-        if (type === input.type) {
-          type = types[input.type]?.type || 'object';
-        }
-        acc[input.name] = {
-          type,
-          required: !isOptional,
-          raw_type: input.type,
-        };
-        return acc;
-      }, {} as ABIFunctionArguments),
-      allowedAssets: parsedAbi.constructor.payableInTokens,
-    };
-  }
+  const upgradeConstructor = parseConstructorInputs(
+    parsedAbi.upgradeConstructor?.inputs ?? [],
+    parsedAbi.upgradeConstructor?.payableInTokens,
+    types,
+  );
 
-  return { functions, constructor };
+  return { functions, constructor, upgradeConstructor };
 };
 
 const parseCallValue = (data: FormData) => {
@@ -377,13 +391,9 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
 
   const func: ABIFunction | undefined =
     scType === 1
-      ? abi?.construct || {
-          arguments: {},
-        }
+      ? abi?.construct || { arguments: {} }
       : scType === 2
-        ? abi?.functions?.upgrade || {
-            arguments: {},
-          }
+        ? abi?.upgradeConstruct || { arguments: {} }
         : functions?.[watch('function') || ''];
 
   const hasFunctions = functions && Object.keys(functions)?.length > 0;
@@ -404,13 +414,15 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
     const abi = await (e.target.files[0] as File).text();
 
     const data = {} as ABIMap;
-    const { functions, constructor } = parseAbiFunctions(abi);
+    const { functions, constructor, upgradeConstructor } =
+      parseAbiFunctions(abi);
 
     if (Object.keys(functions)?.length > 0) {
       data['functions'] = functions;
     }
 
     data['construct'] = constructor;
+    data['upgradeConstruct'] = upgradeConstructor;
 
     const types = parseAbiStructs(abi);
     if (Object.keys(types)?.length > 0) {
@@ -546,7 +558,9 @@ const SmartContract: React.FC<PropsWithChildren<IContractProps>> = ({
                 arguments={
                   scType === 1
                     ? abi?.construct?.arguments || undefined
-                    : func?.arguments || undefined
+                    : scType === 2
+                      ? abi?.upgradeConstruct?.arguments || undefined
+                      : func?.arguments || undefined
                 }
                 types={abi?.types}
                 handleInputChange={handleInputChange}

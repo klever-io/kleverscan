@@ -6,6 +6,16 @@ import {
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
 
+// This route proxies the multipart upload to the validator by streaming the raw
+// request body. Next.js' default body parser would consume the stream before
+// the handler reads it, leaving `req.on('data')` with nothing and the request
+// hanging forever. Disable it so we can forward the bytes untouched.
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,

@@ -37,6 +37,7 @@ import {
   AuditReportRow,
   AuditSection,
   AuditSectionTitle,
+  CheckboxField,
   CodeBlockWrapper,
   EmptyState,
   ErrorBox,
@@ -171,10 +172,15 @@ export function ContractSourceTab({
   const [activeTab, setActiveTab] = useState<'source' | 'abi'>('source');
   const [viewMode, setViewMode] = useState<ViewMode>('tabs');
 
+  const selectedVersionHidden = !!versions.find(
+    v => v.version === selectedVersion,
+  )?.sourceHidden;
+
   const { data: sourceFiles, isLoading } = useQuery({
     queryKey: ['sourceFiles', contractAddress, selectedVersion],
     queryFn: () => fetchSourceFiles(contractAddress, selectedVersion),
-    enabled: versions.length > 0,
+    // Skip the request for ABI-only versions: the source is private (403).
+    enabled: versions.length > 0 && !selectedVersionHidden,
   });
 
   const fileNames = sourceFiles ? Object.keys(sourceFiles).sort() : [];
@@ -189,7 +195,9 @@ export function ContractSourceTab({
       return abiVersion.abi;
     }
   })();
-  const ideActiveFile = selectedFile || fileNames[0] || '';
+  // Fall back to the ABI when there are no source files (e.g. ABI-only versions).
+  const ideActiveFile =
+    selectedFile || fileNames[0] || (abiContent ? '__abi__' : '');
   const [srcFolderOpen, setSrcFolderOpen] = useState(true);
   const [outputFolderOpen, setOutputFolderOpen] = useState(true);
 
@@ -236,6 +244,13 @@ export function ContractSourceTab({
       setViewMode(saved);
     }
   }, []);
+
+  // ABI-only versions have no source to show — land on the ABI tab.
+  useEffect(() => {
+    if (selectedVersionHidden) {
+      setActiveTab('abi');
+    }
+  }, [selectedVersionHidden]);
 
   return (
     <SourceSection>
@@ -313,7 +328,12 @@ export function ContractSourceTab({
 
           {activeTab === 'source' && (
             <>
-              {isLoading ? (
+              {selectedVersionHidden ? (
+                <EmptyState>
+                  Source code is private for this version. The contract was
+                  verified ABI-only — only the ABI is published.
+                </EmptyState>
+              ) : isLoading ? (
                 <EmptyState>Loading source files...</EmptyState>
               ) : fileNames.length === 0 ? (
                 <EmptyState>
@@ -804,6 +824,7 @@ function UploadForm({
   const fileRef = useRef<HTMLInputElement>(null);
   const [kscVersion, setKscVersion] = useState('');
   const [rustVersion, setRustVersion] = useState('');
+  const [hideSource, setHideSource] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { wallet, walletAddress } = useExtension();
@@ -847,6 +868,7 @@ function UploadForm({
         rustVersion,
         walletAddress,
         signature,
+        hideSource,
       );
       toast.success('Validation queued successfully');
       onSubmitted();
@@ -887,6 +909,21 @@ function UploadForm({
             onChange={e => setRustVersion(e.target.value)}
           />
         </FormField>
+        <CheckboxField>
+          <input
+            type="checkbox"
+            checked={hideSource}
+            onChange={e => setHideSource(e.target.checked)}
+          />
+          <div>
+            <strong>Publish ABI only (keep source code private)</strong>
+            <small>
+              The contract is still verified against the on-chain bytecode and
+              its ABI is published, but the Rust source code is not stored or
+              made public.
+            </small>
+          </div>
+        </CheckboxField>
         <SubmitButton type="submit" disabled={submitting}>
           {submitting ? 'Submitting...' : 'Submit for verification'}
         </SubmitButton>

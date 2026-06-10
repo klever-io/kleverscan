@@ -82,6 +82,39 @@ export const FormField = styled.div`
   }
 `;
 
+export const CheckboxField = styled.label`
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  cursor: pointer;
+  color: ${({ theme }) => theme.black};
+
+  input[type='checkbox'] {
+    margin-top: 0.15rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: ${({ theme }) => theme.violet};
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  strong {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  small {
+    font-size: 0.75rem;
+    opacity: 0.6;
+  }
+`;
+
 export const SubmitButton = styled.button`
   align-self: flex-start;
   padding: 0.5rem 1.25rem;

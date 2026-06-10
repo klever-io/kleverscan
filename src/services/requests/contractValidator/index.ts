@@ -49,7 +49,9 @@ export const fetchSourceFiles = async (
   const res = await fetch(
     `${BASE}/${contractAddress}/versions/${version}/source`,
   );
-  if (res.status === 404) return null;
+  // 404: no source for this version. 403: source is private (verified ABI-only).
+  // Both mean "no source files to show" — the ABI is served separately.
+  if (res.status === 404 || res.status === 403) return null;
   if (!res.ok) throw new Error('Failed to fetch source files');
   const data = await res.json();
   return data.sourceFiles as Record<string, string>;
@@ -62,11 +64,13 @@ export const submitValidation = async (
   rustVersion: string,
   walletAddress: string,
   signature: string,
+  hideSource = false,
 ): Promise<{ jobId: number; message: string }> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('ksc_version', kscVersion);
   if (rustVersion) formData.append('rust_version', rustVersion);
+  if (hideSource) formData.append('hide_source', 'true');
 
   const res = await fetch(`${BASE}/${contractAddress}/validate`, {
     method: 'POST',

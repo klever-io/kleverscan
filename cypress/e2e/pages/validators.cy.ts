@@ -3,6 +3,26 @@
 const validatorsLinks: string[] = [];
 const validatorsAmount: number = 10;
 const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
+const TOTAL_STAKE_SELECTOR = '[data-testid="total-stake"]';
+
+// The validator detail page fires a single client-side request on mount and
+// does not retry when the API returns an error response, so a transient
+// testnet hiccup leaves the page stuck on the loading skeleton forever. Give
+// the request time to resolve and, if the stake still hasn't rendered, reload
+// to issue a fresh request before failing.
+const assertStakeVisibleWithReload = (reloadsLeft = 2): void => {
+  cy.wait(2500);
+  cy.get('body').then($body => {
+    if ($body.find(TOTAL_STAKE_SELECTOR).length > 0) {
+      cy.get(TOTAL_STAKE_SELECTOR).should('be.visible');
+    } else if (reloadsLeft > 0) {
+      cy.reload();
+      assertStakeVisibleWithReload(reloadsLeft - 1);
+    } else {
+      cy.get(TOTAL_STAKE_SELECTOR, { timeout: 10000 }).should('be.visible');
+    }
+  });
+};
 
 describe('Validators Page', () => {
   beforeEach(() => {
@@ -47,12 +67,7 @@ describe('Validator Details Page', () => {
       // expected, mirroring the asset details page pattern.
       if (link) {
         cy.visit(link);
-        // The detail page fetches the validator client-side (with internal
-        // retries) after hydration, which can take longer than Cypress' 4s
-        // default under CI load, so give the stake element room to render.
-        cy.get('[data-testid="total-stake"]', { timeout: 15000 }).should(
-          'be.visible',
-        );
+        assertStakeVisibleWithReload();
       } else {
         cy.log(`No link collected for validator #${index + 1}`);
       }

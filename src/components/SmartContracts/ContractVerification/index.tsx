@@ -612,7 +612,10 @@ function ChangeVisibilityForm({
     try {
       const windowMs = 2 * 60 * 1000;
       const roundedTs = Math.floor(Date.now() / windowMs) * windowMs;
-      const sigMessage = `Change source visibility for contract ${contractAddress} at ${roundedTs}`;
+      // Binds version + hideSource so the signature can't be replayed against a
+      // different version or to flip visibility the other way. MUST stay
+      // byte-identical to the proxy verifier and the Go validator.
+      const sigMessage = `Change source visibility for contract ${contractAddress} version ${selectedVersion} hideSource=${hideSource} at ${roundedTs}`;
       const sig = await wallet.signMessage(sigMessage);
       signature = sig.toBase64();
     } catch {
@@ -984,7 +987,10 @@ function UploadForm({
     try {
       const windowMs = 2 * 60 * 1000;
       const roundedTs = Math.floor(Date.now() / windowMs) * windowMs;
-      const sigMessage = `Submit validation for contract ${contractAddress} at ${roundedTs}`;
+      // Binds hideSource so the signature can't be replayed with a different
+      // visibility. MUST stay byte-identical to the proxy verifier and the Go
+      // validator.
+      const sigMessage = `Submit validation for contract ${contractAddress} hideSource=${hideSource} at ${roundedTs}`;
       const sig = await wallet.signMessage(sigMessage);
       signature = sig.toBase64();
     } catch {

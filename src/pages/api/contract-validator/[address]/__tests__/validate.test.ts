@@ -148,7 +148,30 @@ describe('POST /api/contract-validator/[address]/validate', () => {
       // The builder reproduces the exact per-window message the wallet signs.
       const buildMessage = mockedVerify.mock.calls[0][2] as (ts: number) => string;
       expect(buildMessage(123)).toBe(
-        `Submit validation for contract ${CONTRACT_ADDRESS} at 123`,
+        `Submit validation for contract ${CONTRACT_ADDRESS} hideSource=false at 123`,
+      );
+    });
+
+    it('binds hide_source=true from the query into the signed message', async () => {
+      (global.fetch as jest.Mock).mockResolvedValueOnce({
+        status: 200,
+        headers: { get: () => 'application/json' },
+        json: async () => ({ jobId: 1 }),
+      });
+      const { res } = makeRes();
+      await handler(
+        makeStreamReq({
+          query: { address: CONTRACT_ADDRESS, hide_source: 'true' },
+        }),
+        res,
+      );
+
+      // calls accumulate across tests in this file (module mocks aren't cleared
+      // by restoreAllMocks), so read the most recent call's builder.
+      const calls = mockedVerify.mock.calls;
+      const buildMessage = calls[calls.length - 1][2] as (ts: number) => string;
+      expect(buildMessage(123)).toBe(
+        `Submit validation for contract ${CONTRACT_ADDRESS} hideSource=true at 123`,
       );
     });
 

@@ -72,14 +72,20 @@ export const submitValidation = async (
   if (rustVersion) formData.append('rust_version', rustVersion);
   if (hideSource) formData.append('hide_source', 'true');
 
-  const res = await fetch(`${BASE}/${contractAddress}/validate`, {
-    method: 'POST',
-    headers: {
-      'X-Wallet-Address': walletAddress,
-      'X-Wallet-Signature': signature,
+  // hide_source is also passed as a query param: the signed message binds it, but
+  // the proxy streams the multipart body raw and can't read the form field, so
+  // it reconstructs the message from the query value instead.
+  const res = await fetch(
+    `${BASE}/${contractAddress}/validate?hide_source=${hideSource}`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Wallet-Address': walletAddress,
+        'X-Wallet-Signature': signature,
+      },
+      body: formData,
     },
-    body: formData,
-  });
+  );
 
   const data = await res.json();
   if (!res.ok) {

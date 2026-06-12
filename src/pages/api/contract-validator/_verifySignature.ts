@@ -9,8 +9,9 @@ import { keccak_256 } from '@noble/hashes/sha3';
 const KLV_MSG_PREFIX = '\x17Klever Signed Message:\n';
 
 // signatureWindowMs is the validity window for a signed request. The frontend
-// rounds the signing timestamp down to this window; we accept the current and
-// previous window to tolerate clock skew and window boundaries.
+// rounds the signing timestamp down to this window; we accept the current,
+// previous, and next window to tolerate clock skew in either direction and
+// window boundaries.
 export const SIGNATURE_WINDOW_MS = 2 * 60 * 1000;
 
 export function prepareKlvMessage(message: string): Uint8Array {
@@ -23,11 +24,16 @@ export function prepareKlvMessage(message: string): Uint8Array {
   return keccak_256(prepared);
 }
 
-// signatureWindows returns the timestamps (ms) to try when verifying: the current
-// and previous window. Mirrors the frontend's rounding in ContractVerification.
+// signatureWindows returns the timestamps (ms) to try when verifying: the
+// current, previous, and next window. Mirrors the frontend's rounding in
+// ContractVerification and the Go validator's accepted windows.
 export function signatureWindows(now = Date.now()): number[] {
   const current = Math.floor(now / SIGNATURE_WINDOW_MS) * SIGNATURE_WINDOW_MS;
-  return [current, current - SIGNATURE_WINDOW_MS];
+  return [
+    current,
+    current - SIGNATURE_WINDOW_MS,
+    current + SIGNATURE_WINDOW_MS,
+  ];
 }
 
 // verifyKleverSignature reports whether signatureB64 is a valid Klever wallet

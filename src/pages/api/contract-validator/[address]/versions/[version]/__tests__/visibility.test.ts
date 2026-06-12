@@ -69,6 +69,14 @@ describe('POST /api/contract-validator/[address]/versions/[version]/visibility',
     expect(json).toHaveBeenCalledWith({ message: 'Missing wallet signature' });
   });
 
+  it('returns 400 when hideSource is missing from the body', async () => {
+    const { res, status, json } = makeRes();
+    await handler(makeReq({ body: {} }), res);
+    expect(status).toHaveBeenCalledWith(400);
+    expect(json).toHaveBeenCalledWith({ message: 'hideSource is required' });
+    expect(mockedVerify).not.toHaveBeenCalled();
+  });
+
   it('returns 401 when the signature does not verify', async () => {
     mockedVerify.mockResolvedValueOnce(false);
     const { res, status, json } = makeRes();
@@ -93,7 +101,7 @@ describe('POST /api/contract-validator/[address]/versions/[version]/visibility',
     );
     const buildMessage = mockedVerify.mock.calls[0][2] as (ts: number) => string;
     expect(buildMessage(123)).toBe(
-      `Change source visibility for contract ${VALID_ADDRESS} at 123`,
+      `Change source visibility for contract ${VALID_ADDRESS} version ${VALID_VERSION} hideSource=true at 123`,
     );
 
     const [, upstreamOptions] = (global.fetch as jest.Mock).mock.calls[0];

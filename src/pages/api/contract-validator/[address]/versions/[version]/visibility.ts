@@ -2,8 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { proxyToValidator } from '@/pages/api/contract-validator/_proxy';
 import { verifyWindowedSignature } from '@/pages/api/contract-validator/_verifySignature';
 
-const visibilityMessage = (address: string, ts: number): string =>
-  `Change source visibility for contract ${address} at ${ts}`;
+const visibilityMessage = (
+  address: string,
+  version: string,
+  hideSource: boolean,
+  ts: number,
+): string =>
+  `Change source visibility for contract ${address} version ${version} hideSource=${hideSource} at ${ts}`;
 
 export default async function handler(
   req: NextApiRequest,
@@ -45,10 +50,19 @@ export default async function handler(
     return;
   }
 
+  // hideSource is required and bound into the signed message; reject anything
+  // but an explicit boolean so it can't be defaulted on the way through.
+  const hideSource = (req.body as { hideSource?: unknown } | undefined)
+    ?.hideSource;
+  if (typeof hideSource !== 'boolean') {
+    res.status(400).json({ message: 'hideSource is required' });
+    return;
+  }
+
   const signatureValid = await verifyWindowedSignature(
     walletSignature,
     walletAddress,
-    ts => visibilityMessage(address, ts),
+    ts => visibilityMessage(address, version, hideSource, ts),
   );
   if (!signatureValid) {
     res.status(401).json({ message: 'Invalid wallet signature' });

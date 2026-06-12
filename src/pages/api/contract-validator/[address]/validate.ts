@@ -3,8 +3,12 @@ import { verifyWindowedSignature } from '../_verifySignature';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
 
-const validateMessage = (address: string, ts: number): string =>
-  `Submit validation for contract ${address} at ${ts}`;
+const validateMessage = (
+  address: string,
+  hideSource: boolean,
+  ts: number,
+): string =>
+  `Submit validation for contract ${address} hideSource=${hideSource} at ${ts}`;
 
 // This route proxies the multipart upload to the validator by streaming the raw
 // request body. Next.js' default body parser would consume the stream before
@@ -33,6 +37,12 @@ export default async function handler(
     return;
   }
 
+  // This route streams the multipart body raw (bodyParser disabled), so the
+  // proxy can't read the hide_source form field. It arrives as a query param so
+  // we can reconstruct the signed message; the validator re-reads hide_source
+  // from the multipart body and reconstructs the same string.
+  const hideSource = req.query.hide_source === 'true';
+
   if (!validatorUrl) {
     res.status(500).json({ message: 'Contract validator URL not configured' });
     return;
@@ -56,7 +66,7 @@ export default async function handler(
   const signatureValid = await verifyWindowedSignature(
     walletSignature,
     walletAddress,
-    ts => validateMessage(address, ts),
+    ts => validateMessage(address, hideSource, ts),
   );
 
   if (!signatureValid) {

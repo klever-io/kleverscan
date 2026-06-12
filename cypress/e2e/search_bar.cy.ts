@@ -8,7 +8,10 @@ describe('Search bar', () => {
 
     cy.get('[data-testid="search"]').type('KLV', { delay: 300 });
 
-    cy.get('[data-testid="card-item"]').contains('KLV');
+    // The search input debounces for 1s before firing the request, and the
+    // result is fetched from the live API, so allow more time than Cypress'
+    // 4s default before the result card is expected to appear.
+    cy.get('[data-testid="card-item"]', { timeout: 15000 }).contains('KLV');
     cy.wait(3000);
     cy.get('[data-testid="search"]').type('{enter}');
 
@@ -23,7 +26,7 @@ describe('Search bar', () => {
 
     cy.get('[data-testid="search"]').type('100', { delay: 300 });
 
-    cy.get('[data-testid="card-item"]').contains('100');
+    cy.get('[data-testid="card-item"]', { timeout: 15000 }).contains('100');
     cy.wait(3000);
     cy.get('[data-testid="search"]').type('{enter}');
     cy.url().should('include', '/block/100');
@@ -39,7 +42,7 @@ describe('Search bar', () => {
       { delay: 10 },
     );
 
-    cy.get('[data-testid="card-item"]').contains(
+    cy.get('[data-testid="card-item"]', { timeout: 15000 }).contains(
       'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl',
     );
     cy.wait(3000);

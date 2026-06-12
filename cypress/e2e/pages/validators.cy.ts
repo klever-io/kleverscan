@@ -47,7 +47,12 @@ describe('Validator Details Page', () => {
       // expected, mirroring the asset details page pattern.
       if (link) {
         cy.visit(link);
-        cy.get('[data-testid="total-stake"]').should('be.visible');
+        // The detail page fetches the validator client-side (with internal
+        // retries) after hydration, which can take longer than Cypress' 4s
+        // default under CI load, so give the stake element room to render.
+        cy.get('[data-testid="total-stake"]', { timeout: 15000 }).should(
+          'be.visible',
+        );
       } else {
         cy.log(`No link collected for validator #${index + 1}`);
       }

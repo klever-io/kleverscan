@@ -49,7 +49,9 @@ export const fetchSourceFiles = async (
   const res = await fetch(
     `${BASE}/${contractAddress}/versions/${version}/source`,
   );
-  if (res.status === 404) return null;
+  // 404: no source for this version. 403: source is private (verified ABI-only).
+  // Both mean "no source files to show" — the ABI is served separately.
+  if (res.status === 404 || res.status === 403) return null;
   if (!res.ok) throw new Error('Failed to fetch source files');
   const data = await res.json();
   return data.sourceFiles as Record<string, string>;
@@ -62,20 +64,28 @@ export const submitValidation = async (
   rustVersion: string,
   walletAddress: string,
   signature: string,
+  hideSource = false,
 ): Promise<{ jobId: number; message: string }> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('ksc_version', kscVersion);
   if (rustVersion) formData.append('rust_version', rustVersion);
+  if (hideSource) formData.append('hide_source', 'true');
 
-  const res = await fetch(`${BASE}/${contractAddress}/validate`, {
-    method: 'POST',
-    headers: {
-      'X-Wallet-Address': walletAddress,
-      'X-Wallet-Signature': signature,
+  // hide_source is also passed as a query param: the signed message binds it, but
+  // the proxy streams the multipart body raw and can't read the form field, so
+  // it reconstructs the message from the query value instead.
+  const res = await fetch(
+    `${BASE}/${contractAddress}/validate?hide_source=${hideSource}`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Wallet-Address': walletAddress,
+        'X-Wallet-Signature': signature,
+      },
+      body: formData,
     },
-    body: formData,
-  });
+  );
 
   const data = await res.json();
   if (!res.ok) {
@@ -83,6 +93,33 @@ export const submitValidation = async (
       cause: data?.error || undefined,
     }) as Error;
     throw err;
+  }
+  return data;
+};
+
+export const changeCodeVisibility = async (
+  contractAddress: string,
+  version: number,
+  hideSource: boolean,
+  walletAddress: string,
+  signature: string,
+): Promise<{ message: string; version: number; sourceHidden: boolean }> => {
+  const res = await fetch(
+    `${BASE}/${contractAddress}/versions/${version}/visibility`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Wallet-Address': walletAddress,
+        'X-Wallet-Signature': signature,
+      },
+      body: JSON.stringify({ hideSource }),
+    },
+  );
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to change code visibility');
   }
   return data;
 };

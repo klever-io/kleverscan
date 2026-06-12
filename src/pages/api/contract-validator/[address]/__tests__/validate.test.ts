@@ -9,16 +9,14 @@ const SIG_HEX =
   '16136cd31025eec41c1fd0d5938a09cb29e098aa2c6449ccdf92d0f8b3f3bce98ff7e45d272931802c68e54187adb33acf50ee14a48242ac2116b8cceae47b04';
 const SIG_B64 = Buffer.from(SIG_HEX, 'hex').toString('base64');
 
-jest.mock('@klever/connect-crypto', () => ({
-  verifyWalletSignedMessage: jest.fn(),
-  cryptoProvider: { addressToBytes: jest.fn() },
+jest.mock('../../_verifySignature', () => ({
+  verifyWindowedSignature: jest.fn(),
 }));
 
 import handler from '../validate';
-import { verifyWalletSignedMessage, cryptoProvider } from '@klever/connect-crypto';
+import { verifyWindowedSignature } from '../../_verifySignature';
 
-const mockedVerify = verifyWalletSignedMessage as jest.Mock;
-const mockedAddressToBytes = cryptoProvider.addressToBytes as jest.Mock;
+const mockedVerify = verifyWindowedSignature as jest.Mock;
 
 // Emits 'data' + 'end' after all pending microtasks (crypto awaits) complete.
 function makeStreamReq(
@@ -58,7 +56,6 @@ beforeEach(() => {
     DEFAULT_CONTRACT_VALIDATOR_KEY: 'test-key',
   };
   global.fetch = jest.fn();
-  mockedAddressToBytes.mockResolvedValue(new Uint8Array(32));
   mockedVerify.mockResolvedValue(true);
 });
 
@@ -143,32 +140,24 @@ describe('POST /api/contract-validator/[address]/validate', () => {
       const { res } = makeRes();
       await handler(makeStreamReq(), res);
 
-      const expectedSigBytes = new Uint8Array(Buffer.from(SIG_B64, 'base64'));
       expect(mockedVerify).toHaveBeenCalledWith(
-        expect.stringMatching(
-          new RegExp(`^Submit validation for contract ${CONTRACT_ADDRESS} at \\d+$`),
-        ),
-        expectedSigBytes,
-        new Uint8Array(32),
+        SIG_B64,
+        WALLET_ADDRESS,
+        expect.any(Function),
+      );
+      // The builder reproduces the exact per-window message the wallet signs.
+      const buildMessage = mockedVerify.mock.calls[0][2] as (ts: number) => string;
+      expect(buildMessage(123)).toBe(
+        `Submit validation for contract ${CONTRACT_ADDRESS} at 123`,
       );
     });
 
     it('returns 401 when signature does not match', async () => {
-      mockedVerify.mockResolvedValueOnce(false).mockResolvedValueOnce(false);
+      mockedVerify.mockResolvedValueOnce(false);
       const { res, status, json } = makeRes();
       await handler(makeStreamReq(), res);
       expect(status).toHaveBeenCalledWith(401);
       expect(json).toHaveBeenCalledWith({ message: 'Invalid wallet signature' });
-    });
-
-    it('returns 401 when addressToBytes throws', async () => {
-      mockedAddressToBytes.mockRejectedValueOnce(new Error('bad address'));
-      const { res, status, json } = makeRes();
-      await handler(makeStreamReq(), res);
-      expect(status).toHaveBeenCalledWith(401);
-      expect(json).toHaveBeenCalledWith({
-        message: 'Signature verification failed',
-      });
     });
   });
 
@@ -185,7 +174,7 @@ describe('POST /api/contract-validator/[address]/validate', () => {
       expect(json).toHaveBeenCalledWith({ jobId: 42, message: 'Queued' });
     });
 
-    it('does not forward wallet signature headers to upstream', async () => {
+    it('forwards wallet signature headers to upstream for re-verification', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         status: 200,
         headers: { get: () => 'application/json' },
@@ -195,8 +184,8 @@ describe('POST /api/contract-validator/[address]/validate', () => {
       await handler(makeStreamReq(), res);
 
       const [, upstreamOptions] = (global.fetch as jest.Mock).mock.calls[0];
-      expect(upstreamOptions.headers['x-wallet-address']).toBeUndefined();
-      expect(upstreamOptions.headers['x-wallet-signature']).toBeUndefined();
+      expect(upstreamOptions.headers['X-Wallet-Address']).toBe(WALLET_ADDRESS);
+      expect(upstreamOptions.headers['X-Wallet-Signature']).toBe(SIG_B64);
     });
 
     it('returns 504 when upstream times out', async () => {

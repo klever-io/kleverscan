@@ -137,6 +137,34 @@ export const SubmitButton = styled.button`
   }
 `;
 
+export const ActionButtons = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+`;
+
+export const SecondaryButton = styled.button`
+  align-self: flex-start;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.violet};
+  background: transparent;
+  color: ${({ theme }) => theme.violet};
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    opacity: 0.85;
+  }
+`;
+
 export const JobStatusCard = styled.div`
   display: flex;
   flex-direction: column;

@@ -91,6 +91,33 @@ export const submitValidation = async (
   return data;
 };
 
+export const changeCodeVisibility = async (
+  contractAddress: string,
+  version: number,
+  hideSource: boolean,
+  walletAddress: string,
+  signature: string,
+): Promise<{ message: string; version: number; sourceHidden: boolean }> => {
+  const res = await fetch(
+    `${BASE}/${contractAddress}/versions/${version}/visibility`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Wallet-Address': walletAddress,
+        'X-Wallet-Signature': signature,
+      },
+      body: JSON.stringify({ hideSource }),
+    },
+  );
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to change code visibility');
+  }
+  return data;
+};
+
 export const submitAuditReport = async (
   contractAddress: string,
   txHash: string,

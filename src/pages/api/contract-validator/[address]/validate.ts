@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  verifyWalletSignedMessage,
-  cryptoProvider,
-} from '@klever/connect-crypto';
+import { verifyWindowedSignature } from '../_verifySignature';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
+
+const validateMessage = (address: string, ts: number): string =>
+  `Submit validation for contract ${address} at ${ts}`;
 
 // This route proxies the multipart upload to the validator by streaming the raw
 // request body. Next.js' default body parser would consume the stream before
@@ -53,33 +53,11 @@ export default async function handler(
     return;
   }
 
-  const signatureBytes = new Uint8Array(Buffer.from(walletSignature, 'base64'));
-
-  const windowMs = 2 * 60 * 1000;
-  const now = Date.now();
-  const currentWindow = Math.floor(now / windowMs) * windowMs;
-  const previousWindow = currentWindow - windowMs;
-
-  let signatureValid = false;
-  try {
-    const publicKeyBytes = await cryptoProvider.addressToBytes(walletAddress);
-    for (const ts of [currentWindow, previousWindow]) {
-      const sigMessage = `Submit validation for contract ${address} at ${ts}`;
-      if (
-        await verifyWalletSignedMessage(
-          sigMessage,
-          signatureBytes,
-          publicKeyBytes,
-        )
-      ) {
-        signatureValid = true;
-        break;
-      }
-    }
-  } catch {
-    res.status(401).json({ message: 'Signature verification failed' });
-    return;
-  }
+  const signatureValid = await verifyWindowedSignature(
+    walletSignature,
+    walletAddress,
+    ts => validateMessage(address, ts),
+  );
 
   if (!signatureValid) {
     res.status(401).json({ message: 'Invalid wallet signature' });
@@ -113,6 +91,9 @@ export default async function handler(
           'content-type': req.headers['content-type'] as string,
           'content-length': body.byteLength.toString(),
           'X-API-KEY': API_KEY,
+          // Forward wallet auth so the validator re-verifies (defense in depth).
+          'X-Wallet-Address': walletAddress,
+          'X-Wallet-Signature': walletSignature,
         },
         body: body.buffer as ArrayBuffer,
         signal: controller.signal,

@@ -111,6 +111,7 @@ export interface ContractVersion {
   byteCodeHash: string;
   transactionHash: string;
   storagePath: string;
+  sourceHidden?: boolean;
   contractInfoId: number;
   auditReports?: AuditReport[];
   createdAt: string;

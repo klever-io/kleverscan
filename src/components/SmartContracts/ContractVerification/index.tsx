@@ -1,4 +1,5 @@
 import {
+  changeCodeVisibility,
   fetchSourceFiles,
   submitValidation,
 } from '@/services/requests/contractValidator';
@@ -35,8 +36,10 @@ import {
   AuditReportLabel,
   AuditReportList,
   AuditReportRow,
+  ActionButtons,
   AuditSection,
   AuditSectionTitle,
+  CheckboxField,
   CodeBlockWrapper,
   EmptyState,
   ErrorBox,
@@ -57,6 +60,7 @@ import {
   JobRow,
   JobStatusCard,
   ModalCancelButton,
+  SecondaryButton,
   SelectorGroup,
   SelectorLabel,
   SourceSection,
@@ -171,10 +175,15 @@ export function ContractSourceTab({
   const [activeTab, setActiveTab] = useState<'source' | 'abi'>('source');
   const [viewMode, setViewMode] = useState<ViewMode>('tabs');
 
+  const selectedVersionHidden = !!versions.find(
+    v => v.version === selectedVersion,
+  )?.sourceHidden;
+
   const { data: sourceFiles, isLoading } = useQuery({
     queryKey: ['sourceFiles', contractAddress, selectedVersion],
     queryFn: () => fetchSourceFiles(contractAddress, selectedVersion),
-    enabled: versions.length > 0,
+    // Skip the request for ABI-only versions: the source is private (403).
+    enabled: versions.length > 0 && !selectedVersionHidden,
   });
 
   const fileNames = sourceFiles ? Object.keys(sourceFiles).sort() : [];
@@ -189,7 +198,9 @@ export function ContractSourceTab({
       return abiVersion.abi;
     }
   })();
-  const ideActiveFile = selectedFile || fileNames[0] || '';
+  // Fall back to the ABI when there are no source files (e.g. ABI-only versions).
+  const ideActiveFile =
+    selectedFile || fileNames[0] || (abiContent ? '__abi__' : '');
   const [srcFolderOpen, setSrcFolderOpen] = useState(true);
   const [outputFolderOpen, setOutputFolderOpen] = useState(true);
 
@@ -236,6 +247,13 @@ export function ContractSourceTab({
       setViewMode(saved);
     }
   }, []);
+
+  // ABI-only versions have no source to show — land on the ABI tab.
+  useEffect(() => {
+    if (selectedVersionHidden) {
+      setActiveTab('abi');
+    }
+  }, [selectedVersionHidden]);
 
   return (
     <SourceSection>
@@ -313,7 +331,12 @@ export function ContractSourceTab({
 
           {activeTab === 'source' && (
             <>
-              {isLoading ? (
+              {selectedVersionHidden ? (
+                <EmptyState>
+                  Source code is private for this version. The contract was
+                  verified ABI-only — only the ABI is published.
+                </EmptyState>
+              ) : isLoading ? (
                 <EmptyState>Loading source files...</EmptyState>
               ) : fileNames.length === 0 ? (
                 <EmptyState>
@@ -469,18 +492,22 @@ export function ContractSourceTab({
 
 export function ContractVerifyTab({
   contractAddress,
+  contractInfo,
   latestJob,
   hasVerifiedVersions,
   onSubmitted,
 }: {
   contractAddress: string;
+  contractInfo: ContractInfo | null;
   latestJob: ValidationJob | null;
   hasVerifiedVersions: boolean;
   onSubmitted: () => void;
 }) {
   const [showUpload, setShowUpload] = useState(!hasVerifiedVersions);
+  const [showVisibility, setShowVisibility] = useState(false);
   useEffect(() => {
     setShowUpload(!hasVerifiedVersions);
+    setShowVisibility(false);
   }, [hasVerifiedVersions]);
 
   const activeJob =
@@ -498,11 +525,34 @@ export function ContractVerifyTab({
       {(!activeJob || activeJob.status === 'failed') && (
         <>
           {!showUpload && hasVerifiedVersions ? (
-            <JobStatusCard>
-              <SubmitButton type="button" onClick={() => setShowUpload(true)}>
-                Upload new version
-              </SubmitButton>
-            </JobStatusCard>
+            <>
+              <JobStatusCard>
+                <ActionButtons>
+                  <SubmitButton
+                    type="button"
+                    onClick={() => setShowUpload(true)}
+                  >
+                    Upload new version
+                  </SubmitButton>
+                  <SecondaryButton
+                    type="button"
+                    onClick={() => setShowVisibility(v => !v)}
+                  >
+                    Change code visibility
+                  </SecondaryButton>
+                </ActionButtons>
+              </JobStatusCard>
+              {showVisibility && (
+                <ChangeVisibilityForm
+                  contractAddress={contractAddress}
+                  contractInfo={contractInfo}
+                  onDone={() => {
+                    setShowVisibility(false);
+                    onSubmitted();
+                  }}
+                />
+              )}
+            </>
           ) : (
             <UploadForm
               contractAddress={contractAddress}
@@ -521,6 +571,111 @@ export function ContractVerifyTab({
         </EmptyState>
       )}
     </div>
+  );
+}
+
+function ChangeVisibilityForm({
+  contractAddress,
+  contractInfo,
+  onDone,
+}: {
+  contractAddress: string;
+  contractInfo: ContractInfo | null;
+  onDone: () => void;
+}) {
+  const versions = contractInfo?.contractVersions ?? [];
+  const latestVersion = versions[versions.length - 1]?.version ?? 1;
+  const [selectedVersion, setSelectedVersion] = useState(latestVersion);
+  const [submitting, setSubmitting] = useState(false);
+  const { wallet, walletAddress } = useExtension();
+
+  const currentVersion = versions.find(v => v.version === selectedVersion);
+  const [hideSource, setHideSource] = useState(!!currentVersion?.sourceHidden);
+  useEffect(() => {
+    setHideSource(!!currentVersion?.sourceHidden);
+  }, [currentVersion?.sourceHidden, selectedVersion]);
+
+  const versionOptions = [...versions].reverse().map(v => ({
+    value: v.version,
+    label: `v${v.version}${v.sourceHidden ? ' — private' : ' — public'}`,
+  }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!wallet || !walletAddress) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    setSubmitting(true);
+    let signature: string;
+    try {
+      const windowMs = 2 * 60 * 1000;
+      const roundedTs = Math.floor(Date.now() / windowMs) * windowMs;
+      // Binds version + hideSource so the signature can't be replayed against a
+      // different version or to flip visibility the other way. MUST stay
+      // byte-identical to the proxy verifier and the Go validator.
+      const sigMessage = `Change source visibility for contract ${contractAddress} version ${selectedVersion} hideSource=${hideSource} at ${roundedTs}`;
+      const sig = await wallet.signMessage(sigMessage);
+      signature = sig.toBase64();
+    } catch {
+      setSubmitting(false);
+      toast.error('Wallet signing was rejected or failed');
+      return;
+    }
+
+    try {
+      await changeCodeVisibility(
+        contractAddress,
+        selectedVersion,
+        hideSource,
+        walletAddress,
+        signature,
+      );
+      toast.success('Code visibility updated');
+      onDone();
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : 'Failed to update visibility',
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <UploadCard>
+        {versions.length > 1 && (
+          <SelectorGroup>
+            <SelectorLabel>Version</SelectorLabel>
+            <SelectorDropdown
+              value={selectedVersion}
+              options={versionOptions}
+              onChange={version => setSelectedVersion(version)}
+            />
+          </SelectorGroup>
+        )}
+        <CheckboxField>
+          <input
+            type="checkbox"
+            checked={hideSource}
+            onChange={e => setHideSource(e.target.checked)}
+          />
+          <div>
+            <strong>Keep source code private (publish ABI only)</strong>
+            <small>
+              The source stays verified against the on-chain bytecode and the
+              ABI remains public, but the Rust source is not served while
+              private. You can toggle this at any time.
+            </small>
+          </div>
+        </CheckboxField>
+        <SubmitButton type="submit" disabled={submitting}>
+          {submitting ? 'Saving...' : 'Save visibility'}
+        </SubmitButton>
+      </UploadCard>
+    </form>
   );
 }
 
@@ -804,6 +959,7 @@ function UploadForm({
   const fileRef = useRef<HTMLInputElement>(null);
   const [kscVersion, setKscVersion] = useState('');
   const [rustVersion, setRustVersion] = useState('');
+  const [hideSource, setHideSource] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { wallet, walletAddress } = useExtension();
@@ -831,7 +987,10 @@ function UploadForm({
     try {
       const windowMs = 2 * 60 * 1000;
       const roundedTs = Math.floor(Date.now() / windowMs) * windowMs;
-      const sigMessage = `Submit validation for contract ${contractAddress} at ${roundedTs}`;
+      // Binds hideSource so the signature can't be replayed with a different
+      // visibility. MUST stay byte-identical to the proxy verifier and the Go
+      // validator.
+      const sigMessage = `Submit validation for contract ${contractAddress} hideSource=${hideSource} at ${roundedTs}`;
       const sig = await wallet.signMessage(sigMessage);
       signature = sig.toBase64();
     } catch {
@@ -847,6 +1006,7 @@ function UploadForm({
         rustVersion,
         walletAddress,
         signature,
+        hideSource,
       );
       toast.success('Validation queued successfully');
       onSubmitted();
@@ -887,6 +1047,21 @@ function UploadForm({
             onChange={e => setRustVersion(e.target.value)}
           />
         </FormField>
+        <CheckboxField>
+          <input
+            type="checkbox"
+            checked={hideSource}
+            onChange={e => setHideSource(e.target.checked)}
+          />
+          <div>
+            <strong>Publish ABI only (keep source code private)</strong>
+            <small>
+              The contract is still verified against the on-chain bytecode and
+              its ABI is published, but the Rust source code is not stored or
+              made public.
+            </small>
+          </div>
+        </CheckboxField>
         <SubmitButton type="submit" disabled={submitting}>
           {submitting ? 'Submitting...' : 'Submit for verification'}
         </SubmitButton>

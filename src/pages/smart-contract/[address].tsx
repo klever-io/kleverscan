@@ -227,10 +227,12 @@ const SmartContractInvoke: React.FC = () => {
         return (
           <ContractVerifyTab
             contractAddress={contractAddress}
+            contractInfo={contractInfo}
             latestJob={latestJob ?? null}
             hasVerifiedVersions={hasVerifiedVersions}
             onSubmitted={() => {
               refetchJob();
+              refetchContractInfo();
             }}
           />
         );

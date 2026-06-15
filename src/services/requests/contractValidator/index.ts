@@ -70,7 +70,9 @@ export const submitValidation = async (
   formData.append('file', file);
   formData.append('ksc_version', kscVersion);
   if (rustVersion) formData.append('rust_version', rustVersion);
-  if (hideSource) formData.append('hide_source', 'true');
+  // Always sent (the validator requires an explicit value); the default lives
+  // in the client. The query param below mirrors it for the streaming proxy.
+  formData.append('hide_source', String(hideSource));
 
   // hide_source is also passed as a query param: the signed message binds it, but
   // the proxy streams the multipart body raw and can't read the form field, so

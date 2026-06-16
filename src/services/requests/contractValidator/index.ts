@@ -16,6 +16,28 @@ export const fetchLatestJob = async (
   return data.job as ValidationJob;
 };
 
+// fetchJob fetches a single job by id (used to poll a specific paid match-check).
+// The validator returns the job object directly (not wrapped under `job`).
+export const fetchJob = async (
+  contractAddress: string,
+  jobId: number,
+): Promise<ValidationJob> => {
+  const res = await fetch(`${BASE}/${contractAddress}/jobs/${jobId}`);
+  if (!res.ok) throw new Error('Failed to fetch job');
+  return (await res.json()) as ValidationJob;
+};
+
+// fetchWalletChecks returns the connected wallet's recent paid match-checks, so
+// the tool can show history and resume polling ongoing checks after a reload.
+export const fetchWalletChecks = async (
+  walletAddress: string,
+): Promise<ValidationJob[]> => {
+  const res = await fetch(`${BASE}/wallet/${walletAddress}/checks`);
+  if (!res.ok) throw new Error('Failed to fetch validation history');
+  const data = await res.json();
+  return (data.checks ?? []) as ValidationJob[];
+};
+
 export interface ContractInfoResult {
   contractInfo: ContractInfo | null;
   auditReports: AuditReport[];
@@ -95,6 +117,37 @@ export const submitValidation = async (
       cause: data?.error || undefined,
     }) as Error;
     throw err;
+  }
+  return data;
+};
+
+// submitCheck uploads a project for a paid, ephemeral match-check. The KLV
+// payment must already be broadcast and confirmed; its hash is sent as a form
+// field and the validator re-verifies it on-chain. Returns the async job id to
+// poll via fetchJob.
+export const submitCheck = async (
+  contractAddress: string,
+  file: File,
+  kscVersion: string,
+  rustVersion: string,
+  paymentTxHash: string,
+): Promise<{ jobId: number; message: string }> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('ksc_version', kscVersion);
+  if (rustVersion) formData.append('rust_version', rustVersion);
+  formData.append('payment_tx_hash', paymentTxHash);
+
+  const res = await fetch(`${BASE}/${contractAddress}/check`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.message || 'Check submission failed', {
+      cause: data?.error || undefined,
+    });
   }
   return data;
 };

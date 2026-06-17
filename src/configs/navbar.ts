@@ -9,7 +9,7 @@ import {
 import { GiTwoCoins } from 'react-icons/gi';
 import { MdFeedback, MdOutlineLocalMall } from 'react-icons/md';
 import { RiPenNibFill } from 'react-icons/ri';
-import { TbArrowsLeftRight } from 'react-icons/tb';
+import { TbArrowsLeftRight, TbShieldCheck } from 'react-icons/tb';
 import { getNetwork } from '@/utils/networkFunctions';
 import { isKVMAvailable } from '@/utils/kvm';
 export interface INavbarItem {
@@ -109,6 +109,11 @@ const navbarItems: INavbarItem[] = [
         name: 'Verify',
         pathTo: '/verify-signature',
         Icon: TickSquare,
+      },
+      {
+        name: 'Contract Validator',
+        pathTo: '/contract-validator',
+        Icon: TbShieldCheck,
       },
       {
         name: 'Marketplaces',

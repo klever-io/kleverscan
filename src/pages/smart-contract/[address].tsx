@@ -51,6 +51,7 @@ import { useQuery } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
+import { setQueryAndRouter } from '@/utils';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
@@ -130,11 +131,20 @@ const SmartContractInvoke: React.FC = () => {
 
   const [selectedTab, setSelectedTab] = useState(tabHeaders[0].label);
 
+  // Keep the active tab in sync with the ?tab= query param so links can deep-link
+  // to a specific tab (e.g. ?tab=Verify%20Contract), the same way the shared Tabs
+  // component does. Tabs that depend on async data (e.g. "Verify Contract", which
+  // only appears once ownership resolves) are honored once they become available.
   useEffect(() => {
-    if (!tabHeaders.some(tab => tab.label === selectedTab)) {
-      setSelectedTab(tabHeaders[0].label);
-    }
-  }, [tabHeaders, selectedTab]);
+    if (!router.isReady) return;
+    const labels = tabHeaders.map(tab => tab.label);
+    const fromQuery = router.query.tab;
+    setSelectedTab(
+      typeof fromQuery === 'string' && labels.includes(fromQuery)
+        ? fromQuery
+        : labels[0],
+    );
+  }, [router.isReady, router.query.tab, tabHeaders]);
 
   const requestBeforeYesterdayTransactions = async () => {
     try {
@@ -261,7 +271,8 @@ const SmartContractInvoke: React.FC = () => {
       requestBeforeYesterdayTransactions();
       requestSmartContractData();
       requestInvokesTotalRecords();
-      setSelectedTab(tabHeaders[0].label);
+      // Tab selection is driven by the ?tab= query effect above, so it isn't
+      // reset here (which would clobber a deep link on first load).
     }
   }, [contractAddress]);
 
@@ -355,7 +366,13 @@ const SmartContractInvoke: React.FC = () => {
             <CardHeaderItem
               key={String(index)}
               selected={selectedTab === header.label}
-              onClick={() => setSelectedTab(header.label)}
+              onClick={() => {
+                setSelectedTab(header.label);
+                setQueryAndRouter(
+                  { ...router.query, tab: header.label },
+                  router,
+                );
+              }}
             >
               <span>{header.label}</span>
             </CardHeaderItem>

@@ -3,6 +3,7 @@ import {
   fetchSourceFiles,
   submitValidation,
 } from '@/services/requests/contractValidator';
+import { readBuildVersionsFromZip } from '@/utils/contractValidator/abiVersions';
 import {
   AuditReport,
   ContractInfo,
@@ -964,6 +965,17 @@ function UploadForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { wallet, walletAddress } = useExtension();
 
+  // Auto-fill KSC/Rust versions from the selected zip's output/*.abi.json.
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const versions = await readBuildVersionsFromZip(f);
+    // Always overwrite (including clearing) so a previously parsed zip's versions
+    // can't linger when a new zip lacks build metadata.
+    setKscVersion(versions?.kscVersion ?? '');
+    setRustVersion(versions?.rustVersion ?? '');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const file = fileRef.current?.files?.[0];
@@ -973,6 +985,10 @@ function UploadForm({
     }
     if (!kscVersion.trim()) {
       toast.error('KSC version is required');
+      return;
+    }
+    if (!rustVersion.trim()) {
+      toast.error('Rust version is required');
       return;
     }
     if (!wallet || !walletAddress) {
@@ -1026,8 +1042,17 @@ function UploadForm({
         {submitError && <ErrorBox>{submitError}</ErrorBox>}
         <FormField>
           <label>Contract ZIP file</label>
-          <input type="file" accept=".zip" ref={fileRef} />
-          <small>Upload the Rust source project as a ZIP archive</small>
+          <input
+            type="file"
+            accept=".zip"
+            ref={fileRef}
+            onChange={handleFileChange}
+          />
+          <small>
+            Upload the Rust source project as a ZIP archive. KSC &amp; Rust
+            versions fill in automatically from the project&apos;s ABI when
+            available.
+          </small>
         </FormField>
         <FormField>
           <label>KSC version</label>
@@ -1039,7 +1064,7 @@ function UploadForm({
           />
         </FormField>
         <FormField>
-          <label>Rust version (optional)</label>
+          <label>Rust version</label>
           <input
             type="text"
             placeholder="e.g. 1.70.0"

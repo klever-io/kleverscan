@@ -22,7 +22,9 @@ export const fetchJob = async (
   contractAddress: string,
   jobId: number,
 ): Promise<ValidationJob> => {
-  const res = await fetch(`${BASE}/${contractAddress}/jobs/${jobId}`);
+  const res = await fetch(
+    `${BASE}/${encodeURIComponent(contractAddress)}/jobs/${jobId}`,
+  );
   if (!res.ok) throw new Error('Failed to fetch job');
   return (await res.json()) as ValidationJob;
 };
@@ -32,10 +34,12 @@ export const fetchJob = async (
 export const fetchWalletChecks = async (
   walletAddress: string,
 ): Promise<ValidationJob[]> => {
-  const res = await fetch(`${BASE}/wallet/${walletAddress}/checks`);
+  const res = await fetch(
+    `${BASE}/wallet/${encodeURIComponent(walletAddress)}/checks`,
+  );
   if (!res.ok) throw new Error('Failed to fetch validation history');
   const data = await res.json();
-  return (data.checks ?? []) as ValidationJob[];
+  return Array.isArray(data.checks) ? (data.checks as ValidationJob[]) : [];
 };
 
 export interface ContractInfoResult {
@@ -138,10 +142,13 @@ export const submitCheck = async (
   if (rustVersion) formData.append('rust_version', rustVersion);
   formData.append('payment_tx_hash', paymentTxHash);
 
-  const res = await fetch(`${BASE}/${contractAddress}/check`, {
-    method: 'POST',
-    body: formData,
-  });
+  const res = await fetch(
+    `${BASE}/${encodeURIComponent(contractAddress)}/check`,
+    {
+      method: 'POST',
+      body: formData,
+    },
+  );
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

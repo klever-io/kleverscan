@@ -33,14 +33,18 @@ export default async function handler(
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10_000);
-    const response = await fetch(
-      `${validatorUrl}/wallet/${encodeURIComponent(walletAddress)}/checks`,
-      {
-        headers: { 'X-API-KEY': API_KEY },
-        signal: controller.signal,
-      },
-    );
-    clearTimeout(timeoutId);
+    let response: Response;
+    try {
+      response = await fetch(
+        `${validatorUrl}/wallet/${encodeURIComponent(walletAddress)}/checks`,
+        {
+          headers: { 'X-API-KEY': API_KEY },
+          signal: controller.signal,
+        },
+      );
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {

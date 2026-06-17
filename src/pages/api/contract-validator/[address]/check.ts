@@ -2,6 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
 
+// Cap the buffered upload so an oversized body can't exhaust server memory.
+const MAX_CHECK_UPLOAD_BYTES = 1 * 1024 * 1024; // 1 MiB
+
 // This route proxies the multipart upload to the validator by streaming the raw
 // request body. Next.js' default body parser would consume the stream before the
 // handler reads it, leaving `req.on('data')` with nothing and the request hanging
@@ -40,7 +43,21 @@ export default async function handler(
   try {
     const body = await new Promise<Uint8Array>((resolve, reject) => {
       const chunks: Uint8Array[] = [];
-      req.on('data', chunk => chunks.push(new Uint8Array(chunk)));
+      let received = 0;
+      req.on('data', chunk => {
+        const part = new Uint8Array(chunk);
+        received += part.byteLength;
+        if (received > MAX_CHECK_UPLOAD_BYTES) {
+          req.destroy();
+          reject(
+            Object.assign(new Error('Payload too large'), {
+              name: 'PayloadTooLargeError',
+            }),
+          );
+          return;
+        }
+        chunks.push(part);
+      });
       req.on('end', () => {
         const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
         const result = new Uint8Array(totalLength);
@@ -56,17 +73,21 @@ export default async function handler(
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
-    const response = await fetch(`${validatorUrl}/contract/${address}/check`, {
-      method: 'POST',
-      headers: {
-        'content-type': req.headers['content-type'] as string,
-        'content-length': body.byteLength.toString(),
-        'X-API-KEY': API_KEY,
-      },
-      body: body.buffer as ArrayBuffer,
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
+    let response: Response;
+    try {
+      response = await fetch(`${validatorUrl}/contract/${address}/check`, {
+        method: 'POST',
+        headers: {
+          'content-type': req.headers['content-type'] as string,
+          'content-length': body.byteLength.toString(),
+          'X-API-KEY': API_KEY,
+        },
+        body: body.buffer as ArrayBuffer,
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {
@@ -77,6 +98,10 @@ export default async function handler(
     const text = await response.text();
     res.status(response.status).send(text || '');
   } catch (error) {
+    if ((error as Error).name === 'PayloadTooLargeError') {
+      res.status(413).json({ message: 'Upload too large' });
+      return;
+    }
     if ((error as Error).name === 'AbortError') {
       res.status(504).json({ message: 'Upstream validator timeout' });
       return;

@@ -10,7 +10,7 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { broadcastTXandCheckStatus } from '@/utils/transaction';
 import { Transaction } from '@klever/connect';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 
 interface ValidationSettings {
@@ -42,6 +42,13 @@ export function useContractCheck() {
   const [submitting, setSubmitting] = useState(false);
   const [statusText, setStatusText] = useState<string | null>(null);
   const [parsing, setParsing] = useState(false);
+
+  // Tracks the latest file-selection so a slower parse of an earlier file can't
+  // overwrite the versions of a more recently selected one.
+  const parseRequestIdRef = useRef(0);
+  // Holds a confirmed-but-not-yet-consumed payment hash so that retrying after a
+  // failed submitCheck reuses the same payment instead of charging the user again.
+  const pendingPaymentTxHashRef = useRef<string | null>(null);
 
   // Fetch the validation fee up front so the button can display it.
   useEffect(() => {
@@ -89,6 +96,7 @@ export function useContractCheck() {
   // and auto-fill them (best-effort). `parsing` lets the UI show a loader and
   // reveal the version inputs only once parsing finishes.
   const onFileSelected = async (selected: File | null): Promise<void> => {
+    const requestId = ++parseRequestIdRef.current;
     setFile(selected);
     setKscVersion('');
     setRustVersion('');
@@ -96,10 +104,12 @@ export function useContractCheck() {
     setParsing(true);
     try {
       const versions = await readBuildVersionsFromZip(selected);
+      // Ignore results if a newer file was selected while parsing.
+      if (requestId !== parseRequestIdRef.current) return;
       if (versions?.kscVersion) setKscVersion(versions.kscVersion);
       if (versions?.rustVersion) setRustVersion(versions.rustVersion);
     } finally {
-      setParsing(false);
+      if (requestId === parseRequestIdRef.current) setParsing(false);
     }
   };
 
@@ -130,68 +140,78 @@ export function useContractCheck() {
 
     setSubmitting(true);
 
-    // Load payment settings (receiver + amount in on-chain precision).
-    let settings: ValidationSettings;
-    try {
-      setStatusText('Loading payment settings…');
-      const res = await fetch('/api/contract-validator/settings');
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      settings = data?.validation;
-      if (!settings?.receiver_address || settings.transfer_value == null) {
-        throw new Error();
-      }
-    } catch {
-      toast.error('Failed to load payment settings');
-      setSubmitting(false);
-      setStatusText(null);
-      return;
-    }
-
-    // Build + sign the KLV payment.
-    let signedTransaction: unknown;
-    try {
-      setStatusText('Waiting for wallet signature…');
-      const unsignedTx = await wallet.buildTransaction([
-        {
-          receiver: settings.receiver_address,
-          amount: settings.transfer_value,
-          contractType: 0,
-        },
-      ]);
-      signedTransaction = await wallet.signTransaction(
-        Transaction.fromTransaction(unsignedTx),
-      );
-    } catch {
-      toast.error('Wallet signing was rejected or failed');
-      setSubmitting(false);
-      setStatusText(null);
-      return;
-    }
-
-    // Broadcast and wait for on-chain confirmation before hitting the validator,
-    // so the payment is visible when the validator verifies it.
+    // Reuse a previously confirmed payment if a prior submit failed after paying,
+    // so a retry doesn't charge the user twice.
     let paymentTxHash: string;
-    try {
-      setStatusText('Broadcasting payment…');
-      const {
-        error: txError,
-        status,
-        hash,
-      } = await broadcastTXandCheckStatus(
-        signedTransaction as Parameters<typeof broadcastTXandCheckStatus>[0],
-      );
-      if (txError || status !== 'success' || !hash) {
-        throw new Error('Payment transaction failed');
+    if (pendingPaymentTxHashRef.current) {
+      paymentTxHash = pendingPaymentTxHashRef.current;
+    } else {
+      // Load payment settings (receiver + amount in on-chain precision).
+      let settings: ValidationSettings;
+      try {
+        setStatusText('Loading payment settings…');
+        const res = await fetch('/api/contract-validator/settings');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        settings = data?.validation;
+        if (!settings?.receiver_address || settings.transfer_value == null) {
+          throw new Error();
+        }
+      } catch {
+        toast.error('Failed to load payment settings');
+        setSubmitting(false);
+        setStatusText(null);
+        return;
       }
-      paymentTxHash = hash;
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Payment transaction failed';
-      toast.error(message);
-      setSubmitting(false);
-      setStatusText(null);
-      return;
+
+      // Build + sign the KLV payment.
+      let signedTransaction: unknown;
+      try {
+        setStatusText('Waiting for wallet signature…');
+        const unsignedTx = await wallet.buildTransaction([
+          {
+            receiver: settings.receiver_address,
+            amount: settings.transfer_value,
+            contractType: 0,
+          },
+        ]);
+        signedTransaction = await wallet.signTransaction(
+          Transaction.fromTransaction(unsignedTx),
+        );
+      } catch {
+        toast.error('Wallet signing was rejected or failed');
+        setSubmitting(false);
+        setStatusText(null);
+        return;
+      }
+
+      // Broadcast and wait for on-chain confirmation before hitting the validator,
+      // so the payment is visible when the validator verifies it.
+      try {
+        setStatusText('Broadcasting payment…');
+        const {
+          error: txError,
+          status,
+          hash,
+        } = await broadcastTXandCheckStatus(
+          signedTransaction as Parameters<typeof broadcastTXandCheckStatus>[0],
+        );
+        if (txError || status !== 'success' || !hash) {
+          throw new Error('Payment transaction failed');
+        }
+        paymentTxHash = hash;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Payment transaction failed';
+        toast.error(message);
+        setSubmitting(false);
+        setStatusText(null);
+        return;
+      }
+
+      // Remember the confirmed payment so a failed submit below can be retried
+      // without paying again.
+      pendingPaymentTxHashRef.current = paymentTxHash;
     }
 
     // Submit the upload, then hand off to the history. We do NOT wait for the
@@ -206,6 +226,8 @@ export function useContractCheck() {
         rustVersion.trim(),
         paymentTxHash,
       );
+      // Payment consumed — clear it so the next check pays anew.
+      pendingPaymentTxHashRef.current = null;
       toast.success(
         'Validation started — track its progress in the history below.',
       );

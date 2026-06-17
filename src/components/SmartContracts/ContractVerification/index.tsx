@@ -970,8 +970,10 @@ function UploadForm({
     const f = e.target.files?.[0];
     if (!f) return;
     const versions = await readBuildVersionsFromZip(f);
-    if (versions?.kscVersion) setKscVersion(versions.kscVersion);
-    if (versions?.rustVersion) setRustVersion(versions.rustVersion);
+    // Always overwrite (including clearing) so a previously parsed zip's versions
+    // can't linger when a new zip lacks build metadata.
+    setKscVersion(versions?.kscVersion ?? '');
+    setRustVersion(versions?.rustVersion ?? '');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

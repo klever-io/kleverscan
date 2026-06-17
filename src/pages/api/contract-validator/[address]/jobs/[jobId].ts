@@ -14,7 +14,7 @@ export default async function handler(
   const { address, jobId } = req.query;
   const validatorUrl = process.env.DEFAULT_CONTRACT_VALIDATOR_URL;
 
-  if (typeof address !== 'string' || !address) {
+  if (typeof address !== 'string' || !/^klv1[0-9a-z]{58}$/.test(address)) {
     res.status(400).json({ message: 'Invalid contract address' });
     return;
   }
@@ -31,14 +31,18 @@ export default async function handler(
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10_000);
-    const response = await fetch(
-      `${validatorUrl}/contract/${encodeURIComponent(address)}/jobs/${encodeURIComponent(jobId)}`,
-      {
-        headers: { 'X-API-KEY': API_KEY },
-        signal: controller.signal,
-      },
-    );
-    clearTimeout(timeoutId);
+    let response: Response;
+    try {
+      response = await fetch(
+        `${validatorUrl}/contract/${encodeURIComponent(address)}/jobs/${encodeURIComponent(jobId)}`,
+        {
+          headers: { 'X-API-KEY': API_KEY },
+          signal: controller.signal,
+        },
+      );
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     const contentType = response.headers.get('content-type') || '';
     if (contentType.includes('application/json')) {

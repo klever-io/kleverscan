@@ -88,6 +88,7 @@ function findAbiEntry(buf: Uint8Array): RawEntry | null {
       const lNameLen = dv.getUint16(localOff + 26, true);
       const lExtraLen = dv.getUint16(localOff + 28, true);
       const dataStart = localOff + 30 + lNameLen + lExtraLen;
+      if (dataStart + compSize > buf.length) return null;
       return { bytes: buf.subarray(dataStart, dataStart + compSize), method };
     }
 
@@ -106,5 +107,9 @@ async function inflate(
 
   const ds = new DecompressionStream('deflate-raw');
   const stream = new Blob([bytes]).stream().pipeThrough(ds);
-  return new Uint8Array(await new Response(stream).arrayBuffer());
+  const buffer = await new Response(stream).arrayBuffer();
+  // Guard against a maliciously oversized ABI decompressing into memory.
+  const MAX_DECOMPRESSED_BYTES = 10 * 1024 * 1024;
+  if (buffer.byteLength > MAX_DECOMPRESSED_BYTES) return null;
+  return new Uint8Array(buffer);
 }

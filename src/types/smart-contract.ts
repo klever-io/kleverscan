@@ -93,6 +93,12 @@ export interface ValidationJob {
   error: string;
   createdAt: string;
   updatedAt: string;
+  // Paid match-check fields. checkOnly marks an ephemeral, payment-gated check;
+  // matched is its verdict (null until the check completes).
+  checkOnly?: boolean;
+  matched?: boolean | null;
+  walletAddress?: string;
+  fileName?: string;
 }
 
 export interface AuditReport {
@@ -111,6 +117,7 @@ export interface ContractVersion {
   byteCodeHash: string;
   transactionHash: string;
   storagePath: string;
+  sourceHidden?: boolean;
   contractInfoId: number;
   auditReports?: AuditReport[];
   createdAt: string;

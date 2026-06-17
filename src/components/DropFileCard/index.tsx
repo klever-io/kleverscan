@@ -62,9 +62,13 @@ const DropFileCard: React.FC<PropsWithChildren<IDropFileCardProps>> = ({
           setIsDragging(true);
           onDragOver;
         }}
-        onClick={() => document.getElementById(id || '')?.click()}
-        onChange={onChange}
       >
+        {/*
+          The transparent <Input> overlays the whole zone and opens the file
+          dialog natively on click. We deliberately do NOT also call input.click()
+          from a DropZone onClick handler — doing both fired the dialog twice.
+          onChange lives only on the input (not the zone) so it fires once.
+        */}
         <Input id={id} type="file" accept={accept} onChange={onChange} />
 
         <IconContainer>

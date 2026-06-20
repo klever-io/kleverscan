@@ -88,7 +88,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
           { element: props => <p key={rank}>{rank}°</p>, span: 1, width: 100 },
           {
             element: props => (
-              <DoubleRow {...props} key={ownerAddress + status}>
+              <DoubleRow key={ownerAddress + status} {...props}>
                 <span>
                   {
                     <AddressContainer>
@@ -115,7 +115,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
 
           {
             element: props => (
-              <DoubleRow {...props} key={status + rating}>
+              <DoubleRow key={status + rating} {...props}>
                 <span>{capitalizeString(status)}</span>
                 <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
               </DoubleRow>
@@ -124,7 +124,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
           },
           {
             element: props => (
-              <DoubleRow {...props} key={staked}>
+              <DoubleRow key={staked} {...props}>
                 <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
                 <span key={commission}>{commission / 10 ** 2}%</span>
               </DoubleRow>
@@ -133,7 +133,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
           },
           {
             element: props => (
-              <DoubleRow {...props} key={totalProduced}>
+              <DoubleRow key={totalProduced} {...props}>
                 <span>{totalProduced}</span>
                 <CenteredRow>
                   <span>{totalMissed}</span>

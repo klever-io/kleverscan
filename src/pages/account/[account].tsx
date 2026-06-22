@@ -164,8 +164,8 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     if (currentEpoch == null || lastClaimEpoch == null) return null;
     const remaining = maxEpochsUnclaimed - (currentEpoch - lastClaimEpoch);
     if (remaining <= 0) return { days: 0, warning: true };
-    const days = Math.floor(remaining / 4);
-    return { days, warning: days < 3 };
+    const days = Math.max(1, Math.floor(remaining / 4));
+    return { days, warning: remaining < 12 };
   };
 
   const klvStakingExpiry = calcExpiry(account?.assets?.KLV?.lastClaim?.epoch);
@@ -635,8 +635,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                           0 && (
                           <RewardExpiry warning={klvStakingExpiry.warning}>
                             {klvStakingExpiry.days === 0
-                              ? 'Expired'
-                              : `Expires in ~${klvStakingExpiry.days} ${klvStakingExpiry.days === 1 ? 'day' : 'days'}`}
+                              ? t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.Expired',
+                                )
+                              : t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.ExpiresIn',
+                                  { count: klvStakingExpiry.days },
+                                )}
                           </RewardExpiry>
                         )}
                       <KLVStakingClaimButton />
@@ -660,8 +665,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                           0 && (
                           <RewardExpiry warning={kfiStakingExpiry.warning}>
                             {kfiStakingExpiry.days === 0
-                              ? 'Expired'
-                              : `Expires in ~${kfiStakingExpiry.days} ${kfiStakingExpiry.days === 1 ? 'day' : 'days'}`}
+                              ? t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.Expired',
+                                )
+                              : t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.ExpiresIn',
+                                  { count: kfiStakingExpiry.days },
+                                )}
                           </RewardExpiry>
                         )}
                       <KFIStakingClaimButton />

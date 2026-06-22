@@ -24,7 +24,10 @@
         "Rewards": "Rewards",
         "Available": "Available",
         "Allowance": "Allowance",
-        "Staking": " {{asset}} Staking"
+        "Staking": " {{asset}} Staking",
+        "Expired": "Expired",
+        "ExpiresIn_one": "Expires in ~{{count}} day",
+        "ExpiresIn_other": "Expires in ~{{count}} days"
       },
       "Nonce": "Nonce"
     },

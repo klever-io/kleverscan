@@ -26,7 +26,13 @@ import { parseValidators } from '@/utils/parseValues';
 import { AddressContainer } from '@/views/validators/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 
 const VersionStatus = styled(Status)`
@@ -44,7 +50,6 @@ export const validatorsHeaders = [
   'Software Version',
   'Cumulative Stake',
 ];
-
 
 const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
@@ -64,131 +69,140 @@ const Validators: React.FC<PropsWithChildren> = () => {
     loadHeartbeat();
   }, []);
 
-  const validatorsRowSections = (validator: IValidator): IRowSection[] => {
-    const {
-      name,
-      ownerAddress,
-      parsedAddress,
-      rank,
-      staked,
-      commission,
-      cumulativeStaked,
-      rating,
-      status,
-      totalProduced,
-      totalMissed,
-      canDelegate,
-      blsPublicKey,
-    } = validator;
+  const validatorsRowSections = useCallback(
+    (validator: IValidator): IRowSection[] => {
+      const {
+        name,
+        ownerAddress,
+        parsedAddress,
+        rank,
+        staked,
+        commission,
+        cumulativeStaked,
+        rating,
+        status,
+        totalProduced,
+        totalMissed,
+        canDelegate,
+        blsPublicKey,
+      } = validator;
 
-    const softwareVersion = blsPublicKey ? versionMap[blsPublicKey] : undefined;
-    const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
-    const sections: IRowSection[] = ownerAddress
-      ? [
-          { element: props => <p key={rank}>{rank}°</p>, span: 1, width: 100 },
-          {
-            element: props => (
-              <DoubleRow key={ownerAddress + status} {...props}>
-                <span>
-                  {
-                    <AddressContainer>
-                      <Link
-                        href={`validator/${ownerAddress}`}
-                        data-testid="validator-link"
-                      >
-                        {name ? name : <Mono>{parsedAddress}</Mono>}
-                      </Link>
-                      <Copy data={ownerAddress} info="Validator Address" />
-                    </AddressContainer>
-                  }
-                </span>
-                <Status
-                  status={canDelegate ? 'success' : 'fail'}
-                  key={String(canDelegate)}
-                >
-                  {canDelegate ? 'Yes' : 'No'}
-                </Status>
-              </DoubleRow>
-            ),
-            span: 1,
-          },
-
-          {
-            element: props => (
-              <DoubleRow key={status + rating} {...props}>
-                <span>{capitalizeString(status)}</span>
-                <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
-              </DoubleRow>
-            ),
-            span: 1,
-          },
-          {
-            element: props => (
-              <DoubleRow key={staked} {...props}>
-                <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
-                <span key={commission}>{commission / 10 ** 2}%</span>
-              </DoubleRow>
-            ),
-            span: 1,
-          },
-          {
-            element: props => (
-              <DoubleRow key={totalProduced} {...props}>
-                <span>{totalProduced}</span>
-                <CenteredRow>
-                  <span>{totalMissed}</span>
-                  <Tooltip
-                    msg="Missed Percentage"
-                    Component={() => (
-                      <CustomFieldWrapper>
-                        <span>
-                          {' '}
-                          (
-                          {totalProduced
-                            ? (
-                                ((totalMissed || 0) * 100) /
-                                totalProduced
-                              ).toFixed(2)
-                            : '- -'}
-                          %)
-                        </span>
-                      </CustomFieldWrapper>
-                    )}
-                  />
-                </CenteredRow>
-              </DoubleRow>
-            ),
-            span: 1,
-          },
-          {
-            element: props => (
-              <CenteredRow key={softwareVersion}>
-                {softwareVersion ? (
-                  <VersionStatus
-                    status={
-                      softwareVersion === latestVersion ? 'success' : 'fail'
+      const softwareVersion = blsPublicKey
+        ? versionMap[blsPublicKey]
+        : undefined;
+      const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
+      const sections: IRowSection[] = ownerAddress
+        ? [
+            {
+              element: props => <p key={rank}>{rank}°</p>,
+              span: 1,
+              width: 100,
+            },
+            {
+              element: props => (
+                <DoubleRow key={ownerAddress + status} {...props}>
+                  <span>
+                    {
+                      <AddressContainer>
+                        <Link
+                          href={`validator/${ownerAddress}`}
+                          data-testid="validator-link"
+                        >
+                          {name ? name : <Mono>{parsedAddress}</Mono>}
+                        </Link>
+                        <Copy data={ownerAddress} info="Validator Address" />
+                      </AddressContainer>
                     }
+                  </span>
+                  <Status
+                    status={canDelegate ? 'success' : 'fail'}
+                    key={String(canDelegate)}
                   >
-                    {softwareVersion}
-                  </VersionStatus>
-                ) : (
-                  <span>-</span>
-                )}
-              </CenteredRow>
-            ),
-            span: 1,
-          },
-          {
-            element: props => (
-              <Progress percent={cumulativeStaked} key={cumulativeStaked} />
-            ),
-            span: 2,
-          },
-        ]
-      : [];
+                    {canDelegate ? 'Yes' : 'No'}
+                  </Status>
+                </DoubleRow>
+              ),
+              span: 1,
+            },
 
-    return sections;
-  };
+            {
+              element: props => (
+                <DoubleRow key={status + rating} {...props}>
+                  <span>{capitalizeString(status)}</span>
+                  <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
+                </DoubleRow>
+              ),
+              span: 1,
+            },
+            {
+              element: props => (
+                <DoubleRow key={staked} {...props}>
+                  <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
+                  <span key={commission}>{commission / 10 ** 2}%</span>
+                </DoubleRow>
+              ),
+              span: 1,
+            },
+            {
+              element: props => (
+                <DoubleRow key={totalProduced} {...props}>
+                  <span>{totalProduced}</span>
+                  <CenteredRow>
+                    <span>{totalMissed}</span>
+                    <Tooltip
+                      msg="Missed Percentage"
+                      Component={() => (
+                        <CustomFieldWrapper>
+                          <span>
+                            {' '}
+                            (
+                            {totalProduced
+                              ? (
+                                  ((totalMissed || 0) * 100) /
+                                  totalProduced
+                                ).toFixed(2)
+                              : '- -'}
+                            %)
+                          </span>
+                        </CustomFieldWrapper>
+                      )}
+                    />
+                  </CenteredRow>
+                </DoubleRow>
+              ),
+              span: 1,
+            },
+            {
+              element: props => (
+                <CenteredRow key={softwareVersion}>
+                  {softwareVersion ? (
+                    <VersionStatus
+                      status={
+                        softwareVersion === latestVersion ? 'success' : 'fail'
+                      }
+                    >
+                      {softwareVersion}
+                    </VersionStatus>
+                  ) : (
+                    <span>-</span>
+                  )}
+                </CenteredRow>
+              ),
+              span: 1,
+            },
+            {
+              element: props => (
+                <Progress percent={cumulativeStaked} key={cumulativeStaked} />
+              ),
+              span: 2,
+            },
+          ]
+        : [];
+
+      return sections;
+    },
+    [latestVersion, versionMap],
+  );
 
   const filters: IFilter[] = useMemo(() => {
     return [

@@ -1,7 +1,6 @@
 import {
   smartContractsListCall,
   smartContractsStatisticCall,
-  smartContractsTotalContractsCall,
   smartContractTotalTransactionsListCall,
   smartContractsBeforeYesterdayTransactionsCall,
 } from '@/services/requests/smartContracts';
@@ -29,7 +28,6 @@ export const SmartContractDataProvider: React.FC<PropsWithChildren> = ({
   const [
     smartContractsStatisticResult,
     smartContractsListResult,
-    smartContractTotalContractsResult,
     smartContractTotalTransactionsResult,
     smartContractsBeforeYesterdayTransactionsResult,
   ] = useQueries({
@@ -42,11 +40,6 @@ export const SmartContractDataProvider: React.FC<PropsWithChildren> = ({
       {
         queryKey: ['smartContractsList'],
         queryFn: smartContractsListCall,
-        refetchInterval: watcherTimeout,
-      },
-      {
-        queryKey: ['smartContractsTotalContracts'],
-        queryFn: smartContractsTotalContractsCall,
         refetchInterval: watcherTimeout,
       },
       {
@@ -66,7 +59,7 @@ export const SmartContractDataProvider: React.FC<PropsWithChildren> = ({
     smartContractsStatistic:
       smartContractsStatisticResult.data?.statistics || [],
     smartContractsList: smartContractsListResult.data?.smartContracts || [],
-    smartContractTotalContracts: smartContractTotalContractsResult.data || 0,
+    smartContractTotalContracts: smartContractsListResult.data?.totalContracts || 0,
     beforeYesterdayTransactions:
       smartContractsBeforeYesterdayTransactionsResult.data
         ?.beforeYesterdayTxs || 0,

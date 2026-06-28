@@ -43,7 +43,9 @@ export const fetchHeartbeatStatus = async (): Promise<
 
     for (const hb of data.data.heartbeats as HeartbeatEntry[]) {
       if (!hb.publicKey || !hb.versionNumber) continue;
-      const shortVersion = hb.versionNumber.split('/')[0];
+      const shortVersion = hb.versionNumber
+        .split('/')[0]
+        .replace(/-\d+-g[0-9a-f]+$/, '');
       versionMap[hb.publicKey] = shortVersion;
 
       if (!latestVersion || compareSemver(shortVersion, latestVersion) > 0) {

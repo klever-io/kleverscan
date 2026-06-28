@@ -6,6 +6,7 @@ import { IFilter } from '@/components/Filter';
 import Progress from '@/components/Progress';
 import { ITable } from '@/components/Table';
 import { CustomFieldWrapper, Status } from '@/components/Table/styles';
+import Skeleton from '@/components/Skeleton';
 import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
 import { fetchHeartbeatStatus } from '@/services/requests/heartbeat';
@@ -57,6 +58,8 @@ const Validators: React.FC<PropsWithChildren> = () => {
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');
   const [latestVersion, setLatestVersion] = useState<string | undefined>();
   const [versionMap, setVersionMap] = useState<Record<string, string>>({});
+  const [versionLoading, setVersionLoading] = useState(true);
+  const [totalValidators, setTotalValidators] = useState<number | undefined>();
 
   useEffect(() => {
     const loadHeartbeat = async () => {
@@ -65,6 +68,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
         setLatestVersion(result.latestVersion);
         setVersionMap(result.versionMap);
       }
+      setVersionLoading(false);
     };
     loadHeartbeat();
   }, []);
@@ -236,6 +240,9 @@ const Validators: React.FC<PropsWithChildren> = () => {
 
     if (!validators.error) {
       const parsedValidators = parseValidators(validators);
+      if (totalValidators === undefined) {
+        setTotalValidators(validators.pagination?.totalRecords ?? undefined);
+      }
       return { ...validators, data: { validators: parsedValidators } };
     } else {
       return validators;
@@ -250,8 +257,29 @@ const Validators: React.FC<PropsWithChildren> = () => {
     dataName: 'validators',
   };
 
-  const versionCard = latestVersion ? (
+  const versionCard = (
     <CardContainer>
+      <Card>
+        <div>
+          <span>
+            <strong>Total Validators</strong>
+          </span>
+        </div>
+        <div>
+          <span>
+            <small>Network</small>
+          </span>
+        </div>
+        <div>
+          <span>
+            {totalValidators === undefined ? (
+              <Skeleton width={40} height={19} />
+            ) : (
+              totalValidators
+            )}
+          </span>
+        </div>
+      </Card>
       <Card>
         <div>
           <span>
@@ -264,11 +292,17 @@ const Validators: React.FC<PropsWithChildren> = () => {
           </span>
         </div>
         <div>
-          <span>{latestVersion}</span>
+          <span>
+            {versionLoading ? (
+              <Skeleton width={80} height={19} />
+            ) : (
+              (latestVersion ?? '-')
+            )}
+          </span>
         </div>
       </Card>
     </CardContainer>
-  ) : undefined;
+  );
 
   const detailProps = {
     title: 'Validators',

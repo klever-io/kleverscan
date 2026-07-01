@@ -1,11 +1,11 @@
-name: Build
+name: E2E Tests
 
 on:
   pull_request:
     branches: ['develop']
 
 jobs:
-  build:
+  e2e:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,5 +30,8 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build project
-        run: yarn build
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          build: yarn build
+          start: yarn start

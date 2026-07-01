@@ -19,7 +19,7 @@ import { parseValidators } from '@/utils/parseValues';
 import { AddressContainer } from '@/views/validators/detail';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { PropsWithChildren, useMemo } from 'react';
+import React, { PropsWithChildren, useMemo, useRef } from 'react';
 
 export const validatorsHeaders = [
   'Rank',
@@ -140,6 +140,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const [filterValidators, fetchPartialValidator, loading, setLoading] =
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filters: IFilter[] = useMemo(() => {
     return [
@@ -157,6 +158,10 @@ const Validators: React.FC<PropsWithChildren> = () => {
         },
         onChange: async value => {
           setLoading(true);
+          if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+          searchTimeoutRef.current = setTimeout(() => {
+            setQueryAndRouter(value ? { name: value } : {}, router);
+          }, 500);
           await fetchPartialValidator(value);
         },
         current: (router.query.name as string) || undefined,

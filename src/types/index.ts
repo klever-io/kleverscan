@@ -296,6 +296,7 @@ export interface IAccount {
 export interface IAssetsBuckets {
   asset?: IAccountAsset;
   bucket?: IBucket;
+  validatorStatus?: string;
 }
 
 export interface IHolders {
@@ -558,6 +559,7 @@ export interface IBucket {
   balance: number;
   delegation: string;
   availableEpoch: number | string;
+  validatorName?: string;
 }
 
 // TODO: establish a pattern for filter types

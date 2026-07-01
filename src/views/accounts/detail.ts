@@ -279,6 +279,24 @@ export const RewardsAvailableContainer = styled.div`
   flex-direction: column;
 `;
 
+export const RewardExpiry = styled.span<{ warning: boolean }>`
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px !important;
+  padding-right: 7px !important;
+  border-radius: 10px;
+  white-space: nowrap;
+  width: fit-content;
+  min-width: fit-content !important;
+  align-self: center;
+  color: ${props =>
+    props.warning ? props.theme.table.fail : props.theme.table.icon};
+  background-color: ${props =>
+    props.warning
+      ? `${props.theme.table.fail}22`
+      : `${props.theme.table.icon}22`};
+`;
+
 export const FrozenContainerLi = styled.li`
   div {
     padding: 0;

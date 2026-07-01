@@ -98,8 +98,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const headers = [
     t('common:Titles.Assets'),
     t('common:Titles.Transactions'),
-    t('accounts:SingleAccount.Tabs.Buckets'),
-    t('accounts:SingleAccount.Tabs.Rewards'),
     t('accounts:SingleAccount.Tabs.SmartContracts'),
   ];
   const tabHeaders = [t('common:Tabs.Overview')];
@@ -171,9 +169,24 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const klvStakingExpiry = calcExpiry(account?.assets?.KLV?.lastClaim?.epoch);
   const kfiStakingExpiry = calcExpiry(account?.assets?.KFI?.lastClaim?.epoch);
 
+  const hasBuckets = Object.values(account?.assets || {}).some(
+    asset => (asset as { buckets?: unknown[] })?.buckets?.length,
+  );
+
   const getHeaders = () => {
     if (hasProprietaryAssets) {
       headers.splice(1, 0, t('accounts:SingleAccount.Tabs.ProprietaryAssets'));
+    }
+    if (hasBuckets) {
+      const transactionsIndex = headers.indexOf(
+        t('common:Titles.Transactions'),
+      );
+      headers.splice(
+        transactionsIndex + 1,
+        0,
+        t('accounts:SingleAccount.Tabs.Buckets'),
+        t('accounts:SingleAccount.Tabs.Rewards'),
+      );
     }
   };
   getHeaders();

@@ -190,6 +190,14 @@ export const bucketsRequest = (
       asset => assets[asset]?.buckets?.length,
     );
 
+    if (assetsWithBuckets.length === 0) {
+      return {
+        data: { buckets: [] },
+        code: 'successful',
+        error: '',
+      };
+    }
+
     const assetsDetailsResponse: IAssetsResponse = await api.get({
       route: `assets/list`,
       query: { asset: assetsWithBuckets, page, limit },

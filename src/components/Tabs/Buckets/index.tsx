@@ -11,7 +11,7 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ContractContainer, Status } from './styles';
+import { ContractContainer, Status, ValidatorStatusBadge } from './styles';
 
 export interface IBuckets {
   bucketsTableProps: IInnerTableProps;
@@ -40,7 +40,7 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
   };
 
   const rowSections = (assetBucket: IAssetsBuckets): IRowSection[] => {
-    const { asset, bucket } = assetBucket;
+    const { asset, bucket, validatorStatus } = assetBucket;
 
     const minEpochsToUnstake = asset?.staking?.minEpochsToUnstake ?? 1;
     const minEpochsToWithdraw = asset?.staking?.minEpochsToWithdraw ?? 2;
@@ -226,9 +226,19 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
                 <ExplorerLink
                   type="validator"
                   value={bucket?.delegation}
-                  label={parseAddress(bucket?.delegation, 22)}
+                  label={
+                    bucket?.validatorName ||
+                    parseAddress(bucket?.delegation, 22)
+                  }
                   compact
                 />
+                {(validatorStatus === 'jailed' ||
+                  validatorStatus === 'inactive') && (
+                  <ValidatorStatusBadge status={validatorStatus}>
+                    {validatorStatus.charAt(0).toUpperCase() +
+                      validatorStatus.slice(1)}
+                  </ValidatorStatusBadge>
+                )}
               </>
             ) : (
               <>{getDelegation()}</>

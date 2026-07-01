@@ -581,11 +581,22 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
   ) => {
     setTxLoading(true);
 
-    const payload = JSON.parse(
-      JSON.stringify(parseKda(contractValues, contractType)),
-    );
+    let payload;
+    try {
+      payload = JSON.parse(
+        JSON.stringify(parseKda(contractValues, contractType)),
+      );
 
-    await precisionParse(payload, contractType);
+      await precisionParse(payload, contractType);
+    } catch (e) {
+      const errorMessage =
+        typeof e === 'object' && e !== null && 'message' in e
+          ? (e as { message: string }).message
+          : String(e);
+      toast.error(errorMessage);
+      setTxLoading(false);
+      return;
+    }
 
     parsePayload(payload, metadata, contractType);
 

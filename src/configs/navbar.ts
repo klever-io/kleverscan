@@ -9,7 +9,7 @@ import {
 import { GiTwoCoins } from 'react-icons/gi';
 import { MdFeedback, MdOutlineLocalMall } from 'react-icons/md';
 import { RiPenNibFill } from 'react-icons/ri';
-import { TbArrowsLeftRight } from 'react-icons/tb';
+import { TbArrowsLeftRight, TbShieldCheck } from 'react-icons/tb';
 import { getNetwork } from '@/utils/networkFunctions';
 import { isKVMAvailable } from '@/utils/kvm';
 export interface INavbarItem {
@@ -24,6 +24,9 @@ export const heightLimit = 70; // pixels
 export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 export const network = getNetwork();
+
+const isContractValidationEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
 
 const navbarItems: INavbarItem[] = [
   {
@@ -110,6 +113,15 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/verify-signature',
         Icon: TickSquare,
       },
+      ...(isContractValidationEnabled
+        ? [
+            {
+              name: 'Contract Validator',
+              pathTo: '/contract-validator',
+              Icon: TbShieldCheck,
+            },
+          ]
+        : []),
       {
         name: 'Marketplaces',
         pathTo: '/marketplaces',

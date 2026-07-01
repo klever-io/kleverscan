@@ -17,6 +17,8 @@ import {
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useMobile } from '@/contexts/mobile';
+import { useNetworkParams } from '@/contexts/contract/networkParams';
+import api from '@/services/api';
 import {
   KFIAllowancePromise,
   KLVAllowancePromise,
@@ -54,6 +56,7 @@ import {
   IconContainer,
   ItemContainerPermissions,
   ItemContentPermissions,
+  RewardExpiry,
   RewardsAvailableContainer,
   StakingRewards,
 } from '@/views/accounts/detail';
@@ -95,8 +98,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const headers = [
     t('common:Titles.Assets'),
     t('common:Titles.Transactions'),
-    t('accounts:SingleAccount.Tabs.Buckets'),
-    t('accounts:SingleAccount.Tabs.Rewards'),
     t('accounts:SingleAccount.Tabs.SmartContracts'),
   ];
   const tabHeaders = [t('common:Tabs.Overview')];
@@ -104,6 +105,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const { walletAddress, extensionInstalled, connectExtension } =
     useExtension();
   const { isTablet } = useMobile();
+  const { paramsList } = useNetworkParams();
   const router = useRouter();
 
   const { data: priceCall, isLoading: isLoadingPriceCall } = useQuery<
@@ -142,9 +144,53 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     enabled: !!router?.isReady,
   });
 
+  const { data: currentEpoch } = useQuery({
+    queryKey: ['epoch'],
+    queryFn: async () => {
+      const res = await api.get({ route: 'block/list' });
+      return res.data?.blocks[0]?.epoch as number | undefined;
+    },
+  });
+
+  const maxEpochsUnclaimedRaw = Number(
+    paramsList?.find(p => p.parameterLabel === 'MaxEpochsUnclaimed')
+      ?.currentValue,
+  );
+  const maxEpochsUnclaimed = Number.isNaN(maxEpochsUnclaimedRaw)
+    ? 100
+    : maxEpochsUnclaimedRaw;
+
+  const calcExpiry = (
+    lastClaimEpoch: number | undefined,
+  ): { days: number; warning: boolean } | null => {
+    if (currentEpoch == null || lastClaimEpoch == null) return null;
+    const remaining = maxEpochsUnclaimed - (currentEpoch - lastClaimEpoch);
+    if (remaining <= 0) return { days: 0, warning: true };
+    const days = Math.max(1, Math.floor(remaining / 4));
+    return { days, warning: remaining < 12 };
+  };
+
+  const klvStakingExpiry = calcExpiry(account?.assets?.KLV?.lastClaim?.epoch);
+  const kfiStakingExpiry = calcExpiry(account?.assets?.KFI?.lastClaim?.epoch);
+
+  const hasBuckets = Object.values(account?.assets || {}).some(
+    asset => (asset as { buckets?: unknown[] })?.buckets?.length,
+  );
+
   const getHeaders = () => {
     if (hasProprietaryAssets) {
       headers.splice(1, 0, t('accounts:SingleAccount.Tabs.ProprietaryAssets'));
+    }
+    if (hasBuckets) {
+      const transactionsIndex = headers.indexOf(
+        t('common:Titles.Transactions'),
+      );
+      headers.splice(
+        transactionsIndex + 1,
+        0,
+        t('accounts:SingleAccount.Tabs.Buckets'),
+        t('accounts:SingleAccount.Tabs.Rewards'),
+      );
     }
   };
   getHeaders();
@@ -601,6 +647,20 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   {!isLoadingKLVAllowance ? (
                     <>
                       <span>{getKLVStaking()}</span>
+                      {klvStakingExpiry != null &&
+                        (KLVAllowance?.data?.result?.stakingRewards ?? 0) >
+                          0 && (
+                          <RewardExpiry warning={klvStakingExpiry.warning}>
+                            {klvStakingExpiry.days === 0
+                              ? t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.Expired',
+                                )
+                              : t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.ExpiresIn',
+                                  { count: klvStakingExpiry.days },
+                                )}
+                          </RewardExpiry>
+                        )}
                       <KLVStakingClaimButton />
                     </>
                   ) : (
@@ -617,6 +677,20 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                   {!isLoadingKFIAllowance ? (
                     <>
                       <span>{getKFIStaking()}</span>
+                      {kfiStakingExpiry != null &&
+                        (KFIAllowance?.data?.result?.stakingRewards ?? 0) >
+                          0 && (
+                          <RewardExpiry warning={kfiStakingExpiry.warning}>
+                            {kfiStakingExpiry.days === 0
+                              ? t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.Expired',
+                                )
+                              : t(
+                                  'accounts:SingleAccount.Content.RewardsAvailable.ExpiresIn',
+                                  { count: kfiStakingExpiry.days },
+                                )}
+                          </RewardExpiry>
+                        )}
                       <KFIStakingClaimButton />
                     </>
                   ) : (

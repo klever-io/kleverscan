@@ -190,6 +190,14 @@ export const bucketsRequest = (
       asset => assets[asset]?.buckets?.length,
     );
 
+    if (assetsWithBuckets.length === 0) {
+      return {
+        data: { buckets: [] },
+        code: 'successful',
+        error: '',
+      };
+    }
+
     const assetsDetailsResponse: IAssetsResponse = await api.get({
       route: `assets/list`,
       query: { asset: assetsWithBuckets, page, limit },
@@ -204,6 +212,71 @@ export const bucketsRequest = (
 
       for (const bucket of asset?.buckets ?? [])
         assetsBuckets.push({ asset, bucket });
+    }
+
+    const uniqueDelegations = Array.from(
+      new Set(
+        assetsBuckets
+          .map(ab => ab.bucket?.delegation)
+          .filter((d): d is string => !!d && d.length > 0),
+      ),
+    );
+
+    const statusMap = new Map<string, string>();
+
+    if (uniqueDelegations.length > 0) {
+      if (uniqueDelegations.length <= 3) {
+        const results = await Promise.all(
+          uniqueDelegations.map(addr =>
+            api.get({ route: `validator/${addr}` }).catch(() => null),
+          ),
+        );
+        for (let i = 0; i < uniqueDelegations.length; i++) {
+          const res = results[i];
+          if (res && !res.error) {
+            statusMap.set(
+              uniqueDelegations[i],
+              res.data?.validator?.list || '',
+            );
+          }
+        }
+      } else {
+        const firstPage = await api
+          .get({ route: 'validator/list', query: { page: 1, limit: 100 } })
+          .catch(() => null);
+        if (firstPage && !firstPage.error) {
+          const totalPages = Math.ceil(
+            (firstPage.pagination?.totalRecords || 0) / 100,
+          );
+          const allPages = [firstPage];
+          if (totalPages > 1) {
+            const rest = await Promise.all(
+              Array.from({ length: totalPages - 1 }, (_, i) =>
+                api
+                  .get({
+                    route: 'validator/list',
+                    query: { page: i + 2, limit: 100 },
+                  })
+                  .catch(() => null),
+              ),
+            );
+            allPages.push(...rest.filter(Boolean));
+          }
+          for (const p of allPages) {
+            for (const v of p?.data?.validators ?? []) {
+              if (v.ownerAddress) {
+                statusMap.set(v.ownerAddress, v.list || '');
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (const ab of assetsBuckets) {
+      if (ab.bucket?.delegation) {
+        ab.validatorStatus = statusMap.get(ab.bucket.delegation) || '';
+      }
     }
 
     return {

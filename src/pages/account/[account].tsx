@@ -152,11 +152,13 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     },
   });
 
-  const maxEpochsUnclaimed =
-    Number(
-      paramsList?.find(p => p.parameterLabel === 'MaxEpochsUnclaimed')
-        ?.currentValue,
-    ) || 100;
+  const maxEpochsUnclaimedRaw = Number(
+    paramsList?.find(p => p.parameterLabel === 'MaxEpochsUnclaimed')
+      ?.currentValue,
+  );
+  const maxEpochsUnclaimed = Number.isNaN(maxEpochsUnclaimedRaw)
+    ? 100
+    : maxEpochsUnclaimedRaw;
 
   const calcExpiry = (
     lastClaimEpoch: number | undefined,

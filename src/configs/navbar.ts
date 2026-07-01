@@ -25,6 +25,9 @@ export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 export const network = getNetwork();
 
+const isContractValidationEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
+
 const navbarItems: INavbarItem[] = [
   {
     name: 'Blocks',
@@ -110,11 +113,15 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/verify-signature',
         Icon: TickSquare,
       },
-      {
-        name: 'Contract Validator',
-        pathTo: '/contract-validator',
-        Icon: TbShieldCheck,
-      },
+      ...(isContractValidationEnabled
+        ? [
+            {
+              name: 'Contract Validator',
+              pathTo: '/contract-validator',
+              Icon: TbShieldCheck,
+            },
+          ]
+        : []),
       {
         name: 'Marketplaces',
         pathTo: '/marketplaces',

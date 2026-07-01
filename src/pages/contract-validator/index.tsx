@@ -302,9 +302,16 @@ const ContractValidator: React.FC<PropsWithChildren> = () => {
   );
 };
 
+const isContractValidationEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
+
 export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
+  if (!isContractValidationEnabled) {
+    return { notFound: true };
+  }
+
   const props = await serverSideTranslations(
     locale,
     ['contractValidator', 'common'],

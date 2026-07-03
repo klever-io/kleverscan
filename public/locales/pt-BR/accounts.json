@@ -24,7 +24,10 @@
         "Rewards": "Recompensas",
         "Available": "Disponíveis",
         "Allowance": "Permissão",
-        "Staking": "Participação de {{asset}}"
+        "Staking": "Participação de {{asset}}",
+        "Expired": "Expirado",
+        "ExpiresIn_one": "Expira em ~{{count}} dia",
+        "ExpiresIn_other": "Expira em ~{{count}} dias"
       },
       "Nonce": "Nonce"
     },

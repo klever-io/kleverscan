@@ -7,7 +7,7 @@ import {
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 const smartContractsListCall = async (): Promise<
-  { smartContracts: SmartContractsList[] } | undefined
+  { smartContracts: SmartContractsList[]; totalContracts: number } | undefined
 > => {
   try {
     const smartContractsRes = await api.get({
@@ -15,7 +15,10 @@ const smartContractsListCall = async (): Promise<
     });
 
     if (!smartContractsRes.error || smartContractsRes.error === '') {
-      return { smartContracts: smartContractsRes.data.sc };
+      return {
+        smartContracts: smartContractsRes.data.sc,
+        totalContracts: smartContractsRes.pagination?.totalRecords || 0,
+      };
     }
   } catch (error) {
     console.error(error);

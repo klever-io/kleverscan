@@ -32,6 +32,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import styled from 'styled-components';
@@ -56,6 +57,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const [filterValidators, fetchPartialValidator, loading, setLoading] =
     useFetchPartial<IValidator>('validators', 'validator/list', 'name');
+  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [latestVersion, setLatestVersion] = useState<string | undefined>();
   const [versionMap, setVersionMap] = useState<Record<string, string>>({});
   const [versionLoading, setVersionLoading] = useState(true);
@@ -224,6 +226,10 @@ const Validators: React.FC<PropsWithChildren> = () => {
         },
         onChange: async value => {
           setLoading(true);
+          if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+          searchTimeoutRef.current = setTimeout(() => {
+            setQueryAndRouter(value ? { name: value } : {}, router);
+          }, 500);
           await fetchPartialValidator(value);
         },
         current: (router.query.name as string) || undefined,

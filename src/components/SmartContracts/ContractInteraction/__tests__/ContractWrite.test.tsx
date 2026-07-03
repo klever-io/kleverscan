@@ -102,8 +102,9 @@ jest.mock('@/components/Contract/utils', () => ({
 jest.mock('@/utils/precisionFunctions', () => ({
   getPrecision: jest.fn(),
 }));
-jest.mock('@/components/Contract', () => ({
-  HashComponent: ({ hash }: { hash: string }) => <div>{hash}</div>,
+jest.mock('../WriteResult', () => ({
+  __esModule: true,
+  default: ({ hash }: { hash: string }) => <div>{hash}</div>,
 }));
 jest.mock('react-toastify', () => ({
   toast: {

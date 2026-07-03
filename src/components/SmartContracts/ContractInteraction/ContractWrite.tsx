@@ -4,8 +4,8 @@ import { ABI, ABIType } from '@/types/contracts';
 import { ContractInfo } from '@/types/smart-contract';
 import { getPrecision } from '@/utils/precisionFunctions';
 
-import { HashComponent } from '@/components/Contract';
 import { buildTransaction } from '@/components/Contract/utils';
+import WriteResult from './WriteResult';
 import { Transaction } from '@klever/connect';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -226,7 +226,13 @@ function WriteEndpointCard({
       </EndpointHeader>
       {open && (
         <EndpointBody>
-          {txHash && <HashComponent hash={txHash} setHash={setTxHash} />}
+          {txHash && (
+            <WriteResult
+              hash={txHash}
+              setHash={setTxHash}
+              outputTypes={endpoint.outputs?.map(o => o.type)}
+            />
+          )}
 
           {endpoint.inputs.map(input => (
             <InputGroup key={input.name}>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { cleanHex, hexToUtf8 } from '@/utils/hex';
 import {
   Cell,
   DataCell,
@@ -25,26 +26,37 @@ const RETURN_DATA_IDENTIFIER = 'ReturnData';
 
 type ValueFormat = 'hex' | 'string' | 'number';
 
-const cleanHex = (value?: string | null): string =>
-  (value ?? '').replace(/^0x/, '');
+// Signed ABI integer types are encoded as two's-complement, so they must be
+// sign-extended before rendering — an unsigned BigInt read would turn negative
+// values into large positives.
+const SIGNED_INT_TYPE = /^(bigint|i8|i16|i32|i64|isize)$/;
 
-const hexToUtf8 = (hex: string): string => {
-  if (!/^[0-9a-fA-F]*$/.test(hex) || hex.length % 2 !== 0) return hex;
-  let out = '';
-  for (let i = 0; i < hex.length; i += 2) {
-    out += String.fromCharCode(parseInt(hex.slice(i, i + 2), 16));
-  }
-  return out;
+const isSignedType = (abiType?: string): boolean =>
+  !!abiType && SIGNED_INT_TYPE.test(abiType.toLowerCase());
+
+// Decode a hex value as a decimal integer, interpreting it as two's-complement
+// (over its actual byte width) when the ABI type is signed.
+const hexToDecimal = (hex: string, signed: boolean): string => {
+  const value = BigInt(`0x${hex}`);
+  if (!signed) return value.toString(10);
+  const one = BigInt(1);
+  const bits = BigInt(hex.length * 4);
+  const signBit = one << (bits - one);
+  return (value >= signBit ? value - (one << bits) : value).toString(10);
 };
 
-const formatValue = (hex: string, format: ValueFormat): string => {
+const formatValue = (
+  hex: string,
+  format: ValueFormat,
+  abiType?: string,
+): string => {
   if (hex === '') return '';
   switch (format) {
     case 'string':
       return hexToUtf8(hex);
     case 'number':
       try {
-        return BigInt(`0x${hex}`).toString(10);
+        return hexToDecimal(hex, isSignedType(abiType));
       } catch {
         return hex;
       }
@@ -85,7 +97,7 @@ const ValueCell: React.FC<{ value: string; abiType?: string }> = ({
   if (hex === '') return <Empty>—</Empty>;
   return (
     <Cell>
-      <Mono>{formatValue(hex, format)}</Mono>
+      <Mono>{formatValue(hex, format, abiType)}</Mono>
       <FormatSelect
         aria-label="Display format"
         value={format}
@@ -118,15 +130,26 @@ const ReturnData: React.FC<ReturnDataProps> = ({
     e => e.identifier === RETURN_DATA_IDENTIFIER,
   );
 
-  const topics: string[] = [];
-  const data: string[] = [];
+  // Build rows per event so topic/data pairs from different ReturnData events
+  // are never mixed into the same row. ABI output types are matched to data
+  // values in overall order (data[n] ↔ outputTypes[n]).
+  let dataCursor = 0;
+  const rows: { topic: string; data: string; dataType?: string }[] = [];
   returnEvents.forEach(e => {
-    (e.topics ?? []).forEach(t => topics.push(t ?? ''));
-    (e.data ?? []).forEach(d => data.push(d ?? ''));
+    const eventTopics = (e.topics ?? []).map(t => t ?? '');
+    const eventData = (e.data ?? []).map(d => d ?? '');
+    const rowCount = Math.max(eventTopics.length, eventData.length);
+    for (let i = 0; i < rowCount; i++) {
+      const hasData = i < eventData.length;
+      rows.push({
+        topic: eventTopics[i] ?? '',
+        data: hasData ? eventData[i] : '',
+        dataType: hasData ? outputTypes[dataCursor++] : undefined,
+      });
+    }
   });
 
-  const rowCount = Math.max(topics.length, data.length);
-  if (rowCount === 0) return null;
+  if (rows.length === 0) return null;
 
   return (
     <Table>
@@ -134,13 +157,13 @@ const ReturnData: React.FC<ReturnDataProps> = ({
         <span>Topic</span>
         <span>Data</span>
       </HeaderRow>
-      {Array.from({ length: rowCount }).map((_, i) => (
+      {rows.map((row, i) => (
         <Row key={i}>
           <TopicCell>
-            <ValueCell value={topics[i] ?? ''} />
+            <ValueCell value={row.topic} />
           </TopicCell>
           <DataCell>
-            <ValueCell value={data[i] ?? ''} abiType={outputTypes[i]} />
+            <ValueCell value={row.data} abiType={row.dataType} />
           </DataCell>
         </Row>
       ))}

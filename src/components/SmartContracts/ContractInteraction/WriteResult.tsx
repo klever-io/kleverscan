@@ -2,6 +2,7 @@ import { HashComponent } from '@/components/Contract';
 import ReturnData, { hasReturnData, ILogEvent } from '@/components/ReturnData';
 import api from '@/services/api';
 import { Service } from '@/types';
+import { hexToUtf8 } from '@/utils/hex';
 import React, { useEffect, useState } from 'react';
 import { AiFillCheckCircle, AiFillExclamationCircle } from 'react-icons/ai';
 import {
@@ -21,23 +22,14 @@ const MAX_ATTEMPTS = 40; // ~2 minutes before giving up and pointing at the expl
 const FAILURE_EVENTS = ['signalError', 'internalVMErrors'];
 const FAILURE_STATUSES = ['fail', 'failed', 'invalid'];
 
-// Best-effort hex → utf8 to decode a signalError message; falls back to raw hex.
-const hexToUtf8 = (hex: string): string => {
-  const clean = hex.replace(/^0x/, '');
-  if (!/^[0-9a-fA-F]+$/.test(clean) || clean.length % 2 !== 0) return hex;
-  let out = '';
-  for (let i = 0; i < clean.length; i += 2) {
-    out += String.fromCharCode(parseInt(clean.slice(i, i + 2), 16));
-  }
-  return /^[\x20-\x7e]+$/.test(out) ? out : hex;
-};
-
 const extractErrorMessage = (events: ILogEvent[]): string => {
   const errEvent = events.find(e => FAILURE_EVENTS.includes(e.identifier));
   if (!errEvent) return 'The transaction was not successful.';
+  // Best-effort decode of the signalError message; falls back to raw hex when
+  // the payload isn't printable text.
   const parts = [...(errEvent.topics ?? []), ...(errEvent.data ?? [])]
     .filter((v): v is string => !!v && v !== '')
-    .map(hexToUtf8);
+    .map(v => hexToUtf8(v, { printableAsciiOnly: true }));
   return parts.join(' ') || 'The transaction was not successful.';
 };
 

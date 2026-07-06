@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import { cleanHex, hexToUtf8 } from '@/utils/hex';
 import {
   Cell,
@@ -92,6 +93,7 @@ const ValueCell: React.FC<{ value: string; abiType?: string }> = ({
   value,
   abiType,
 }) => {
+  const { t } = useTranslation('common');
   const [format, setFormat] = useState<ValueFormat>(inferFormat(abiType));
   const hex = cleanHex(value);
   if (hex === '') return <Empty>—</Empty>;
@@ -99,13 +101,13 @@ const ValueCell: React.FC<{ value: string; abiType?: string }> = ({
     <Cell>
       <Mono>{formatValue(hex, format, abiType)}</Mono>
       <FormatSelect
-        aria-label="Display format"
+        aria-label={t('ReturnData.displayFormat', 'Display format')}
         value={format}
         onChange={e => setFormat(e.target.value as ValueFormat)}
       >
-        <option value="hex">Hex</option>
-        <option value="string">String</option>
-        <option value="number">Number</option>
+        <option value="hex">{t('ReturnData.hex', 'Hex')}</option>
+        <option value="string">{t('ReturnData.string', 'String')}</option>
+        <option value="number">{t('ReturnData.number', 'Number')}</option>
       </FormatSelect>
     </Cell>
   );
@@ -126,6 +128,7 @@ const ReturnData: React.FC<ReturnDataProps> = ({
   events,
   outputTypes = [],
 }) => {
+  const { t } = useTranslation('common');
   const returnEvents = (events ?? []).filter(
     e => e.identifier === RETURN_DATA_IDENTIFIER,
   );
@@ -154,8 +157,8 @@ const ReturnData: React.FC<ReturnDataProps> = ({
   return (
     <Table>
       <HeaderRow>
-        <span>Topic</span>
-        <span>Data</span>
+        <span>{t('ReturnData.topic', 'Topic')}</span>
+        <span>{t('ReturnData.data', 'Data')}</span>
       </HeaderRow>
       {rows.map((row, i) => (
         <Row key={i}>

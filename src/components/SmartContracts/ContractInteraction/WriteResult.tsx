@@ -3,6 +3,7 @@ import ReturnData, { hasReturnData, ILogEvent } from '@/components/ReturnData';
 import api from '@/services/api';
 import { Service } from '@/types';
 import { hexToUtf8 } from '@/utils/hex';
+import { useTranslation } from 'next-i18next';
 import React, { useEffect, useState } from 'react';
 import { AiFillCheckCircle, AiFillExclamationCircle } from 'react-icons/ai';
 import {
@@ -22,15 +23,18 @@ const MAX_ATTEMPTS = 40; // ~2 minutes before giving up and pointing at the expl
 const FAILURE_EVENTS = ['signalError', 'internalVMErrors'];
 const FAILURE_STATUSES = ['fail', 'failed', 'invalid'];
 
+// Returns the decoded on-chain error message, or '' when none is available (the
+// caller substitutes a localized fallback). The message itself comes from the
+// chain and is not translated.
 const extractErrorMessage = (events: ILogEvent[]): string => {
   const errEvent = events.find(e => FAILURE_EVENTS.includes(e.identifier));
-  if (!errEvent) return 'The transaction was not successful.';
+  if (!errEvent) return '';
   // Best-effort decode of the signalError message; falls back to raw hex when
   // the payload isn't printable text.
-  const parts = [...(errEvent.topics ?? []), ...(errEvent.data ?? [])]
+  return [...(errEvent.topics ?? []), ...(errEvent.data ?? [])]
     .filter((v): v is string => !!v && v !== '')
-    .map(v => hexToUtf8(v, { printableAsciiOnly: true }));
-  return parts.join(' ') || 'The transaction was not successful.';
+    .map(v => hexToUtf8(v, { printableAsciiOnly: true }))
+    .join(' ');
 };
 
 interface WriteResultProps {
@@ -47,6 +51,7 @@ interface WriteResultProps {
 // chain readiness (replacing the old fixed fake loader), and unsuccessful
 // transactions surface an explicit failed state.
 export function WriteResult({ hash, setHash, outputTypes }: WriteResultProps) {
+  const { t } = useTranslation('smartContracts');
   const [phase, setPhase] = useState<Phase>('pending');
   const [events, setEvents] = useState<ILogEvent[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -121,13 +126,19 @@ export function WriteResult({ hash, setHash, outputTypes }: WriteResultProps) {
       {phase === 'pending' && (
         <StatusLine tone="pending">
           <Spinner />
-          Waiting for the transaction to be processed…
+          {t(
+            'ContractInteraction.status.pending',
+            'Waiting for the transaction to be processed…',
+          )}
         </StatusLine>
       )}
 
       {phase === 'timeout' && (
         <StatusLine tone="pending">
-          Still processing — open the transaction to see the result.
+          {t(
+            'ContractInteraction.status.timeout',
+            'Still processing — open the transaction to see the result.',
+          )}
         </StatusLine>
       )}
 
@@ -135,11 +146,13 @@ export function WriteResult({ hash, setHash, outputTypes }: WriteResultProps) {
         <>
           <StatusLine tone="success">
             <AiFillCheckCircle size={16} />
-            Transaction successful
+            {t('ContractInteraction.status.success', 'Transaction successful')}
           </StatusLine>
           {hasReturnData(events) && (
             <OutputRow>
-              <ResultLabel>Return Data</ResultLabel>
+              <ResultLabel>
+                {t('ContractInteraction.returnData', 'Return Data')}
+              </ResultLabel>
               <ReturnData events={events} outputTypes={outputTypes} />
             </OutputRow>
           )}
@@ -150,9 +163,15 @@ export function WriteResult({ hash, setHash, outputTypes }: WriteResultProps) {
         <>
           <StatusLine tone="fail">
             <AiFillExclamationCircle size={16} />
-            Transaction failed
+            {t('ContractInteraction.status.failed', 'Transaction failed')}
           </StatusLine>
-          {errorMsg && <ResultBox isError>{errorMsg}</ResultBox>}
+          <ResultBox isError>
+            {errorMsg ||
+              t(
+                'ContractInteraction.status.notSuccessful',
+                'The transaction was not successful.',
+              )}
+          </ResultBox>
         </>
       )}
     </ResultContainer>

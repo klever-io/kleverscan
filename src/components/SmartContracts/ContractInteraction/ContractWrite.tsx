@@ -8,6 +8,7 @@ import { buildTransaction } from '@/components/Contract/utils';
 import WriteResult from './WriteResult';
 import { Transaction } from '@klever/connect';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'next-i18next';
 import { toast } from 'react-toastify';
 import {
   CallValueRow,
@@ -64,12 +65,6 @@ const buildEncodedArgs = (
   abiTypes: Record<string, ABIType>,
 ): string[] => {
   const abi = { types: abiTypes };
-  const missingInputs = inputs.filter(input => !args[input.name]?.trim());
-  if (missingInputs.length > 0) {
-    throw new Error(
-      `Missing required arguments: ${missingInputs.map(i => i.name).join(', ')}`,
-    );
-  }
   return inputs.map(input => parseArgument(args[input.name], input.type, abi));
 };
 
@@ -80,6 +75,7 @@ export function ContractWriteTab({
   contractAddress: string;
   contractInfo: ContractInfo;
 }) {
+  const { t } = useTranslation('smartContracts');
   const { walletAddress, wallet } = useExtension();
   const versions = contractInfo.contractVersions ?? [];
   const latestVersion = versions[versions.length - 1];
@@ -97,7 +93,10 @@ export function ContractWriteTab({
   if (!abi || mutableEndpoints.length === 0) {
     return (
       <EmptyState>
-        No writable functions available for this contract.
+        {t(
+          'ContractInteraction.noWritable',
+          'No writable functions available for this contract.',
+        )}
       </EmptyState>
     );
   }
@@ -105,7 +104,10 @@ export function ContractWriteTab({
   if (!walletAddress) {
     return (
       <ConnectWalletMessage>
-        Connect your wallet to interact with contract functions.
+        {t(
+          'ContractInteraction.connectWallet',
+          'Connect your wallet to interact with contract functions.',
+        )}
       </ConnectWalletMessage>
     );
   }
@@ -133,6 +135,7 @@ function WriteEndpointCard({
   endpoint: Endpoint;
   abiTypes: Record<string, ABIType>;
 }) {
+  const { t } = useTranslation('smartContracts');
   const { wallet } = useExtension();
   const [open, setOpen] = useState(false);
   const [args, setArgs] = useState<Record<string, string>>({});
@@ -157,7 +160,21 @@ function WriteEndpointCard({
 
     try {
       if (!wallet) {
-        throw new Error('Wallet not connected');
+        throw new Error(
+          t('ContractInteraction.walletNotConnected', 'Wallet not connected'),
+        );
+      }
+
+      const missingInputs = endpoint.inputs.filter(
+        input => !args[input.name]?.trim(),
+      );
+      if (missingInputs.length > 0) {
+        throw new Error(
+          t('ContractInteraction.missingArguments', {
+            args: missingInputs.map(i => i.name).join(', '),
+            defaultValue: 'Missing required arguments: {{args}}',
+          }),
+        );
       }
 
       const encodedArgs = buildEncodedArgs(endpoint.inputs, args, abiTypes);
@@ -209,9 +226,17 @@ function WriteEndpointCard({
 
       const hash = txHashes?.[0] || unsignedTx.txHash;
       setTxHash(hash);
-      toast.success('Transaction sent successfully');
+      toast.success(
+        t(
+          'ContractInteraction.transactionSent',
+          'Transaction sent successfully',
+        ),
+      );
     } catch (err: any) {
-      const msg = err?.message || err?.toString() || 'Transaction failed';
+      const msg =
+        err?.message ||
+        err?.toString() ||
+        t('ContractInteraction.status.failed', 'Transaction failed');
       setError(msg);
       toast.error(msg);
     } finally {
@@ -251,11 +276,16 @@ function WriteEndpointCard({
 
           {hasPayable && (
             <CallValueSection>
-              <InputLabel>Call Value</InputLabel>
+              <InputLabel>
+                {t('ContractInteraction.callValue', 'Call Value')}
+              </InputLabel>
               <CallValueRow>
                 <InputGroup>
                   <InputLabel>
-                    Asset ID <span>(token to send)</span>
+                    {t('ContractInteraction.assetId', 'Asset ID')}{' '}
+                    <span>
+                      {t('ContractInteraction.assetIdHint', '(token to send)')}
+                    </span>
                   </InputLabel>
                   <InputField
                     placeholder="KLV"
@@ -269,7 +299,9 @@ function WriteEndpointCard({
                   />
                 </InputGroup>
                 <InputGroup>
-                  <InputLabel>Amount</InputLabel>
+                  <InputLabel>
+                    {t('ContractInteraction.amount', 'Amount')}
+                  </InputLabel>
                   <InputField
                     placeholder="0"
                     type="number"
@@ -288,12 +320,16 @@ function WriteEndpointCard({
 
           <WriteButton onClick={handleWrite} disabled={loading}>
             {loading && <Spinner />}
-            {loading ? 'Sending...' : 'Write'}
+            {loading
+              ? t('ContractInteraction.sending', 'Sending...')
+              : t('ContractInteraction.write', 'Write')}
           </WriteButton>
 
           {error && (
             <OutputRow>
-              <ResultLabel>Error</ResultLabel>
+              <ResultLabel>
+                {t('ContractInteraction.error', 'Error')}
+              </ResultLabel>
               <ResultBox isError>{error}</ResultBox>
             </OutputRow>
           )}

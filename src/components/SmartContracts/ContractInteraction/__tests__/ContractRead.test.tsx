@@ -8,8 +8,9 @@ import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
 Object.assign(global, { TextEncoder, TextDecoder });
-(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean })
-  .IS_REACT_ACT_ENVIRONMENT = true;
+(
+  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 jest.mock('@/services/api', () => ({
   __esModule: true,
@@ -18,11 +19,31 @@ jest.mock('@/services/api', () => ({
   },
 }));
 
+// Resolve translations to their English default value (with {{var}} interpolation)
+// so assertions can match the rendered copy.
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: string | Record<string, unknown>) => {
+      if (typeof options === 'string') return options;
+      const defaultValue = (options?.defaultValue as string) ?? key;
+      if (options && typeof options === 'object') {
+        return defaultValue.replace(/\{\{(\w+)\}\}/g, (_m, name) =>
+          options[name] != null ? String(options[name]) : `{{${name}}}`,
+        );
+      }
+      return defaultValue;
+    },
+  }),
+}));
+
 jest.mock('react-dom', () => {
   const actual = jest.requireActual('react-dom');
   const client = jest.requireActual('react-dom/client');
   const React = jest.requireActual('react');
-  const roots = new Map<Element, { render: (ui: React.ReactNode) => void; unmount: () => void }>();
+  const roots = new Map<
+    Element,
+    { render: (ui: React.ReactNode) => void; unmount: () => void }
+  >();
 
   return {
     ...actual,
@@ -62,7 +83,8 @@ const renderWithTheme = (ui: React.ReactElement) =>
 const buildContractInfo = (abi: Record<string, unknown>): ContractInfo =>
   ({
     id: 1,
-    contractAddress: 'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7y7p',
+    contractAddress:
+      'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7y7p',
     createdAt: '2026-03-30T00:00:00.000Z',
     updatedAt: '2026-03-30T00:00:00.000Z',
     contractVersions: [

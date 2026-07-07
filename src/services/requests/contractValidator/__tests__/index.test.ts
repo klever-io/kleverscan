@@ -57,6 +57,34 @@ describe('contractValidator service — paid match-check', () => {
       const body = fetchMock.mock.calls[0][1].body as FormData;
       expect(body.get('rust_version')).toBeNull();
     });
+
+    it('appends wasm_opt_version when provided', async () => {
+      const fetchMock = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ jobId: 2, message: 'check queued' }),
+      });
+      global.fetch = fetchMock as unknown as typeof fetch;
+
+      const file = new File(['zip'], 'project.zip');
+      await submitCheck(ADDRESS, file, '0.45.0', '1.78.0', 'd'.repeat(64), '116');
+
+      const body = fetchMock.mock.calls[0][1].body as FormData;
+      expect(body.get('wasm_opt_version')).toBe('116');
+    });
+
+    it('omits wasm_opt_version when empty', async () => {
+      const fetchMock = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ jobId: 3, message: 'check queued' }),
+      });
+      global.fetch = fetchMock as unknown as typeof fetch;
+
+      const file = new File(['zip'], 'project.zip');
+      await submitCheck(ADDRESS, file, '0.45.0', '', 'e'.repeat(64));
+
+      const body = fetchMock.mock.calls[0][1].body as FormData;
+      expect(body.get('wasm_opt_version')).toBeNull();
+    });
   });
 
   describe('fetchJob', () => {

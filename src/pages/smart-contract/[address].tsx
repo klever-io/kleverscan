@@ -395,7 +395,9 @@ export const getServerSideProps: GetServerSideProps = async ({
   }
   const props = await serverSideTranslations(
     locale,
-    ['common'],
+    // contractValidator: used by the Verify Contract tab's DependencyVersionFields.
+    // smartContracts: used by the Read/Write contract interaction tabs.
+    ['common', 'contractValidator', 'smartContracts'],
     nextI18nextConfig,
     ['en'],
   );

@@ -4,6 +4,7 @@ import { ABI } from '@/types/contracts';
 import { ContractInfo } from '@/types/smart-contract';
 import { encodeByType, bytesToHex } from '@klever/connect-contracts';
 import type { ContractABI } from '@klever/connect-contracts';
+import { useTranslation } from 'next-i18next';
 import React, { useMemo, useState } from 'react';
 import {
   InteractionSection,
@@ -67,8 +68,12 @@ const hexToInt = (hex: string): string => {
   }
 };
 
-const decodeOutput = (hexValue: string, outputType: string): string => {
-  if (!hexValue || hexValue === '') return '(empty)';
+const decodeOutput = (
+  hexValue: string,
+  outputType: string,
+  emptyLabel: string,
+): string => {
+  if (!hexValue || hexValue === '') return emptyLabel;
 
   const t = outputType.toLowerCase();
   if (
@@ -130,6 +135,7 @@ export function ContractReadTab({
   contractAddress: string;
   contractInfo: ContractInfo;
 }) {
+  const { t } = useTranslation('smartContracts');
   const versions = contractInfo.contractVersions ?? [];
   const latestVersion = versions[versions.length - 1];
 
@@ -146,7 +152,10 @@ export function ContractReadTab({
   if (!abi || readonlyEndpoints.length === 0) {
     return (
       <EmptyState>
-        No readable functions available for this contract.
+        {t(
+          'ContractInteraction.noReadable',
+          'No readable functions available for this contract.',
+        )}
       </EmptyState>
     );
   }
@@ -174,11 +183,14 @@ function ReadEndpointCard({
   endpoint: Endpoint;
   abiTypes: Record<string, any>;
 }) {
+  const { t } = useTranslation('smartContracts');
   const [open, setOpen] = useState(false);
   const [args, setArgs] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const emptyLabel = t('ContractInteraction.empty', '(empty)');
 
   const handleQuery = async () => {
     const missingRequired = endpoint.inputs.filter(
@@ -186,7 +198,10 @@ function ReadEndpointCard({
     );
     if (missingRequired.length > 0) {
       setError(
-        `Missing required arguments: ${missingRequired.map(i => i.name).join(', ')}`,
+        t('ContractInteraction.missingArguments', {
+          args: missingRequired.map(i => i.name).join(', '),
+          defaultValue: 'Missing required arguments: {{args}}',
+        }),
       );
       return;
     }
@@ -220,26 +235,30 @@ function ReadEndpointCard({
       const data = res.data?.data;
 
       if (data === undefined || data === null) {
-        setResult('(no data returned)');
+        setResult(
+          t('ContractInteraction.noDataReturned', '(no data returned)'),
+        );
         return;
       }
 
       if (typeof data === 'string') {
         const outputType = endpoint.outputs?.[0]?.type ?? 'hex';
-        setResult(decodeOutput(data, outputType));
+        setResult(decodeOutput(data, outputType, emptyLabel));
       } else if (Array.isArray(data)) {
         const outputs = endpoint.outputs ?? [];
         const decoded = data.map((hex: string, i: number) => {
           const outputType = outputs[i]?.type ?? 'hex';
           const label = outputs[i]?.name || `[${i}]`;
-          return `${label}: ${decodeOutput(hex, outputType)}`;
+          return `${label}: ${decodeOutput(hex, outputType, emptyLabel)}`;
         });
         setResult(decoded.join('\n'));
       } else {
         setResult(JSON.stringify(data, null, 2));
       }
     } catch (err: any) {
-      setError(err.message || 'Query failed');
+      setError(
+        err.message || t('ContractInteraction.queryFailed', 'Query failed'),
+      );
     } finally {
       setLoading(false);
     }
@@ -269,19 +288,25 @@ function ReadEndpointCard({
 
           <QueryButton onClick={handleQuery} disabled={loading}>
             {loading && <Spinner />}
-            {loading ? 'Querying...' : 'Query'}
+            {loading
+              ? t('ContractInteraction.querying', 'Querying...')
+              : t('ContractInteraction.query', 'Query')}
           </QueryButton>
 
           {result !== null && (
             <OutputRow>
-              <ResultLabel>Result</ResultLabel>
+              <ResultLabel>
+                {t('ContractInteraction.result', 'Result')}
+              </ResultLabel>
               <ResultBox>{result}</ResultBox>
             </OutputRow>
           )}
 
           {error && (
             <OutputRow>
-              <ResultLabel>Error</ResultLabel>
+              <ResultLabel>
+                {t('ContractInteraction.error', 'Error')}
+              </ResultLabel>
               <ResultBox isError>{error}</ResultBox>
             </OutputRow>
           )}

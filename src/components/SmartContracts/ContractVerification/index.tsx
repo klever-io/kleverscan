@@ -3,7 +3,7 @@ import {
   fetchSourceFiles,
   submitValidation,
 } from '@/services/requests/contractValidator';
-import { readBuildVersionsFromZip } from '@/utils/contractValidator/abiVersions';
+import ContractProjectUpload from '@/components/ContractProjectUpload';
 import {
   AuditReport,
   ContractInfo,
@@ -20,7 +20,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
@@ -957,28 +956,19 @@ function UploadForm({
   contractAddress: string;
   onSubmitted: () => void;
 }) {
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [kscVersion, setKscVersion] = useState('');
   const [rustVersion, setRustVersion] = useState('');
+  // Optional binaryen/wasm-opt version; not embedded in the ABI, so it stays a
+  // manual field. Empty lets the validator try unoptimized first, then default opt.
+  const [wasmOptVersion, setWasmOptVersion] = useState('');
   const [hideSource, setHideSource] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { wallet, walletAddress } = useExtension();
 
-  // Auto-fill KSC/Rust versions from the selected zip's output/*.abi.json.
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const versions = await readBuildVersionsFromZip(f);
-    // Always overwrite (including clearing) so a previously parsed zip's versions
-    // can't linger when a new zip lacks build metadata.
-    setKscVersion(versions?.kscVersion ?? '');
-    setRustVersion(versions?.rustVersion ?? '');
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const file = fileRef.current?.files?.[0];
     if (!file) {
       toast.error('Please select a ZIP file');
       return;
@@ -1023,6 +1013,7 @@ function UploadForm({
         walletAddress,
         signature,
         hideSource,
+        wasmOptVersion,
       );
       toast.success('Validation queued successfully');
       onSubmitted();
@@ -1040,56 +1031,36 @@ function UploadForm({
     <form onSubmit={handleSubmit}>
       <UploadCard>
         {submitError && <ErrorBox>{submitError}</ErrorBox>}
-        <FormField>
-          <label>Contract ZIP file</label>
-          <input
-            type="file"
-            accept=".zip"
-            ref={fileRef}
-            onChange={handleFileChange}
-          />
-          <small>
-            Upload the Rust source project as a ZIP archive. KSC &amp; Rust
-            versions fill in automatically from the project&apos;s ABI when
-            available.
-          </small>
-        </FormField>
-        <FormField>
-          <label>KSC version</label>
-          <input
-            type="text"
-            placeholder="e.g. 1.0.0"
-            value={kscVersion}
-            onChange={e => setKscVersion(e.target.value)}
-          />
-        </FormField>
-        <FormField>
-          <label>Rust version</label>
-          <input
-            type="text"
-            placeholder="e.g. 1.70.0"
-            value={rustVersion}
-            onChange={e => setRustVersion(e.target.value)}
-          />
-        </FormField>
-        <CheckboxField>
-          <input
-            type="checkbox"
-            checked={hideSource}
-            onChange={e => setHideSource(e.target.checked)}
-          />
-          <div>
-            <strong>Publish ABI only (keep source code private)</strong>
-            <small>
-              The contract is still verified against the on-chain bytecode and
-              its ABI is published, but the Rust source code is not stored or
-              made public.
-            </small>
-          </div>
-        </CheckboxField>
-        <SubmitButton type="submit" disabled={submitting}>
-          {submitting ? 'Submitting...' : 'Submit for verification'}
-        </SubmitButton>
+        <ContractProjectUpload
+          file={file}
+          onFileChange={setFile}
+          kscVersion={kscVersion}
+          onKscVersionChange={setKscVersion}
+          rustVersion={rustVersion}
+          onRustVersionChange={setRustVersion}
+          wasmOptVersion={wasmOptVersion}
+          onWasmOptVersionChange={setWasmOptVersion}
+          idPrefix="verify"
+        >
+          <CheckboxField>
+            <input
+              type="checkbox"
+              checked={hideSource}
+              onChange={e => setHideSource(e.target.checked)}
+            />
+            <div>
+              <strong>Publish ABI only (keep source code private)</strong>
+              <small>
+                The contract is still verified against the on-chain bytecode and
+                its ABI is published, but the Rust source code is not stored or
+                made public.
+              </small>
+            </div>
+          </CheckboxField>
+          <SubmitButton type="submit" disabled={submitting}>
+            {submitting ? 'Submitting...' : 'Submit for verification'}
+          </SubmitButton>
+        </ContractProjectUpload>
       </UploadCard>
     </form>
   );
@@ -1115,6 +1086,12 @@ function JobStatusSection({ job }: { job: ValidationJob }) {
         <JobRow>
           <strong>Rust version</strong>
           <span>{job.rustVersion}</span>
+        </JobRow>
+      )}
+      {job.wasmOptVersion && (
+        <JobRow>
+          <strong>wasm-opt version</strong>
+          <span>{job.wasmOptVersion}</span>
         </JobRow>
       )}
       <JobRow>

@@ -5,7 +5,6 @@ import {
 } from '@/services/requests/contractValidator';
 import api from '@/services/api';
 import { ValidationJob } from '@/types/smart-contract';
-import { readBuildVersionsFromZip } from '@/utils/contractValidator/abiVersions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { broadcastTXandCheckStatus } from '@/utils/transaction';
 import { Transaction } from '@klever/connect';
@@ -36,16 +35,16 @@ export function useContractCheck() {
   const [contractAddress, setContractAddress] = useState('');
   const [kscVersion, setKscVersion] = useState('');
   const [rustVersion, setRustVersion] = useState('');
+  // Optional binaryen/wasm-opt version. Unlike ksc/rust it is not embedded in the
+  // ABI, so it is a manual field: empty lets the validator try unoptimized first,
+  // then its default wasm-opt.
+  const [wasmOptVersion, setWasmOptVersion] = useState('');
   const [file, setFile] = useState<File | null>(null);
 
   const [feeKlv, setFeeKlv] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [statusText, setStatusText] = useState<string | null>(null);
-  const [parsing, setParsing] = useState(false);
 
-  // Tracks the latest file-selection so a slower parse of an earlier file can't
-  // overwrite the versions of a more recently selected one.
-  const parseRequestIdRef = useRef(0);
   // Holds a confirmed-but-not-yet-consumed payment hash so that retrying after a
   // failed submitCheck reuses the same payment instead of charging the user again.
   const pendingPaymentTxHashRef = useRef<string | null>(null);
@@ -91,27 +90,6 @@ export function useContractCheck() {
 
   const isOwner =
     !!walletAddress && !!ownerAddress && walletAddress === ownerAddress;
-
-  // On file select, read the compiler versions from the zip's output/*.abi.json
-  // and auto-fill them (best-effort). `parsing` lets the UI show a loader and
-  // reveal the version inputs only once parsing finishes.
-  const onFileSelected = async (selected: File | null): Promise<void> => {
-    const requestId = ++parseRequestIdRef.current;
-    setFile(selected);
-    setKscVersion('');
-    setRustVersion('');
-    if (!selected) return;
-    setParsing(true);
-    try {
-      const versions = await readBuildVersionsFromZip(selected);
-      // Ignore results if a newer file was selected while parsing.
-      if (requestId !== parseRequestIdRef.current) return;
-      if (versions?.kscVersion) setKscVersion(versions.kscVersion);
-      if (versions?.rustVersion) setRustVersion(versions.rustVersion);
-    } finally {
-      if (requestId === parseRequestIdRef.current) setParsing(false);
-    }
-  };
 
   const handleCheck = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
@@ -225,6 +203,7 @@ export function useContractCheck() {
         kscVersion.trim(),
         rustVersion.trim(),
         paymentTxHash,
+        wasmOptVersion.trim(),
       );
       // Payment consumed — clear it so the next check pays anew.
       pendingPaymentTxHashRef.current = null;
@@ -248,12 +227,13 @@ export function useContractCheck() {
     setKscVersion,
     rustVersion,
     setRustVersion,
+    wasmOptVersion,
+    setWasmOptVersion,
     file,
-    onFileSelected,
+    setFile,
     feeKlv,
     submitting,
     statusText,
-    parsing,
     isAddressValid,
     isOwner,
     handleCheck,

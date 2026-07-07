@@ -88,6 +88,9 @@ export interface ValidationJob {
   contractAddress: string;
   kscVersion: string;
   rustVersion: string;
+  // Binaryen/wasm-opt version used for the optimize step. Optional: empty means
+  // the validator compares the unoptimized build first, then the default wasm-opt.
+  wasmOptVersion?: string;
   status: ValidationJobStatus;
   result: string;
   error: string;

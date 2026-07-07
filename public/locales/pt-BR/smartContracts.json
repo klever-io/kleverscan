@@ -8,5 +8,34 @@
     "Deployer": "Implantador",
     "Deployer Hash": "Hash do Implantador",
     "Total Transactions": "Total de Transações"
+  },
+  "ContractInteraction": {
+    "noReadable": "Nenhuma função de leitura disponível para este contrato.",
+    "noWritable": "Nenhuma função de escrita disponível para este contrato.",
+    "connectWallet": "Conecte sua carteira para interagir com as funções do contrato.",
+    "query": "Consultar",
+    "querying": "Consultando...",
+    "write": "Escrever",
+    "sending": "Enviando...",
+    "result": "Resultado",
+    "error": "Erro",
+    "returnData": "Dados de Retorno",
+    "callValue": "Valor da Chamada",
+    "assetId": "ID do Ativo",
+    "assetIdHint": "(token a enviar)",
+    "amount": "Quantidade",
+    "empty": "(vazio)",
+    "noDataReturned": "(nenhum dado retornado)",
+    "queryFailed": "Falha na consulta",
+    "walletNotConnected": "Carteira não conectada",
+    "missingArguments": "Argumentos obrigatórios ausentes: {{args}}",
+    "transactionSent": "Transação enviada com sucesso",
+    "status": {
+      "pending": "Aguardando o processamento da transação…",
+      "timeout": "Ainda processando — abra a transação para ver o resultado.",
+      "success": "Transação bem-sucedida",
+      "failed": "Transação falhou",
+      "notSuccessful": "A transação não foi bem-sucedida."
+    }
   }
 }

@@ -91,11 +91,13 @@ export const submitValidation = async (
   walletAddress: string,
   signature: string,
   hideSource = false,
+  wasmOptVersion = '',
 ): Promise<{ jobId: number; message: string }> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('ksc_version', kscVersion);
   if (rustVersion) formData.append('rust_version', rustVersion);
+  if (wasmOptVersion) formData.append('wasm_opt_version', wasmOptVersion);
   // Always sent (the validator requires an explicit value); the default lives
   // in the client. The query param below mirrors it for the streaming proxy.
   formData.append('hide_source', String(hideSource));
@@ -135,11 +137,13 @@ export const submitCheck = async (
   kscVersion: string,
   rustVersion: string,
   paymentTxHash: string,
+  wasmOptVersion = '',
 ): Promise<{ jobId: number; message: string }> => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('ksc_version', kscVersion);
   if (rustVersion) formData.append('rust_version', rustVersion);
+  if (wasmOptVersion) formData.append('wasm_opt_version', wasmOptVersion);
   formData.append('payment_tx_hash', paymentTxHash);
 
   const res = await fetch(

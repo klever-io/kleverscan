@@ -1,5 +1,36 @@
 import styled, { keyframes } from 'styled-components';
 
+// --- Write result (poll + status + return data) ---
+
+export const ResultContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid ${({ theme }) => theme.black20};
+  border-radius: 8px;
+  background: ${({ theme }) => theme.white};
+`;
+
+type StatusTone = 'pending' | 'success' | 'fail';
+
+export const StatusLine = styled.div<{ tone: StatusTone }>`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: ${({ theme, tone }) => {
+    if (tone === 'success') return theme.green;
+    if (tone === 'fail') return theme.error;
+    return theme.black;
+  }};
+
+  svg {
+    flex-shrink: 0;
+  }
+`;
+
 export const InteractionSection = styled.div`
   padding: 0.5rem;
   display: flex;

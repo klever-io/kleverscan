@@ -9,8 +9,9 @@ import { toast } from 'react-toastify';
 import { ThemeProvider } from 'styled-components';
 
 Object.assign(global, { TextEncoder, TextDecoder });
-(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean })
-  .IS_REACT_ACT_ENVIRONMENT = true;
+(
+  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 const mockWallet = {
   signTransaction: jest.fn(),
@@ -21,7 +22,10 @@ jest.mock('react-dom', () => {
   const actual = jest.requireActual('react-dom');
   const client = jest.requireActual('react-dom/client');
   const React = jest.requireActual('react');
-  const roots = new Map<Element, { render: (ui: React.ReactNode) => void; unmount: () => void }>();
+  const roots = new Map<
+    Element,
+    { render: (ui: React.ReactNode) => void; unmount: () => void }
+  >();
 
   return {
     ...actual,
@@ -51,6 +55,23 @@ jest.mock('react-dom', () => {
     },
   };
 });
+
+// Resolve translations to their English default value (with {{var}} interpolation)
+// so assertions can match the rendered copy.
+jest.mock('next-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: string | Record<string, unknown>) => {
+      if (typeof options === 'string') return options;
+      const defaultValue = (options?.defaultValue as string) ?? key;
+      if (options && typeof options === 'object') {
+        return defaultValue.replace(/\{\{(\w+)\}\}/g, (_m, name) =>
+          options[name] != null ? String(options[name]) : `{{${name}}}`,
+        );
+      }
+      return defaultValue;
+    },
+  }),
+}));
 
 jest.mock('react-syntax-highlighter', () => ({}), { virtual: true });
 jest.mock('react-syntax-highlighter/dist/cjs/prism-light', () => ({}), {
@@ -91,8 +112,7 @@ jest.mock('@/utils/networkFunctions', () => ({
 }));
 jest.mock('@/contexts/extension', () => ({
   useExtension: jest.fn(() => ({
-    walletAddress:
-      'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7y7p',
+    walletAddress: 'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7y7p',
     wallet: mockWallet,
   })),
 }));
@@ -102,8 +122,9 @@ jest.mock('@/components/Contract/utils', () => ({
 jest.mock('@/utils/precisionFunctions', () => ({
   getPrecision: jest.fn(),
 }));
-jest.mock('@/components/Contract', () => ({
-  HashComponent: ({ hash }: { hash: string }) => <div>{hash}</div>,
+jest.mock('../WriteResult', () => ({
+  __esModule: true,
+  default: ({ hash }: { hash: string }) => <div>{hash}</div>,
 }));
 jest.mock('react-toastify', () => ({
   toast: {
@@ -129,7 +150,8 @@ const renderWithTheme = (ui: React.ReactElement) =>
 const buildContractInfo = (abi: Record<string, unknown>): ContractInfo =>
   ({
     id: 1,
-    contractAddress: 'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7y7p',
+    contractAddress:
+      'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqp7y7p',
     createdAt: '2026-03-30T00:00:00.000Z',
     updatedAt: '2026-03-30T00:00:00.000Z',
     contractVersions: [
@@ -144,7 +166,10 @@ beforeAll(() => {
     .spyOn(console, 'error')
     .mockImplementation((...args: unknown[]) => {
       const [message] = args;
-      if (typeof message === 'string' && message.includes('ReactDOMTestUtils.act')) {
+      if (
+        typeof message === 'string' &&
+        message.includes('ReactDOMTestUtils.act')
+      ) {
         return;
       }
     });
@@ -161,7 +186,9 @@ beforeEach(() => {
     result: { raw: 'unsigned-transaction' },
     txHash: 'fallback-hash',
   });
-  mockWallet.signTransaction.mockResolvedValue({ signed: 'wallet-transaction' });
+  mockWallet.signTransaction.mockResolvedValue({
+    signed: 'wallet-transaction',
+  });
   mockWallet.broadcastTransactions.mockResolvedValue(['wallet-hash']);
 });
 
@@ -205,7 +232,9 @@ describe('ContractWriteTab', () => {
     });
 
     const [, metadata] = mockBuildTransaction.mock.calls[0];
-    const decodedMetadata = Buffer.from(metadata[0], 'base64').toString('utf-8');
+    const decodedMetadata = Buffer.from(metadata[0], 'base64').toString(
+      'utf-8',
+    );
 
     expect(decodedMetadata).toBe('setConfig@2a@4b4c56');
     expect(toast.success).toHaveBeenCalledWith('Transaction sent successfully');

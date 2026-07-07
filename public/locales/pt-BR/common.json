@@ -3,6 +3,14 @@
   "Search Address, Block, Transaction": "Pesquisar Endereço, Bloco, Transação, Ativo",
   "transactionBroadcastSuccess": "Transação realizada com sucesso",
   "dailyTransactions": "Transações Diárias",
+  "ReturnData": {
+    "topic": "Tópico",
+    "data": "Dados",
+    "displayFormat": "Formato de exibição",
+    "hex": "Hex",
+    "string": "Texto",
+    "number": "Número"
+  },
   "Cards": {
     "Total Accounts": "Total de Contas",
     "Total Transactions": "Total de Transações",

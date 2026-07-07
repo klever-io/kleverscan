@@ -90,6 +90,7 @@ export const parseValidators = (
         totalMissed,
         commission: delegation.commission,
         maxDelegation: delegation.maxDelegation,
+        blsPublicKey: delegation.blsPublicKey,
       };
     },
   );

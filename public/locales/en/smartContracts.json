@@ -8,5 +8,34 @@
     "Deployer": "Deployer",
     "Deployer Hash": "Deployer Hash",
     "Total Transactions": "Total Transactions"
+  },
+  "ContractInteraction": {
+    "noReadable": "No readable functions available for this contract.",
+    "noWritable": "No writable functions available for this contract.",
+    "connectWallet": "Connect your wallet to interact with contract functions.",
+    "query": "Query",
+    "querying": "Querying...",
+    "write": "Write",
+    "sending": "Sending...",
+    "result": "Result",
+    "error": "Error",
+    "returnData": "Return Data",
+    "callValue": "Call Value",
+    "assetId": "Asset ID",
+    "assetIdHint": "(token to send)",
+    "amount": "Amount",
+    "empty": "(empty)",
+    "noDataReturned": "(no data returned)",
+    "queryFailed": "Query failed",
+    "walletNotConnected": "Wallet not connected",
+    "missingArguments": "Missing required arguments: {{args}}",
+    "transactionSent": "Transaction sent successfully",
+    "status": {
+      "pending": "Waiting for the transaction to be processed…",
+      "timeout": "Still processing — open the transaction to see the result.",
+      "success": "Transaction successful",
+      "failed": "Transaction failed",
+      "notSuccessful": "The transaction was not successful."
+    }
   }
 }

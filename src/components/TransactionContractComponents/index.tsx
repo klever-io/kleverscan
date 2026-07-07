@@ -1,6 +1,7 @@
 import { KLV } from '@/assets/coins';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
+import ReturnData, { hasReturnData } from '@/components/ReturnData';
 import { FrozenContainer, Row, RowContent } from '@/styles/common';
 import {
   EnumTriggerTypeName,
@@ -2751,6 +2752,16 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
         </Row>
       )}
       {renderMetadata()}
+      {hasReturnData(logs?.events) && (
+        <Row>
+          <span>
+            <strong>Return Data</strong>
+          </span>
+          <RowContent>
+            <ReturnData events={logs.events} />
+          </RowContent>
+        </Row>
+      )}
     </>
   );
 };

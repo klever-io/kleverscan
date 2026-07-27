@@ -270,13 +270,14 @@ const ContractValidator: React.FC<PropsWithChildren> = () => {
   );
 };
 
-const isContractValidationEnabled =
-  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
+const isThirdPartyValidationEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true' &&
+  process.env.NEXT_PUBLIC_ENABLE_3RD_PARTY_VALIDATION === 'true';
 
 export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
-  if (!isContractValidationEnabled) {
+  if (!isThirdPartyValidationEnabled) {
     return { notFound: true };
   }
 

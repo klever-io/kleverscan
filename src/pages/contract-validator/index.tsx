@@ -1,5 +1,5 @@
+import ContractProjectUpload from '@/components/ContractProjectUpload';
 import Copy from '@/components/Copy';
-import DropFileCard from '@/components/DropFileCard';
 import Title from '@/components/Layout/Title';
 import { InlineLoader } from '@/components/Loader';
 import { Container, Header } from '@/styles/common';
@@ -8,7 +8,6 @@ import {
   Content,
   Description,
   FeeNote,
-  FieldRow,
   Form,
   FormField,
   HistoryDate,
@@ -65,12 +64,13 @@ const ContractValidator: React.FC<PropsWithChildren> = () => {
     setKscVersion,
     rustVersion,
     setRustVersion,
+    wasmOptVersion,
+    setWasmOptVersion,
     file,
-    onFileSelected,
+    setFile,
     feeKlv,
     submitting,
     statusText,
-    parsing,
     isAddressValid,
     isOwner,
     handleCheck,
@@ -131,56 +131,17 @@ const ContractValidator: React.FC<PropsWithChildren> = () => {
             </FormField>
 
             {isAddressValid && (
-              <FormField>
-                <label>{t('projectZip')}</label>
-                <DropFileCard
-                  id="check-file"
-                  accept=".zip"
-                  message={
-                    file
-                      ? t('fileSelected', { name: file.name })
-                      : t('dropMessage')
-                  }
-                  onChange={e => onFileSelected(e.target.files?.[0] ?? null)}
-                />
-                <small>{t('versionsAutofillHint')}</small>
-              </FormField>
-            )}
-
-            {file && parsing && (
-              <StatusText>
-                <InlineLoader />
-                {t('parsingVersions')}
-              </StatusText>
-            )}
-
-            {file && !parsing && (
-              <>
-                <FieldRow>
-                  <FormField>
-                    <label htmlFor="ksc-version">{t('kscVersion')}</label>
-                    <input
-                      id="ksc-version"
-                      type="text"
-                      value={kscVersion}
-                      onChange={e => setKscVersion(e.target.value)}
-                      placeholder="0.45.0"
-                      spellCheck={false}
-                    />
-                  </FormField>
-                  <FormField>
-                    <label htmlFor="rust-version">{t('rustVersion')}</label>
-                    <input
-                      id="rust-version"
-                      type="text"
-                      value={rustVersion}
-                      onChange={e => setRustVersion(e.target.value)}
-                      placeholder="1.90.0"
-                      spellCheck={false}
-                    />
-                  </FormField>
-                </FieldRow>
-
+              <ContractProjectUpload
+                file={file}
+                onFileChange={setFile}
+                kscVersion={kscVersion}
+                onKscVersionChange={setKscVersion}
+                rustVersion={rustVersion}
+                onRustVersionChange={setRustVersion}
+                wasmOptVersion={wasmOptVersion}
+                onWasmOptVersionChange={setWasmOptVersion}
+                idPrefix="check"
+              >
                 <SubmitButton
                   type="submit"
                   disabled={
@@ -198,7 +159,7 @@ const ContractValidator: React.FC<PropsWithChildren> = () => {
                 {feeKlv != null && (
                   <FeeNote>{t('feeNote', { fee: feeKlv })}</FeeNote>
                 )}
-              </>
+              </ContractProjectUpload>
             )}
 
             {statusText && (
@@ -253,11 +214,18 @@ const ContractValidator: React.FC<PropsWithChildren> = () => {
                           {h.fileName ? `${h.fileName} · ` : ''}
                           {new Date(h.createdAt).toLocaleString()}
                         </HistoryDate>
-                        {(h.kscVersion || h.rustVersion) && (
+                        {(h.kscVersion ||
+                          h.rustVersion ||
+                          h.wasmOptVersion) && (
                           <HistoryVersions>
-                            {h.kscVersion && `KSC ${h.kscVersion}`}
-                            {h.kscVersion && h.rustVersion ? ' · ' : ''}
-                            {h.rustVersion && `Rust ${h.rustVersion}`}
+                            {[
+                              h.kscVersion && `KSC ${h.kscVersion}`,
+                              h.rustVersion && `Rust ${h.rustVersion}`,
+                              h.wasmOptVersion &&
+                                `wasm-opt ${h.wasmOptVersion}`,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ')}
                           </HistoryVersions>
                         )}
                       </HistoryLeft>
@@ -302,13 +270,14 @@ const ContractValidator: React.FC<PropsWithChildren> = () => {
   );
 };
 
-const isContractValidationEnabled =
-  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
+const isThirdPartyValidationEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true' &&
+  process.env.NEXT_PUBLIC_ENABLE_3RD_PARTY_VALIDATION === 'true';
 
 export const getServerSideProps: GetServerSideProps = async ({
   locale = 'en',
 }) => {
-  if (!isContractValidationEnabled) {
+  if (!isThirdPartyValidationEnabled) {
     return { notFound: true };
   }
 

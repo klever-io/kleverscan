@@ -619,6 +619,7 @@ export interface IDelegationsResponse {
   canDelegate: boolean;
   maxDelegation: number;
   commission: number;
+  blsPublicKey?: string;
 }
 export interface IValidator {
   ownerAddress: string;
@@ -635,6 +636,8 @@ export interface IValidator {
   canDelegate: boolean;
   commission: number;
   maxDelegation: number;
+  softwareVersion?: string;
+  blsPublicKey?: string;
 }
 
 export interface IChainStatistics {

@@ -25,8 +25,9 @@ export const navbarHeight = 5; // rem
 export const navbarPadding = '1rem 17.5rem';
 export const network = getNetwork();
 
-const isContractValidationEnabled =
-  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true';
+const isThirdPartyValidationEnabled =
+  process.env.NEXT_PUBLIC_ENABLE_CONTRACT_VALIDATION === 'true' &&
+  process.env.NEXT_PUBLIC_ENABLE_3RD_PARTY_VALIDATION === 'true';
 
 const navbarItems: INavbarItem[] = [
   {
@@ -113,7 +114,7 @@ const navbarItems: INavbarItem[] = [
         pathTo: '/verify-signature',
         Icon: TickSquare,
       },
-      ...(isContractValidationEnabled
+      ...(isThirdPartyValidationEnabled
         ? [
             {
               name: 'Contract Validator',

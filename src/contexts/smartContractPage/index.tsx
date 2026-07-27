@@ -59,7 +59,8 @@ export const SmartContractDataProvider: React.FC<PropsWithChildren> = ({
     smartContractsStatistic:
       smartContractsStatisticResult.data?.statistics || [],
     smartContractsList: smartContractsListResult.data?.smartContracts || [],
-    smartContractTotalContracts: smartContractsListResult.data?.totalContracts || 0,
+    smartContractTotalContracts:
+      smartContractsListResult.data?.totalContracts || 0,
     beforeYesterdayTransactions:
       smartContractsBeforeYesterdayTransactionsResult.data
         ?.beforeYesterdayTxs || 0,

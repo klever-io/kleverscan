@@ -1,6 +1,7 @@
 import {
   buildVersionStats,
   compareSemver,
+  fetchHeartbeatStatus,
   latestVersionAmongValidators,
   normalizeVersion,
   resolveValidatorVersion,
@@ -169,5 +170,143 @@ describe('buildVersionStats', () => {
       'v1.7.20',
     );
     expect(stats.map(s => s.version)).toEqual(['v1.7.20', 'v1.7.15']);
+  });
+});
+
+describe('fetchHeartbeatStatus', () => {
+  const originalFetch = global.fetch;
+  const originalNodeHost = process.env.DEFAULT_NODE_HOST;
+
+  beforeEach(() => {
+    process.env.DEFAULT_NODE_HOST = 'https://node.test.example';
+    global.fetch = jest.fn();
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+    process.env.DEFAULT_NODE_HOST = originalNodeHost;
+    jest.restoreAllMocks();
+  });
+
+  const okJson = (body: unknown) =>
+    Promise.resolve({
+      ok: true,
+      json: async () => body,
+    } as Response);
+
+  const failRes = (status = 500) =>
+    Promise.resolve({
+      ok: false,
+      status,
+      json: async () => ({}),
+    } as Response);
+
+  it('returns version map from the same-origin proxy when available', async () => {
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+      okJson({
+        data: {
+          heartbeats: [
+            {
+              publicKey: 'ABC',
+              versionNumber: 'v1.7.20-0-gdeadbeef/go1.22',
+            },
+            {
+              publicKey: 'def',
+              versionNumber: 'v1.7.21-rc1/go1.22',
+            },
+          ],
+        },
+      }),
+    );
+
+    const result = await fetchHeartbeatStatus();
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/heartbeat',
+      expect.objectContaining({ method: 'GET' }),
+    );
+    expect(result?.versionMap).toEqual({
+      abc: 'v1.7.20',
+      def: 'v1.7.21-rc1',
+    });
+    expect(result?.latestVersion).toBe('v1.7.21-rc1');
+  });
+
+  it('falls back to direct node when proxy fails', async () => {
+    (global.fetch as jest.Mock)
+      .mockImplementationOnce(() => failRes(502))
+      .mockImplementationOnce(() =>
+        okJson({
+          data: {
+            heartbeats: [
+              {
+                publicKey: 'pk1',
+                versionNumber: 'v1.7.19',
+              },
+            ],
+          },
+        }),
+      );
+
+    const result = await fetchHeartbeatStatus();
+    expect(global.fetch).toHaveBeenNthCalledWith(
+      2,
+      'https://node.test.example/node/heartbeatstatus',
+      expect.objectContaining({ mode: 'cors' }),
+    );
+    expect(result?.latestVersion).toBe('v1.7.19');
+  });
+
+  it('falls back when proxy throws', async () => {
+    (global.fetch as jest.Mock)
+      .mockImplementationOnce(() => Promise.reject(new Error('network')))
+      .mockImplementationOnce(() =>
+        okJson({
+          data: {
+            heartbeats: [
+              { publicKey: 'x', versionNumber: 'v1.0.0' },
+            ],
+          },
+        }),
+      );
+
+    const result = await fetchHeartbeatStatus();
+    expect(result?.versionMap.x).toBe('v1.0.0');
+  });
+
+  it('returns undefined when both proxy and direct fail', async () => {
+    (global.fetch as jest.Mock)
+      .mockImplementationOnce(() => failRes())
+      .mockImplementationOnce(() => failRes());
+
+    await expect(fetchHeartbeatStatus()).resolves.toBeUndefined();
+  });
+
+  it('returns undefined when heartbeats are empty', async () => {
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+      okJson({ data: { heartbeats: [] } }),
+    );
+    // proxy parsed empty → falls through to direct
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+      okJson({ data: { heartbeats: [] } }),
+    );
+
+    await expect(fetchHeartbeatStatus()).resolves.toBeUndefined();
+  });
+
+  it('skips entries missing publicKey or versionNumber', async () => {
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+      okJson({
+        data: {
+          heartbeats: [
+            { publicKey: '', versionNumber: 'v1.0.0' },
+            { publicKey: 'only-pk' },
+            { publicKey: 'good', versionNumber: 'v2.0.0' },
+          ],
+        },
+      }),
+    );
+
+    const result = await fetchHeartbeatStatus();
+    expect(result?.versionMap).toEqual({ good: 'v2.0.0' });
   });
 });

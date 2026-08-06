@@ -90,6 +90,24 @@ describe('Filter', () => {
     expect(screen.queryByText('Alice')).not.toBeInTheDocument();
   });
 
+  it('matches version dots literally (not as regex any-char)', async () => {
+    renderWithTheme(
+      <Filter
+        title="Version"
+        data={['v1.7.20', 'v1x7x20']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('selector'));
+    const input = await screen.findByLabelText('Search Version');
+    fireEvent.change(input, { target: { value: 'v1.7.20' } });
+
+    expect(screen.getByText('v1.7.20')).toBeInTheDocument();
+    expect(screen.queryByText('v1x7x20')).not.toBeInTheDocument();
+  });
+
   it('calls onClick and closes when an item is selected', async () => {
     const onClick = jest.fn();
     renderWithTheme(

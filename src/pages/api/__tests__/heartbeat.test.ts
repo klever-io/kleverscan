@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import handler from '../heartbeat';
 
+const TEST_NODE_HOST = 'https://node.test.example';
+
 function makeReq(method = 'GET'): NextApiRequest {
   return { method } as unknown as NextApiRequest;
 }
@@ -23,7 +25,7 @@ const originalEnv = process.env;
 beforeEach(() => {
   process.env = {
     ...originalEnv,
-    DEFAULT_NODE_HOST: 'https://node.mainnet.example/',
+    DEFAULT_NODE_HOST: `${TEST_NODE_HOST}/`,
   };
   global.fetch = jest.fn();
   jest.useFakeTimers();
@@ -55,7 +57,7 @@ describe('GET /api/heartbeat', () => {
     await handler(makeReq('GET'), res);
 
     expect(global.fetch).toHaveBeenCalledWith(
-      'https://node.mainnet.example/node/heartbeatstatus',
+      `${TEST_NODE_HOST}/node/heartbeatstatus`,
       expect.objectContaining({
         method: 'GET',
         headers: { Accept: 'application/json' },
@@ -86,8 +88,15 @@ describe('GET /api/heartbeat', () => {
     });
   });
 
-  it('returns 502 when upstream fetch throws', async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('timeout'));
+  it('returns 502 with a fixed message when upstream fetch throws', async () => {
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    (global.fetch as jest.Mock).mockRejectedValueOnce(
+      new Error(
+        `request to ${TEST_NODE_HOST}/node/heartbeatstatus failed`,
+      ),
+    );
 
     const { res, status, json } = makeRes();
     await handler(makeReq('GET'), res);
@@ -95,9 +104,13 @@ describe('GET /api/heartbeat', () => {
     expect(status).toHaveBeenCalledWith(502);
     expect(json).toHaveBeenCalledWith({
       data: null,
-      error: 'timeout',
+      error: 'Heartbeat request failed',
       code: 'proxy_error',
     });
+    // Client body must not echo the upstream URL from the Error message.
+    expect(json.mock.calls[0][0].error).not.toContain(TEST_NODE_HOST);
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
 
   it('uses testnet default when DEFAULT_NODE_HOST is unset', async () => {
@@ -107,12 +120,13 @@ describe('GET /api/heartbeat', () => {
       json: async () => ({ data: { heartbeats: [] } }),
     });
 
-    const { res } = makeRes();
+    const { res, status } = makeRes();
     await handler(makeReq('GET'), res);
 
     expect(global.fetch).toHaveBeenCalledWith(
       'https://node.testnet.klever.org/node/heartbeatstatus',
       expect.any(Object),
     );
+    expect(status).toHaveBeenCalledWith(200);
   });
 });

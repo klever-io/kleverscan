@@ -114,12 +114,16 @@ const Validators: React.FC<PropsWithChildren> = () => {
   // Refs so table request always sees the latest join data without stale closures.
   const versionMapRef = useRef(versionMap);
   const allValidatorsRef = useRef(allValidators);
+  // Lazy-init once: useRef(new Promise(...)) re-runs the initializer every
+  // render and would overwrite the resolve callback while keeping the first
+  // promise — hangers on await dataReadyPromiseRef when ?version= is set.
   const dataReadyResolveRef = useRef<(() => void) | null>(null);
-  const dataReadyPromiseRef = useRef(
-    new Promise<void>(resolve => {
+  const dataReadyPromiseRef = useRef<Promise<void> | null>(null);
+  if (!dataReadyPromiseRef.current) {
+    dataReadyPromiseRef.current = new Promise<void>(resolve => {
       dataReadyResolveRef.current = resolve;
-    }),
-  );
+    });
+  }
   const dataReadyRef = useRef(false);
 
   useEffect(() => {
@@ -421,15 +425,16 @@ const Validators: React.FC<PropsWithChildren> = () => {
     // Client-side path: version filter requires heartbeat join.
     if (versionFilter) {
       if (!dataReadyRef.current) {
-        await dataReadyPromiseRef.current;
+        await dataReadyPromiseRef.current!;
       }
 
       let list = allValidatorsRef.current;
       const map = versionMapRef.current;
 
       if (nameFilter) {
+        // Mirror validator/list name matching: case-insensitive prefix.
         const needle = nameFilter.toLowerCase();
-        list = list.filter(v => v.name?.toLowerCase().includes(needle));
+        list = list.filter(v => v.name?.toLowerCase().startsWith(needle));
       }
 
       list = list.filter(

@@ -231,61 +231,26 @@ describe('fetchHeartbeatStatus', () => {
     expect(result?.latestVersion).toBe('v1.7.21-rc1');
   });
 
-  it('falls back to direct node when proxy fails', async () => {
-    (global.fetch as jest.Mock)
-      .mockImplementationOnce(() => failRes(502))
-      .mockImplementationOnce(() =>
-        okJson({
-          data: {
-            heartbeats: [
-              {
-                publicKey: 'pk1',
-                versionNumber: 'v1.7.19',
-              },
-            ],
-          },
-        }),
-      );
+  it('returns undefined when proxy is not ok (no client-side node fallback)', async () => {
+    (global.fetch as jest.Mock).mockImplementationOnce(() => failRes(502));
 
-    const result = await fetchHeartbeatStatus();
-    expect(global.fetch).toHaveBeenNthCalledWith(
-      2,
-      'https://node.test.example/node/heartbeatstatus',
-      expect.objectContaining({ mode: 'cors' }),
+    await expect(fetchHeartbeatStatus()).resolves.toBeUndefined();
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/heartbeat',
+      expect.any(Object),
     );
-    expect(result?.latestVersion).toBe('v1.7.19');
   });
 
-  it('falls back when proxy throws', async () => {
-    (global.fetch as jest.Mock)
-      .mockImplementationOnce(() => Promise.reject(new Error('network')))
-      .mockImplementationOnce(() =>
-        okJson({
-          data: {
-            heartbeats: [
-              { publicKey: 'x', versionNumber: 'v1.0.0' },
-            ],
-          },
-        }),
-      );
-
-    const result = await fetchHeartbeatStatus();
-    expect(result?.versionMap.x).toBe('v1.0.0');
-  });
-
-  it('returns undefined when both proxy and direct fail', async () => {
-    (global.fetch as jest.Mock)
-      .mockImplementationOnce(() => failRes())
-      .mockImplementationOnce(() => failRes());
+  it('returns undefined when proxy throws', async () => {
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+      Promise.reject(new Error('network')),
+    );
 
     await expect(fetchHeartbeatStatus()).resolves.toBeUndefined();
   });
 
   it('returns undefined when heartbeats are empty', async () => {
-    (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      okJson({ data: { heartbeats: [] } }),
-    );
-    // proxy parsed empty → falls through to direct
     (global.fetch as jest.Mock).mockImplementationOnce(() =>
       okJson({ data: { heartbeats: [] } }),
     );

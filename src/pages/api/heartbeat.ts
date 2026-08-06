@@ -13,6 +13,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Same project default as api.ts when DEFAULT_NODE_HOST is unset.
   const nodeHost = (
     process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.org'
   ).replace(/\/$/, '');
@@ -44,11 +45,11 @@ export default async function handler(
     );
     return res.status(200).json(data);
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : 'Heartbeat request failed';
+    // Do not return error.message — fetch failures often embed the upstream URL.
+    console.error('Heartbeat proxy request failed', error);
     return res.status(502).json({
       data: null,
-      error: message,
+      error: 'Heartbeat request failed',
       code: 'proxy_error',
     });
   } finally {

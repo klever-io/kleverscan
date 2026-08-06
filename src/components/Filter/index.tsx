@@ -173,8 +173,12 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     if (input === '') {
       return getDataArray();
     }
-    const regex = new RegExp(`${input}`, 'gi');
-    return getDataArray().filter(item => String(item).match(regex)?.[0]);
+    // Literal case-insensitive match — do not pass user input to RegExp
+    // (dots in versions like v1.7.20 must not mean "any character").
+    const needle = input.toLowerCase();
+    return getDataArray().filter(item =>
+      String(item).toLowerCase().includes(needle),
+    );
   };
   const filteredArray = filterArrayByInput(inputValue);
 

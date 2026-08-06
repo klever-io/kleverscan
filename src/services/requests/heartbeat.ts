@@ -152,8 +152,9 @@ const parseHeartbeatPayload = (data: any): HeartbeatStatus | undefined => {
 };
 
 /**
- * Fetch node heartbeat via same-origin API proxy (reliable on mainnet).
- * Falls back to direct node host if the proxy is unavailable.
+ * Fetch node heartbeat via same-origin API proxy only.
+ * Avoids client-side direct node calls that can silently hit the wrong network
+ * when DEFAULT_NODE_HOST is missing from the bundle.
  */
 export const fetchHeartbeatStatus = async (): Promise<
   HeartbeatStatus | undefined
@@ -164,29 +165,11 @@ export const fetchHeartbeatStatus = async (): Promise<
       headers: { Accept: 'application/json' },
     });
 
-    if (proxyRes.ok) {
-      const data = await proxyRes.json();
-      const parsed = parseHeartbeatPayload(data);
-      if (parsed) return parsed;
+    if (!proxyRes.ok) {
+      return undefined;
     }
-  } catch {
-    // Fall through to direct node request.
-  }
 
-  // Fallback: direct node (same as historical path).
-  try {
-    const nodeHost = (
-      process.env.DEFAULT_NODE_HOST || 'https://node.testnet.klever.org'
-    ).replace(/\/$/, '');
-
-    const directRes = await fetch(`${nodeHost}/node/heartbeatstatus`, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      mode: 'cors',
-    });
-
-    if (!directRes.ok) return undefined;
-    const data = await directRes.json();
+    const data = await proxyRes.json();
     return parseHeartbeatPayload(data);
   } catch {
     return undefined;

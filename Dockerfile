@@ -1,7 +1,9 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 
-COPY . .
+RUN chown node:node /app
+COPY --chown=node:node . .
+USER node
 RUN yarn --frozen-lockfile
 RUN yarn build
 

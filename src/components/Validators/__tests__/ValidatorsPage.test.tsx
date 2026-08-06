@@ -199,7 +199,7 @@ jest.mock('react-dom', () => {
   };
 });
 
-import Validators from '../index';
+import Validators from '@/pages/validators';
 
 const sampleValidator = {
   ownerAddress: 'klv1owner1',

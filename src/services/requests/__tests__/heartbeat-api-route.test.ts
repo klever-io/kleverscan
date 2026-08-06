@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import handler from '../heartbeat';
+import handler from '@/pages/api/heartbeat';
 
 const TEST_NODE_HOST = 'https://node.test.example';
 

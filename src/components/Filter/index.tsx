@@ -1,5 +1,11 @@
 import { FilterArrowDown } from '@/assets/icons';
-import React, { PropsWithChildren, useMemo, useRef, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { Loader } from '../Loader/styles';
 import {
@@ -53,6 +59,11 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const [closed, setClosed] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
   const [inputValue, setInputValue] = useState('');
+
+  // Keep display in sync when parent changes `current` (e.g. URL / external chips).
+  useEffect(() => {
+    setSelected(initial || allItem);
+  }, [initial, allItem]);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const selectorRef = useRef<HTMLDivElement>(null);

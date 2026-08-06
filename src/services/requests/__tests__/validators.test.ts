@@ -14,7 +14,13 @@ jest.mock('@/services/api', () => ({
 
 jest.mock('@/utils/parseValues', () => ({
   parseValidators: (response: {
-    data: { validators: Array<{ blsPublicKey?: string; name?: string }> };
+    data: {
+      validators: Array<{
+        blsPublicKey?: string;
+        name?: string;
+        list?: string;
+      }>;
+    };
     pagination: { self: number; perPage: number };
   }) =>
     response.data.validators.map((v, index) => ({
@@ -30,7 +36,7 @@ jest.mock('@/utils/parseValues', () => ({
       rating: 0,
       canDelegate: true,
       selfStake: 0,
-      status: 'elected',
+      status: v.list ?? 'elected',
       totalProduced: 0,
       totalMissed: 0,
       commission: 0,
@@ -45,7 +51,7 @@ const makePage = (
   page: number,
   totalPages: number,
   totalRecords: number,
-  items: Array<{ blsPublicKey: string; name: string }>,
+  items: Array<{ blsPublicKey: string; name: string; list?: string }>,
 ) => ({
   data: {
     validators: items,
@@ -148,6 +154,31 @@ describe('fetchAllValidators', () => {
     await expect(fetchAllValidators()).rejects.toThrow(
       'Failed to load validator list',
     );
+  });
+
+  it('excludes jailed validators from the aggregated set', async () => {
+    mockGet
+      .mockResolvedValueOnce(
+        makePage(1, 2, 3, [
+          { blsPublicKey: 'bls1', name: 'A', list: 'elected' },
+          { blsPublicKey: 'bls-jailed', name: 'Jailed', list: 'jailed' },
+        ]),
+      )
+      .mockResolvedValueOnce(
+        makePage(2, 2, 3, [
+          { blsPublicKey: 'bls2', name: 'B', list: 'eligible' },
+        ]),
+      );
+
+    const result = await fetchAllValidators();
+    expect(result.validators.map(v => v.blsPublicKey)).toEqual([
+      'bls1',
+      'bls2',
+    ]);
+    expect(result.totalRecords).toBe(2);
+    expect(
+      result.validators.every(v => v.status !== 'jailed'),
+    ).toBe(true);
   });
 });
 

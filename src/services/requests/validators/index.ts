@@ -91,10 +91,14 @@ export const fetchAllValidators = async (): Promise<{
     }
   }
 
-  const validators = pages.flat();
+  // Match validatorsCall: exclude jailed so version stats/filters align with the list.
+  const validators = pages
+    .flat()
+    .filter(validator => validator.status !== 'jailed');
 
   return {
     validators,
-    totalRecords: totalRecords || validators.length,
+    // Prefer filtered count so totals match the dataset used for aggregation.
+    totalRecords: validators.length || totalRecords,
   };
 };

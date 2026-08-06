@@ -437,8 +437,11 @@ const Validators: React.FC<PropsWithChildren> = () => {
         list = list.filter(v => v.name?.toLowerCase().startsWith(needle));
       }
 
+      const normalizedVersionFilter = versionFilter.toLowerCase();
       list = list.filter(
-        v => resolveValidatorVersion(v.blsPublicKey, map) === versionFilter,
+        v =>
+          resolveValidatorVersion(v.blsPublicKey, map).toLowerCase() ===
+          normalizedVersionFilter,
       );
 
       const totalRecords = list.length;

@@ -45,8 +45,9 @@ export default async function handler(
     );
     return res.status(200).json(data);
   } catch (error) {
-    // Do not return error.message — fetch failures often embed the upstream URL.
-    console.error('Heartbeat proxy request failed', error);
+    // Avoid logging error.message — fetch failures often embed the upstream URL.
+    const kind = error instanceof Error ? error.name : 'unknown';
+    console.error('Heartbeat proxy request failed', kind);
     return res.status(502).json({
       data: null,
       error: 'Heartbeat request failed',

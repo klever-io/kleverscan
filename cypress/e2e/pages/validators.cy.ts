@@ -25,19 +25,18 @@ const assertStakeVisibleWithReload = (reloadsLeft = 2): void => {
 };
 
 // Same pattern as stake: list load can flake under concurrent API pressure
-// (full validator snapshot + table + heartbeat). Reload once or twice before
-// failing so a single slow testnet response doesn't red the suite.
+// (full validator snapshot + table + heartbeat). Wait for async table paint
+// before the sync probe so a healthy visit does not always reload twice.
 const assertTableRowsVisibleWithReload = (reloadsLeft = 2): void => {
+  cy.wait(2500);
   cy.get('body').then($body => {
     if ($body.find(TABLE_ROW_SELECTOR).length > 0) {
-      cy.get(TABLE_ROW_SELECTOR, { timeout: 10000 }).should('exist');
+      cy.get(TABLE_ROW_SELECTOR).should('exist');
       return;
     }
     if (reloadsLeft > 0) {
       cy.log(`No validator table rows yet; reloading (${reloadsLeft} left)...`);
       cy.reload();
-      // Allow the page + network a beat after reload before re-checking.
-      cy.wait(1500);
       assertTableRowsVisibleWithReload(reloadsLeft - 1);
     } else {
       cy.get(TABLE_ROW_SELECTOR, { timeout: 15000 }).should('exist');

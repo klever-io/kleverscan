@@ -125,7 +125,8 @@ jest.mock('@/components/Detail', () => {
       return () => {
         cancelled = true;
       };
-    }, [tableProps?.refreshKey, customHeader]);
+      // refreshKey only — customHeader is new JSX every parent render.
+    }, [tableProps?.refreshKey]);
 
     return (
       <div data-testid="detail">

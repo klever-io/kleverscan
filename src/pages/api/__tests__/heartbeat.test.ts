@@ -109,7 +109,13 @@ describe('GET /api/heartbeat', () => {
     });
     // Client body must not echo the upstream URL from the Error message.
     expect(json.mock.calls[0][0].error).not.toContain(TEST_NODE_HOST);
-    expect(consoleSpy).toHaveBeenCalled();
+    // Server logs must not include the host either (name only, not message).
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Heartbeat proxy request failed',
+      'Error',
+    );
+    const logArgs = consoleSpy.mock.calls.flat().map(String).join(' ');
+    expect(logArgs).not.toContain(TEST_NODE_HOST);
     consoleSpy.mockRestore();
   });
 

@@ -23,53 +23,42 @@ const stubSearchApis = (): void => {
     body: okEnvelope({ precisions: { KLV: 6, KFI: 6 } }),
   }).as('precisions');
 
-  // PrePageTooltip lowercases the query before fetching (asset=klv).
-  cy.intercept('GET', '**/assets/list*', req => {
-    if (/asset=klv/i.test(req.url)) {
-      req.reply({
-        statusCode: 200,
-        body: okEnvelope({
-          assets: [
-            {
-              assetId: 'KLV',
-              name: 'Klever',
-              ticker: 'KLV',
-              assetType: 'Fungible',
-              precision: 6,
-              maxSupply: 0,
-              circulatingSupply: 10000000000000,
-              verified: true,
-              logo: '',
-            },
-          ],
-        }),
-      });
-      return;
-    }
-    req.continue();
+  // Narrow patterns so cy.wait is not satisfied by unrelated home-page calls.
+  // PrePageTooltip lowercases the query (asset=klv).
+  cy.intercept('GET', /\/assets\/list\?.*asset=klv/i, {
+    statusCode: 200,
+    body: okEnvelope({
+      assets: [
+        {
+          assetId: 'KLV',
+          name: 'Klever',
+          ticker: 'KLV',
+          assetType: 'Fungible',
+          precision: 6,
+          maxSupply: 0,
+          circulatingSupply: 10000000000000,
+          verified: true,
+          logo: '',
+        },
+      ],
+    }),
   }).as('assetSearch');
 
-  cy.intercept('GET', '**/block/by-nonce/**', req => {
-    if (req.url.includes('by-nonce/100')) {
-      req.reply({
-        statusCode: 200,
-        body: okEnvelope({
-          block: {
-            hash: 'cd84b16ed965d8df6a0d83d790084d0784c1bdda4798d4c8a46c437ae32b0377',
-            nonce: 100,
-            epoch: 1,
-            timestamp: 1738889200,
-            txCount: 0,
-            size: 370,
-            producerName: 'node-0',
-            producerOwnerAddress: ADDRESS,
-            producerLogo: '',
-          },
-        }),
-      });
-      return;
-    }
-    req.continue();
+  cy.intercept('GET', '**/block/by-nonce/100*', {
+    statusCode: 200,
+    body: okEnvelope({
+      block: {
+        hash: 'cd84b16ed965d8df6a0d83d790084d0784c1bdda4798d4c8a46c437ae32b0377',
+        nonce: 100,
+        epoch: 1,
+        timestamp: 1738889200,
+        txCount: 0,
+        size: 370,
+        producerName: 'node-0',
+        producerOwnerAddress: ADDRESS,
+        producerLogo: '',
+      },
+    }),
   }).as('blockSearch');
 
   cy.intercept('GET', `**/address/${ADDRESS}*`, {
@@ -89,14 +78,27 @@ const stubSearchApis = (): void => {
   }).as('addressSearch');
 };
 
+/**
+ * Set the search input via the native value setter + a single bubbling `input`
+ * event. Cypress .type() can drop/race React onChange under CI Electron after
+ * navigations, so the 1s debounce never gets the final query and no API fires.
+ */
 const typeSearch = (value: string): void => {
-  // Small per-key delay so React onChange fires reliably in CI Electron
-  // (delay:0 can leave search stuck without a fetch after navigation).
   cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
     .should('be.visible')
     .click({ force: true })
-    .clear({ force: true })
-    .type(value, { delay: 20, parseSpecialCharSequences: false, force: true })
+    .then($input => {
+      const el = $input[0] as HTMLInputElement;
+      const setter = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        'value',
+      )?.set;
+      // Clear then set full value so debounce only arms once with the final query.
+      setter?.call(el, '');
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      setter?.call(el, value);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    })
     .should('have.value', value);
   // App only sets `search` (and thus fetches) after the 1s debounce.
   cy.wait(SEARCH_DEBOUNCE_MS);

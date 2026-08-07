@@ -104,12 +104,19 @@ const stubTransactionListApis = (): void => {
   }).as('txList');
 };
 
+/**
+ * Apply Success + contract type filters. Consumes list intercepts so the final
+ * wait is the type-filtered request (not the intermediate status-only one).
+ * Requires `@txList` intercept from stubTransactionListApis.
+ */
 const applyStatusAndTypeFilters = (type: string, typeIndex: number): void => {
   cy.get(STATUS_FILTER_SELECTOR, { timeout: 10000 }).click();
   cy.get(STATUS_FILTER_SELECTOR)
     .contains('Success', { timeout: 10000 })
     .click();
   cy.url().should('include', 'status=Success');
+  // Status-only refetch — drain so the next wait is the type-filtered call.
+  cy.wait('@txList', { timeout: 15000 });
 
   cy.get(TYPE_FILTER_SELECTOR, { timeout: 10000 }).click();
   cy.get(TYPE_FILTER_SELECTOR).find('input').type(type, { delay: 0 });
@@ -118,6 +125,42 @@ const applyStatusAndTypeFilters = (type: string, typeIndex: number): void => {
   cy.url().should(currentUrl => {
     const url = new URL(currentUrl);
     expect(Number(url.searchParams.get('type'))).to.eq(typeIndex);
+  });
+
+  // Prove the list request itself carries both filter params (not only the URL).
+  cy.wait('@txList', { timeout: 15000 })
+    .its('request.url')
+    .should(requestUrl => {
+      const url = new URL(requestUrl);
+      expect(url.searchParams.get('status')).to.eq('Success');
+      expect(Number(url.searchParams.get('type'))).to.eq(typeIndex);
+    });
+};
+
+/**
+ * Visit SSR transaction detail with backoff. GSSP uses live api.get; persistent
+ * 429 returns notFound (HTTP 404) which failOnStatusCode would fail immediately.
+ */
+const visitTransactionDetail = (hash: string, retriesLeft = 3): void => {
+  cy.visit(`/transaction/${hash}`, {
+    timeout: 60000,
+    failOnStatusCode: false,
+  });
+  cy.get('body', { timeout: 15000 }).then($body => {
+    const titleText = $body.find(PAGE_TITLE_SELECTOR).text();
+    if (titleText.includes('Transaction Details')) {
+      cy.get(PAGE_TITLE_SELECTOR)
+        .contains('Transaction Details')
+        .should('be.visible');
+      return;
+    }
+    if (retriesLeft <= 0) {
+      throw new Error(
+        `Transaction detail page did not load for ${hash} after retries (likely API 429 / notFound)`,
+      );
+    }
+    cy.wait(3000);
+    visitTransactionDetail(hash, retriesLeft - 1);
   });
 };
 
@@ -202,17 +245,22 @@ describe('Transaction Details Page', () => {
 
       requestTxList(typeIndex).then(res => {
         expect(res.status, `${type} list HTTP status`).to.eq(200);
-        const hash = res.body?.data?.transactions?.[0]?.hash as
-          | string
+        const tx = res.body?.data?.transactions?.[0] as
+          | {
+              hash?: string;
+              contract?: { type?: number }[];
+            }
           | undefined;
+        expect(
+          tx?.contract?.[0]?.type,
+          `${type} contract type from list`,
+        ).to.eq(typeIndex);
+        const hash = tx?.hash;
         expect(hash, `${type} transaction hash`)
           .to.be.a('string')
           .and.match(/^[a-f0-9]{64}$/i);
 
-        cy.visit(`/transaction/${hash}`, { timeout: 60000 });
-        cy.get(PAGE_TITLE_SELECTOR, { timeout: 60000 })
-          .contains('Transaction Details', { timeout: 60000 })
-          .should('be.visible');
+        visitTransactionDetail(hash as string);
       });
     });
   });

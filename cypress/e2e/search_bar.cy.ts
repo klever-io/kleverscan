@@ -9,74 +9,79 @@ const SEARCH_DEBOUNCE_MS = 1100;
 const ADDRESS =
   'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
 
+const okEnvelope = (data: Record<string, unknown>) => ({
+  data,
+  error: '',
+  code: 'successful',
+});
+
 const stubSearchApis = (): void => {
-  // PrePageTooltip lowercases the query before fetching (asset=klv, etc.).
-  cy.intercept('GET', /\/v1\.0\/assets\/list\?.*asset=klv/i, {
+  // Home/charts may POST precisions; a non-string `error` from rate limits
+  // crashes the app (`error.charAt is not a function` in getPrecisionFromApi).
+  cy.intercept('POST', '**/assets/precisions*', {
     statusCode: 200,
-    body: {
-      data: {
-        assets: [
-          {
-            assetId: 'KLV',
-            name: 'Klever',
-            ticker: 'KLV',
-            assetType: 'Fungible',
-            precision: 6,
-            maxSupply: 0,
-            circulatingSupply: 10000000000000,
-            verified: true,
-            logo: '',
-          },
-        ],
-      },
-      error: '',
-      code: 'successful',
-    },
+    body: okEnvelope({ precisions: { KLV: 6, KFI: 6 } }),
+  }).as('precisions');
+
+  // PrePageTooltip lowercases the query before fetching (asset=klv).
+  cy.intercept('GET', /assets\/list\?.*asset=klv/i, {
+    statusCode: 200,
+    body: okEnvelope({
+      assets: [
+        {
+          assetId: 'KLV',
+          name: 'Klever',
+          ticker: 'KLV',
+          assetType: 'Fungible',
+          precision: 6,
+          maxSupply: 0,
+          circulatingSupply: 10000000000000,
+          verified: true,
+          logo: '',
+        },
+      ],
+    }),
   }).as('assetSearch');
 
-  cy.intercept('GET', '**/v1.0/block/by-nonce/100*', {
+  // Regex (not glob) so path/host/version differences still match.
+  cy.intercept('GET', /block\/by-nonce\/100\b/, {
     statusCode: 200,
-    body: {
-      data: {
-        block: {
-          hash: 'cd84b16ed965d8df6a0d83d790084d0784c1bdda4798d4c8a46c437ae32b0377',
-          nonce: 100,
-          timestamp: 1738889200,
-          txCount: 0,
-          size: 370,
-          producerName: 'node-0',
-          producerOwnerAddress: ADDRESS,
-        },
+    body: okEnvelope({
+      block: {
+        hash: 'cd84b16ed965d8df6a0d83d790084d0784c1bdda4798d4c8a46c437ae32b0377',
+        nonce: 100,
+        epoch: 1,
+        timestamp: 1738889200,
+        txCount: 0,
+        size: 370,
+        producerName: 'node-0',
+        producerOwnerAddress: ADDRESS,
+        producerLogo: '',
       },
-      error: '',
-      code: 'successful',
-    },
+    }),
   }).as('blockSearch');
 
-  cy.intercept('GET', `**/v1.0/address/${ADDRESS}*`, {
+  cy.intercept('GET', new RegExp(`address/${ADDRESS}`), {
     statusCode: 200,
-    body: {
-      data: {
-        account: {
-          address: ADDRESS,
-          nonce: 1,
-          balance: 1000000,
-          frozenBalance: 0,
-          allowance: 0,
-          permissions: [],
-          timestamp: 1738889200,
-          assets: {},
-        },
+    body: okEnvelope({
+      account: {
+        address: ADDRESS,
+        nonce: 1,
+        balance: 1000000,
+        frozenBalance: 0,
+        allowance: 0,
+        permissions: [],
+        timestamp: 1738889200,
+        assets: {},
       },
-      error: '',
-      code: 'successful',
-    },
+    }),
   }).as('addressSearch');
 };
 
 const typeSearch = (value: string): void => {
   cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
     .should('be.visible')
+    .click()
     .clear()
     .type(value, { delay: 0 })
     .should('have.value', value);

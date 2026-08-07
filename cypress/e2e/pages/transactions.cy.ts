@@ -1,12 +1,11 @@
 /// <reference types="cypress" />
 
 /**
- * Transactions E2E stubs the list + precision APIs so CI is not flaky under
- * testnet rate limits while still exercising filter UI → URL → table → link.
- *
- * Detail pages use getServerSideProps against the live API (intercepts cannot
- * stub Node SSR). Visiting those hashes caused HTTP 404 under rate limits.
- * Link correctness is asserted here; list→detail navigation is covered by smoke.
+ * Transactions E2E:
+ * - List/filter suite stubs list + precision APIs (deterministic, fast).
+ * - Detail suite covers Transfer + Smart Contract via live list → visit.
+ *   Detail pages use getServerSideProps (intercepts cannot stub Node SSR),
+ *   so we only exercise two representative types instead of all 26.
  */
 
 import { contracts } from '../../../src/configs/transactions';
@@ -19,6 +18,9 @@ const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
 
 const ADDRESS =
   'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
+
+/** Representative types for live SSR detail coverage. */
+const DETAIL_CONTRACTS = ['Transfer', 'Smart Contract'] as const;
 
 /** Deterministic 64-char hex hash unique per contract type index. */
 const hashForType = (typeIndex: number): string => {
@@ -75,8 +77,7 @@ const listResponse = (typeIndex: number) => ({
   code: 'successful',
 });
 
-const stubTransactionApis = (): void => {
-  // List page may POST for asset precisions after parsing rows.
+const stubPrecisions = (): void => {
   cy.intercept('POST', '**/v1.0/assets/precisions*', {
     statusCode: 200,
     body: {
@@ -85,6 +86,10 @@ const stubTransactionApis = (): void => {
       code: 'successful',
     },
   }).as('precisions');
+};
+
+const stubTransactionListApis = (): void => {
+  stubPrecisions();
 
   cy.intercept('GET', '**/v1.0/transaction/list*', req => {
     const url = new URL(req.url);
@@ -99,9 +104,26 @@ const stubTransactionApis = (): void => {
   }).as('txList');
 };
 
+const applyStatusAndTypeFilters = (type: string, typeIndex: number): void => {
+  cy.get(STATUS_FILTER_SELECTOR, { timeout: 10000 }).click();
+  cy.get(STATUS_FILTER_SELECTOR)
+    .contains('Success', { timeout: 10000 })
+    .click();
+  cy.url().should('include', 'status=Success');
+
+  cy.get(TYPE_FILTER_SELECTOR, { timeout: 10000 }).click();
+  cy.get(TYPE_FILTER_SELECTOR).find('input').type(type, { delay: 0 });
+  cy.get(TYPE_FILTER_SELECTOR).contains(type, { timeout: 10000 }).click();
+
+  cy.url().should(currentUrl => {
+    const url = new URL(currentUrl);
+    expect(Number(url.searchParams.get('type'))).to.eq(typeIndex);
+  });
+};
+
 describe('Transactions Page', () => {
   beforeEach(() => {
-    stubTransactionApis();
+    stubTransactionListApis();
     cy.visit('/transactions');
     cy.wait('@txList', { timeout: 15000 });
   });
@@ -127,21 +149,7 @@ describe('Transactions Page', () => {
         .contains('Transactions')
         .should('be.visible');
 
-      cy.get(STATUS_FILTER_SELECTOR, { timeout: 10000 }).click();
-      cy.get(STATUS_FILTER_SELECTOR)
-        .contains('Success', { timeout: 10000 })
-        .click();
-      cy.url().should('include', 'status=Success');
-
-      cy.get(TYPE_FILTER_SELECTOR, { timeout: 10000 }).click();
-      // Contract filter is typeahead; type without artificial delay.
-      cy.get(TYPE_FILTER_SELECTOR).find('input').type(type, { delay: 0 });
-      cy.get(TYPE_FILTER_SELECTOR).contains(type, { timeout: 10000 }).click();
-
-      cy.url().should(currentUrl => {
-        const url = new URL(currentUrl);
-        expect(Number(url.searchParams.get('type'))).to.eq(typeIndex);
-      });
+      applyStatusAndTypeFilters(type, typeIndex);
 
       // Wait for the stubbed row for this type (handles multi-request races).
       cy.get(`a[href*="/transaction/${expectedHash}"]`, {
@@ -151,6 +159,61 @@ describe('Transactions Page', () => {
         'have.length.at.least',
         1,
       );
+    });
+  });
+});
+
+describe('Transaction Details Page', () => {
+  // Detail pages use getServerSideProps against the live API (browser intercepts
+  // cannot stub Node). Resolve a real hash via cy.request, then visit SSR page.
+  const API_BASE =
+    Cypress.env('DEFAULT_API_HOST') || 'https://api.testnet.klever.org';
+  const API_VERSION = Cypress.env('DEFAULT_API_VERSION') || 'v1.0';
+
+  const requestTxList = (
+    typeIndex: number,
+    retriesLeft = 5,
+  ): Cypress.Chainable<Cypress.Response<any>> => {
+    return cy
+      .request({
+        url: `${API_BASE}/${API_VERSION}/transaction/list`,
+        qs: {
+          type: typeIndex,
+          status: 'Success',
+          limit: 1,
+          page: 1,
+        },
+        failOnStatusCode: false,
+        timeout: 20000,
+      })
+      .then(res => {
+        // Full suite can 429 the shared testnet API; back off and retry.
+        if (res.status === 429 && retriesLeft > 0) {
+          cy.wait(2500);
+          return requestTxList(typeIndex, retriesLeft - 1);
+        }
+        return cy.wrap(res);
+      });
+  };
+
+  DETAIL_CONTRACTS.forEach(type => {
+    it(`should load the transaction details page - ${type}`, () => {
+      const typeIndex = ContractsIndex[type as keyof typeof ContractsIndex];
+
+      requestTxList(typeIndex).then(res => {
+        expect(res.status, `${type} list HTTP status`).to.eq(200);
+        const hash = res.body?.data?.transactions?.[0]?.hash as
+          | string
+          | undefined;
+        expect(hash, `${type} transaction hash`)
+          .to.be.a('string')
+          .and.match(/^[a-f0-9]{64}$/i);
+
+        cy.visit(`/transaction/${hash}`, { timeout: 60000 });
+        cy.get(PAGE_TITLE_SELECTOR, { timeout: 60000 })
+          .contains('Transaction Details', { timeout: 60000 })
+          .should('be.visible');
+      });
     });
   });
 });

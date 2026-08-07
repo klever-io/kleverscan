@@ -2,7 +2,7 @@
 
 // Search input debounces 1s before firing. Stub live API responses so this
 // suite is not flaky under Cloudflare/API rate limits (HTTP 1015) in CI.
-const SEARCH_DEBOUNCE_MS = 1500;
+// Wait on intercept aliases (not fixed sleeps) after the debounce window.
 const CARD_TIMEOUT_MS = 15000;
 
 const ADDRESS =
@@ -79,17 +79,14 @@ describe('Search bar', () => {
 
   it('should search for an asset', () => {
     cy.visit('/');
-
-    cy.wait(1000);
-
-    cy.get('[data-testid="search"]').type('KLV', { delay: 300 });
-    cy.wait(SEARCH_DEBOUNCE_MS);
+    cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
+      .should('be.visible')
+      .type('KLV', { delay: 0 });
 
     cy.wait('@assetSearch', { timeout: CARD_TIMEOUT_MS });
     cy.get('[data-testid="card-item"]', { timeout: CARD_TIMEOUT_MS }).contains(
       'KLV',
     );
-    cy.wait(500);
     cy.get('[data-testid="search"]').type('{enter}');
 
     cy.url({ timeout: CARD_TIMEOUT_MS }).should('include', '/asset/KLV');
@@ -97,28 +94,23 @@ describe('Search bar', () => {
 
   it('should search for a block', () => {
     cy.visit('/');
-
-    cy.wait(1000);
-
-    cy.get('[data-testid="search"]').type('100', { delay: 300 });
-    cy.wait(SEARCH_DEBOUNCE_MS);
+    cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
+      .should('be.visible')
+      .type('100', { delay: 0 });
 
     cy.wait('@blockSearch', { timeout: CARD_TIMEOUT_MS });
     cy.get('[data-testid="card-item"]', { timeout: CARD_TIMEOUT_MS }).contains(
       '100',
     );
-    cy.wait(500);
     cy.get('[data-testid="search"]').type('{enter}');
     cy.url({ timeout: CARD_TIMEOUT_MS }).should('include', '/block/100');
   });
 
   it('should search for an address', () => {
     cy.visit('/');
-
-    cy.wait(1000);
-
-    cy.get('[data-testid="search"]').type(ADDRESS, { delay: 10 });
-    cy.wait(SEARCH_DEBOUNCE_MS);
+    cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
+      .should('be.visible')
+      .type(ADDRESS, { delay: 0 });
 
     cy.wait('@addressSearch', { timeout: CARD_TIMEOUT_MS });
     // Wait for the result card to render. Unlike the asset/block cards, the
@@ -128,7 +120,6 @@ describe('Search bar', () => {
     cy.get('[data-testid="card-item"]', { timeout: CARD_TIMEOUT_MS }).should(
       'be.visible',
     );
-    cy.wait(500);
     cy.get('[data-testid="search"]').type('{enter}');
 
     cy.url({ timeout: CARD_TIMEOUT_MS }).should(

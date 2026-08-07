@@ -33,46 +33,43 @@ describe('Account Page', () => {
 
       cy.get(TAB_SELECTOR).contains('Transactions', { timeout: 10000 }).click();
 
-      cy.url().then(currentUrl => {
+      cy.url().should(currentUrl => {
         const url = new URL(currentUrl);
-        const tabParam = url.searchParams.get('tab');
-        expect(tabParam).to.eq('Transactions');
+        expect(url.searchParams.get('tab')).to.eq('Transactions');
       });
 
-      const typeFilter = cy.get(TYPE_FILTER_SELECTOR).first();
+      cy.get(TYPE_FILTER_SELECTOR).first().click();
+      cy.get(TYPE_FILTER_SELECTOR)
+        .first()
+        .contains(type, { timeout: 5000 })
+        .click();
 
-      typeFilter.click();
-
-      typeFilter.contains(type, { timeout: 5000 }).click();
-
-      cy.url().then(currentUrl => {
+      cy.url().should(currentUrl => {
         const url = new URL(currentUrl);
         if (type === 'Transactions Out') {
-          const fromAddressParam = url.searchParams.get('fromAddress');
-          expect(fromAddressParam).to.eq(address);
+          expect(url.searchParams.get('fromAddress')).to.eq(address);
         } else if (type === 'Transactions In') {
-          const toAddressParam = url.searchParams.get('toAddress');
-          expect(toAddressParam).to.eq(address);
+          expect(url.searchParams.get('toAddress')).to.eq(address);
         }
       });
 
-      cy.wait(5000);
+      cy.get(`${TABLE_ROW_SELECTOR}, ${TABLE_EMPTY_SELECTOR}`, {
+        timeout: 15000,
+      }).should('exist');
 
       cy.get('body').then($body => {
-        if ($body.length > 0) {
-          const hasRow = $body.find(TABLE_ROW_SELECTOR).length > 0;
-          if (hasRow) {
-            cy.get(TABLE_ROW_0_LINK_SELECTOR, { timeout: 5000 })
-              .first()
-              .invoke('attr', 'href')
-              .then(href => {
-                href && transaction_links.push({ name: type, link: href });
-              });
-          } else {
-            cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should(
-              'be.visible',
-            );
-          }
+        const hasRow = $body.find(TABLE_ROW_SELECTOR).length > 0;
+        if (hasRow) {
+          cy.get(TABLE_ROW_0_LINK_SELECTOR, { timeout: 5000 })
+            .first()
+            .invoke('attr', 'href')
+            .then(href => {
+              if (href) {
+                transaction_links.push({ name: type, link: href });
+              }
+            });
+        } else {
+          cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should('be.visible');
         }
       });
     });

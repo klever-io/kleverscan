@@ -10,6 +10,7 @@ import { KleverProvider } from '@klever/connect-react';
 import { InputSearchProvider } from '@/contexts/inputSearch';
 import { MobileProvider } from '@/contexts/mobile';
 import { ParticipateProvider } from '@/contexts/participate';
+import { SpotlightProvider } from '@/contexts/spotlight';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { GetServerSideProps } from 'next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -45,11 +46,13 @@ const ContextProviders: React.FC<PropsWithChildren> = ({ children }) => {
                   <MulticontractProvider>
                     <ContractProvider>
                       <InputSearchProvider>
-                        <ParticipateProvider>
-                          <ContractModalProvider>
-                            <WizardProvider>{children}</WizardProvider>
-                          </ContractModalProvider>
-                        </ParticipateProvider>
+                        <SpotlightProvider>
+                          <ParticipateProvider>
+                            <ContractModalProvider>
+                              <WizardProvider>{children}</WizardProvider>
+                            </ContractModalProvider>
+                          </ParticipateProvider>
+                        </SpotlightProvider>
                       </InputSearchProvider>
                     </ContractProvider>
                   </MulticontractProvider>

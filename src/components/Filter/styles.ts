@@ -75,6 +75,7 @@ export const Content = styled.div<{ open: boolean }>`
 
   height: 32px;
   width: 100%;
+  min-width: 12rem;
 
   padding: 8px 16px;
 
@@ -200,16 +201,45 @@ export const HiddenInput = styled.input<{
   show: boolean;
   isHiddenInput: boolean;
 }>`
-  width: 100%;
+  /* Sit in the control row so caret + typed text are visible when open. */
   position: absolute;
-  visibility: ${props => (props.show ? 'visible' : 'hidden')};
-  caret-color: ${props => props.theme.black};
-  color: ${props => props.theme.black};
+  left: 16px;
+  right: 4.5rem; /* leave room for clear + chevron */
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+
+  width: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
 
   font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 32px;
+
+  color: ${props => props.theme.black};
+  caret-color: ${props => props.theme.black};
+
+  visibility: ${props => (props.show ? 'visible' : 'hidden')};
+  opacity: ${props => (props.show ? 1 : 0)};
+  pointer-events: ${props => (props.show ? 'auto' : 'none')};
+
+  &::placeholder {
+    color: ${props =>
+      props.theme.dark ? props.theme.gray700 : props.theme.darkGray};
+    opacity: 0.85;
+  }
 
   &:hover {
     cursor: ${props => (props.isHiddenInput ? 'text' : 'pointer')};
+  }
+
+  &:focus {
+    outline: none;
   }
 `;
 
@@ -220,6 +250,8 @@ export const CloseContainer = styled.div<{ empty: boolean }>`
   padding: 6px;
   margin-top: 0 !important;
   margin-left: auto;
+  position: relative;
+  z-index: 3;
 
   ${props =>
     props.empty &&
@@ -241,6 +273,8 @@ export const ArrowDownContainer = styled.div<{ open: boolean }>`
 
   padding: 6px;
   margin-top: 0 !important;
+  position: relative;
+  z-index: 3;
 
   svg {
     transition: 0.2s ease;

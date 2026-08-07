@@ -1,5 +1,12 @@
 import { FilterArrowDown } from '@/assets/icons';
-import React, { PropsWithChildren, useMemo, useRef, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
 import { Loader } from '../Loader/styles';
 import {
@@ -54,22 +61,58 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const [dontBlur, setDontBlur] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
+  // Keep display in sync when parent changes `current` (e.g. URL / external chips).
+  useEffect(() => {
+    setSelected(initial || allItem);
+  }, [initial, allItem]);
+
   const contentRef = useRef<HTMLDivElement>(null);
   const selectorRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLInputElement>(null);
 
-  const openDropdown = () => {
+  // Input only mounts after open; focus once it exists so the caret is visible.
+  useEffect(() => {
+    if (closed || disabledInput) return;
+
+    const focusInput = () => {
+      const el = focusRef.current;
+      if (!el) return;
+      el.focus({ preventScroll: true });
+      // Move caret to end so typing feels ready.
+      const len = el.value.length;
+      try {
+        el.setSelectionRange(len, len);
+      } catch {
+        // Some input types (e.g. button) do not support selection APIs.
+      }
+    };
+
+    // Double rAF: wait for the input to paint after `closed` flips.
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(focusInput);
+    });
+    return () => cancelAnimationFrame(id);
+  }, [closed, disabledInput]);
+
+  const closeDropDown = useCallback(() => {
+    setClosed(true);
+    setInputValue('');
+  }, []);
+
+  const openDropdown = useCallback(() => {
     if (disabledInput) return;
     if (closed) {
       setClosed(false);
-      focusRef.current?.focus();
+      return;
     }
-    if (!closed && !isHiddenInput) {
+    // Non-typeahead mode: second click on the control closes.
+    if (!isHiddenInput) {
       closeDropDown();
     }
-  };
+  }, [closed, closeDropDown, disabledInput, isHiddenInput]);
 
-  const arrowOnClick = () => {
+  const arrowOnClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (disabledInput) return;
     if (!closed) {
       closeDropDown();
@@ -78,18 +121,13 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     }
   };
 
-  const closeDropDown = () => {
-    setClosed(true);
-    setInputValue('');
-  };
-
   const SelectorItem: React.FC<PropsWithChildren<IFilterItem>> = ({ item }) => {
     const handleClick = () => {
       if (onClick) {
         onClick(item);
       }
       setSelected(item);
-      openDropdown();
+      closeDropDown();
     };
     return (
       <Item
@@ -102,7 +140,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     );
   };
 
-  const handleClear = (e: any) => {
+  const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     setSelected(allItem);
@@ -119,7 +157,8 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     if (value === '') {
       setInputValue('');
     } else {
-      const parsedValue = value.match(/[\w-\s]+/gi)?.[0];
+      // Allow dots for versions (v1.7.20) and common name chars.
+      const parsedValue = value.match(/[\w.\-\s]+/gi)?.[0];
       if (parsedValue) {
         setInputValue(parsedValue);
       }
@@ -134,8 +173,12 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     if (input === '') {
       return getDataArray();
     }
-    const regex = new RegExp(`${input}`, 'gi');
-    return getDataArray().filter(item => String(item).match(regex)?.[0]);
+    // Literal case-insensitive match — do not pass user input to RegExp
+    // (dots in versions like v1.7.20 must not mean "any character").
+    const needle = input.toLowerCase();
+    return getDataArray().filter(item =>
+      String(item).toLowerCase().includes(needle),
+    );
   };
   const filteredArray = filterArrayByInput(inputValue);
 
@@ -145,7 +188,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       open: closed,
       onClick: () => openDropdown(),
     };
-  }, [contentRef, closed, openDropdown]);
+  }, [closed, openDropdown]);
 
   const selectorProps = {
     ref: selectorRef,
@@ -156,10 +199,17 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const getPlaceholder = () => {
     if (title === 'Coin' || title === 'Asset') {
       return 'Type the token ID';
-    } else if (title === 'Contract') {
+    }
+    if (title === 'Contract') {
       return 'Type the contract';
     }
-    return '';
+    if (title === 'Name') {
+      return 'Search name…';
+    }
+    if (title === 'Version') {
+      return 'Search version…';
+    }
+    return 'Type to search…';
   };
 
   return (
@@ -181,6 +231,9 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
             placeholder={getPlaceholder()}
             onChange={handleChange}
             isHiddenInput={isHiddenInput}
+            aria-label={title ? `Search ${title}` : 'Search filter'}
+            autoComplete="off"
+            spellCheck={false}
           />
         )}
         <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
@@ -193,7 +246,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
           </CloseContainer>
         )}
 
-        <ArrowDownContainer onClick={() => arrowOnClick()} open={!closed}>
+        <ArrowDownContainer onClick={arrowOnClick} open={!closed}>
           <FilterArrowDown />
         </ArrowDownContainer>
         {!closed && (

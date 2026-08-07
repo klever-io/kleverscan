@@ -1,15 +1,17 @@
 /// <reference types="cypress" />
 
-// Search input debounces 1s before firing. Stub live API responses so this
-// suite is not flaky under Cloudflare/API rate limits (HTTP 1015) in CI.
-// Wait on intercept aliases (not fixed sleeps) after the debounce window.
+// Search input debounces 1s before firing (InputGlobal). Stub live API
+// responses so this suite is not flaky under Cloudflare/API rate limits.
 const CARD_TIMEOUT_MS = 15000;
+/** Match app debounce (1000ms) with a small buffer before asserting network. */
+const SEARCH_DEBOUNCE_MS = 1100;
 
 const ADDRESS =
   'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
 
 const stubSearchApis = (): void => {
-  cy.intercept('GET', '**/assets/list*asset=KLV*', {
+  // PrePageTooltip lowercases the query before fetching (asset=klv, etc.).
+  cy.intercept('GET', /\/v1\.0\/assets\/list\?.*asset=klv/i, {
     statusCode: 200,
     body: {
       data: {
@@ -32,7 +34,7 @@ const stubSearchApis = (): void => {
     },
   }).as('assetSearch');
 
-  cy.intercept('GET', '**/block/by-nonce/100*', {
+  cy.intercept('GET', '**/v1.0/block/by-nonce/100*', {
     statusCode: 200,
     body: {
       data: {
@@ -51,7 +53,7 @@ const stubSearchApis = (): void => {
     },
   }).as('blockSearch');
 
-  cy.intercept('GET', `**/address/${ADDRESS}*`, {
+  cy.intercept('GET', `**/v1.0/address/${ADDRESS}*`, {
     statusCode: 200,
     body: {
       data: {
@@ -72,20 +74,29 @@ const stubSearchApis = (): void => {
   }).as('addressSearch');
 };
 
+const typeSearch = (value: string): void => {
+  cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
+    .should('be.visible')
+    .clear()
+    .type(value, { delay: 0 })
+    .should('have.value', value);
+  // App only sets `search` (and thus fetches) after the 1s debounce.
+  cy.wait(SEARCH_DEBOUNCE_MS);
+};
+
 describe('Search bar', () => {
   beforeEach(() => {
     stubSearchApis();
+    cy.visit('/');
   });
 
   it('should search for an asset', () => {
-    cy.visit('/');
-    cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
-      .should('be.visible')
-      .type('KLV', { delay: 0 });
+    typeSearch('KLV');
 
     cy.wait('@assetSearch', { timeout: CARD_TIMEOUT_MS });
     cy.get('[data-testid="card-item"]', { timeout: CARD_TIMEOUT_MS }).contains(
       'KLV',
+      { timeout: CARD_TIMEOUT_MS },
     );
     cy.get('[data-testid="search"]').type('{enter}');
 
@@ -93,24 +104,19 @@ describe('Search bar', () => {
   });
 
   it('should search for a block', () => {
-    cy.visit('/');
-    cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
-      .should('be.visible')
-      .type('100', { delay: 0 });
+    typeSearch('100');
 
     cy.wait('@blockSearch', { timeout: CARD_TIMEOUT_MS });
     cy.get('[data-testid="card-item"]', { timeout: CARD_TIMEOUT_MS }).contains(
       '100',
+      { timeout: CARD_TIMEOUT_MS },
     );
     cy.get('[data-testid="search"]').type('{enter}');
     cy.url({ timeout: CARD_TIMEOUT_MS }).should('include', '/block/100');
   });
 
   it('should search for an address', () => {
-    cy.visit('/');
-    cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
-      .should('be.visible')
-      .type(ADDRESS, { delay: 0 });
+    typeSearch(ADDRESS);
 
     cy.wait('@addressSearch', { timeout: CARD_TIMEOUT_MS });
     // Wait for the result card to render. Unlike the asset/block cards, the

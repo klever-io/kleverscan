@@ -64,9 +64,8 @@ describe('Account Page', () => {
             .first()
             .invoke('attr', 'href')
             .then(href => {
-              if (href) {
-                transaction_links.push({ name: type, link: href });
-              }
+              expect(href).to.be.a('string').and.not.be.empty;
+              transaction_links.push({ name: type, link: href as string });
             });
         } else {
           cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should('be.visible');

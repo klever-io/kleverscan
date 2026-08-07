@@ -43,9 +43,8 @@ describe('Assets Page', () => {
             .first()
             .invoke('attr', 'href')
             .then(href => {
-              if (href) {
-                assetsLinks.push({ name: type, link: href });
-              }
+              expect(href).to.be.a('string').and.not.be.empty;
+              assetsLinks.push({ name: type, link: href as string });
             });
         } else {
           cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should('be.visible');

@@ -4,7 +4,7 @@
 // responses so this suite is not flaky under Cloudflare/API rate limits.
 const CARD_TIMEOUT_MS = 15000;
 /** Match app debounce (1000ms) with a small buffer before asserting network. */
-const SEARCH_DEBOUNCE_MS = 1100;
+const SEARCH_DEBOUNCE_MS = 1200;
 
 const ADDRESS =
   'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
@@ -43,7 +43,6 @@ const stubSearchApis = (): void => {
     }),
   }).as('assetSearch');
 
-  // Regex (not glob) so path/host/version differences still match.
   cy.intercept('GET', /block\/by-nonce\/100\b/, {
     statusCode: 200,
     body: okEnvelope({
@@ -61,7 +60,8 @@ const stubSearchApis = (): void => {
     }),
   }).as('blockSearch');
 
-  cy.intercept('GET', new RegExp(`address/${ADDRESS}`), {
+  // Glob form is more reliable than RegExp for long bech32 addresses in CI.
+  cy.intercept('GET', `**/address/${ADDRESS}*`, {
     statusCode: 200,
     body: okEnvelope({
       account: {
@@ -79,11 +79,15 @@ const stubSearchApis = (): void => {
 };
 
 const typeSearch = (value: string): void => {
+  // Long values (addresses) need a small delay so React onChange fires per
+  // character in CI Electron; delay:0 can leave search stuck without a fetch.
+  const delay = value.length > 20 ? 5 : 0;
+
   cy.get('[data-testid="search"]', { timeout: CARD_TIMEOUT_MS })
     .should('be.visible')
     .click()
     .clear()
-    .type(value, { delay: 0 })
+    .type(value, { delay, parseSpecialCharSequences: false })
     .should('have.value', value);
   // App only sets `search` (and thus fetches) after the 1s debounce.
   cy.wait(SEARCH_DEBOUNCE_MS);

@@ -49,11 +49,15 @@ const Input: React.FC<PropsWithChildren<InputGlobal>> = ({
   }, [openSearch]);
 
   const debounce = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // Capture value synchronously. Reading event.target later (after the 1s
+    // debounce) is racy under fast Cypress typing and can leave search stuck
+    // on a partial string so PrePageTooltip never fetches.
+    const value = event.target.value;
     if (timeoutId.current) {
       clearTimeout(timeoutId.current);
     }
     timeoutId.current = setTimeout(() => {
-      setSearch(event.target.value);
+      setSearch(value);
     }, 1000);
   };
 

@@ -1,51 +1,152 @@
 /// <reference types="cypress" />
 
-const validatorsLinks: string[] = [];
-const validatorsAmount: number = 10;
+/**
+ * Validators E2E stubs the live validator/list, heartbeat proxy, and detail
+ * APIs so CI is not flaky under testnet rate limits while still exercising the
+ * real list → detail UI flow.
+ */
+
+const validatorsAmount = 10;
 const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
 const TOTAL_STAKE_SELECTOR = '[data-testid="total-stake"]';
 
-// The validator detail page fires a single client-side request on mount and
-// does not retry when the API returns an error response, so a transient
-// testnet hiccup leaves the page stuck on the loading skeleton forever. Give
-// the request time to resolve and, if the stake still hasn't rendered, reload
-// to issue a fresh request before failing.
-const assertStakeVisibleWithReload = (reloadsLeft = 2): void => {
-  cy.wait(2500);
-  cy.get('body').then($body => {
-    if ($body.find(TOTAL_STAKE_SELECTOR).length > 0) {
-      cy.get(TOTAL_STAKE_SELECTOR).should('be.visible');
-    } else if (reloadsLeft > 0) {
-      cy.reload();
-      assertStakeVisibleWithReload(reloadsLeft - 1);
-    } else {
-      cy.get(TOTAL_STAKE_SELECTOR, { timeout: 10000 }).should('be.visible');
-    }
-  });
+const successRate = (numSuccess: number, numFailure = 0) => ({
+  numSuccess,
+  numFailure,
+});
+
+/** 62-char bech32-shaped addresses unique per index. */
+const ownerAddressFor = (index: number): string => {
+  const n = String(index + 1).padStart(2, '0');
+  // "klv1validator" (13) + 2 digits + 47 padding = 62
+  return `klv1validator${n}${'q'.repeat(47)}`;
 };
 
-// Same pattern as stake: list load can flake under concurrent API pressure
-// (full validator snapshot + table + heartbeat). Wait for async table paint
-// before the sync probe so a healthy visit does not always reload twice.
-const assertTableRowsVisibleWithReload = (reloadsLeft = 2): void => {
-  cy.wait(2500);
-  cy.get('body').then($body => {
-    if ($body.find(TABLE_ROW_SELECTOR).length > 0) {
-      cy.get(TABLE_ROW_SELECTOR).should('exist');
-      return;
-    }
-    if (reloadsLeft > 0) {
-      cy.log(`No validator table rows yet; reloading (${reloadsLeft} left)...`);
-      cy.reload();
-      assertTableRowsVisibleWithReload(reloadsLeft - 1);
-    } else {
-      cy.get(TABLE_ROW_SELECTOR, { timeout: 15000 }).should('exist');
-    }
-  });
+const blsKeyFor = (index: number): string =>
+  `bls${String(index + 1).padStart(2, '0')}${'ab'.repeat(30)}`;
+
+const rawValidators = Array.from({ length: validatorsAmount }, (_, index) => {
+  const ownerAddress = ownerAddressFor(index);
+  return {
+    totalStake: 1_000_000_000_000 * (validatorsAmount - index),
+    ownerAddress,
+    name: `E2E Validator ${index + 1}`,
+    totalLeaderSuccessRate: successRate(10 + index),
+    totalValidatorSuccessRate: successRate(100 + index, 1),
+    rating: 5_000_000,
+    selfStake: 100_000_000,
+    list: 'elected',
+    canDelegate: true,
+    maxDelegation: 0,
+    commission: 500,
+    blsPublicKey: blsKeyFor(index),
+  };
+});
+
+const networkTotalStake = rawValidators.reduce((s, v) => s + v.totalStake, 0);
+
+const listResponse = {
+  data: {
+    validators: rawValidators,
+    networkTotalStake,
+  },
+  pagination: {
+    self: 1,
+    next: 1,
+    previous: 1,
+    perPage: 100,
+    totalPages: 1,
+    totalRecords: validatorsAmount,
+  },
+  error: '',
+  code: 'successful',
 };
+
+const heartbeatResponse = {
+  data: {
+    heartbeats: rawValidators.map((v, index) => ({
+      publicKey: v.blsPublicKey,
+      versionNumber: index < 7 ? 'v1.7.20' : 'v1.6.0',
+      isActive: true,
+      timestamp: '2026-08-06T00:00:00Z',
+    })),
+  },
+};
+
+const detailResponseFor = (index: number) => {
+  const raw = rawValidators[index];
+  return {
+    data: {
+      validator: {
+        blsPublicKey: raw.blsPublicKey,
+        ownerAddress: raw.ownerAddress,
+        rewardAddress: raw.ownerAddress,
+        canDelegate: raw.canDelegate,
+        commission: raw.commission,
+        maxDelegation: raw.maxDelegation,
+        rating: raw.rating,
+        list: raw.list,
+        totalStake: raw.totalStake,
+        selfStake: raw.selfStake,
+        logo: '',
+        name: raw.name,
+        totalLeaderSuccessRate: raw.totalLeaderSuccessRate,
+        totalValidatorSuccessRate: raw.totalValidatorSuccessRate,
+        uris: [],
+      },
+    },
+    error: '',
+    code: 'successful',
+  };
+};
+
+const stubValidatorsApis = (): void => {
+  // Scope to API version path only — bare **/validator/** also matches
+  // Next.js page navigations to /validator/<address> and breaks cy.visit.
+  cy.intercept('GET', '**/v1.0/validator/list*', {
+    statusCode: 200,
+    body: listResponse,
+  }).as('validatorList');
+
+  // Version distribution uses the same-origin heartbeat proxy.
+  cy.intercept('GET', '**/api/heartbeat', {
+    statusCode: 200,
+    body: heartbeatResponse,
+  }).as('heartbeat');
+
+  // Detail API: /v1.0/validator/<ownerAddress>
+  rawValidators.forEach((v, index) => {
+    cy.intercept('GET', `**/v1.0/validator/${v.ownerAddress}*`, {
+      statusCode: 200,
+      body: detailResponseFor(index),
+    }).as(`validatorDetail${index}`);
+  });
+
+  // Delegators table on detail (empty is fine).
+  cy.intercept('GET', '**/v1.0/validator/delegated/**', {
+    statusCode: 200,
+    body: {
+      data: { validators: [] },
+      pagination: {
+        self: 1,
+        next: 1,
+        previous: 1,
+        perPage: 10,
+        totalPages: 1,
+        totalRecords: 0,
+      },
+      error: '',
+      code: 'successful',
+    },
+  }).as('validatorDelegated');
+};
+
+const toVisitPath = (href: string): string =>
+  href.startsWith('/') ? href : `/${href}`;
 
 describe('Validators Page', () => {
   beforeEach(() => {
+    stubValidatorsApis();
     cy.visit('/validators');
   });
 
@@ -53,44 +154,39 @@ describe('Validators Page', () => {
     cy.get('h1').contains('Validators').should('be.visible');
   });
 
-  Array.from({ length: validatorsAmount }).forEach((_, index) => {
-    it(`Should find validator #${index + 1} from list`, () => {
-      // Wait for the list to load before probing for a specific row, so the
-      // existence check below isn't racing the async render.
-      assertTableRowsVisibleWithReload();
+  it('should list stubbed validators and expose detail links', () => {
+    cy.wait('@validatorList', { timeout: 15000 });
+    cy.get(TABLE_ROW_SELECTOR, { timeout: 15000 }).should(
+      'have.length.at.least',
+      validatorsAmount,
+    );
 
-      cy.get('body').then($body => {
-        // The list may contain fewer than `validatorsAmount` entries (e.g. in
-        // CI), so only collect a link when the row is actually present.
-        if ($body.find(`[data-testid="table-row-${index}"]`).length === 0) {
-          cy.log(`Validator row #${index} not present in list`);
-          return;
-        }
-
-        cy.get(`[data-testid="table-row-${index}"]`)
-          .find('a')
-          .invoke('attr', 'href')
-          .then(href => {
-            href && validatorsLinks.push(href);
-          });
+    cy.get('[data-testid="validator-link"]')
+      .should('have.length.at.least', validatorsAmount)
+      .then($links => {
+        const hrefs = Array.from($links)
+          .slice(0, validatorsAmount)
+          .map(el => toVisitPath(el.getAttribute('href') || ''));
+        expect(hrefs.every(Boolean)).to.eq(true);
+        Cypress.env('validatorLinks', hrefs);
       });
-    });
   });
 });
 
 describe('Validator Details Page', () => {
+  beforeEach(() => {
+    stubValidatorsApis();
+  });
+
   Array.from({ length: validatorsAmount }).forEach((_, index) => {
     it(`should load the validator page #${index + 1}`, () => {
-      const link = validatorsLinks[index];
+      const links =
+        (Cypress.env('validatorLinks') as string[] | undefined) || [];
+      const link = links[index] || `/validator/${ownerAddressFor(index)}`;
 
-      // Guard against missing links when the list had fewer validators than
-      // expected, mirroring the asset details page pattern.
-      if (link) {
-        cy.visit(link);
-        assertStakeVisibleWithReload();
-      } else {
-        cy.log(`No link collected for validator #${index + 1}`);
-      }
+      cy.visit(link);
+      cy.wait(`@validatorDetail${index}`, { timeout: 15000 });
+      cy.get(TOTAL_STAKE_SELECTOR, { timeout: 15000 }).should('be.visible');
     });
   });
 });

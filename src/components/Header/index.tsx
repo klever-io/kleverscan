@@ -1,18 +1,18 @@
 import { PropsWithChildren } from 'react';
-import { ArrowDropdown } from '@/assets/icons';
+import { ArrowDropdown, Search } from '@/assets/icons';
 import { INavbarItem, navbarItems } from '@/configs/navbar';
 import { useMobile } from '@/contexts/mobile';
+import { useSpotlight } from '@/contexts/spotlight';
 import { useTheme } from '@/contexts/theme';
 import { useScroll } from '@/utils/hooks';
 import { getNetwork } from '@/utils/networkFunctions';
 import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ConnectWallet from './ConnectWallet';
 import OptionsContainer from './OptionsContainer';
 import {
-  CloseSearch,
   ConnectContainer,
   ConnectionWrapper,
   Container,
@@ -24,7 +24,6 @@ import {
   DropdownMenu,
   HeaderContainer,
   IconsMenu,
-  Input,
   Item,
   LinkStyled,
   Logo,
@@ -35,9 +34,7 @@ import {
   MobileItem,
   MobileNavbarItemList,
   MobileOptions,
-  SearchContainer,
-  SearchIcon,
-  SearchIconWrapper,
+  SpotlightTrigger,
 } from './styles';
 
 interface IDropdownPages {
@@ -136,10 +133,18 @@ const Navbar: React.FC<PropsWithChildren> = () => {
     isMobile,
   } = useMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [openSearch, setOpenSearch] = useState(false);
+  const [modKey, setModKey] = useState('⌘');
   const prevScrollpos = useRef<number>(0);
   const router = useRouter();
   const { isDarkTheme } = useTheme();
+  const { openSpotlight } = useSpotlight();
+  // Home uses HomeSpotlightHero as the primary CTA — avoid a second Spotlight control.
+  const showHeaderSpotlight = router.pathname !== '/';
+
+  useEffect(() => {
+    const isApple = /Mac|iPhone|iPad|iPod/i.test(navigator.platform);
+    setModKey(isApple ? '⌘' : 'Ctrl');
+  }, []);
 
   const handleMobileScroll = () => {
     const navbar = mobileNavbarRef.current;
@@ -176,10 +181,7 @@ const Navbar: React.FC<PropsWithChildren> = () => {
     <>
       <Container ref={mobileNavbarRef}>
         <Content isMainNet={network === 'Mainnet'}>
-          <HeaderContainer
-            isMainNet={network === 'Mainnet'}
-            openSearch={!isTablet ? false : openSearch}
-          >
+          <HeaderContainer isMainNet={network === 'Mainnet'}>
             <Link href="/">
               <Logo onClick={closeMenu}>
                 <Image
@@ -204,7 +206,19 @@ const Navbar: React.FC<PropsWithChildren> = () => {
                   ))}
                 </IconsMenu>
                 <DesktopSubWrapper>
-                  {router.pathname !== '/' && <Input />}
+                  {showHeaderSpotlight && (
+                    <SpotlightTrigger
+                      type="button"
+                      onClick={() => openSpotlight()}
+                      aria-label="Open spotlight search"
+                      data-testid="spotlight-trigger"
+                      title="Open spotlight (⌘K / Ctrl+K)"
+                    >
+                      <Search />
+                      <span>Spotlight</span>
+                      <kbd>{modKey}K</kbd>
+                    </SpotlightTrigger>
+                  )}
                   <ConnectWallet clickConnection={closeDrawer} />
                   <OptionsContainer />
                 </DesktopSubWrapper>
@@ -213,47 +227,28 @@ const Navbar: React.FC<PropsWithChildren> = () => {
           )}
 
           {isTablet && (
-            <MobileContainer $openSearch={openSearch}>
-              {isMobile && router.pathname !== '/' && (
-                <SearchIconWrapper
-                  onClick={() => setOpenSearch(!openSearch)}
-                  openSearch={openSearch}
+            <MobileContainer>
+              {showHeaderSpotlight && (
+                <SpotlightTrigger
+                  type="button"
+                  onClick={() => openSpotlight()}
+                  aria-label="Open spotlight search"
+                  data-testid="spotlight-trigger-mobile"
+                  title="Open spotlight"
                 >
-                  <SearchIcon />
-                </SearchIconWrapper>
+                  <Search />
+                  <kbd>{modKey}K</kbd>
+                </SpotlightTrigger>
               )}
-              <SearchContainer $openSearch={openSearch}>
-                {openSearch && (
-                  <Input
-                    setOpenSearch={setOpenSearch}
-                    openSearch={openSearch}
-                  />
-                )}
-
-                <CloseSearch
-                  onClick={() => setOpenSearch(false)}
-                  $openSearch={openSearch}
-                />
-              </SearchContainer>
               {!isMobile && (
-                <>
-                  {router.pathname !== '/' && (
-                    <SearchIconWrapper
-                      onClick={() => setOpenSearch(!openSearch)}
-                      openSearch={openSearch}
-                    >
-                      <SearchIcon />
-                    </SearchIconWrapper>
-                  )}
-                  <ConnectContainer
-                    onClick={() => {
-                      handleClickConnection();
-                      closeMenu();
-                    }}
-                  >
-                    <ConnectWallet clickConnection={closeDrawer} />
-                  </ConnectContainer>
-                </>
+                <ConnectContainer
+                  onClick={() => {
+                    handleClickConnection();
+                    closeMenu();
+                  }}
+                >
+                  <ConnectWallet clickConnection={closeDrawer} />
+                </ConnectContainer>
               )}
 
               <MenuIcon onClick={handleMenu} data-testid="menu-icon" />

@@ -1,6 +1,5 @@
 import { PropsWithChildren } from 'react';
 import { useInputSearch } from '@/contexts/inputSearch';
-import { useTheme } from '@/contexts/theme';
 import { getAssetByPartialSymbol } from '@/services/requests/asset';
 import getAccount from '@/services/requests/searchBar/account';
 import getBlock from '@/services/requests/searchBar/block';
@@ -16,6 +15,10 @@ import {
 import { IBlockResponse } from '@/types/blocks';
 import { ITransferContract } from '@/types/contracts';
 import { getPrecision } from '@/utils/precisionFunctions';
+import {
+  getInputType,
+  normalizeSearchQuery,
+} from '@/utils/search/getInputType';
 import { processRowSectionsLayout } from '@/utils/table';
 import React, { useEffect, useState } from 'react';
 import { LuSearchX } from 'react-icons/lu';
@@ -49,43 +52,14 @@ export interface IPrePageTooltip {
   isInHomePage: boolean;
 }
 
-const getInputType = (value: string) => {
-  const addressLength = 62;
-  const txLength = 64;
-
-  if (!isNaN(Number(value)) && Number(value) !== 0) {
-    return 'block';
-  }
-
-  if (value.includes('qqqqqqqqqqqqq')) {
-    return 'smartContract';
-  }
-
-  if (value.length === txLength) {
-    return 'transaction';
-  }
-
-  if (value.length === addressLength && !value.includes('qqqqqqqqqqqqq')) {
-    return 'account';
-  }
-
-  if (value.toUpperCase() === 'KLV' || value.toUpperCase() === 'KFI') {
-    return 'asset';
-  }
-
-  if (value.length <= 15) {
-    return 'asset';
-  }
-};
-
 const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
   search,
   setShowTooltip,
   isInHomePage,
 }) => {
   const [precision, setPrecision] = useState(0);
-  const trimmedSearch = search.trim().toLowerCase();
   const { setSearchValue } = useInputSearch();
+  const trimmedSearch = normalizeSearchQuery(search).toLowerCase();
   const type = getInputType(trimmedSearch);
   const canSearch = () => {
     if (!type) {

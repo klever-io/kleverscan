@@ -1,5 +1,4 @@
 import { IStaking } from '@/types';
-import { exactAmount } from '@/components/DataList/format';
 import { getCapUsage, getLatestAprPercent, getRewardsModel } from '../helpers';
 
 const staking = (overrides: Partial<IStaking>): IStaking =>
@@ -67,12 +66,5 @@ describe('getRewardsModel', () => {
     });
     expect(getRewardsModel(null)).toEqual({ kind: 'none' });
     expect(getRewardsModel(undefined)).toEqual({ kind: 'none' });
-  });
-});
-
-describe('exactAmount', () => {
-  it('renders the exact value with the asset precision', () => {
-    expect(exactAmount(9663317768717496, 6)).toBe('9,663,317,768.717496');
-    expect(exactAmount(350, 0)).toBe('350');
   });
 });

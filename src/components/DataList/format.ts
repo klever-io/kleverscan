@@ -16,18 +16,21 @@ export const formatShare = (part: number, total: number): string => {
 };
 
 /**
- * Exact human-readable amount for tooltips, where compact notation lies.
- * Divides by 10^precision through string math: float division would round
- * the last decimal on 16-digit raw supplies.
+ * Human-readable amount for tooltips, where compact notation lies. Divides by
+ * 10^precision through string math, because float division rounds the last
+ * decimal on 16-digit raw supplies.
+ *
+ * The exactness ceiling is the input rather than this function: a raw supply
+ * above Number.MAX_SAFE_INTEGER already lost its value in JSON.parse, so what
+ * comes out is an exact rendering of the stored double, not necessarily of the
+ * chain figure. Closing that gap means carrying the supply as a string from
+ * the API boundary.
  */
 export const exactAmount = (raw: number, precision: number): string => {
   if (!Number.isFinite(raw) || raw < 0) return '--';
-  const rawString = Math.trunc(raw).toString();
-  if (rawString.includes('e')) {
-    return (raw / 10 ** precision).toLocaleString('en-US', {
-      maximumFractionDigits: precision,
-    });
-  }
+  // BigInt rather than toString(): a double at or above 1e21 stringifies to
+  // exponent form, which the digit walk below cannot read.
+  const rawString = BigInt(Math.trunc(raw)).toString();
   const padded = rawString.padStart(precision + 1, '0');
   const whole = precision > 0 ? padded.slice(0, -precision) : padded;
   const fraction = precision > 0 ? padded.slice(-precision) : '';

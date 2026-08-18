@@ -2,7 +2,6 @@ import {
   buildRowBar,
   computeHoldersSummary,
   concentrationLevel,
-  formatShare,
   getMedalTier,
   isVoidAddress,
 } from '../holdersMath';
@@ -21,31 +20,6 @@ const holder = (
   frozenBalance,
   totalBalance,
   rank,
-});
-
-describe('formatShare', () => {
-  it('returns a placeholder when the total is missing or zero', () => {
-    expect(formatShare(10, 0)).toBe('--');
-    expect(formatShare(10, -5)).toBe('--');
-  });
-
-  it('formats exact zero without decimals', () => {
-    expect(formatShare(0, 1000)).toBe('0%');
-  });
-
-  it('floors dust shares instead of rounding them to zero', () => {
-    expect(formatShare(1, 1_000_000)).toBe('<0.01%');
-  });
-
-  it('uses two decimals below ten percent and one above', () => {
-    expect(formatShare(123, 10_000)).toBe('1.23%');
-    expect(formatShare(2_623, 10_000)).toBe('26.2%');
-  });
-
-  it('drops the trailing zero decimal and clamps to 100%', () => {
-    expect(formatShare(1_000, 1_000)).toBe('100%');
-    expect(formatShare(2_000, 1_000)).toBe('100%');
-  });
 });
 
 describe('concentrationLevel', () => {

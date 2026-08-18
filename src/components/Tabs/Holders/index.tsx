@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import ExplorerLink from '@/components/ExplorerLink';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
@@ -163,24 +163,29 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
     return { data: { accounts: [] } };
   };
 
+  // Rendered by the table itself, so the filters share the row with the
+  // items-per-page selector, the way the transactions tab already does.
+  const HoldersFilters = useCallback(
+    () => (
+      <FilterContainerHolders>
+        {filters.map(filter => (
+          <Filter key={filter.title} {...filter} />
+        ))}
+      </FilterContainerHolders>
+    ),
+    [holderQuery],
+  );
+
   const tableProps: ITable = {
     rowSections,
     header: getHeader(),
     type: 'holders',
     dataName: 'accounts',
     request: (page: number, limit: number) => requestAssetHolders(page, limit),
+    Filters: HoldersFilters,
   };
 
-  return (
-    <>
-      <FilterContainerHolders>
-        {filters.map(filter => (
-          <Filter key={JSON.stringify(filter)} {...filter} />
-        ))}
-      </FilterContainerHolders>
-      <Table {...tableProps} />
-    </>
-  );
+  return <Table {...tableProps} />;
 };
 
 export default Holders;

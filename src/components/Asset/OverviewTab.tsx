@@ -62,6 +62,13 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
     );
   };
 
+  // Both void-derived rows mount before the asset resolves, so both need the
+  // same loading guard: formatSupply() would answer 'N/A' for a missing asset.
+  const renderCirculatingSupply = () => {
+    if (!asset) return <Skeleton />;
+    return formatSupply(asset.netCirculatingSupply);
+  };
+
   const renderVoidValue = () => {
     if (!asset) return <Skeleton />;
     return (
@@ -186,7 +193,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
             <strong>{t('table:CirculatingSupply')}</strong>
           </span>
           <div>
-            <small>{formatSupply(asset?.netCirculatingSupply)}</small>
+            <small>{renderCirculatingSupply()}</small>
             <Tooltip
               msg={t('assets:Overview.CirculatingSupplyTooltip')}
               customStyles={{ place: 'right' }}

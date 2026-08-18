@@ -32,9 +32,9 @@ export const AddressContainer = styled.div`
   gap: 0.5rem;
 `;
 
-export const FilterContainerHolders = styled(FilterContainer)`
-  margin-bottom: 1rem;
-`;
+// Lives inside the table's filter row now, so it needs no spacing of its own:
+// the row aligns it with the items-per-page selector.
+export const FilterContainerHolders = styled(FilterContainer)``;
 
 export const AmountWithShare = styled.div`
   display: flex;

@@ -1,6 +1,12 @@
 {
   "Overview": {
-    "Burned Value": "Burned Value",
+    "Contract Burn": "Contract Burn",
+    "Total Supply": "Total Supply",
+    "TotalSupplyTooltip": "All tokens currently held in wallets, including the void address. Contract-burned tokens are already excluded from this number.",
+    "ContractBurnTooltip": "Tokens burned through the on-chain burn contract. If the asset has minting enabled, this amount can be minted again, unlike tokens sent to the void address.",
+    "Void": "Void",
+    "VoidTooltip": "Amount held by the void address. These tokens are permanently out of circulation and are excluded from the circulating supply shown on this page.",
+    "CirculatingSupplyTooltip": "Tokens currently in circulation. Equals the total supply minus the tokens held by the void address.",
     "Holders": "Holders",
     "Staking Type": "Staking Type"
   },

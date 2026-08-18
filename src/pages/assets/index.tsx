@@ -8,11 +8,13 @@ import Table, { ITable } from '@/components/Table';
 import Tabs, { ITabs } from '@/components/Tabs';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
-import { Container, DoubleRow, Header } from '@/styles/common';
+import { DoubleRow, Header } from '@/styles/common';
+import { AssetsListContainer } from '@/views/assets';
 import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
+import { getCirculatingSupply } from '@/utils/voidSupply';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -87,7 +89,6 @@ const AssetsFilters: React.FC<PropsWithChildren> = () => {
 const Assets: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets', 'table']);
-
   const header = [
     '',
     'Token Name/ID',
@@ -96,6 +97,11 @@ const Assets: React.FC<PropsWithChildren> = () => {
     `Initial Supply/Total Staked`,
     `${t('table:RewardsType')}`,
   ];
+
+  const renderCirculatingSupply = (asset: IAsset): ReactNode =>
+    `${formatAmount(
+      getCirculatingSupply(asset) / 10 ** asset.precision,
+    )} ${asset.ticker}`;
 
   const rowSections = (asset: IAsset): IRowSection[] => {
     const {
@@ -107,7 +113,6 @@ const Assets: React.FC<PropsWithChildren> = () => {
       initialSupply,
       maxSupply,
       staking,
-      circulatingSupply,
       precision,
       verified,
     } = asset;
@@ -169,9 +174,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
       {
         element: props => (
           <DoubleRow {...props}>
-            <span key={circulatingSupply}>
-              {formatAmount(circulatingSupply / 10 ** precision)} {ticker}
-            </span>
+            <span>{renderCirculatingSupply(asset)}</span>
             <span key={maxSupply}>
               {renderMaxSupply()} {ticker}
             </span>
@@ -262,11 +265,11 @@ const Assets: React.FC<PropsWithChildren> = () => {
   }, [router.isReady]);
 
   return (
-    <Container>
+    <AssetsListContainer>
       <Tabs {...tabProps}>
         <SelectedTabComponent />
       </Tabs>
-    </Container>
+    </AssetsListContainer>
   );
 };
 

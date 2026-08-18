@@ -6,6 +6,7 @@ import {
   IVotingPowers,
 } from '@/types/proposals';
 import { format, fromUnixTime } from 'date-fns';
+import { VOID_ADDRESS } from './globalVariables';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { NextRouter } from 'next/router';
 import { secondsToHourMinSec } from './timeFunctions';
@@ -185,9 +186,7 @@ export const validateFormattedVotes = (
 };
 
 export const IsTokenBurn = (token: string) => {
-  const tokenBurn =
-    'klv1000000000000000000000000000000000000000000000000000ql8r3r7';
-  return token === tokenBurn;
+  return token === VOID_ADDRESS;
 };
 
 export { storageViewMode, getStorageViewMode };

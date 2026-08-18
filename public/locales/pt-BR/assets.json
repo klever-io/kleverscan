@@ -1,6 +1,12 @@
 {
   "Overview": {
-    "Burned Value": "Valor Queimado",
+    "Contract Burn": "Queima por Contrato",
+    "Total Supply": "Fornecimento Total",
+    "TotalSupplyTooltip": "Todos os tokens atualmente mantidos em carteiras, incluindo o endereço void. Os tokens queimados por contrato já estão excluídos deste número.",
+    "ContractBurnTooltip": "Tokens queimados através do contrato de queima on-chain. Se o ativo tiver mint habilitado, essa quantidade pode ser mintada novamente, ao contrário dos tokens enviados para o endereço void.",
+    "Void": "Void",
+    "VoidTooltip": "Quantidade mantida pelo endereço void. Esses tokens estão permanentemente fora de circulação e são excluídos do fornecimento circulante exibido nesta página.",
+    "CirculatingSupplyTooltip": "Tokens atualmente em circulação. Igual ao fornecimento total menos os tokens mantidos pelo endereço void.",
     "Holders": "Detentores",
     "Staking Type": "Tipo de Staking"
   },

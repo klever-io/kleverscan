@@ -459,6 +459,10 @@ export interface IAsset {
   precision: number;
   initialSupply: number;
   circulatingSupply: number;
+  // Served by newer proxy builds only, so both are optional: an environment
+  // running an older build omits them and the UI falls back to the raw supply.
+  voidedSupply?: number;
+  netCirculatingSupply?: number;
   maxSupply: number;
   royalties: IRoyalties;
   mintedValue: number;

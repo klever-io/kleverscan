@@ -519,7 +519,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
             </AmountContainer>
             {IsTokenBurn(router.query.account as string) && (
               <RowAlert>
-                <span>{t('accounts:SingleAccount.BlackHole')}</span>
+                <span>{t('accounts:SingleAccount.Void')}</span>
               </RowAlert>
             )}
           </RowContent>

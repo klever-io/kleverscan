@@ -2,10 +2,13 @@ import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
+import Tooltip from '@/components/Tooltip';
 import { holdersCall, transactionCall } from '@/services/requests/asset';
 import { IAsset } from '@/types';
 import { parseApr } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
+import { VOID_ADDRESS } from '@/utils/globalVariables';
+import { hasVoidSupply } from '@/utils/voidSupply';
 import { HoverAnchor, Row } from '@/views/assets/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { useTranslation } from 'next-i18next';
@@ -37,6 +40,11 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
     enabled: !!router?.isReady,
   });
 
+  // While the asset is still loading we cannot know yet, so keep the rows and
+  // let them render their skeletons; only hide them once a loaded asset turns
+  // out to come from an API build that does not report the void figures.
+  const showVoidSupply = !asset || hasVoidSupply(asset);
+
   const isSftCollection =
     asset?.assetType === AssetTypeString.SemiFungible &&
     !asset?.assetId?.includes('/');
@@ -51,6 +59,17 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
     return toLocaleFixed(
       (value || 0) / 10 ** (asset?.precision || 0),
       asset?.precision || 0,
+    );
+  };
+
+  const renderVoidValue = () => {
+    if (!asset) return <Skeleton />;
+    return (
+      <Link href={`/account/${VOID_ADDRESS}`} legacyBehavior>
+        <HoverAnchor>
+          <small>{formatSupply(asset.voidedSupply)}</small>
+        </HoverAnchor>
+      </Link>
     );
   };
 
@@ -100,28 +119,88 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('table:CirculatingSupply')}</strong>
+          <strong>{t('assets:Overview.Total Supply')}</strong>
         </span>
-        <span>
+        <div>
           <small>
             {asset ? formatSupply(asset?.circulatingSupply) : <Skeleton />}
           </small>
-        </span>
+          <Tooltip
+            msg={t('assets:Overview.TotalSupplyTooltip')}
+            customStyles={{ place: 'right' }}
+          />
+        </div>
       </Row>
       <Row>
         <span>
-          <strong>{t('assets:Overview.Burned Value')}</strong>
+          <strong>{t('assets:Overview.Contract Burn')}</strong>
         </span>
-        <span>
+        <div>
           <small>
             {asset ? (
               toLocaleFixed(
-                asset?.burnedValue / 10 ** asset?.precision,
+                (asset?.burnedValue ?? 0) / 10 ** asset?.precision,
                 asset?.precision,
               )
             ) : (
               <Skeleton />
             )}
+          </small>
+          <Tooltip
+            msg={t('assets:Overview.ContractBurnTooltip')}
+            customStyles={{ place: 'right' }}
+          />
+        </div>
+      </Row>
+      {showVoidSupply && (
+        <Row>
+          <span>
+            <strong>{t('assets:Overview.Void')}</strong>
+          </span>
+          <div>
+            {renderVoidValue()}
+            <Tooltip
+              msg={t('assets:Overview.VoidTooltip')}
+              customStyles={{ place: 'right' }}
+            />
+          </div>
+        </Row>
+      )}
+      <Row>
+        <span>
+          <strong>{t('common:Titles.Transactions')}</strong>
+        </span>
+        <span>
+          <small>
+            {asset ? (
+              toLocaleFixed(transactionsPagination?.totalRecords ?? 0, 0)
+            ) : (
+              <Skeleton />
+            )}
+          </small>
+        </span>
+      </Row>
+      {showVoidSupply && (
+        <Row>
+          <span>
+            <strong>{t('table:CirculatingSupply')}</strong>
+          </span>
+          <div>
+            <small>{formatSupply(asset?.netCirculatingSupply)}</small>
+            <Tooltip
+              msg={t('assets:Overview.CirculatingSupplyTooltip')}
+              customStyles={{ place: 'right' }}
+            />
+          </div>
+        </Row>
+      )}
+      <Row>
+        <span>
+          <strong>{t('assets:Overview.Holders')}</strong>
+        </span>
+        <span>
+          <small>
+            {asset ? holdersPagination?.totalRecords : <Skeleton />}
           </small>
         </span>
       </Row>
@@ -144,28 +223,12 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
       </Row>
       <Row>
         <span>
-          <strong>{t('assets:Overview.Holders')}</strong>
-        </span>
-        <span>{asset ? holdersPagination?.totalRecords : <Skeleton />}</span>
-      </Row>
-      <Row>
-        <span>
-          <strong>{t('common:Titles.Transactions')}</strong>
-        </span>
-        <span>
-          {asset ? (
-            toLocaleFixed(transactionsPagination?.totalRecords ?? 0, 0)
-          ) : (
-            <Skeleton />
-          )}
-        </span>
-      </Row>
-      <Row>
-        <span>
           <strong>{t('assets:Overview.Staking Type')}</strong>
         </span>
         <span>
-          {asset ? parseApr(asset?.staking?.interestType) : <Skeleton />}
+          <small>
+            {asset ? parseApr(asset?.staking?.interestType) : <Skeleton />}
+          </small>
         </span>
       </Row>
     </>

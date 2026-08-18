@@ -1,4 +1,9 @@
-import { CardContent, CardHeaderItem, Container } from '@/styles/common';
+import {
+  CardContent,
+  CardHeaderItem,
+  Container,
+  PAGE_TOP_SPACING,
+} from '@/styles/common';
 import styled, { css } from 'styled-components';
 
 export const Title = styled.div`
@@ -49,7 +54,17 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 
 export const AssetPageContainer = styled(Container)`
   max-width: 1440px;
-  margin: 0 auto;
+  margin: ${PAGE_TOP_SPACING} auto 0;
+`;
+
+export const AssetsListContainer = styled(Container)`
+  /* 0.5rem compensates the tab item's inner padding so the visible tab
+     text starts at PAGE_TOP_SPACING, aligned with other page titles. */
+  margin-top: calc(${PAGE_TOP_SPACING} - 0.5rem);
+
+  > div {
+    margin-top: 0;
+  }
 `;
 
 export const AssetCardContent = styled(CardContent)`

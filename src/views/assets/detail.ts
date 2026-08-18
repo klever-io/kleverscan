@@ -150,6 +150,14 @@ export const Row = styled.div<{ span?: number }>`
 
     line-height: 1.5rem;
     word-break: break-all;
+
+    small {
+      font-weight: 400;
+      font-size: 0.95rem;
+      color: ${props => props.theme.black};
+      /* break-all above is meant for addresses and URIs, not for amounts. */
+      word-break: normal;
+    }
   }
 
   &::after {

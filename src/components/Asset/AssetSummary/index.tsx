@@ -163,8 +163,8 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
               <Image
                 src={asset?.logo || ''}
                 alt=""
-                width={550}
-                height={450}
+                width={500}
+                height={380}
                 loader={({ src, width }) => `${src}?w=${width}`}
               />
             </BackgroundImage>

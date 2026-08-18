@@ -90,7 +90,6 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding-top: 40px;
 `;
 
 export const Header = styled.div`
@@ -98,7 +97,6 @@ export const Header = styled.div`
   justify-content: space-between;
   flex-direction: column;
   gap: 24px;
-  padding-top: 20px;
 
   h1 {
     font-size: 2.5rem;
@@ -108,10 +106,8 @@ export const Header = styled.div`
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row;
-    align-items: center;
-    padding-top: 40px;
-    padding-bottom: 80px;
-    min-height: 450px;
+    padding-bottom: 32px;
+    min-height: 320px;
   }
 `;
 
@@ -329,8 +325,8 @@ export const BackgroundImage = styled.div`
 
   object-fit: cover;
 
-  width: 550px;
-  height: 450px;
+  width: 500px;
+  height: 380px;
 
   position: absolute;
   top: 50%;

@@ -26,8 +26,11 @@ export const MobileProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const isMobileCheck = (width: number) =>
     width <= 768 ? setIsMobile(true) : setIsMobile(false);
+  // Matches the CSS: `min-width: 1025px` already applies at exactly 1025,
+  // so treating that width as tablet here left a gap where neither the
+  // desktop nor the mobile controls rendered.
   const isTabletCheck = (width: number) =>
-    width <= 1025 ? setIsTablet(true) : setIsTablet(false);
+    width < 1025 ? setIsTablet(true) : setIsTablet(false);
 
   const handleResize = () => {
     const width = window.innerWidth;

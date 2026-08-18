@@ -2,6 +2,12 @@ import { TableRowElementProps } from '@/types';
 import { transparentize, lighten } from 'polished';
 import styled, { css } from 'styled-components';
 
+// Distance between the site header and the first visible page content.
+// Kept in px because the root font size shrinks below the mobile breakpoint,
+// which would otherwise make this gap differ per viewport. Pages with extra
+// inner spacing compensate so their first visible text lands on this value.
+export const PAGE_TOP_SPACING = '40px';
+
 export const SpanBold = styled.span`
   font-weight: 700 !important;
 `;
@@ -11,7 +17,7 @@ export const Container = styled.div`
 
   flex-direction: column;
 
-  margin-top: 40px;
+  margin-top: ${PAGE_TOP_SPACING};
 `;
 
 export const SpacedContainer = styled(Container)`
@@ -177,6 +183,7 @@ export const RowAlert = styled.div`
   align-items: center;
   gap: 1rem;
   span {
+    text-transform: uppercase;
     font-size: 14px;
     font-weight: 400;
     background-color: #f8496033;

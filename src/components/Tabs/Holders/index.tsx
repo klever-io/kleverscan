@@ -8,26 +8,29 @@ import { parseAddress, parseHolders } from '@/utils/parseValues';
 import React from 'react';
 import {
   AddressContainer,
+  AmountWithShare,
   FilterContainerHolders,
+  PercentageText,
   RankingContainer,
   RankingText,
 } from './styles';
 import api from '@/services/api';
 import { useRouter } from 'next/router';
-import { setQueryAndRouter } from '@/utils';
+import { useTranslation } from 'next-i18next';
+import { RowAlert } from '@/styles/common';
+import { IsTokenBurn, setQueryAndRouter } from '@/utils';
+import { formatHolderPercentage } from '@/utils/voidSupply';
 
-const header = [
-  'Rank',
-  'Address',
-  'Percentage',
-  'Staked Amount',
-  'Balance',
-  'Total Balance',
-];
+// Every amount is paired with its share, measured against the total supply so
+// the void address counts as the holder it is and the shares add up to 100%.
+const header = ['Rank', 'Address', 'Staked Amount', 'Balance', 'Total Balance'];
 
 const Holders: React.FC<IHolders> = ({ asset }) => {
   const router = useRouter();
+  const { t } = useTranslation(['assets']);
   const [holderQuery, setHolderQuery] = useState<string>('');
+  // Total supply, so the void address counts as the holder it is.
+  const totalSupply = asset.circulatingSupply;
 
   useEffect(() => {
     if (router?.isReady) {
@@ -42,6 +45,7 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
   const rowSections = (props: IBalance): IRowSection[] => {
     const { address, frozenBalance, index, rank, balance, totalBalance } =
       props;
+    const holderPercentage = formatHolderPercentage(totalBalance, totalSupply);
     return [
       {
         element: props => (
@@ -60,40 +64,44 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
               label={parseAddress(address, 40)}
               compact
             />
+            {IsTokenBurn(address) && (
+              <RowAlert>
+                <span>{t('assets:Overview.Void')}</span>
+              </RowAlert>
+            )}
           </AddressContainer>
         ),
         span: 1,
       },
       {
         element: props => (
-          <span key={asset.circulatingSupply}>
-            {((totalBalance / asset.circulatingSupply) * 100).toFixed(2)}%
-          </span>
-        ),
-        span: 1,
-      },
-      {
-        element: props => (
-          <div key={asset.precision}>
-            {formatAmount(frozenBalance / 10 ** asset.precision)}
-          </div>
+          <AmountWithShare>
+            <span>{formatAmount(frozenBalance / 10 ** asset.precision)}</span>
+            <PercentageText>
+              ({formatHolderPercentage(frozenBalance, totalSupply)})
+            </PercentageText>
+          </AmountWithShare>
         ),
         span: 1,
         maxWidth: 150,
       },
       {
         element: props => (
-          <span key={balance}>
-            {formatAmount(balance / 10 ** asset.precision)}
-          </span>
+          <AmountWithShare>
+            <span>{formatAmount(balance / 10 ** asset.precision)}</span>
+            <PercentageText>
+              ({formatHolderPercentage(balance, totalSupply)})
+            </PercentageText>
+          </AmountWithShare>
         ),
         span: 1,
       },
       {
         element: props => (
-          <span key={totalBalance}>
-            {formatAmount(totalBalance / 10 ** asset.precision)}
-          </span>
+          <AmountWithShare>
+            <span>{formatAmount(totalBalance / 10 ** asset.precision)}</span>
+            <PercentageText>({holderPercentage})</PercentageText>
+          </AmountWithShare>
         ),
         span: 1,
       },

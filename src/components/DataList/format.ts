@@ -24,7 +24,8 @@ export const formatShare = (part: number, total: number): string => {
  * above Number.MAX_SAFE_INTEGER already lost its value in JSON.parse, so what
  * comes out is an exact rendering of the stored double, not necessarily of the
  * chain figure. Closing that gap means carrying the supply as a string from
- * the API boundary.
+ * the API boundary; tracked in issue #679, and this body works unchanged on a
+ * string input.
  */
 export const exactAmount = (raw: number, precision: number): string => {
   if (!Number.isFinite(raw) || raw < 0) return '--';

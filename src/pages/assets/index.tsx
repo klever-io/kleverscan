@@ -1,6 +1,45 @@
 import { Assets as Icon } from '@/assets/title-icons';
 import AssetsPools from '@/components/AssetsPools';
-import ExplorerLink from '@/components/ExplorerLink';
+import {
+  APR_CONFIGURED_TOOLTIP,
+  APR_TOOLTIP,
+  ASSET_BADGE_TOOLTIPS,
+  FPR_TOOLTIP,
+} from '@/components/AssetsList/badgeTexts';
+import { getCapUsage, getRewardsModel } from '@/components/AssetsList/helpers';
+import AssetsMobileCard from '@/components/AssetsList/MobileCard';
+import RegistryStrip from '@/components/AssetsList/RegistryStrip';
+import {
+  AssetsTableWrapper,
+  CapContext,
+  RewardsCell,
+  RewardsMuted,
+  RewardsRate,
+  RewardsUnit,
+  ShareValueLine,
+  SupplyCell,
+  SupplyPrimary,
+} from '@/components/AssetsList/styles';
+import CopyAction from '@/components/DataList/CopyAction';
+import { exactAmount, formatShare } from '@/components/DataList/format';
+import {
+  ActionLink,
+  AmountMuted,
+  AssetIdLine,
+  AssetName,
+  BadgePill,
+  IdentityCell,
+  IdentityLink,
+  IdentityText,
+  InlineShare,
+  RowActions,
+  ShareCell,
+  ShareFill,
+  ShareSegment,
+  ShareTrack,
+  ShareValue,
+  VisuallyHidden,
+} from '@/components/DataList/styles';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
@@ -8,7 +47,7 @@ import Table, { ITable } from '@/components/Table';
 import Tabs, { ITabs } from '@/components/Tabs';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
-import { DoubleRow, Header } from '@/styles/common';
+import { Header } from '@/styles/common';
 import { AssetsListContainer } from '@/views/assets';
 import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
@@ -18,7 +57,6 @@ import { getCirculatingSupply } from '@/utils/voidSupply';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, {
   PropsWithChildren,
@@ -27,6 +65,7 @@ import React, {
   useState,
 } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
+import { MdOpenInNew } from 'react-icons/md';
 import nextI18nextConfig from '../../../next-i18next.config';
 
 const AssetsFilters: React.FC<PropsWithChildren> = () => {
@@ -86,22 +125,18 @@ const AssetsFilters: React.FC<PropsWithChildren> = () => {
   );
 };
 
+const header = [
+  'Asset',
+  'Maximum Supply',
+  'Circulating Supply',
+  'Cap Used',
+  'Staked',
+  'Rewards',
+];
+
 const Assets: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets', 'table']);
-  const header = [
-    '',
-    'Token Name/ID',
-    `Type/Precision`,
-    `Circulating/Maximum Supply`,
-    `Initial Supply/Total Staked`,
-    `${t('table:RewardsType')}`,
-  ];
-
-  const renderCirculatingSupply = (asset: IAsset): ReactNode =>
-    `${formatAmount(
-      getCirculatingSupply(asset) / 10 ** asset.precision,
-    )} ${asset.ticker}`;
 
   const rowSections = (asset: IAsset): IRowSection[] => {
     const {
@@ -110,111 +145,210 @@ const Assets: React.FC<PropsWithChildren> = () => {
       logo,
       assetId,
       assetType,
-      initialSupply,
       maxSupply,
+      burnedValue,
+      initialSupply,
       staking,
       precision,
       verified,
+      attributes,
+      hasKdaPool,
     } = asset;
 
-    const renderMaxSupply = (): ReactNode => {
-      return (
-        <span>
-          {maxSupply !== 0 ? (
-            formatAmount(maxSupply / 10 ** precision)
+    const precisionDivisor = 10 ** precision;
+    const circulating = getCirculatingSupply(asset);
+    // The cap limits minted minus burned, which is the gross circulating
+    // supply: tokens parked on the void address were minted and never
+    // burned, so they still take up cap headroom.
+    const capBasis = asset.circulatingSupply;
+    const cap = getCapUsage(capBasis, maxSupply);
+    const rewards = getRewardsModel(staking);
+    const totalStaked = staking?.totalStaked ?? 0;
+
+    const supplyTitle = [
+      `Circulating ${exactAmount(circulating, precision)} ${ticker}`,
+      `Max ${maxSupply > 0 ? exactAmount(maxSupply, precision) : 'unlimited'}`,
+      `Initial ${exactAmount(initialSupply, precision)}`,
+      `Burned ${exactAmount(burnedValue, precision)}`,
+      `Precision ${precision}`,
+    ].join(' · ');
+
+    let capTitle: string | undefined;
+    if (cap.hasCap) {
+      capTitle = `${formatShare(capBasis, maxSupply)} of the ${formatAmount(
+        maxSupply / precisionDivisor,
+      )} cap minted and not burned`;
+    }
+
+    return [
+      {
+        element: () => (
+          <IdentityCell>
+            <IdentityLink
+              href={`/asset/${assetId}`}
+              data-testid="asset-link"
+              title={name}
+            >
+              <AssetLogo
+                logo={logo}
+                ticker={ticker}
+                name={name}
+                verified={verified}
+                size={32}
+              />
+              <IdentityText>
+                <AssetName>{name}</AssetName>
+                <AssetIdLine>{assetId}</AssetIdLine>
+              </IdentityText>
+            </IdentityLink>
+            {assetType === 'NonFungible' && (
+              <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.nft}>
+                NFT
+              </BadgePill>
+            )}
+            {assetType === 'SemiFungible' && (
+              <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.sft}>
+                SFT
+              </BadgePill>
+            )}
+            {attributes?.isPaused && (
+              <BadgePill $variant="warning" title={ASSET_BADGE_TOOLTIPS.paused}>
+                Paused
+              </BadgePill>
+            )}
+            {hasKdaPool && (
+              <BadgePill $variant="accent" title={ASSET_BADGE_TOOLTIPS.pool}>
+                Fee Pool
+              </BadgePill>
+            )}
+            <RowActions>
+              <CopyAction
+                value={assetId}
+                label="Copy asset ID"
+                announcement="Asset ID copied to clipboard"
+              />
+              <ActionLink
+                href={`/asset/${assetId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open asset in a new tab"
+                title="Open in a new tab"
+              >
+                <MdOpenInNew size={14} />
+              </ActionLink>
+            </RowActions>
+          </IdentityCell>
+        ),
+        span: 1,
+      },
+      {
+        element: () =>
+          maxSupply > 0 ? (
+            <SupplyCell
+              title={`${exactAmount(maxSupply, precision)} ${ticker}`}
+            >
+              <SupplyPrimary>
+                {formatAmount(maxSupply / precisionDivisor)}
+              </SupplyPrimary>
+            </SupplyCell>
           ) : (
-            <IoIosInfinite />
-          )}
-        </span>
-      );
-    };
-
-    const sections: IRowSection[] = [
-      {
-        element: props => (
-          <Link
-            href={`/asset/${assetId}`}
-            key={assetId}
-            data-testid="asset-link"
-          >
-            <AssetLogo
-              logo={logo}
-              ticker={ticker}
-              name={name}
-              verified={verified}
-              size={36}
-            />
-          </Link>
-        ),
+            <SupplyCell title="No maximum supply">
+              <SupplyPrimary>
+                <IoIosInfinite size={14} aria-hidden="true" />
+                <VisuallyHidden>Unlimited</VisuallyHidden>
+              </SupplyPrimary>
+            </SupplyCell>
+          ),
         span: 1,
-        width: 50,
+        width: 170,
       },
       {
-        element: props => (
-          <DoubleRow {...props} key={assetId}>
-            <ExplorerLink type="asset" value={assetId} label={name} compact />
-            <ExplorerLink type="asset" value={assetId} compact />
-          </DoubleRow>
+        element: () => (
+          <SupplyCell title={supplyTitle}>
+            <SupplyPrimary>
+              {formatAmount(circulating / precisionDivisor)} {ticker}
+            </SupplyPrimary>
+          </SupplyCell>
         ),
         span: 1,
-      },
-
-      {
-        element: props => (
-          <DoubleRow {...props} key={assetType + precision}>
-            <span key={assetType}>{assetType}</span>
-            <span key={precision}>
-              {precision} decimal{precision > 1 && 's'}
-            </span>
-          </DoubleRow>
-        ),
-
-        span: 1,
+        width: 180,
       },
       {
-        element: props => (
-          <DoubleRow {...props}>
-            <span>{renderCirculatingSupply(asset)}</span>
-            <span key={maxSupply}>
-              {renderMaxSupply()} {ticker}
-            </span>
-          </DoubleRow>
-        ),
+        element: () =>
+          cap.hasCap ? (
+            <ShareCell title={capTitle}>
+              <ShareValueLine>
+                <ShareValue>{formatShare(capBasis, maxSupply)}</ShareValue>
+                <CapContext>of cap</CapContext>
+              </ShareValueLine>
+              <ShareTrack aria-hidden="true">
+                <ShareFill $delay={0}>
+                  {cap.usedShare > 0 && (
+                    <ShareSegment
+                      $kind="liquid"
+                      style={{ width: `${cap.usedShare * 100}%` }}
+                    />
+                  )}
+                </ShareFill>
+              </ShareTrack>
+              <VisuallyHidden>
+                of the maximum supply minted and not burned.
+              </VisuallyHidden>
+            </ShareCell>
+          ) : (
+            <ShareCell>
+              <RewardsMuted>n/a</RewardsMuted>
+            </ShareCell>
+          ),
         span: 1,
+        width: 200,
       },
       {
-        element: props => (
-          <DoubleRow
-            {...props}
-            key={initialSupply + String(staking?.totalStaked)}
-          >
-            <span key={initialSupply}>
-              {formatAmount(initialSupply / 10 ** precision)} {ticker}
-            </span>
-            <span key={String(staking?.totalStaked)}>
-              {staking?.totalStaked
-                ? formatAmount(staking.totalStaked / 10 ** precision)
-                : 0}
-            </span>
-          </DoubleRow>
-        ),
+        element: () =>
+          staking ? (
+            <AmountMuted
+              title={`${exactAmount(totalStaked, precision)} ${ticker} staked · ${formatShare(
+                totalStaked,
+                circulating,
+              )} of the circulating supply`}
+            >
+              <span>{formatAmount(totalStaked / precisionDivisor)}</span>
+              <InlineShare>
+                ({formatShare(totalStaked, circulating)})
+              </InlineShare>
+            </AmountMuted>
+          ) : (
+            <AmountMuted>
+              <RewardsMuted>n/a</RewardsMuted>
+            </AmountMuted>
+          ),
         span: 1,
+        width: 170,
       },
       {
-        element: props => (
-          <span>
-            {staking
-              ? staking?.interestType === 'APRI'
-                ? 'APR'
-                : 'FPR'
-              : '--'}
-          </span>
+        element: () => (
+          <RewardsCell>
+            {rewards.kind === 'apr' && (
+              <>
+                <RewardsRate title={APR_TOOLTIP}>{rewards.rate}</RewardsRate>
+                <RewardsUnit>APR</RewardsUnit>
+              </>
+            )}
+            {rewards.kind === 'apr-configured' && (
+              <RewardsMuted title={APR_CONFIGURED_TOOLTIP}>APR</RewardsMuted>
+            )}
+            {rewards.kind === 'fpr' && (
+              <BadgePill $variant="neutral" title={FPR_TOOLTIP}>
+                FPR
+              </BadgePill>
+            )}
+            {rewards.kind === 'none' && <RewardsMuted>n/a</RewardsMuted>}
+          </RewardsCell>
         ),
         span: 1,
+        width: 130,
       },
     ];
-
-    return sections;
   };
 
   const tableProps: ITable = {
@@ -224,6 +358,8 @@ const Assets: React.FC<PropsWithChildren> = () => {
     request: (page, limit) => requestAssetsQuery(page, limit, router),
     dataName: 'assets',
     Filters: AssetsFilters,
+    MobileCard: AssetsMobileCard,
+    singleLineSkeleton: true,
   };
 
   const tableHeaders = [
@@ -235,21 +371,29 @@ const Assets: React.FC<PropsWithChildren> = () => {
   const tabProps: ITabs = {
     headers: tableHeaders,
     onClick: header => {
-      setSelectedTab(header),
-        setQueryAndRouter({ ...router.query, tab: header }, router);
+      setSelectedTab(header);
+      // Both tabs read the same page and asset params while listing different
+      // things: page 12 of the assets list does not exist in the four pages of
+      // pools, and an asset without a pool filters that tab down to nothing.
+      // Switching tabs therefore starts from the top of the new list.
+      const { page, asset, ...rest } = router.query;
+      setQueryAndRouter({ ...rest, tab: header }, router);
     },
   };
 
-  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
+  // Rendered as elements, not as a component defined during render: a fresh
+  // component identity on every render remounts the whole tab, which refetches
+  // everything and makes paging feel like a full page reload.
+  const renderSelectedTab = (): ReactNode => {
     switch (selectedTab) {
       case `${t('common:Titles.Overview')}`:
         return (
           <>
-            <Header>
-              <Title title={t('common:Titles.Assets')} Icon={Icon} />
-            </Header>
+            <RegistryStrip />
 
-            <Table {...tableProps} />
+            <AssetsTableWrapper>
+              <Table {...tableProps} />
+            </AssetsTableWrapper>
           </>
         );
       case `${t('common:Titles.Pools')}`:
@@ -266,9 +410,10 @@ const Assets: React.FC<PropsWithChildren> = () => {
 
   return (
     <AssetsListContainer>
-      <Tabs {...tabProps}>
-        <SelectedTabComponent />
-      </Tabs>
+      <Header>
+        <Title title={t('common:Titles.Assets')} Icon={Icon} />
+      </Header>
+      <Tabs {...tabProps}>{renderSelectedTab()}</Tabs>
     </AssetsListContainer>
   );
 };

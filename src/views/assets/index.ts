@@ -58,12 +58,17 @@ export const AssetPageContainer = styled(Container)`
 `;
 
 export const AssetsListContainer = styled(Container)`
-  /* 0.5rem compensates the tab item's inner padding so the visible tab
-     text starts at PAGE_TOP_SPACING, aligned with other page titles. */
-  margin-top: calc(${PAGE_TOP_SPACING} - 0.5rem);
+  /* The title sits above the tab row, aligned with other page titles. */
+  margin-top: ${PAGE_TOP_SPACING};
 
   > div {
-    margin-top: 0;
+    margin-top: 1rem;
+  }
+
+  /* Same gap under the tab row as the asset detail page has under its
+     Transactions/Holders row (24px, measured in the browser). */
+  [data-testid^='tab-content'] {
+    margin-top: 1.5rem;
   }
 `;
 

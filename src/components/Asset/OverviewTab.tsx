@@ -1,5 +1,7 @@
 import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
+import { formatShare } from '@/components/DataList/format';
+import { InlineShare } from '@/components/DataList/styles';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import Tooltip from '@/components/Tooltip';
@@ -8,7 +10,7 @@ import { IAsset } from '@/types';
 import { parseApr } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { VOID_ADDRESS } from '@/utils/globalVariables';
-import { hasVoidSupply } from '@/utils/voidSupply';
+import { getCirculatingSupply, hasVoidSupply } from '@/utils/voidSupply';
 import { HoverAnchor, Row } from '@/views/assets/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { useTranslation } from 'next-i18next';
@@ -28,15 +30,20 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets']);
 
+  // Both answer undefined on an API error, which React Query treats as a
+  // failed query and retries; null keeps the counts blank without the retry
+  // storm, the same way the asset page handles its lookups.
   const { data: transactionsPagination } = useQuery({
     queryKey: [`transactionAsset`, router.query.asset],
-    queryFn: () => transactionCall(router.query.asset as string),
+    queryFn: async () =>
+      (await transactionCall(router.query.asset as string)) ?? null,
     enabled: !!router?.isReady,
   });
 
   const { data: holdersPagination } = useQuery({
     queryKey: [`holdersAsset`, router.query.asset],
-    queryFn: () => holdersCall(router.query.asset as string),
+    queryFn: async () =>
+      (await holdersCall(router.query.asset as string)) ?? null,
     enabled: !!router?.isReady,
   });
 
@@ -48,6 +55,18 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
   const isSftCollection =
     asset?.assetType === AssetTypeString.SemiFungible &&
     !asset?.assetId?.includes('/');
+
+  // Shares next to the raw amounts: burned measures against everything ever
+  // minted (burned plus circulating), staked against the circulating supply.
+  const burnedShare =
+    asset && asset.burnedValue > 0 && asset.mintedValue > 0
+      ? formatShare(asset.burnedValue, asset.mintedValue)
+      : undefined;
+  const totalStaked = asset?.staking?.totalStaked ?? 0;
+  const stakedShare =
+    asset && totalStaked > 0 && getCirculatingSupply(asset) > 0
+      ? formatShare(totalStaked, getCirculatingSupply(asset))
+      : undefined;
 
   const formatSupply = (
     value?: number,
@@ -135,6 +154,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
           <Tooltip
             msg={t('assets:Overview.TotalSupplyTooltip')}
             customStyles={{ place: 'right' }}
+            maxVw={24}
           />
         </div>
       </Row>
@@ -145,10 +165,18 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         <div>
           <small>
             {asset ? (
-              toLocaleFixed(
-                (asset?.burnedValue ?? 0) / 10 ** asset?.precision,
-                asset?.precision,
-              )
+              <>
+                {toLocaleFixed(
+                  (asset?.burnedValue ?? 0) / 10 ** asset?.precision,
+                  asset?.precision,
+                )}
+                {burnedShare && (
+                  <InlineShare title="Share of everything ever minted">
+                    {' '}
+                    ({burnedShare})
+                  </InlineShare>
+                )}
+              </>
             ) : (
               <Skeleton />
             )}
@@ -156,6 +184,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
           <Tooltip
             msg={t('assets:Overview.ContractBurnTooltip')}
             customStyles={{ place: 'right' }}
+            maxVw={24}
           />
         </div>
       </Row>
@@ -169,6 +198,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
             <Tooltip
               msg={t('assets:Overview.VoidTooltip')}
               customStyles={{ place: 'right' }}
+              maxVw={24}
             />
           </div>
         </Row>
@@ -197,6 +227,7 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
             <Tooltip
               msg={t('assets:Overview.CirculatingSupplyTooltip')}
               customStyles={{ place: 'right' }}
+              maxVw={24}
             />
           </div>
         </Row>
@@ -218,10 +249,18 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         <span>
           <small>
             {asset ? (
-              toLocaleFixed(
-                (asset?.staking?.totalStaked || 0) / 10 ** asset?.precision,
-                asset?.precision,
-              )
+              <>
+                {toLocaleFixed(
+                  (asset?.staking?.totalStaked || 0) / 10 ** asset?.precision,
+                  asset?.precision,
+                )}
+                {stakedShare && (
+                  <InlineShare title="Share of the circulating supply">
+                    {' '}
+                    ({stakedShare})
+                  </InlineShare>
+                )}
+              </>
             ) : (
               <Skeleton />
             )}

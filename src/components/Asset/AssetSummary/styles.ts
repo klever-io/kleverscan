@@ -6,8 +6,11 @@ export const TitleContainer = styled.div`
   gap: 40px;
 `;
 
+/* Matches the page titles elsewhere on the site (global h1, 1.8rem). The
+   override is needed because this header sets every h1 to 2.5rem for the
+   asset name below it. */
 export const PageTitle = styled.h1`
-  font-size: 1.25rem !important;
+  font-size: 1.8rem !important;
 `;
 
 export const AssetTitleContainer = styled.div`
@@ -107,7 +110,9 @@ export const Header = styled.div`
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     flex-direction: row;
     padding-bottom: 32px;
-    min-height: 320px;
+    /* Sized so the watermark ends above the About heading without leaving
+       the empty band the old 320px header had. */
+    min-height: 280px;
   }
 `;
 
@@ -157,7 +162,9 @@ export const About = styled.div`
   flex-direction: column;
   gap: 24px;
 
-  padding-bottom: 80px;
+  /* The tab row below brings its own spacing; 80px left an empty band
+     between the description and the tabs. */
+  padding-bottom: 32px;
 
   line-height: 1.5;
 `;
@@ -323,17 +330,23 @@ export const RightSide = styled.div`
 export const BackgroundImage = styled.div`
   filter: saturate(10%) opacity(7%);
 
-  object-fit: cover;
+  object-fit: contain;
 
-  width: 500px;
-  height: 380px;
+  /* Square, because asset logos are: the old 500x380 box stretched every
+     logo horizontally. */
+  width: 300px;
+  height: 300px;
 
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translateY(-40%) translateX(-50%);
+  /* Sits slightly higher than centre so it ends above the About heading
+     while the header itself stays compact. */
+  transform: translateY(-45%) translateX(-50%);
 
   img {
+    object-fit: contain;
+
     mask-image: linear-gradient(
         to top,
         transparent 0%,

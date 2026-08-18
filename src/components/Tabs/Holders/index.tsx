@@ -1,158 +1,313 @@
-import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
-import ExplorerLink from '@/components/ExplorerLink';
+import { isValidContractAddress } from '@klever/connect';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
-import { IBalance, IHolders, IRowSection } from '@/types/index';
-import { formatAmount } from '@/utils/formatFunctions';
-import { parseAddress, parseHolders } from '@/utils/parseValues';
-import React from 'react';
-import {
-  AddressContainer,
-  AmountWithShare,
-  FilterContainerHolders,
-  PercentageText,
-  RankingContainer,
-  RankingText,
-} from './styles';
 import api from '@/services/api';
-import { useRouter } from 'next/router';
+import { IBalance, IHolders, IRowSection } from '@/types/index';
+import { setQueryAndRouter } from '@/utils';
+import { formatAmount } from '@/utils/formatFunctions';
+import { useDidUpdateEffect } from '@/utils/hooks';
+import { parseAddress, parseHolders } from '@/utils/parseValues';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
-import { RowAlert } from '@/styles/common';
-import { IsTokenBurn, setQueryAndRouter } from '@/utils';
-import { formatHolderPercentage } from '@/utils/voidSupply';
+import { useRouter } from 'next/router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { MdOpenInNew } from 'react-icons/md';
+import CopyAction from '@/components/DataList/CopyAction';
+import {
+  ActionLink,
+  AddressLink,
+  AmountMuted,
+  AmountPrimary,
+  BadgePill,
+  InlineShare,
+  RowActions,
+  ShareCell,
+  ShareFill,
+  ShareSegment,
+  ShareTrack,
+  ShareValue,
+  VisuallyHidden,
+} from '@/components/DataList/styles';
+import {
+  buildRowBar,
+  computeHoldersSummary,
+  formatShare,
+  getMedalTier,
+  isVoidAddress,
+} from './holdersMath';
+import HoldersMobileCard, { IHoldersMobileCardExtras } from './MobileCard';
+import HoldersSummary from './Summary';
+import {
+  FilterContainerHolders,
+  HolderCell,
+  HoldersTableWrapper,
+  RankBadge,
+  VoidShareNote,
+} from './styles';
 
-// Every amount is paired with its share, measured against the total supply so
-// the void address counts as the holder it is and the shares add up to 100%.
-const header = ['Rank', 'Address', 'Staked Amount', 'Balance', 'Total Balance'];
+const TOTAL_LABEL = 'Total Balance';
+const LIQUID_LABEL = 'Liquid';
+const SHARE_LABEL = 'Total Supply Share';
 
+const VOID_TOOLTIP =
+  'VOID is the chain burn address. Tokens held here are permanently removed from circulation.';
+const CONTRACT_TOOLTIP = 'This address is a smart contract.';
+
+/**
+ * Holders tab: a concentration summary strip on top of the ranked holder
+ * table. Rows measure against the gross circulating supply (the void address
+ * counts as the holder it is, so the shares add up to 100%), while the strip
+ * measures risk against the net supply; its caption states both.
+ */
 const Holders: React.FC<IHolders> = ({ asset }) => {
   const router = useRouter();
   const { t } = useTranslation(['assets']);
-  const [holderQuery, setHolderQuery] = useState<string>('');
-  // Total supply, so the void address counts as the holder it is.
-  const totalSupply = asset.circulatingSupply;
+  const grossSupply = asset.circulatingSupply;
+  const precisionDivisor = 10 ** asset.precision;
 
-  useEffect(() => {
-    if (router?.isReady) {
-      setHolderQuery(router.query.sortBy as string);
-    }
-  }, [router.isReady]);
+  // KFI staking doubles as governance weight, hence the longer label.
+  const stakedLabel =
+    asset.assetId === 'KFI' ? 'Staked / Voting Power' : 'Staked';
 
-  useEffect(() => {
-    setQueryAndRouter({ ...router.query, sortBy: holderQuery }, router);
-  }, [holderQuery]);
+  const sortFieldByLabel: Record<string, string> = useMemo(
+    () => ({
+      [TOTAL_LABEL]: 'total',
+      [stakedLabel]: 'frozen',
+      [LIQUID_LABEL]: 'balance',
+    }),
+    [stakedLabel],
+  );
+
+  // Seeded from the URL rather than corrected afterwards: the table fetches
+  // during the same effect flush, so a label set later would leave the rows
+  // sorted one way and the header claiming another.
+  const [sortLabel, setSortLabel] = useState<string>(
+    () =>
+      Object.keys(sortFieldByLabel).find(
+        label => sortFieldByLabel[label] === router.query.sortBy,
+      ) ?? TOTAL_LABEL,
+  );
+  const [sortAnnouncement, setSortAnnouncement] = useState('');
+
+  // Sorting restarts from page 1: keeping a deep page position in a
+  // differently ordered list would silently show unrelated rows.
+  useDidUpdateEffect(() => {
+    const apiValue = sortFieldByLabel[sortLabel];
+    if (router.query.sortBy === apiValue) return;
+    setQueryAndRouter({ ...router.query, sortBy: apiValue, page: '1' }, router);
+  }, [sortLabel]);
+
+  const handleSort = (label: string): void => {
+    setSortLabel(label);
+    setSortAnnouncement(`Sorted by ${label}, descending`);
+  };
+
+  // One top-50 fetch per asset feeds the summary strip, the medal shift away
+  // from the void row, and the global bar scale. Cached so revisits within
+  // the session do not double the holders-endpoint load.
+  const { data: topHolders, isLoading: isSummaryLoading } = useQuery({
+    queryKey: ['holdersTop50', asset.assetId],
+    queryFn: async () => {
+      const response = await api.get({
+        route: `assets/holders/${asset.assetId}`,
+        query: { page: 1, limit: 50, sortBy: 'total' },
+      });
+      if (response.error) throw new Error(response.error);
+      return {
+        holders: parseHolders(
+          response.data.accounts,
+          asset.assetId,
+          response.pagination,
+        ),
+        totalRecords: response?.pagination?.totalRecords as number | undefined,
+      };
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+  const summary = useMemo(
+    () =>
+      computeHoldersSummary(
+        asset,
+        topHolders?.holders ?? [],
+        topHolders?.totalRecords,
+      ),
+    [asset, topHolders],
+  );
+
+  const sortedByTotal = sortLabel === TOTAL_LABEL;
 
   const rowSections = (props: IBalance): IRowSection[] => {
     const { address, frozenBalance, index, rank, balance, totalBalance } =
       props;
-    const holderPercentage = formatHolderPercentage(totalBalance, totalSupply);
+    const isVoid = isVoidAddress(address);
+    const isContract = !isVoid && !!address && isValidContractAddress(address);
+    const medal = getMedalTier(rank, isVoid, sortedByTotal, summary.medalRanks);
+    const bar = isVoid ? undefined : buildRowBar(props, grossSupply);
+    const stakedOfHolder =
+      totalBalance > 0 ? Math.round((frozenBalance / totalBalance) * 100) : 0;
+    const shareText = formatShare(totalBalance, grossSupply);
+
     return [
       {
-        element: props => (
-          <RankingContainer key={index}>
-            <RankingText>{rank}°</RankingText>
-          </RankingContainer>
+        element: () => (
+          <RankBadge $medal={medal} title="Rank reflects the current sort">
+            {rank}
+          </RankBadge>
         ),
         span: 1,
+        width: 56,
       },
       {
-        element: props => (
-          <AddressContainer key={address}>
-            <ExplorerLink
-              type="account"
-              value={address}
-              label={parseAddress(address, 40)}
-              compact
-            />
-            {IsTokenBurn(address) && (
-              <RowAlert>
-                <span>{t('assets:Overview.Void')}</span>
-              </RowAlert>
+        element: () => (
+          <HolderCell>
+            <AddressLink href={`/account/${address}`} title={address}>
+              {parseAddress(address, 20)}
+            </AddressLink>
+            {isVoid && (
+              <BadgePill $variant="void" title={VOID_TOOLTIP}>
+                {t('assets:Overview.Void')}
+              </BadgePill>
             )}
-          </AddressContainer>
+            {isContract && (
+              <BadgePill $variant="contract" title={CONTRACT_TOOLTIP}>
+                Contract
+              </BadgePill>
+            )}
+            <RowActions>
+              <CopyAction
+                value={address}
+                label="Copy address"
+                announcement="Address copied to clipboard"
+              />
+              <ActionLink
+                href={`/account/${address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open account in a new tab"
+                title="Open in a new tab"
+              >
+                <MdOpenInNew size={14} />
+              </ActionLink>
+            </RowActions>
+          </HolderCell>
         ),
         span: 1,
       },
       {
-        element: props => (
-          <AmountWithShare>
-            <span>{formatAmount(frozenBalance / 10 ** asset.precision)}</span>
-            <PercentageText>
-              ({formatHolderPercentage(frozenBalance, totalSupply)})
-            </PercentageText>
-          </AmountWithShare>
+        element: () => (
+          <AmountPrimary>
+            {formatAmount(totalBalance / precisionDivisor)}
+          </AmountPrimary>
         ),
         span: 1,
-        maxWidth: 150,
+        width: 180,
       },
       {
-        element: props => (
-          <AmountWithShare>
-            <span>{formatAmount(balance / 10 ** asset.precision)}</span>
-            <PercentageText>
-              ({formatHolderPercentage(balance, totalSupply)})
-            </PercentageText>
-          </AmountWithShare>
+        element: () => (
+          <AmountMuted>
+            <span>{formatAmount(frozenBalance / precisionDivisor)}</span>
+            <InlineShare>
+              ({formatShare(frozenBalance, grossSupply)})
+            </InlineShare>
+          </AmountMuted>
         ),
         span: 1,
+        width: 170,
       },
       {
-        element: props => (
-          <AmountWithShare>
-            <span>{formatAmount(totalBalance / 10 ** asset.precision)}</span>
-            <PercentageText>({holderPercentage})</PercentageText>
-          </AmountWithShare>
+        element: () => (
+          <AmountMuted>
+            <span>{formatAmount(balance / precisionDivisor)}</span>
+            <InlineShare>({formatShare(balance, grossSupply)})</InlineShare>
+          </AmountMuted>
         ),
         span: 1,
+        width: 170,
+      },
+      {
+        element: () =>
+          isVoid ? (
+            <ShareCell>
+              <VoidShareNote>{shareText} · burned</VoidShareNote>
+            </ShareCell>
+          ) : (
+            <ShareCell
+              title={`${shareText} of supply · Staked ${stakedOfHolder}% · Liquid ${
+                100 - stakedOfHolder
+              }%`}
+            >
+              <ShareValue>{shareText}</ShareValue>
+              {bar && (
+                <ShareTrack aria-hidden="true">
+                  <ShareFill $delay={Math.min(index, 15) * 20}>
+                    {balance > 0 && (
+                      <ShareSegment
+                        $kind="liquid"
+                        style={{
+                          width: `${bar.fillRatio * bar.liquidFraction * 100}%`,
+                        }}
+                      />
+                    )}
+                    {frozenBalance > 0 && (
+                      <ShareSegment
+                        $kind="staked"
+                        style={{
+                          width: `${
+                            bar.fillRatio * (1 - bar.liquidFraction) * 100
+                          }%`,
+                        }}
+                      />
+                    )}
+                  </ShareFill>
+                </ShareTrack>
+              )}
+            </ShareCell>
+          ),
+        span: 1,
+        width: 210,
       },
     ];
   };
-  const getHeader = () => {
-    if (asset.assetId === 'KFI') {
-      return header.map(item => {
-        if (item === 'Staked Amount') {
-          return `Staked Amount/ Voting Power`;
-        }
-        return item;
-      });
-    }
-    return header;
-  };
+
+  const tableHeader = [
+    'Rank',
+    'Holder',
+    TOTAL_LABEL,
+    stakedLabel,
+    LIQUID_LABEL,
+    SHARE_LABEL,
+  ];
 
   const filters: IFilter[] = [
     {
       title: 'Sort By',
-      firstItem: 'Total Balance',
-      data: ['Balance', 'Frozen'],
-      onClick: value => {
-        setHolderQuery(value);
-      },
-      current: holderQuery as string | undefined,
+      firstItem: TOTAL_LABEL,
+      data: [stakedLabel, LIQUID_LABEL],
+      onClick: value => handleSort(value),
+      current: sortLabel,
       inputType: 'button',
       isHiddenInput: false,
     },
   ];
 
   const requestAssetHolders = async (page: number, limit: number) => {
-    let newQuery = {
-      ...router.query,
-      sortBy: holderQuery?.toLowerCase() || '',
-    };
-    if (holderQuery === 'Total Balance')
-      newQuery = { ...router.query, sortBy: 'total' };
-
     if (asset) {
       const response = await api.get({
         route: `assets/holders/${asset.assetId}`,
-        query: { ...newQuery, page, limit },
+        query: {
+          ...router.query,
+          sortBy: sortFieldByLabel[sortLabel] || 'total',
+          page,
+          limit,
+        },
       });
 
       let parsedHolders: IBalance[] = [];
       if (!response.error) {
-        const holders = response.data.accounts;
-
         parsedHolders = parseHolders(
-          holders,
+          response.data.accounts,
           asset.assetId,
           response.pagination,
         );
@@ -164,7 +319,8 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
   };
 
   // Rendered by the table itself, so the filters share the row with the
-  // items-per-page selector, the way the transactions tab already does.
+  // items-per-page selector. Desktop sorts through the column headers; this
+  // dropdown only exists where those headers do not render.
   const HoldersFilters = useCallback(
     () => (
       <FilterContainerHolders>
@@ -173,19 +329,37 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
         ))}
       </FilterContainerHolders>
     ),
-    [holderQuery],
+    [sortLabel],
   );
 
-  const tableProps: ITable = {
+  const tableProps: ITable<IHoldersMobileCardExtras> = {
     rowSections,
-    header: getHeader(),
+    header: tableHeader,
     type: 'holders',
     dataName: 'accounts',
     request: (page: number, limit: number) => requestAssetHolders(page, limit),
     Filters: HoldersFilters,
+    sortableColumns: [TOTAL_LABEL, stakedLabel, LIQUID_LABEL],
+    activeSortColumn: sortLabel,
+    onSortColumn: handleSort,
+    MobileCard: HoldersMobileCard,
+    mobileCardProps: { asset, summary, sortedByTotal },
+    singleLineSkeleton: true,
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <>
+      <HoldersSummary
+        asset={asset}
+        summary={summary}
+        isLoading={isSummaryLoading}
+      />
+      <HoldersTableWrapper>
+        <Table {...tableProps} />
+      </HoldersTableWrapper>
+      <VisuallyHidden aria-live="polite">{sortAnnouncement}</VisuallyHidden>
+    </>
+  );
 };
 
 export default Holders;

@@ -37,7 +37,9 @@ export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
 
   @media (min-width: ${props => props.theme.breakpoints.tablet}) {
     div {
-      max-width: 100vw;
+      /* Long messages opt into wrapping via maxVw; without it desktop keeps
+         the historical unbounded width. */
+      max-width: ${props => (props.maxVw ? `${props.maxVw}vw` : '100vw')};
     }
   }
 `;

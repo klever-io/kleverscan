@@ -1,9 +1,5 @@
 import { IAsset } from '@/types';
-import {
-  formatHolderPercentage,
-  getCirculatingSupply,
-  hasVoidSupply,
-} from '../voidSupply';
+import { getCirculatingSupply, hasVoidSupply } from '../voidSupply';
 
 const asset = (fields: Partial<IAsset>): IAsset =>
   ({ assetId: 'TOKEN-1234', circulatingSupply: 1000, ...fields }) as IAsset;
@@ -47,24 +43,5 @@ describe('getCirculatingSupply', () => {
 
   it('falls back to the raw supply when the fields are absent', () => {
     expect(getCirculatingSupply(asset({}))).toBe(1000);
-  });
-});
-
-describe('formatHolderPercentage', () => {
-  it('formats the share of total supply with two decimals', () => {
-    expect(formatHolderPercentage(250, 1000)).toBe('25.00%');
-  });
-
-  it('gives the void address a real share, since it is measured against the total supply', () => {
-    // BLOCK-31F6 holds 97.9% of its supply in the void.
-    expect(formatHolderPercentage(9790000, 10000000)).toBe('97.90%');
-  });
-
-  it('returns a placeholder instead of dividing by a zero supply', () => {
-    expect(formatHolderPercentage(250, 0)).toBe('--');
-  });
-
-  it('returns a placeholder for a negative supply', () => {
-    expect(formatHolderPercentage(250, -10)).toBe('--');
   });
 });

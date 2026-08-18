@@ -1,117 +1,262 @@
-import { Assets as Icon } from '@/assets/title-icons';
-import { requestAssetsPoolsQuery } from '@/services/requests/assetsPools';
-import { Header, Mono, SpanBold } from '@/styles/common';
-import { IAssetPool, IRowSection } from '@/types';
-import { capitalizeString } from '@/utils/convertString';
+import CopyAction from '@/components/DataList/CopyAction';
+import { exactAmount } from '@/components/DataList/format';
+import {
+  ActionLink,
+  AddressLink,
+  AmountMuted,
+  AmountPrimary,
+  AssetIdLine,
+  AssetName,
+  BadgePill,
+  IdentityCell,
+  IdentityLink,
+  IdentityText,
+  RowActions,
+} from '@/components/DataList/styles';
+import Filter, { IFilter } from '@/components/Filter';
+import AssetLogo from '@/components/Logo/AssetLogo';
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
+import {
+  requestAllAssetsPools,
+  requestAssetsPoolsQuery,
+} from '@/services/requests/assetsPools';
+import { IAssetPoolRow, IRowSection } from '@/types';
+import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
-import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import { PropsWithChildren } from 'react';
-import { useTranslation } from 'react-i18next';
-import Copy from '../Copy';
-import Title from '../Layout/Title';
+import { PropsWithChildren, useCallback } from 'react';
+import { MdOpenInNew } from 'react-icons/md';
+
 import Table, { ITable } from '../Table';
-import { Status } from '../Table/styles';
-import { Row } from './styled';
+import { formatRate, getPoolRate, hasSeparateAdmin } from './helpers';
+import PoolsMobileCard from './MobileCard';
+import PoolsSummary from './PoolsSummary';
+import {
+  AdminLabel,
+  AdminRow,
+  OwnerCell,
+  OwnerRow,
+  PoolsTableWrapper,
+  RateCell,
+  RateUnit,
+  RateValue,
+} from './styles';
+import {
+  POOL_ADMIN_NOTE,
+  POOL_DISABLED_TOOLTIP,
+  POOL_KLV_RESERVE_TOOLTIP,
+  POOL_RATE_TOOLTIP,
+} from './texts';
+
+const header = ['Pool', 'Fee Rate', 'KLV Reserve', 'KDA Reserve', 'Owner'];
+
+/**
+ * Asset search over the pools themselves. The full pool set is already
+ * cached for the summary strip, so the dropdown lists exactly the assets
+ * that have a pool: searching one that has none can never come up empty.
+ */
+const PoolsFilters: React.FC<PropsWithChildren> = () => {
+  const router = useRouter();
+  const { t } = useTranslation(['common']);
+
+  const { data: pools, isLoading } = useQuery({
+    queryKey: ['assetsPoolsAll'],
+    queryFn: requestAllAssetsPools,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+  const handleSelected = async (selected: string): Promise<void> => {
+    while (!router.isReady) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    if (selected === 'All') {
+      const updatedQuery = { ...router.query };
+      delete updatedQuery.asset;
+      setQueryAndRouter({ ...updatedQuery, page: '1' }, router);
+      return;
+    }
+    if (selected !== router.query.asset) {
+      // Back to page 1: a filtered set is shorter than the page you were on.
+      setQueryAndRouter(
+        { ...router.query, asset: selected, page: '1' },
+        router,
+      );
+    }
+  };
+
+  const filter: IFilter = {
+    title: `${t('common:Titles.Assets')}`,
+    data: (pools || [])
+      .map(pool => pool.kda)
+      .sort((a, b) => a.localeCompare(b)),
+    onClick: handleSelected,
+    current: (router.query.asset as string) || undefined,
+    loading: isLoading,
+  };
+
+  return (
+    <FilterContainer>
+      <Filter {...filter} />
+    </FilterContainer>
+  );
+};
 
 const AssetsPools: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const { t } = useTranslation(['common', 'assets', 'table']);
 
-  const header = [
-    'KDA/Status',
-    'Owner/Admin Address',
-    `KDA/KLV Balance`,
-    `Ratio`,
-  ];
-
-  const rowSections = (asset: IAssetPool): IRowSection[] => {
+  // The shared Table also calls this with a header label to read the column
+  // widths, so every field has to survive a non-pool argument.
+  const rowSections = (pool: IAssetPoolRow): IRowSection[] => {
     const {
       active,
-      adminAddress,
-      kda,
-      kdaBalance,
-      ownerAddress,
-      klvBalance,
-      ratio,
-    } = asset;
+      adminAddress = '',
+      kda = '',
+      kdaBalance = 0,
+      klvBalance = 0,
+      ownerAddress = '',
+      name,
+      logo,
+      ticker,
+      assetVerified,
+      precision,
+    } = pool ?? ({} as Partial<IAssetPoolRow>);
 
-    const handlerStatus = () => (
-      <>
-        <Row>
-          <Link href={`/asset/${kda}`} key={kda}>
-            <span>{kda}</span>
-          </Link>
-        </Row>
-        <Row>
-          <Status status={active ? 'success' : 'fail'}>
-            {capitalizeString(active ? 'Active' : 'disabled')}
-          </Status>
-        </Row>
-      </>
-    );
-    const handlerAddresses = () => (
-      <>
-        <Row>
-          <Link href={`/account/${ownerAddress}`} key={ownerAddress}>
-            <Mono key={ownerAddress + kda}>
-              {parseAddress(ownerAddress, 16)}
-            </Mono>
-          </Link>
-          <Copy data={ownerAddress} info="Owner Address" />
-        </Row>
-        <Row>
-          <Link href={`/account/${adminAddress}`} key={adminAddress}>
-            <Mono key={adminAddress + kda}>
-              {parseAddress(adminAddress, 16)}
-            </Mono>
-          </Link>
-          <Copy data={adminAddress} info="Admin Address" />
-        </Row>
-      </>
-    );
-    const handlerBalance = () => (
-      <>
-        <Row>
-          <span>{formatAmount((klvBalance || 0) / 10 ** 6)} KDA</span>
-        </Row>
-        <Row>
-          <SpanBold>{formatAmount((kdaBalance || 0) / 10 ** 6)} KLV</SpanBold>
-        </Row>
-      </>
-    );
-    const handlerRatio = () => (
-      <Row>
-        <span>{ratio}</span>
-      </Row>
-    );
+    const displayTicker = ticker || kda.split('-')[0] || 'KDA';
+    const rate = getPoolRate(pool?.fRatioKLV, pool?.fRatioKDA, precision);
+    const separateAdmin = !!pool && hasSeparateAdmin(pool);
 
-    const sections: IRowSection[] = [
+    return [
       {
-        element: () => handlerStatus(),
+        element: () => (
+          <IdentityCell>
+            <IdentityLink
+              href={`/asset/${kda}`}
+              data-testid="pool-link"
+              title={name || kda}
+            >
+              <AssetLogo
+                logo={logo || ''}
+                ticker={displayTicker}
+                name={name || kda}
+                verified={assetVerified}
+                size={32}
+              />
+              <IdentityText>
+                <AssetName>{name || kda}</AssetName>
+                <AssetIdLine>{kda}</AssetIdLine>
+              </IdentityText>
+            </IdentityLink>
+            {!active && (
+              <BadgePill $variant="warning" title={POOL_DISABLED_TOOLTIP}>
+                Disabled
+              </BadgePill>
+            )}
+            <RowActions>
+              <CopyAction
+                value={kda}
+                label="Copy asset ID"
+                announcement="Asset ID copied to clipboard"
+              />
+              <ActionLink
+                href={`/asset/${kda}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Open asset in a new tab"
+                title="Open in a new tab"
+              >
+                <MdOpenInNew size={14} />
+              </ActionLink>
+            </RowActions>
+          </IdentityCell>
+        ),
         span: 1,
-        width: 50,
       },
       {
-        element: () => handlerAddresses(),
+        element: () => (
+          <RateCell title={POOL_RATE_TOOLTIP}>
+            <RateValue>
+              {rate === undefined
+                ? '--'
+                : `${formatRate(rate)} ${displayTicker}`}
+            </RateValue>
+            <RateUnit>per 1 KLV</RateUnit>
+          </RateCell>
+        ),
         span: 1,
-        width: 50,
+        width: 190,
       },
       {
-        element: () => handlerBalance(),
+        element: () => (
+          <AmountPrimary
+            title={`${exactAmount(klvBalance, KLV_PRECISION)} KLV · ${POOL_KLV_RESERVE_TOOLTIP}`}
+          >
+            {formatAmount(klvBalance / 10 ** KLV_PRECISION)}
+          </AmountPrimary>
+        ),
         span: 1,
-        width: 50,
+        width: 170,
       },
       {
-        element: () => handlerRatio(),
+        element: () => (
+          <AmountMuted
+            title={
+              precision === undefined
+                ? 'Asset precision unavailable'
+                : `${exactAmount(kdaBalance, precision)} ${displayTicker}`
+            }
+          >
+            <span>
+              {precision === undefined
+                ? '--'
+                : formatAmount(kdaBalance / 10 ** precision)}
+            </span>
+          </AmountMuted>
+        ),
         span: 1,
-        width: 50,
+        width: 170,
+      },
+      {
+        element: () => (
+          <OwnerCell>
+            <OwnerRow>
+              <AddressLink
+                href={`/account/${ownerAddress}`}
+                title={ownerAddress}
+              >
+                {parseAddress(ownerAddress, 16)}
+              </AddressLink>
+              <RowActions>
+                <CopyAction
+                  value={ownerAddress}
+                  label="Copy owner address"
+                  announcement="Owner address copied to clipboard"
+                />
+              </RowActions>
+            </OwnerRow>
+            {separateAdmin && (
+              <AdminRow title={POOL_ADMIN_NOTE}>
+                <AdminLabel>Admin</AdminLabel>
+                <AddressLink
+                  href={`/account/${adminAddress}`}
+                  title={adminAddress}
+                >
+                  {parseAddress(adminAddress, 12)}
+                </AddressLink>
+              </AdminRow>
+            )}
+          </OwnerCell>
+        ),
+        span: 1,
       },
     ];
-
-    return sections;
   };
+
+  const Filters = useCallback(() => <PoolsFilters />, []);
 
   const tableProps: ITable = {
     rowSections,
@@ -119,15 +264,19 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
     type: 'assetsPage',
     request: (page, limit) => requestAssetsPoolsQuery(page, limit, router),
     dataName: 'pools',
+    MobileCard: PoolsMobileCard,
+    Filters,
+    singleLineSkeleton: true,
   };
 
+  // The assets page renders one shared title above its tabs, so this tab
+  // brings no header of its own.
   return (
     <>
-      <Header>
-        <Title title={t('common:Titles.Pools')} Icon={Icon} />
-      </Header>
-
-      <Table {...tableProps} />
+      <PoolsSummary />
+      <PoolsTableWrapper>
+        <Table {...tableProps} />
+      </PoolsTableWrapper>
     </>
   );
 };

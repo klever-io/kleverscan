@@ -21,17 +21,3 @@ export const getCirculatingSupply = (asset: IAsset): number =>
   hasVoidSupply(asset)
     ? (asset.netCirculatingSupply as number)
     : asset.circulatingSupply;
-
-/**
- * Holder shares are measured against the total supply, the void address
- * included, so every row in the holders table gets a percentage and the column
- * adds up to 100%. Measuring against circulating instead would leave the void
- * row without a value and inflate everyone else on heavily burned assets.
- */
-export const formatHolderPercentage = (
-  totalBalance: number,
-  totalSupply: number,
-): string =>
-  totalSupply > 0
-    ? `${((totalBalance / totalSupply) * 100).toFixed(2)}%`
-    : '--';

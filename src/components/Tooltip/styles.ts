@@ -20,6 +20,11 @@ export const StyledTooltip = styled(Tooltip)<{ displayMsg: boolean }>`
   }
 `;
 
+/* Named rather than inlined: nesting a template literal inside another one's
+   interpolation is ruled out by the repo conventions. */
+const maxWidth = (maxVw: number | undefined): string =>
+  maxVw === undefined ? '100vw' : `${maxVw}vw`;
+
 export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
   min-height: 20px;
 
@@ -39,7 +44,7 @@ export const ToolTipSpan = styled.span<{ maxVw: number | undefined }>`
     div {
       /* Long messages opt into wrapping via maxVw; without it desktop keeps
          the historical unbounded width. */
-      max-width: ${props => (props.maxVw ? `${props.maxVw}vw` : '100vw')};
+      max-width: ${props => maxWidth(props.maxVw)};
     }
   }
 `;

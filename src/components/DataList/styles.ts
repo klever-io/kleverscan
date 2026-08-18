@@ -35,10 +35,10 @@ export const DATA_LIST_ROW_HEIGHT = '60px';
  * spots (violet on dark cards is 3.3:1, red at badge size 3.4:1), so each
  * mode gets a hand-picked equivalent.
  */
-export const accentText = ({ theme }: { theme: DefaultTheme }): string =>
+const accentText = ({ theme }: { theme: DefaultTheme }): string =>
   theme.dark ? '#C95ED4' : theme.violet;
 
-export const voidText = ({ theme }: { theme: DefaultTheme }): string =>
+const voidText = ({ theme }: { theme: DefaultTheme }): string =>
   theme.dark ? '#FF4465' : '#C63A4D';
 
 export const successColor = ({ theme }: { theme: DefaultTheme }): string =>
@@ -50,14 +50,14 @@ const growBar = keyframes`
   }
 `;
 
-export const reducedMotion = css`
+const reducedMotion = css`
   @media (prefers-reduced-motion: reduce) {
     animation: none;
     transition: none;
   }
 `;
 
-export const focusRing = css`
+const focusRing = css`
   &:focus-visible {
     outline: 2px solid ${props => props.theme.violet};
     outline-offset: 2px;
@@ -79,12 +79,7 @@ export const VisuallyHidden = styled.span`
 
 /* --------------------------------- badges -------------------------------- */
 
-export type BadgeVariant =
-  | 'void'
-  | 'contract'
-  | 'neutral'
-  | 'warning'
-  | 'accent';
+type BadgeVariant = 'void' | 'contract' | 'neutral' | 'warning' | 'accent';
 
 const badgeColor = (
   props: { theme: DefaultTheme },

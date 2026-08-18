@@ -1,10 +1,8 @@
 import {
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
-  focusRing,
 } from '@/components/DataList/styles';
 import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
-import Link from 'next/link';
 import styled from 'styled-components';
 
 /* ------------------------------ supply cells ----------------------------- */

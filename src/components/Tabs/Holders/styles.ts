@@ -1,12 +1,10 @@
 import {
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
-  focusRing,
   successColor,
 } from '@/components/DataList/styles';
 import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
-import Link from 'next/link';
 import { transparentize } from 'polished';
 import styled, { css, DefaultTheme } from 'styled-components';
 import {

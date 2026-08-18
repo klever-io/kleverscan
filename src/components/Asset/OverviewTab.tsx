@@ -30,9 +30,9 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets']);
 
-  // Both answer undefined on an API error, which React Query treats as a
-  // failed query and retries; null keeps the counts blank without the retry
-  // storm, the same way the asset page handles its lookups.
+  // Both answer undefined on an API error, which React Query rejects
+  // outright as "data is undefined"; null keeps the counts blank as a
+  // successful answer, the same way the asset page handles its lookups.
   const { data: transactionsPagination } = useQuery({
     queryKey: [`transactionAsset`, router.query.asset],
     queryFn: async () =>

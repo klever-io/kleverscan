@@ -158,8 +158,9 @@ const Table = <TCard,>({
 
       return { items: [], totalPages: 0 };
     } catch (error) {
-      // React Query treats an undefined result as a failed query and retries
-      // it; an empty page is the honest answer and shows the empty state.
+      // React Query rejects an undefined result outright ("data is
+      // undefined") instead of storing it, so a failed request would land the
+      // table in an error state; an empty page shows the empty state.
       console.error(error);
       return { items: [], totalPages: 0 };
     }

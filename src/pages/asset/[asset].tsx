@@ -41,8 +41,8 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   });
 
   // These two answer undefined for a legitimate negative ("this asset has no
-  // ITO", "no pool"), which React Query would treat as a failed query and
-  // retry. null carries the same meaning as a successful answer, and the
+  // ITO", "no pool"), which React Query rejects outright as "data is
+  // undefined". null carries the same meaning as a successful answer, and the
   // components keep receiving undefined.
   const { data: ITOData } = useQuery({
     queryKey: [`ITOasset`, router.query.asset],

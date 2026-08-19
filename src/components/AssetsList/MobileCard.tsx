@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
@@ -36,6 +37,7 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
   item: asset,
   index,
 }) => {
+  const { t } = useTranslation(['assets']);
   const {
     assetId,
     name,
@@ -71,37 +73,42 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
           verified={verified}
         />
         {assetType === 'NonFungible' && (
-          <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.nft}>
+          <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
             NFT
           </BadgePill>
         )}
         {assetType === 'SemiFungible' && (
-          <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.sft}>
+          <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
             SFT
           </BadgePill>
         )}
         {attributes?.isPaused && (
-          <BadgePill $variant="warning" title={ASSET_BADGE_TOOLTIPS.paused}>
+          <BadgePill $variant="warning" title={t(ASSET_BADGE_TOOLTIPS.paused)}>
             Paused
           </BadgePill>
         )}
         {hasKdaPool && (
-          <BadgePill $variant="accent" title={ASSET_BADGE_TOOLTIPS.pool}>
+          <BadgePill $variant="accent" title={t(ASSET_BADGE_TOOLTIPS.pool)}>
             Fee Pool
           </BadgePill>
         )}
         <RowActions>
           <CopyAction
             value={assetId}
-            label="Copy asset ID"
-            announcement="Asset ID copied to clipboard"
+            label={t('assets:Common.CopyAssetId')}
+            announcement={t('assets:Common.AssetIdCopied')}
             large
           />
-          <ExplorerLink href={`/asset/${assetId}`} subject="asset" large />
+          <ExplorerLink
+            href={`/asset/${assetId}`}
+            label={t('assets:Common.OpenAsset')}
+            title={t('assets:Common.OpenInNewTab')}
+            large
+          />
         </RowActions>
       </MobileTopRow>
       <MobileTotalRow>
-        <MobileMetaItem>Circulating</MobileMetaItem>
+        <MobileMetaItem>{t('assets:List.Circulating')}</MobileMetaItem>
         <strong>
           {formatAmount(circulating / precisionDivisor)} {ticker}
         </strong>
@@ -120,40 +127,44 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
               </ShareFill>
             </ShareTrack>
             <MobileCapCaption>
-              {formatShare(capBasis, maxSupply)} of{' '}
-              {formatAmount(maxSupply / precisionDivisor)} cap
+              {t('assets:List.OfCapAmount', {
+                share: formatShare(capBasis, maxSupply),
+                max: formatAmount(maxSupply / precisionDivisor),
+              })}
             </MobileCapCaption>
           </>
         ) : (
           <MobileCapCaption>
-            <IoIosInfinite size={14} /> Unlimited supply
+            <IoIosInfinite size={14} /> {t('assets:List.UnlimitedSupply')}
           </MobileCapCaption>
         )}
       </MobileBarRow>
       <MobileMetaRow>
         <MobileMetaItem>
-          Staked{' '}
+          {t('assets:List.Staked')}{' '}
           {staking
             ? `${formatAmount(totalStaked / precisionDivisor)} (${formatShare(
                 totalStaked,
                 circulating,
               )})`
-            : 'n/a'}
+            : t('assets:List.NotAvailable')}
         </MobileMetaItem>
         <MobileMetaItem>
           {rewards.kind === 'apr' && (
             <>
               <RewardsRate>{rewards.rate}</RewardsRate>
-              <RewardsUnit>APR</RewardsUnit>
+              <RewardsUnit>{t('assets:List.Apr')}</RewardsUnit>
             </>
           )}
-          {rewards.kind === 'apr-configured' && <RewardsUnit>APR</RewardsUnit>}
+          {rewards.kind === 'apr-configured' && (
+            <RewardsUnit>{t('assets:List.Apr')}</RewardsUnit>
+          )}
           {rewards.kind === 'fpr' && (
-            <BadgePill $variant="neutral" title={FPR_TOOLTIP}>
+            <BadgePill $variant="neutral" title={t(FPR_TOOLTIP)}>
               FPR
             </BadgePill>
           )}
-          {rewards.kind === 'none' && 'Rewards n/a'}
+          {rewards.kind === 'none' && t('assets:List.RewardsUnavailable')}
         </MobileMetaItem>
       </MobileMetaRow>
     </MobileListCard>

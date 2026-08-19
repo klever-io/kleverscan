@@ -55,5 +55,82 @@
     "Total deposited": "Total deposited",
     "Total claimed": "Total claimed",
     "Show less": "Show less"
+  },
+  "List": {
+    "AssetsOnChain": "Assets on chain",
+    "AllTokenTypes": "all token types",
+    "Fungible": "Fungible",
+    "Tokens": "tokens",
+    "NftCollections": "NFT collections",
+    "SemiFungible": "Semi-fungible",
+    "Collections": "collections",
+    "AssetTypesAria": "Asset types on this chain: {{fungible}} fungible tokens, {{nft}} NFT collections, {{sft}} semi-fungible collections.",
+    "Circulating": "Circulating",
+    "Apr": "APR",
+    "RewardsUnavailable": "Rewards n/a",
+    "OfCap": "of cap",
+    "Staked": "Staked",
+    "Tooltips": {
+      "Nft": "Non-fungible collection: unique items, precision 0.",
+      "Sft": "Semi-fungible collection: items minted in editions.",
+      "Paused": "Transfers of this asset are currently paused by the owner.",
+      "Pool": "This asset has a KDA fee pool: network fees can be paid in it. See the Pools tab.",
+      "Fpr": "Rewards come from a shared fee pool (Flexible Proportional Rewards); the rate varies per epoch.",
+      "Apr": "Annual percentage rate from the latest staking epoch.",
+      "AprConfigured": "APR staking is configured; no rate history reported yet."
+    },
+    "RegistryAria": "Assets registry summary",
+    "UnlimitedSupply": "Unlimited supply",
+    "NotAvailable": "n/a",
+    "OfCapAmount": "{{share}} of {{max}} cap",
+    "NoMaximumSupply": "No maximum supply",
+    "Unlimited": "Unlimited"
+  },
+  "Pools": {
+    "FeePools": "Fee pools",
+    "Active": "Active",
+    "KlvReserves": "KLV reserves",
+    "FeeRate": "Fee rate",
+    "Disabled": "Disabled",
+    "Tooltips": {
+      "Disabled": "This pool is switched off, so fees cannot be paid in this asset right now.",
+      "Rate": "Fixed rate set by the pool owner: how much of this asset covers one KLV of fees.",
+      "KlvReserve": "KLV held by the pool. Fees paid in this asset are settled from this reserve.",
+      "AdminNote": "This pool has a separate admin account next to its owner."
+    },
+    "SummaryAria": "Fee pools summary",
+    "AssetsAcceptFees": "assets that accept fees",
+    "CurrentlyAccepting": "currently accepting fees",
+    "CombinedAcrossPools": "combined across all pools",
+    "Admin": "Admin",
+    "PrecisionUnavailable": "Asset precision unavailable"
+  },
+  "Holders": {
+    "Holders": "Holders",
+    "Top10Hold": "Top 10 hold",
+    "Top50Hold": "Top 50 hold",
+    "SharesAgainstTotal": "Shares are measured against the total supply.",
+    "SharesAgainstTotalNet": "Shares are measured against the total supply. Only the verdict ignores burned (VOID) tokens.",
+    "ConcentrationTooltip": "Top 10 concentration, ignoring burned (VOID) tokens. Top holders can include exchanges.",
+    "DistributionAria": "Distribution of the total supply: {{segments}}",
+    "SummaryAria": "Holder distribution summary",
+    "AccountsHolding": "accounts holding {{ticker}}",
+    "VoidTooltip": "VOID is the chain burn address. Tokens held here are permanently removed from circulation.",
+    "ContractTooltip": "This address is a smart contract.",
+    "SortBy": "Sort By",
+    "RankTooltip": "Rank reflects the current sort",
+    "Contract": "Contract",
+    "SortedBy": "Sorted by {{label}}, descending"
+  },
+  "Common": {
+    "OpenAsset": "Open asset in a new tab",
+    "OpenAccount": "Open account in a new tab",
+    "OpenInNewTab": "Open in a new tab",
+    "CopyAssetId": "Copy asset ID",
+    "AssetIdCopied": "Asset ID copied to clipboard",
+    "CopyAddress": "Copy address",
+    "AddressCopied": "Address copied to clipboard",
+    "CopyOwnerAddress": "Copy owner address",
+    "OwnerAddressCopied": "Owner address copied to clipboard"
   }
 }

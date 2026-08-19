@@ -75,12 +75,16 @@ const HoldersMobileCard: React.FC<IHoldersMobileCardProps> = ({
         {isVoid && (
           <BadgePill $variant="void">{t('assets:Overview.Void')}</BadgePill>
         )}
-        {isContract && <BadgePill $variant="contract">Contract</BadgePill>}
+        {isContract && (
+          <BadgePill $variant="contract">
+            {t('assets:Holders.Contract')}
+          </BadgePill>
+        )}
         <RowActions>
           <CopyAction
             value={address}
-            label="Copy address"
-            announcement="Address copied to clipboard"
+            label={t('assets:Common.CopyAddress')}
+            announcement={t('assets:Common.AddressCopied')}
             large
           />
         </RowActions>

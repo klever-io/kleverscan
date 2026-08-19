@@ -1,12 +1,13 @@
-/** Tooltip copy shared by the desktop rows and the mobile cards. */
-export const POOL_DISABLED_TOOLTIP =
-  'This pool is switched off, so fees cannot be paid in this asset right now.';
+/**
+ * Translation keys for the tooltip copy shared by the desktop rows and the
+ * mobile cards. Keys rather than sentences, because this module is not a
+ * component and cannot reach the translator itself; each call site resolves
+ * them with its own `t`.
+ */
+export const POOL_DISABLED_TOOLTIP = 'assets:Pools.Tooltips.Disabled';
 
-export const POOL_RATE_TOOLTIP =
-  'Fixed rate set by the pool owner: how much of this asset covers one KLV of fees.';
+export const POOL_RATE_TOOLTIP = 'assets:Pools.Tooltips.Rate';
 
-export const POOL_KLV_RESERVE_TOOLTIP =
-  'KLV held by the pool. Fees paid in this asset are settled from this reserve.';
+export const POOL_KLV_RESERVE_TOOLTIP = 'assets:Pools.Tooltips.KlvReserve';
 
-export const POOL_ADMIN_NOTE =
-  'This pool has a separate admin account next to its owner.';
+export const POOL_ADMIN_NOTE = 'assets:Pools.Tooltips.AdminNote';

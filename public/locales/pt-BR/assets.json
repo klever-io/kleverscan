@@ -55,5 +55,82 @@
     "Total deposited": "Total depositado",
     "Total claimed": "Total reivindicado",
     "Show less": "Mostrar menos"
+  },
+  "List": {
+    "AssetsOnChain": "Ativos na rede",
+    "AllTokenTypes": "todos os tipos de token",
+    "Fungible": "Fungível",
+    "Tokens": "tokens",
+    "NftCollections": "Coleções NFT",
+    "SemiFungible": "Semi-fungível",
+    "Collections": "coleções",
+    "AssetTypesAria": "Tipos de ativo nesta rede: {{fungible}} tokens fungíveis, {{nft}} coleções NFT, {{sft}} coleções semi-fungíveis.",
+    "Circulating": "Em circulação",
+    "Apr": "APR",
+    "RewardsUnavailable": "Recompensas n/d",
+    "OfCap": "do limite",
+    "Staked": "Em stake",
+    "Tooltips": {
+      "Nft": "Coleção não fungível: itens únicos, precisão 0.",
+      "Sft": "Coleção semi-fungível: itens cunhados em edições.",
+      "Paused": "As transferências deste ativo estão pausadas pelo proprietário.",
+      "Pool": "Este ativo tem um pool de taxas KDA: as taxas de rede podem ser pagas nele. Veja a aba Pools.",
+      "Fpr": "As recompensas vêm de um pool de taxas compartilhado (Flexible Proportional Rewards); a taxa varia por época.",
+      "Apr": "Taxa percentual anual da última época de staking.",
+      "AprConfigured": "O staking APR está configurado; nenhum histórico de taxa reportado ainda."
+    },
+    "RegistryAria": "Resumo do registro de ativos",
+    "UnlimitedSupply": "Fornecimento ilimitado",
+    "NotAvailable": "n/d",
+    "OfCapAmount": "{{share}} de {{max}} do limite",
+    "NoMaximumSupply": "Sem fornecimento máximo",
+    "Unlimited": "Ilimitado"
+  },
+  "Pools": {
+    "FeePools": "Pools de taxas",
+    "Active": "Ativos",
+    "KlvReserves": "Reservas de KLV",
+    "FeeRate": "Taxa",
+    "Disabled": "Desativado",
+    "Tooltips": {
+      "Disabled": "Este pool está desativado, portanto as taxas não podem ser pagas neste ativo no momento.",
+      "Rate": "Taxa fixa definida pelo proprietário do pool: quanto deste ativo cobre um KLV de taxas.",
+      "KlvReserve": "KLV mantido pelo pool. As taxas pagas neste ativo são liquidadas a partir desta reserva.",
+      "AdminNote": "Este pool tem uma conta de administrador separada da do proprietário."
+    },
+    "SummaryAria": "Resumo dos pools de taxas",
+    "AssetsAcceptFees": "ativos que aceitam taxas",
+    "CurrentlyAccepting": "aceitando taxas atualmente",
+    "CombinedAcrossPools": "somado entre todos os pools",
+    "Admin": "Admin",
+    "PrecisionUnavailable": "Precisão do ativo indisponível"
+  },
+  "Holders": {
+    "Holders": "Detentores",
+    "Top10Hold": "Top 10 detém",
+    "Top50Hold": "Top 50 detém",
+    "SharesAgainstTotal": "As participações são medidas em relação ao fornecimento total.",
+    "SharesAgainstTotalNet": "As participações são medidas em relação ao fornecimento total. Apenas o veredito ignora os tokens queimados (VOID).",
+    "ConcentrationTooltip": "Concentração do top 10, ignorando os tokens queimados (VOID). Os maiores detentores podem incluir corretoras.",
+    "DistributionAria": "Distribuição do fornecimento total: {{segments}}",
+    "SummaryAria": "Resumo da distribuição de detentores",
+    "AccountsHolding": "contas detendo {{ticker}}",
+    "VoidTooltip": "VOID é o endereço de queima da rede. Os tokens aqui são removidos permanentemente de circulação.",
+    "ContractTooltip": "Este endereço é um contrato inteligente.",
+    "SortBy": "Ordenar por",
+    "RankTooltip": "A posição reflete a ordenação atual",
+    "Contract": "Contrato",
+    "SortedBy": "Ordenado por {{label}}, decrescente"
+  },
+  "Common": {
+    "OpenAsset": "Abrir ativo em uma nova aba",
+    "OpenAccount": "Abrir conta em uma nova aba",
+    "OpenInNewTab": "Abrir em uma nova aba",
+    "CopyAssetId": "Copiar ID do ativo",
+    "AssetIdCopied": "ID do ativo copiado",
+    "CopyAddress": "Copiar endereço",
+    "AddressCopied": "Endereço copiado",
+    "CopyOwnerAddress": "Copiar endereço do proprietário",
+    "OwnerAddressCopied": "Endereço do proprietário copiado"
   }
 }

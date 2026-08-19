@@ -25,9 +25,9 @@ import {
   SupplyPrimary,
 } from '@/components/AssetsList/styles';
 import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/DataList/ExplorerLink';
 import { exactAmount, formatShare } from '@/components/DataList/format';
 import {
-  ActionLink,
   AmountMuted,
   BadgePill,
   IdentityCell,
@@ -64,7 +64,6 @@ import React, {
   useState,
 } from 'react';
 import { IoIosInfinite } from 'react-icons/io';
-import { MdOpenInNew } from 'react-icons/md';
 import nextI18nextConfig from '../../../next-i18next.config';
 
 const AssetsFilters: React.FC<PropsWithChildren> = () => {
@@ -192,40 +191,39 @@ const Assets: React.FC<PropsWithChildren> = () => {
               verified={verified}
             />
             {assetType === 'NonFungible' && (
-              <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.nft}>
+              <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
                 NFT
               </BadgePill>
             )}
             {assetType === 'SemiFungible' && (
-              <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.sft}>
+              <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
                 SFT
               </BadgePill>
             )}
             {attributes?.isPaused && (
-              <BadgePill $variant="warning" title={ASSET_BADGE_TOOLTIPS.paused}>
+              <BadgePill
+                $variant="warning"
+                title={t(ASSET_BADGE_TOOLTIPS.paused)}
+              >
                 Paused
               </BadgePill>
             )}
             {hasKdaPool && (
-              <BadgePill $variant="accent" title={ASSET_BADGE_TOOLTIPS.pool}>
+              <BadgePill $variant="accent" title={t(ASSET_BADGE_TOOLTIPS.pool)}>
                 Fee Pool
               </BadgePill>
             )}
             <RowActions>
               <CopyAction
                 value={assetId}
-                label="Copy asset ID"
-                announcement="Asset ID copied to clipboard"
+                label={t('assets:Common.CopyAssetId')}
+                announcement={t('assets:Common.AssetIdCopied')}
               />
-              <ActionLink
+              <ExplorerLink
                 href={`/asset/${assetId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open asset in a new tab"
-                title="Open in a new tab"
-              >
-                <MdOpenInNew size={14} />
-              </ActionLink>
+                label={t('assets:Common.OpenAsset')}
+                title={t('assets:Common.OpenInNewTab')}
+              />
             </RowActions>
           </IdentityCell>
         ),
@@ -242,10 +240,10 @@ const Assets: React.FC<PropsWithChildren> = () => {
               </SupplyPrimary>
             </SupplyCell>
           ) : (
-            <SupplyCell title="No maximum supply">
+            <SupplyCell title={t('assets:List.NoMaximumSupply')}>
               <SupplyPrimary>
                 <IoIosInfinite size={14} aria-hidden="true" />
-                <VisuallyHidden>Unlimited</VisuallyHidden>
+                <VisuallyHidden>{t('assets:List.Unlimited')}</VisuallyHidden>
               </SupplyPrimary>
             </SupplyCell>
           ),
@@ -320,15 +318,17 @@ const Assets: React.FC<PropsWithChildren> = () => {
           <RewardsCell>
             {rewards.kind === 'apr' && (
               <>
-                <RewardsRate title={APR_TOOLTIP}>{rewards.rate}</RewardsRate>
+                <RewardsRate title={t(APR_TOOLTIP)}>{rewards.rate}</RewardsRate>
                 <RewardsUnit>APR</RewardsUnit>
               </>
             )}
             {rewards.kind === 'apr-configured' && (
-              <RewardsMuted title={APR_CONFIGURED_TOOLTIP}>APR</RewardsMuted>
+              <RewardsMuted title={t(APR_CONFIGURED_TOOLTIP)}>
+                {t('assets:List.Apr')}
+              </RewardsMuted>
             )}
             {rewards.kind === 'fpr' && (
-              <BadgePill $variant="neutral" title={FPR_TOOLTIP}>
+              <BadgePill $variant="neutral" title={t(FPR_TOOLTIP)}>
                 FPR
               </BadgePill>
             )}

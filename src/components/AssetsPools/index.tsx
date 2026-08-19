@@ -102,6 +102,7 @@ const PoolsFilters: React.FC<PropsWithChildren> = () => {
 };
 
 const AssetsPools: React.FC<PropsWithChildren> = () => {
+  const { t } = useTranslation(['assets']);
   const router = useRouter();
 
   // The shared Table also calls this with a header label to read the column
@@ -139,17 +140,21 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
               verified={assetVerified}
             />
             {!active && (
-              <BadgePill $variant="warning" title={POOL_DISABLED_TOOLTIP}>
+              <BadgePill $variant="warning" title={t(POOL_DISABLED_TOOLTIP)}>
                 Disabled
               </BadgePill>
             )}
             <RowActions>
               <CopyAction
                 value={kda}
-                label="Copy asset ID"
-                announcement="Asset ID copied to clipboard"
+                label={t('assets:Common.CopyAssetId')}
+                announcement={t('assets:Common.AssetIdCopied')}
               />
-              <ExplorerLink href={`/asset/${kda}`} subject="asset" />
+              <ExplorerLink
+                href={`/asset/${kda}`}
+                label={t('assets:Common.OpenAsset')}
+                title={t('assets:Common.OpenInNewTab')}
+              />
             </RowActions>
           </IdentityCell>
         ),
@@ -157,7 +162,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
       },
       {
         element: () => (
-          <RateCell title={POOL_RATE_TOOLTIP}>
+          <RateCell title={t(POOL_RATE_TOOLTIP)}>
             <RateValue>
               {rate === undefined
                 ? '--'
@@ -172,7 +177,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
       {
         element: () => (
           <AmountPrimary
-            title={`${exactAmount(klvBalance, KLV_PRECISION)} KLV · ${POOL_KLV_RESERVE_TOOLTIP}`}
+            title={`${exactAmount(klvBalance, KLV_PRECISION)} KLV · ${t(POOL_KLV_RESERVE_TOOLTIP)}`}
           >
             {formatAmount(klvBalance / 10 ** KLV_PRECISION)}
           </AmountPrimary>
@@ -185,7 +190,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
           <AmountMuted
             title={
               precision === undefined
-                ? 'Asset precision unavailable'
+                ? t('assets:Pools.PrecisionUnavailable')
                 : `${exactAmount(kdaBalance, precision)} ${displayTicker}`
             }
           >
@@ -212,14 +217,14 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
               <RowActions>
                 <CopyAction
                   value={ownerAddress}
-                  label="Copy owner address"
-                  announcement="Owner address copied to clipboard"
+                  label={t('assets:Common.CopyOwnerAddress')}
+                  announcement={t('assets:Common.OwnerAddressCopied')}
                 />
               </RowActions>
             </OwnerRow>
             {separateAdmin && (
-              <AdminRow title={POOL_ADMIN_NOTE}>
-                <AdminLabel>Admin</AdminLabel>
+              <AdminRow title={t(POOL_ADMIN_NOTE)}>
+                <AdminLabel>{t('assets:Pools.Admin')}</AdminLabel>
                 <AddressLink
                   href={`/account/${adminAddress}`}
                   title={adminAddress}

@@ -1,4 +1,5 @@
 import SummaryLoading from '@/components/DataList/SummaryLoading';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import {
   SummaryCard,
@@ -20,6 +21,7 @@ import { summarizePools } from './helpers';
  * are deliberately absent: adding up different tokens says nothing.
  */
 const PoolsSummary: React.FC = () => {
+  const { t } = useTranslation(['assets']);
   const { data: pools, isLoading } = useQuery({
     queryKey: ['assetsPoolsAll'],
     queryFn: requestAllAssetsPools,
@@ -28,7 +30,7 @@ const PoolsSummary: React.FC = () => {
   });
 
   if (isLoading) {
-    return <SummaryLoading label="Fee pools summary" tiles={3} />;
+    return <SummaryLoading label={t('assets:Pools.SummaryAria')} tiles={3} />;
   }
 
   if (!pools || pools.length === 0) {
@@ -38,22 +40,22 @@ const PoolsSummary: React.FC = () => {
   const summary = summarizePools(pools);
 
   return (
-    <SummaryCard aria-label="Fee pools summary">
+    <SummaryCard aria-label={t('assets:Pools.SummaryAria')}>
       <TilesGrid>
         <Tile>
-          <TileLabel>Fee pools</TileLabel>
+          <TileLabel>{t('assets:Pools.FeePools')}</TileLabel>
           <TileValue>{summary.total.toLocaleString('en-US')}</TileValue>
-          <TileSub>assets that accept fees</TileSub>
+          <TileSub>{t('assets:Pools.AssetsAcceptFees')}</TileSub>
         </Tile>
         <Tile>
-          <TileLabel>Active</TileLabel>
+          <TileLabel>{t('assets:Pools.Active')}</TileLabel>
           <TileValue>{summary.active.toLocaleString('en-US')}</TileValue>
-          <TileSub>currently accepting fees</TileSub>
+          <TileSub>{t('assets:Pools.CurrentlyAccepting')}</TileSub>
         </Tile>
         <Tile>
-          <TileLabel>KLV reserves</TileLabel>
+          <TileLabel>{t('assets:Pools.KlvReserves')}</TileLabel>
           <TileValue>{formatAmount(summary.klvReserves)}</TileValue>
-          <TileSub>combined across all pools</TileSub>
+          <TileSub>{t('assets:Pools.CombinedAcrossPools')}</TileSub>
         </Tile>
       </TilesGrid>
     </SummaryCard>

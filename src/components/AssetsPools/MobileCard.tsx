@@ -1,3 +1,4 @@
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
@@ -33,6 +34,7 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
   item: pool,
   index,
 }) => {
+  const { t } = useTranslation(['assets']);
   const { kda, name, logo, ticker, assetVerified, precision, active } = pool;
   const rate = getPoolRate(pool.fRatioKLV, pool.fRatioKDA, precision);
   const displayTicker = ticker || kda.split('-')[0];
@@ -50,22 +52,27 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
           verified={assetVerified}
         />
         {!active && (
-          <BadgePill $variant="warning" title={POOL_DISABLED_TOOLTIP}>
+          <BadgePill $variant="warning" title={t(POOL_DISABLED_TOOLTIP)}>
             Disabled
           </BadgePill>
         )}
         <RowActions>
           <CopyAction
             value={kda}
-            label="Copy asset ID"
-            announcement="Asset ID copied to clipboard"
+            label={t('assets:Common.CopyAssetId')}
+            announcement={t('assets:Common.AssetIdCopied')}
             large
           />
-          <ExplorerLink href={`/asset/${kda}`} subject="asset" large />
+          <ExplorerLink
+            href={`/asset/${kda}`}
+            label={t('assets:Common.OpenAsset')}
+            title={t('assets:Common.OpenInNewTab')}
+            large
+          />
         </RowActions>
       </MobileTopRow>
       <MobileTotalRow>
-        <MobileMetaItem>Fee rate</MobileMetaItem>
+        <MobileMetaItem>{t('assets:Pools.FeeRate')}</MobileMetaItem>
         <MobileRateCell>
           <MobileRateValue>
             {rate === undefined ? '--' : `${formatRate(rate)} ${displayTicker}`}

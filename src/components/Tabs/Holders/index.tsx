@@ -48,10 +48,6 @@ const TOTAL_LABEL = 'Total Balance';
 const LIQUID_LABEL = 'Liquid';
 const SHARE_LABEL = 'Total Supply Share';
 
-const VOID_TOOLTIP =
-  'VOID is the chain burn address. Tokens held here are permanently removed from circulation.';
-const CONTRACT_TOOLTIP = 'This address is a smart contract.';
-
 /**
  * Holders tab: a concentration summary strip on top of the ranked holder
  * table. Every displayed share, in the rows and in the strip alike, measures
@@ -101,7 +97,7 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
 
   const handleSort = (label: string): void => {
     setSortLabel(label);
-    setSortAnnouncement(`Sorted by ${label}, descending`);
+    setSortAnnouncement(t('assets:Holders.SortedBy', { label }));
   };
 
   // One top-50 fetch per asset feeds the summary strip, the medal shift away
@@ -154,7 +150,7 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
     return [
       {
         element: () => (
-          <RankBadge $medal={medal} title="Rank reflects the current sort">
+          <RankBadge $medal={medal} title={t('assets:Holders.RankTooltip')}>
             {rank}
           </RankBadge>
         ),
@@ -168,22 +164,32 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
               {parseAddress(address, 20)}
             </AddressLink>
             {isVoid && (
-              <BadgePill $variant="void" title={VOID_TOOLTIP}>
+              <BadgePill
+                $variant="void"
+                title={t('assets:Holders.VoidTooltip')}
+              >
                 {t('assets:Overview.Void')}
               </BadgePill>
             )}
             {isContract && (
-              <BadgePill $variant="contract" title={CONTRACT_TOOLTIP}>
-                Contract
+              <BadgePill
+                $variant="contract"
+                title={t('assets:Holders.ContractTooltip')}
+              >
+                {t('assets:Holders.Contract')}
               </BadgePill>
             )}
             <RowActions>
               <CopyAction
                 value={address}
-                label="Copy address"
-                announcement="Address copied to clipboard"
+                label={t('assets:Common.CopyAddress')}
+                announcement={t('assets:Common.AddressCopied')}
               />
-              <ExplorerLink href={`/account/${address}`} subject="account" />
+              <ExplorerLink
+                href={`/account/${address}`}
+                label={t('assets:Common.OpenAccount')}
+                title={t('assets:Common.OpenInNewTab')}
+              />
             </RowActions>
           </HolderCell>
         ),
@@ -276,7 +282,7 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
 
   const filters: IFilter[] = [
     {
-      title: 'Sort By',
+      title: t('assets:Holders.SortBy'),
       firstItem: TOTAL_LABEL,
       data: [stakedLabel, LIQUID_LABEL],
       onClick: value => handleSort(value),

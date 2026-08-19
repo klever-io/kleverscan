@@ -1,4 +1,5 @@
 import SummaryLoading from '@/components/DataList/SummaryLoading';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import Skeleton from '@/components/Skeleton';
 import {
@@ -43,6 +44,7 @@ const fetchTotalRecords = async (type?: string): Promise<number> => {
  * without duplicating the filter control itself.
  */
 const RegistryStrip: React.FC = () => {
+  const { t } = useTranslation(['assets']);
   const router = useRouter();
   const { theme } = useTheme();
 
@@ -96,30 +98,34 @@ const RegistryStrip: React.FC = () => {
   );
   const activeType = router.query.type as string | undefined;
 
-  const barLabel = `Asset types on this chain: ${counts.fungible} fungible tokens, ${counts.nonFungible} NFT collections, ${counts.semiFungible} semi-fungible collections.`;
+  const barLabel = t('assets:List.AssetTypesAria', {
+    fungible: counts.fungible,
+    nft: counts.nonFungible,
+    sft: counts.semiFungible,
+  });
 
   return (
-    <SummaryCard aria-label="Assets registry summary">
+    <SummaryCard aria-label={t('assets:List.RegistryAria')}>
       <TilesGrid>
         <Tile>
-          <TileLabel>Assets on chain</TileLabel>
+          <TileLabel>{t('assets:List.AssetsOnChain')}</TileLabel>
           <TileValue>{counts.total.toLocaleString('en-US')}</TileValue>
-          <TileSub>all token types</TileSub>
+          <TileSub>{t('assets:List.AllTokenTypes')}</TileSub>
         </Tile>
         <Tile>
-          <TileLabel>Fungible</TileLabel>
+          <TileLabel>{t('assets:List.Fungible')}</TileLabel>
           <TileValue>{counts.fungible.toLocaleString('en-US')}</TileValue>
-          <TileSub>tokens</TileSub>
+          <TileSub>{t('assets:List.Tokens')}</TileSub>
         </Tile>
         <Tile>
-          <TileLabel>NFT collections</TileLabel>
+          <TileLabel>{t('assets:List.NftCollections')}</TileLabel>
           <TileValue>{counts.nonFungible.toLocaleString('en-US')}</TileValue>
-          <TileSub>collections</TileSub>
+          <TileSub>{t('assets:List.Collections')}</TileSub>
         </Tile>
         <Tile>
-          <TileLabel>Semi-fungible</TileLabel>
+          <TileLabel>{t('assets:List.SemiFungible')}</TileLabel>
           <TileValue>{counts.semiFungible.toLocaleString('en-US')}</TileValue>
-          <TileSub>collections</TileSub>
+          <TileSub>{t('assets:List.Collections')}</TileSub>
         </Tile>
       </TilesGrid>
       {segments.length > 0 && segmentsTotal > 0 && (

@@ -5,6 +5,12 @@ import {
   getDefaultCells,
   getContractCells,
 } from '../contracts';
+import { exportToCsv, sanitizeRow } from './index';
+import { toast } from 'react-toastify';
+
+jest.mock('react-toastify', () => ({
+  toast: { error: jest.fn() },
+}));
 
 jest.mock('../precisionFunctions', () => ({
   getPrecision: jest.fn().mockResolvedValue(6),
@@ -589,4 +595,79 @@ describe('header-data alignment', () => {
       expect(sanitizedHeaders.length).toBe(cells.length);
     },
   );
+});
+
+describe('sanitizeRow', () => {
+  it('neutralizes a leading = so a spreadsheet does not evaluate it', () => {
+    expect(sanitizeRow(['=HYPERLINK("https://evil.tld")'])).toBe(
+      '"\'=HYPERLINK(""https://evil.tld"")"\n',
+    );
+  });
+
+  it.each([
+    ['=cmd', "'=cmd\n"],
+    ['+cmd', "'+cmd\n"],
+    ['@cmd', "'@cmd\n"],
+    ['-cmd', "'-cmd\n"],
+    ['-1+1', "'-1+1\n"],
+    ['\tcmd', "'\tcmd\n"],
+  ])('neutralizes the formula prefix in %j', (value, expected) => {
+    expect(sanitizeRow([value])).toBe(expected);
+  });
+
+  it('keeps a value on one record so its tail cannot escape the check', () => {
+    // A bare CR is a record separator to a CSV reader, so without collapsing
+    // it the text behind it would start a new record and never be checked.
+    const result = sanitizeRow(["MyProposal\r=cmd|'/C calc'!A0", 'next']);
+
+    expect(result).not.toContain('\r');
+    expect(result.split('\n').filter(Boolean)).toHaveLength(1);
+    expect(result).toBe("MyProposal =cmd|'/C calc'!A0,next\n");
+  });
+
+  it('collapses an embedded newline for the same reason', () => {
+    expect(sanitizeRow(['line1\nline2'])).toBe('line1 line2\n');
+  });
+
+  it.each([-5, '+1e3', 0, 42])(
+    'leaves %j a number rather than turning it into text',
+    value => {
+      expect(sanitizeRow([value])).toBe(`${value}\n`);
+    },
+  );
+
+  it('leaves an ordinary value untouched', () => {
+    expect(sanitizeRow(['KID-36W3'])).toBe('KID-36W3\n');
+  });
+
+  it('still quotes and escapes a value containing a comma or a quote', () => {
+    expect(sanitizeRow(['a,b'])).toBe('"a,b"\n');
+    expect(sanitizeRow(['say "hi"'])).toBe('"say ""hi"""\n');
+  });
+
+  it('renders null and undefined as empty cells', () => {
+    expect(sanitizeRow([null, undefined, 'x'])).toBe(',,x\n');
+  });
+
+  it('joins multiple cells with a comma', () => {
+    expect(sanitizeRow(['a', 'b', 'c'])).toBe('a,b,c\n');
+  });
+});
+
+describe('exportToCsv', () => {
+  beforeEach(() => {
+    (toast.error as jest.Mock).mockClear();
+  });
+
+  it('reports an empty result with a toast, not a native dialog', async () => {
+    await exportToCsv('transactions.csv', [], mockRouter());
+
+    expect(toast.error).toHaveBeenCalledWith('No data to export!');
+  });
+
+  it('reports the same way when there are no rows at all', async () => {
+    await exportToCsv('transactions.csv', null, mockRouter());
+
+    expect(toast.error).toHaveBeenCalledWith('No data to export!');
+  });
 });

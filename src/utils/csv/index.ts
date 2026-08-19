@@ -19,7 +19,22 @@ const processHeaders = (router: NextRouter) => {
   return sanitizedHeaders;
 };
 
-const sanitizeRow = (parsedRow: any[]) => {
+const FORMULA_PREFIXES = new Set(['=', '+', '-', '@', '\t', '\r']);
+
+/**
+ * Cells starting with one of these are evaluated as a formula by Excel and
+ * LibreOffice, and quoting does not help because they strip the quotes on
+ * import. Chain supplied text (asset ticker, account name, proposal
+ * description) reaches these cells, so a leading quote is added to keep the
+ * value inert. Values that parse as a number are left alone, so a negative
+ * amount stays a number rather than becoming text.
+ */
+const escapeFormula = (value: string): string =>
+  FORMULA_PREFIXES.has(value.charAt(0)) && Number.isNaN(Number(value))
+    ? `'${value}`
+    : value;
+
+export const sanitizeRow = (parsedRow: any[]): string => {
   let finalVal = '';
   for (let j = 0; j < parsedRow.length; j++) {
     const innerValue =
@@ -27,8 +42,14 @@ const sanitizeRow = (parsedRow: any[]) => {
         ? ''
         : parsedRow[j].toString();
 
-    let result = innerValue.replace(/"/g, '""');
-    if (result.search(/("|,|\n)/g) >= 0) result = '"' + result + '"';
+    // Collapse line breaks first. A bare CR is a record separator to a CSV
+    // reader but is not covered by the quoting test below, so a value carrying
+    // one would split the row and drop its tail into the next record's first
+    // cell, past the formula check.
+    const singleLine = innerValue.replace(/[\r\n]+/g, ' ');
+
+    let result = escapeFormula(singleLine).replace(/"/g, '""');
+    if (result.search(/["\n,]/g) >= 0) result = '"' + result + '"';
     if (j > 0) finalVal += ',';
     finalVal += result;
   }
@@ -75,7 +96,7 @@ export const exportToCsv = async (
   router: NextRouter,
 ): Promise<void> => {
   if (!rows || rows.length === 0) {
-    window.alert('No data to export!');
+    toast.error('No data to export!');
     return;
   }
 

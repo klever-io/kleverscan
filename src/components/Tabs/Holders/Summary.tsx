@@ -1,3 +1,4 @@
+import SummaryLoading from '@/components/DataList/SummaryLoading';
 import React from 'react';
 import Skeleton from '@/components/Skeleton';
 import Tooltip from '@/components/Tooltip';
@@ -11,7 +12,6 @@ import {
   LegendItem,
   LegendRow,
   SummaryCard,
-  SummarySkeletonRow,
   Tile,
   TileLabel,
   TileLabelRow,
@@ -54,20 +54,7 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
   }
 
   if (isLoading) {
-    return (
-      <SummaryCard aria-label="Holder distribution summary">
-        <SummarySkeletonRow>
-          {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} width={150} height={56} />
-          ))}
-        </SummarySkeletonRow>
-        <Skeleton
-          width="100%"
-          height={8}
-          containerCustomStyles={{ marginTop: 16 }}
-        />
-      </SummaryCard>
-    );
+    return <SummaryLoading label="Holder distribution summary" tiles={4} bar />;
   }
 
   const formatAssetAmount = (raw: number): string =>

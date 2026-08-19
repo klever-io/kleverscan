@@ -57,6 +57,26 @@ const reducedMotion = css`
   }
 `;
 
+/**
+ * MobileCardItem gives every `a, span` inside a mobile card its own display,
+ * height, min-width and font-weight. That descendant selector outranks a plain
+ * styled-component class, so a value dropped into a card silently loses the
+ * type it was given. Doubling the class wins the specificity back. This is
+ * that fix, named once instead of repeated at every value.
+ */
+const cardWeight = (fontWeight: number) => css`
+  font-weight: ${fontWeight};
+`;
+
+export const inCard = (display: string, fontWeight?: number) => css`
+  && {
+    display: ${display};
+    height: auto;
+    min-width: 0;
+    ${fontWeight === undefined ? null : cardWeight(fontWeight)}
+  }
+`;
+
 const focusRing = css`
   &:focus-visible {
     outline: 2px solid ${props => props.theme.violet};
@@ -219,11 +239,7 @@ export const IdentityCell = styled.div`
 `;
 
 export const IdentityLink = styled(Link)`
-  && {
-    display: flex;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('flex')}
   align-items: center;
   gap: 8px;
   ${focusRing}
@@ -241,12 +257,7 @@ export const IdentityText = styled.span`
 `;
 
 export const AssetName = styled.span`
-  && {
-    display: block;
-    height: auto;
-    min-width: 0;
-    font-weight: 600;
-  }
+  ${inCard('block', 600)}
   max-width: 100%;
   font-size: 0.875rem;
   color: ${props => props.theme.black};
@@ -256,11 +267,7 @@ export const AssetName = styled.span`
 `;
 
 export const AssetIdLine = styled.span`
-  && {
-    display: flex;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('flex')}
   align-items: baseline;
   gap: 4px;
   font-family: 'Fira Mono', monospace;

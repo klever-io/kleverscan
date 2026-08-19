@@ -25,12 +25,8 @@ import { exactAmount, formatShare } from '@/components/DataList/format';
 import {
   ActionLink,
   AmountMuted,
-  AssetIdLine,
-  AssetName,
   BadgePill,
   IdentityCell,
-  IdentityLink,
-  IdentityText,
   InlineShare,
   RowActions,
   ShareCell,
@@ -42,7 +38,7 @@ import {
 } from '@/components/DataList/styles';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
-import AssetLogo from '@/components/Logo/AssetLogo';
+import AssetIdentity from '@/components/DataList/AssetIdentity';
 import Table, { ITable } from '@/components/Table';
 import Tabs, { ITabs } from '@/components/Tabs';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
@@ -184,23 +180,15 @@ const Assets: React.FC<PropsWithChildren> = () => {
       {
         element: () => (
           <IdentityCell>
-            <IdentityLink
+            <AssetIdentity
               href={`/asset/${assetId}`}
-              data-testid="asset-link"
-              title={name}
-            >
-              <AssetLogo
-                logo={logo}
-                ticker={ticker}
-                name={name}
-                verified={verified}
-                size={32}
-              />
-              <IdentityText>
-                <AssetName>{name}</AssetName>
-                <AssetIdLine>{assetId}</AssetIdLine>
-              </IdentityText>
-            </IdentityLink>
+              testId="asset-link"
+              name={name}
+              assetId={assetId}
+              ticker={ticker}
+              logo={logo}
+              verified={verified}
+            />
             {assetType === 'NonFungible' && (
               <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.nft}>
                 NFT

@@ -1,20 +1,16 @@
 import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/DataList/ExplorerLink';
 import { exactAmount } from '@/components/DataList/format';
 import {
-  ActionLink,
   AddressLink,
   AmountMuted,
   AmountPrimary,
-  AssetIdLine,
-  AssetName,
   BadgePill,
   IdentityCell,
-  IdentityLink,
-  IdentityText,
   RowActions,
 } from '@/components/DataList/styles';
 import Filter, { IFilter } from '@/components/Filter';
-import AssetLogo from '@/components/Logo/AssetLogo';
+import AssetIdentity from '@/components/DataList/AssetIdentity';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import {
   requestAllAssetsPools,
@@ -29,7 +25,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { PropsWithChildren, useCallback } from 'react';
-import { MdOpenInNew } from 'react-icons/md';
 
 import Table, { ITable } from '../Table';
 import { formatRate, getPoolRate, hasSeparateAdmin } from './helpers';
@@ -134,23 +129,15 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
       {
         element: () => (
           <IdentityCell>
-            <IdentityLink
+            <AssetIdentity
               href={`/asset/${kda}`}
-              data-testid="pool-link"
-              title={name || kda}
-            >
-              <AssetLogo
-                logo={logo || ''}
-                ticker={displayTicker}
-                name={name || kda}
-                verified={assetVerified}
-                size={32}
-              />
-              <IdentityText>
-                <AssetName>{name || kda}</AssetName>
-                <AssetIdLine>{kda}</AssetIdLine>
-              </IdentityText>
-            </IdentityLink>
+              testId="pool-link"
+              name={name || kda}
+              assetId={kda}
+              ticker={displayTicker}
+              logo={logo || ''}
+              verified={assetVerified}
+            />
             {!active && (
               <BadgePill $variant="warning" title={POOL_DISABLED_TOOLTIP}>
                 Disabled
@@ -162,15 +149,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
                 label="Copy asset ID"
                 announcement="Asset ID copied to clipboard"
               />
-              <ActionLink
-                href={`/asset/${kda}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open asset in a new tab"
-                title="Open in a new tab"
-              >
-                <MdOpenInNew size={14} />
-              </ActionLink>
+              <ExplorerLink href={`/asset/${kda}`} subject="asset" />
             </RowActions>
           </IdentityCell>
         ),

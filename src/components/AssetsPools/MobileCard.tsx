@@ -1,13 +1,9 @@
 import React from 'react';
 import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/DataList/ExplorerLink';
 import { exactAmount } from '@/components/DataList/format';
 import {
-  ActionLink,
-  AssetIdLine,
-  AssetName,
   BadgePill,
-  IdentityLink,
-  IdentityText,
   MobileListCard,
   MobileMetaItem,
   MobileMetaRow,
@@ -15,11 +11,10 @@ import {
   MobileTotalRow,
   RowActions,
 } from '@/components/DataList/styles';
-import AssetLogo from '@/components/Logo/AssetLogo';
+import AssetIdentity from '@/components/DataList/AssetIdentity';
 import { IAssetPoolRow } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { MdOpenInNew } from 'react-icons/md';
 
 import { formatRate, getPoolRate } from './helpers';
 import { POOL_DISABLED_TOOLTIP } from './texts';
@@ -45,23 +40,15 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
       <MobileTopRow>
-        <IdentityLink
+        <AssetIdentity
           href={`/asset/${kda}`}
-          data-testid="pool-link"
-          title={name || kda}
-        >
-          <AssetLogo
-            logo={logo || ''}
-            ticker={displayTicker}
-            name={name || kda}
-            verified={assetVerified}
-            size={32}
-          />
-          <IdentityText>
-            <AssetName>{name || kda}</AssetName>
-            <AssetIdLine>{kda}</AssetIdLine>
-          </IdentityText>
-        </IdentityLink>
+          testId="pool-link"
+          name={name || kda}
+          assetId={kda}
+          ticker={displayTicker}
+          logo={logo || ''}
+          verified={assetVerified}
+        />
         {!active && (
           <BadgePill $variant="warning" title={POOL_DISABLED_TOOLTIP}>
             Disabled
@@ -74,16 +61,7 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
             announcement="Asset ID copied to clipboard"
             large
           />
-          <ActionLink
-            href={`/asset/${kda}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open asset in a new tab"
-            title="Open in a new tab"
-            $large
-          >
-            <MdOpenInNew size={16} />
-          </ActionLink>
+          <ExplorerLink href={`/asset/${kda}`} subject="asset" large />
         </RowActions>
       </MobileTopRow>
       <MobileTotalRow>

@@ -1,6 +1,7 @@
 import {
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
+  inCard,
 } from '@/components/DataList/styles';
 import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
 import styled from 'styled-components';
@@ -20,12 +21,7 @@ export const SupplyCell = styled.div`
 `;
 
 export const SupplyPrimary = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-    font-weight: 600;
-  }
+  ${inCard('inline', 600)}
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
   color: ${props => props.theme.black};
@@ -39,11 +35,7 @@ export const ShareValueLine = styled.div`
 `;
 
 export const CapContext = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('inline')}
   font-size: 0.75rem;
   font-weight: 400;
   color: ${props => props.theme.darkText};
@@ -64,24 +56,14 @@ export const RewardsCell = styled.div`
 `;
 
 export const RewardsRate = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-    font-weight: 600;
-  }
+  ${inCard('inline', 600)}
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
   color: ${props => props.theme.black};
 `;
 
 export const RewardsUnit = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-    font-weight: 600;
-  }
+  ${inCard('inline', 600)}
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -89,11 +71,7 @@ export const RewardsUnit = styled.span`
 `;
 
 export const RewardsMuted = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('inline')}
   font-size: 0.75rem;
   color: ${props => props.theme.darkText};
   opacity: 0.75;
@@ -112,11 +90,7 @@ export const StripBarArea = styled.div`
 /* --------------------------- mobile card pieces -------------------------- */
 
 export const MobileCapCaption = styled.span`
-  && {
-    display: inline-flex;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('inline-flex')}
   align-items: center;
   gap: 4px;
   margin-top: 4px;

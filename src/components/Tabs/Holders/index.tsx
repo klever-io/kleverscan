@@ -11,10 +11,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { MdOpenInNew } from 'react-icons/md';
 import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
-  ActionLink,
   AddressLink,
   AmountMuted,
   AmountPrimary,
@@ -181,15 +180,7 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
                 label="Copy address"
                 announcement="Address copied to clipboard"
               />
-              <ActionLink
-                href={`/account/${address}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Open account in a new tab"
-                title="Open in a new tab"
-              >
-                <MdOpenInNew size={14} />
-              </ActionLink>
+              <ExplorerLink href={`/account/${address}`} subject="account" />
             </RowActions>
           </HolderCell>
         ),

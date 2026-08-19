@@ -1,12 +1,8 @@
 import React from 'react';
 import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
-  ActionLink,
-  AssetIdLine,
-  AssetName,
   BadgePill,
-  IdentityLink,
-  IdentityText,
   MobileBarRow,
   MobileListCard,
   MobileMetaItem,
@@ -19,12 +15,11 @@ import {
   ShareTrack,
 } from '@/components/DataList/styles';
 import { formatShare } from '@/components/DataList/format';
-import AssetLogo from '@/components/Logo/AssetLogo';
+import AssetIdentity from '@/components/DataList/AssetIdentity';
 import { IAsset } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { getCirculatingSupply } from '@/utils/voidSupply';
 import { IoIosInfinite } from 'react-icons/io';
-import { MdOpenInNew } from 'react-icons/md';
 import { MobileCapCaption, RewardsRate, RewardsUnit } from './styles';
 import { getCapUsage, getRewardsModel } from './helpers';
 import { ASSET_BADGE_TOOLTIPS, FPR_TOOLTIP } from './badgeTexts';
@@ -68,23 +63,15 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
       <MobileTopRow>
-        <IdentityLink
+        <AssetIdentity
           href={`/asset/${assetId}`}
-          data-testid="asset-link"
-          title={name}
-        >
-          <AssetLogo
-            logo={logo}
-            ticker={ticker}
-            name={name}
-            verified={verified}
-            size={32}
-          />
-          <IdentityText>
-            <AssetName>{name}</AssetName>
-            <AssetIdLine>{assetId}</AssetIdLine>
-          </IdentityText>
-        </IdentityLink>
+          testId="asset-link"
+          name={name}
+          assetId={assetId}
+          ticker={ticker}
+          logo={logo}
+          verified={verified}
+        />
         {assetType === 'NonFungible' && (
           <BadgePill $variant="neutral" title={ASSET_BADGE_TOOLTIPS.nft}>
             NFT
@@ -112,16 +99,7 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
             announcement="Asset ID copied to clipboard"
             large
           />
-          <ActionLink
-            href={`/asset/${assetId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Open asset in a new tab"
-            title="Open in a new tab"
-            $large
-          >
-            <MdOpenInNew size={16} />
-          </ActionLink>
+          <ExplorerLink href={`/asset/${assetId}`} subject="asset" large />
         </RowActions>
       </MobileTopRow>
       <MobileTotalRow>

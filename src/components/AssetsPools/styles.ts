@@ -1,6 +1,7 @@
 import {
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
+  inCard,
 } from '@/components/DataList/styles';
 import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
 import styled from 'styled-components';
@@ -18,12 +19,7 @@ export const RateCell = styled.div`
 `;
 
 export const RateValue = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-    font-weight: 600;
-  }
+  ${inCard('inline', 600)}
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
   color: ${props => props.theme.black};
@@ -31,11 +27,7 @@ export const RateValue = styled.span`
 `;
 
 export const RateUnit = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('inline')}
   font-size: 0.75rem;
   color: ${props => props.theme.darkText};
   white-space: nowrap;
@@ -51,11 +43,7 @@ export const MobileRateCell = styled.div`
 `;
 
 export const MobileRateValue = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('inline')}
   font-size: 1rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -86,11 +74,7 @@ export const OwnerRow = styled.div`
 `;
 
 export const AdminLabel = styled.span`
-  && {
-    display: inline;
-    height: auto;
-    min-width: 0;
-  }
+  ${inCard('inline')}
   font-size: 0.6875rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;

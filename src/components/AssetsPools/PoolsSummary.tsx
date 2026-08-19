@@ -1,7 +1,7 @@
+import SummaryLoading from '@/components/DataList/SummaryLoading';
 import React from 'react';
 import {
   SummaryCard,
-  SummarySkeletonRow,
   Tile,
   TileLabel,
   TileSub,
@@ -28,15 +28,7 @@ const PoolsSummary: React.FC = () => {
   });
 
   if (isLoading) {
-    return (
-      <SummaryCard aria-label="Fee pools summary">
-        <SummarySkeletonRow>
-          {Array.from({ length: 3 }, (_, index) => (
-            <Skeleton key={index} width={150} height={56} />
-          ))}
-        </SummarySkeletonRow>
-      </SummaryCard>
-    );
+    return <SummaryLoading label="Fee pools summary" tiles={3} />;
   }
 
   if (!pools || pools.length === 0) {

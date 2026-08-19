@@ -610,7 +610,8 @@ describe('sanitizeRow', () => {
     ['@cmd', "'@cmd\n"],
     ['-cmd', "'-cmd\n"],
     ['-1+1', "'-1+1\n"],
-    ['\tcmd', "'\tcmd\n"],
+    // A tab is also a separator for some readers, so it is quoted as well.
+    ['\tcmd', '"\'\tcmd"\n'],
   ])('neutralizes the formula prefix in %j', (value, expected) => {
     expect(sanitizeRow([value])).toBe(expected);
   });
@@ -628,6 +629,18 @@ describe('sanitizeRow', () => {
   it('collapses an embedded newline for the same reason', () => {
     expect(sanitizeRow(['line1\nline2'])).toBe('line1 line2\n');
   });
+
+  it.each([';', '\t'])(
+    'quotes a value containing %j, which a reader may treat as the separator',
+    separator => {
+      // Excel and LibreOffice follow the locale list separator, a semicolon in
+      // most of continental Europe. Unquoted, the tail would start a new field
+      // and the formula check would never have seen it.
+      const result = sanitizeRow([`MyAsset${separator}=cmd|'/C calc'!A0`]);
+
+      expect(result).toBe(`"MyAsset${separator}=cmd|'/C calc'!A0"\n`);
+    },
+  );
 
   it.each([-5, '+1e3', 0, 42])(
     'leaves %j a number rather than turning it into text',

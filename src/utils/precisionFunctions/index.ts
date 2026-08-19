@@ -15,6 +15,14 @@ import {
   getTransactionPrecision,
 } from '@/pages/transactions';
 
+/**
+ * Shared identity for every "precisions could not be resolved" toast, so a
+ * caller that adds its own message cannot stack a second one on top of this.
+ * Names the subject rather than one failure mode: the same lookup fails on a
+ * timeout, an error body and a transport error alike.
+ */
+export const PRECISION_TOAST_ID = 'assets-precisions';
+
 export function getPrecision<T extends string | string[]>(
   assetIds: T,
 ): T extends string ? Promise<number> : Promise<{ [assetId: string]: number }>;
@@ -113,7 +121,7 @@ export const getPrecisionFromApi = async (
     });
     if (response.error) {
       const messageError = capitalizeError(response.error);
-      toast.error(messageError, { toastId: 'Fetch timeout' });
+      toast.error(messageError, { toastId: PRECISION_TOAST_ID });
       throw new Error(messageError);
     }
 

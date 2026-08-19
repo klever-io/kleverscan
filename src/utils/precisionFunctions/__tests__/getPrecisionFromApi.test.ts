@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { toast } from 'react-toastify';
-import { getPrecisionFromApi } from '../index';
+import { PRECISION_TOAST_ID, getPrecisionFromApi } from '../index';
 
 // The module reaches @/pages/transactions, whose import chain ends in an ESM
 // package Jest cannot transform. A factory mock never loads the real module.
@@ -49,7 +49,7 @@ describe('getPrecisionFromApi', () => {
 
     await expect(getPrecisionFromApi(['KLV'])).rejects.toThrow('Fetch timeout');
     expect(mockedToast).toHaveBeenCalledWith('Fetch timeout', {
-      toastId: 'Fetch timeout',
+      toastId: PRECISION_TOAST_ID,
     });
   });
 
@@ -66,7 +66,7 @@ describe('getPrecisionFromApi', () => {
       'Failed to fetch',
     );
     expect(mockedToast).toHaveBeenCalledWith('Failed to fetch', {
-      toastId: 'Fetch timeout',
+      toastId: PRECISION_TOAST_ID,
     });
   });
 

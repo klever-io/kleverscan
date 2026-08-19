@@ -1,6 +1,9 @@
 import api from '@/services/api';
 import { ITransaction, ITransactionsResponse } from '@/types';
-import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
+import {
+  PRECISION_TOAST_ID,
+  getParsedTransactionPrecision,
+} from '@/utils/precisionFunctions';
 import { toast } from 'react-toastify';
 
 type RouterQuery = Record<string, string | string[] | undefined>;
@@ -50,8 +53,9 @@ export const blockTransactionsCall = async (
     }
   });
 
-  // The block being viewed and the table's own paging are set last so they
-  // cannot be overridden by a filter of the same name.
+  // A spoofed blockNum, page or limit in the URL is already dropped by the
+  // allowlist above, never having entered `query`. These three come from the
+  // function arguments instead; writing them last is defence in depth only.
   query.blockNum = blockNum;
   query.page = page;
   query.limit = limit;
@@ -75,11 +79,15 @@ export const blockTransactionsCall = async (
     //
     // Those rows then render at the KLV default of 6, so say so: without a
     // signal the amounts look authoritative while being wrong for any asset
-    // with another precision. Only some of the throwing paths raise a toast
-    // themselves, hence one here for the rest.
+    // with another precision.
+    //
+    // Shares its id with the lookup's own toast, which already fires on the
+    // common path. That keeps it to one message either way: this one only
+    // becomes visible on the paths that stay quiet, such as a corrupt
+    // localStorage cache.
     console.error(error);
     toast.error('Amounts may be inaccurate: asset precisions failed to load', {
-      toastId: 'block-precisions',
+      toastId: PRECISION_TOAST_ID,
     });
   }
 

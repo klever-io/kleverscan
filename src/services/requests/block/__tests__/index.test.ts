@@ -18,6 +18,7 @@ jest.mock('@/services/api', () => ({
 // cannot transform, so it is replaced wholesale rather than spied on.
 jest.mock('@/utils/precisionFunctions', () => ({
   __esModule: true,
+  PRECISION_TOAST_ID: 'assets-precisions',
   getParsedTransactionPrecision: jest.fn(),
 }));
 
@@ -111,14 +112,16 @@ describe('blockTransactionsCall', () => {
     expect(queryOf()).not.toHaveProperty('status');
   });
 
-  it('keeps the requested block and paging even when the URL carries its own', async () => {
+  it('takes the block and paging from its arguments, not from the URL', async () => {
+    // A spoofed blockNum/page/limit never enters the query at all: the
+    // allowlist drops them before these three are set from the arguments.
     await blockTransactionsCall(42, 3, 50, {
       blockNum: '999',
       page: '1',
       limit: '10',
     });
 
-    expect(queryOf()).toMatchObject({ blockNum: 42, page: 3, limit: 50 });
+    expect(queryOf()).toEqual({ blockNum: 42, page: 3, limit: 50 });
   });
 
   it('resolves the precision of the transactions it just fetched', async () => {
@@ -154,7 +157,8 @@ describe('blockTransactionsCall', () => {
 
     expect(toast.error).toHaveBeenCalledWith(
       expect.stringContaining('inaccurate'),
-      { toastId: 'block-precisions' },
+      // Shared with the lookup's own toast so the two cannot stack.
+      { toastId: 'assets-precisions' },
     );
   });
 

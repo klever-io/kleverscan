@@ -9,4 +9,4 @@ import { capitalizeString } from '../convertString';
  * failures it was meant to report, so the message never reached the user.
  */
 export const capitalizeError = (error: unknown): string =>
-  capitalizeString(String((error as Error)?.message ?? error));
+  capitalizeString(error instanceof Error ? error.message : String(error));

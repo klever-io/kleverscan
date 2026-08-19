@@ -19,7 +19,7 @@ import {
 import { IBlock, IBlockPage, IBlockResponse } from '@/types/blocks';
 import { setQueryAndRouter } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
-import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
+import { blockTransactionsCall } from '@/services/requests/block';
 import {
   CenteredRowSpan,
   CommonSpan,
@@ -35,7 +35,7 @@ import {
   MdOutlineKeyboardArrowLeft,
   MdOutlineKeyboardArrowRight,
 } from 'react-icons/md';
-import { ITransaction, ITransactionsResponse, NotFound } from '../../types';
+import { ITransactionsResponse, NotFound } from '../../types';
 
 const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
   const {
@@ -69,34 +69,8 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
   const requestBlock = async (
     page: number,
     limit: number,
-  ): Promise<ITransactionsResponse> => {
-    const transactionsResponse = await api.get({
-      route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
-    });
-
-    // The list endpoint omits each asset's precision, so it is resolved here
-    // and attached to every transaction. Without it the row sections fall
-    // back to the KLV default of 6 and misreport every asset with another
-    // precision.
-    let parsedTransactions: ITransaction[] | undefined;
-    try {
-      parsedTransactions =
-        await getParsedTransactionPrecision(transactionsResponse);
-    } catch (error) {
-      // The precision lookup throws on its own failures. Keep the rows that
-      // the list request already returned rather than reporting a block with
-      // transactions as empty, which is indistinguishable from one without.
-      console.error(error);
-    }
-
-    return {
-      ...transactionsResponse,
-      data: {
-        transactions:
-          parsedTransactions ?? transactionsResponse.data?.transactions ?? [],
-      },
-    };
-  };
+  ): Promise<ITransactionsResponse> =>
+    blockTransactionsCall(nonce, page, limit, router.query);
 
   useEffect(() => {
     if (!router.isReady) return;

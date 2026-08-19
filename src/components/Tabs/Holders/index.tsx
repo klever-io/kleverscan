@@ -54,9 +54,12 @@ const CONTRACT_TOOLTIP = 'This address is a smart contract.';
 
 /**
  * Holders tab: a concentration summary strip on top of the ranked holder
- * table. Rows measure against the gross circulating supply (the void address
- * counts as the holder it is, so the shares add up to 100%), while the strip
- * measures risk against the net supply; its caption states both.
+ * table. Every displayed share, in the rows and in the strip alike, measures
+ * against the gross circulating supply, so the void address counts as the
+ * holder it is and one wallet never shows two different percentages on one
+ * screen. Only the concentration verdict, which is a label and never a number,
+ * is judged against the net supply. Shares are rounded for display and floored
+ * at "<0.01%", so a column does not add up to exactly 100%.
  */
 const Holders: React.FC<IHolders> = ({ asset }) => {
   const router = useRouter();

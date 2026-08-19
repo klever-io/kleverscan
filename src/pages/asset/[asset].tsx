@@ -40,10 +40,12 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     enabled: !!router?.isReady,
   });
 
-  // These two answer undefined for a legitimate negative ("this asset has no
-  // ITO", "no pool"), which React Query rejects outright as "data is
-  // undefined". null carries the same meaning as a successful answer, and the
-  // components keep receiving undefined.
+  // These two answer undefined only for a legitimate negative: no ITO, no
+  // pool, or an ITO that is inactive or outside its window. Real failures now
+  // throw out of the helper and reach React Query as errors. React Query
+  // rejects an undefined result outright as "data is undefined", so null
+  // carries that negative as a successful answer and the components keep
+  // receiving undefined.
   const { data: ITOData } = useQuery({
     queryKey: [`ITOasset`, router.query.asset],
     queryFn: async () => (await ITOCall(router.query.asset as string)) ?? null,

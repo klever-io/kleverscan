@@ -324,7 +324,10 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
             {!inputRef.current?.value && <CalendarIcon />}
             {inputRef.current?.value && (
               <CloseContainer>
-                <AiOutlineClose onClick={handleClear} />
+                <AiOutlineClose
+                  data-testid="date-filter-clear"
+                  onClick={handleClear}
+                />
               </CloseContainer>
             )}
           </OutsideContent>

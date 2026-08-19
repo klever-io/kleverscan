@@ -21,12 +21,18 @@ export interface IConcentrationLevel {
  * Verdict on the top-10 share of the net supply. Wording stays descriptive
  * ("Very high"), never advisory ("risky"): exchange cold wallets are not
  * detectable here and would inflate any stronger claim.
+ *
+ * Returns a translation key rather than a sentence: this module is not a
+ * component and cannot reach the translator, so the call site resolves it.
  */
 export const concentrationLevel = (top10Share: number): IConcentrationLevel => {
-  if (top10Share >= 0.7) return { label: 'Very high', tone: 'high' };
-  if (top10Share >= 0.4) return { label: 'High', tone: 'high' };
-  if (top10Share >= 0.15) return { label: 'Moderate', tone: 'moderate' };
-  return { label: 'Low', tone: 'low' };
+  if (top10Share >= 0.7)
+    return { label: 'assets:Holders.Concentration.VeryHigh', tone: 'high' };
+  if (top10Share >= 0.4)
+    return { label: 'assets:Holders.Concentration.High', tone: 'high' };
+  if (top10Share >= 0.15)
+    return { label: 'assets:Holders.Concentration.Moderate', tone: 'moderate' };
+  return { label: 'assets:Holders.Concentration.Low', tone: 'low' };
 };
 
 export type DistributionSegmentKey =
@@ -100,15 +106,23 @@ const buildSegments = (
 
   const nonVoidTotal = sumTotal(nonVoid);
   const candidates: [DistributionSegmentKey, string, number][] = [
-    ['largest', 'Largest holder', largestHolder.totalBalance],
-    ['ranks2to10', 'Ranks 2-10', sumTotal(nonVoid.slice(1, 10))],
-    ['ranks11to50', 'Ranks 11-50', sumTotal(nonVoid.slice(10))],
+    ['largest', 'assets:Holders.Segments.Largest', largestHolder.totalBalance],
+    [
+      'ranks2to10',
+      'assets:Holders.Segments.Ranks2to10',
+      sumTotal(nonVoid.slice(1, 10)),
+    ],
+    [
+      'ranks11to50',
+      'assets:Holders.Segments.Ranks11to50',
+      sumTotal(nonVoid.slice(10)),
+    ],
     [
       'rest',
-      'Everyone else',
+      'assets:Holders.Segments.Rest',
       Math.max(grossSupply - nonVoidTotal - (voidAmount ?? 0), 0),
     ],
-    ['burned', 'Burned (VOID)', voidAmount ?? 0],
+    ['burned', 'assets:Holders.Segments.Burned', voidAmount ?? 0],
   ];
 
   return candidates

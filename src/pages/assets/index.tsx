@@ -11,6 +11,7 @@ import {
   getCapUsage,
   getRewardsModel,
 } from '@/components/AssetsList/helpers';
+import { hasVoidSupply } from '@/utils/voidSupply';
 import AssetsMobileCard from '@/components/AssetsList/MobileCard';
 import RegistryStrip from '@/components/AssetsList/RegistryStrip';
 import {
@@ -162,11 +163,18 @@ const Assets: React.FC<PropsWithChildren> = () => {
     const rewards = getRewardsModel(staking);
     const totalStaked = staking?.totalStaked ?? 0;
 
+    // The cell shows a net circulating figure beside a gross cap, so without
+    // the void amount the row reads as a contradiction: "Max 10 M ·
+    // Circulating 209 K · Cap Used >99.9%". Burned is a different quantity and
+    // invites the wrong reconciliation, so name the void explicitly.
     const supplyTitle = [
       `Circulating ${exactAmount(circulating, precision)} ${ticker}`,
       `Max ${maxSupply > 0 ? exactAmount(maxSupply, precision) : 'unlimited'}`,
       `Initial ${exactAmount(initialSupply, precision)}`,
       `Burned ${exactAmount(burnedValue, precision)}`,
+      ...(hasVoidSupply(asset)
+        ? [`Void ${exactAmount(asset.voidedSupply, precision)}`]
+        : []),
       `Precision ${precision}`,
     ].join(' · ');
 
@@ -192,12 +200,12 @@ const Assets: React.FC<PropsWithChildren> = () => {
             />
             {assetType === 'NonFungible' && (
               <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
-                NFT
+                {t('assets:List.Nft')}
               </BadgePill>
             )}
             {assetType === 'SemiFungible' && (
               <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
-                SFT
+                {t('assets:List.Sft')}
               </BadgePill>
             )}
             {attributes?.isPaused && (
@@ -205,7 +213,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
                 $variant="warning"
                 title={t(ASSET_BADGE_TOOLTIPS.paused)}
               >
-                Paused
+                {t('assets:List.Paused')}
               </BadgePill>
             )}
             {hasKdaPool && (
@@ -267,7 +275,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
             <ShareCell title={capTitle}>
               <ShareValueLine>
                 <ShareValue>{formatShare(capBasis, maxSupply)}</ShareValue>
-                <CapContext>of cap</CapContext>
+                <CapContext>{t('assets:List.OfCap')}</CapContext>
               </ShareValueLine>
               <ShareTrack aria-hidden="true">
                 <ShareFill $delay={0}>
@@ -285,7 +293,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
             </ShareCell>
           ) : (
             <ShareCell>
-              <RewardsMuted>n/a</RewardsMuted>
+              <RewardsMuted>{t('assets:List.NotAvailable')}</RewardsMuted>
             </ShareCell>
           ),
         span: 1,
@@ -307,7 +315,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
             </AmountMuted>
           ) : (
             <AmountMuted>
-              <RewardsMuted>n/a</RewardsMuted>
+              <RewardsMuted>{t('assets:List.NotAvailable')}</RewardsMuted>
             </AmountMuted>
           ),
         span: 1,
@@ -319,7 +327,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
             {rewards.kind === 'apr' && (
               <>
                 <RewardsRate title={t(APR_TOOLTIP)}>{rewards.rate}</RewardsRate>
-                <RewardsUnit>APR</RewardsUnit>
+                <RewardsUnit>{t('assets:List.Apr')}</RewardsUnit>
               </>
             )}
             {rewards.kind === 'apr-configured' && (
@@ -332,7 +340,9 @@ const Assets: React.FC<PropsWithChildren> = () => {
                 FPR
               </BadgePill>
             )}
-            {rewards.kind === 'none' && <RewardsMuted>n/a</RewardsMuted>}
+            {rewards.kind === 'none' && (
+              <RewardsMuted>{t('assets:List.NotAvailable')}</RewardsMuted>
+            )}
           </RewardsCell>
         ),
         span: 1,

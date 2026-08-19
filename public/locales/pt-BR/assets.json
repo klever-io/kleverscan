@@ -84,7 +84,10 @@
     "NotAvailable": "n/d",
     "OfCapAmount": "{{share}} de {{max}} do limite",
     "NoMaximumSupply": "Sem fornecimento máximo",
-    "Unlimited": "Ilimitado"
+    "Unlimited": "Ilimitado",
+    "Paused": "Pausado",
+    "Nft": "NFT",
+    "Sft": "SFT"
   },
   "Pools": {
     "FeePools": "Pools de taxas",
@@ -103,7 +106,8 @@
     "CurrentlyAccepting": "aceitando taxas atualmente",
     "CombinedAcrossPools": "somado entre todos os pools",
     "Admin": "Admin",
-    "PrecisionUnavailable": "Precisão do ativo indisponível"
+    "PrecisionUnavailable": "Precisão do ativo indisponível",
+    "PerOneKlv": "por 1 KLV"
   },
   "Holders": {
     "Holders": "Detentores",
@@ -120,7 +124,20 @@
     "SortBy": "Ordenar por",
     "RankTooltip": "A posição reflete a ordenação atual",
     "Contract": "Contrato",
-    "SortedBy": "Ordenado por {{label}}, decrescente"
+    "SortedBy": "Ordenado por {{label}}, decrescente",
+    "Concentration": {
+      "VeryHigh": "Muito alta",
+      "High": "Alta",
+      "Moderate": "Moderada",
+      "Low": "Baixa"
+    },
+    "Segments": {
+      "Largest": "Maior detentor",
+      "Ranks2to10": "Posições 2-10",
+      "Ranks11to50": "Posições 11-50",
+      "Rest": "Todos os demais",
+      "Burned": "Queimado (VOID)"
+    }
   },
   "Common": {
     "OpenAsset": "Abrir ativo em uma nova aba",

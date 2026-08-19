@@ -124,7 +124,8 @@ const HoldersMobileCard: React.FC<IHoldersMobileCardProps> = ({
       <MobileMetaRow>
         <MobileMetaItem>
           <LegendDot $color={theme.lightPurple} />
-          Staked {formatAmount(frozenBalance / precisionDivisor)} (
+          {t('assets:List.Staked')}{' '}
+          {formatAmount(frozenBalance / precisionDivisor)} (
           {formatShare(frozenBalance, summary.grossSupply)})
         </MobileMetaItem>
         <MobileMetaItem>

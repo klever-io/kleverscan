@@ -84,7 +84,10 @@
     "NotAvailable": "n/a",
     "OfCapAmount": "{{share}} of {{max}} cap",
     "NoMaximumSupply": "No maximum supply",
-    "Unlimited": "Unlimited"
+    "Unlimited": "Unlimited",
+    "Paused": "Paused",
+    "Nft": "NFT",
+    "Sft": "SFT"
   },
   "Pools": {
     "FeePools": "Fee pools",
@@ -103,7 +106,8 @@
     "CurrentlyAccepting": "currently accepting fees",
     "CombinedAcrossPools": "combined across all pools",
     "Admin": "Admin",
-    "PrecisionUnavailable": "Asset precision unavailable"
+    "PrecisionUnavailable": "Asset precision unavailable",
+    "PerOneKlv": "per 1 KLV"
   },
   "Holders": {
     "Holders": "Holders",
@@ -120,7 +124,20 @@
     "SortBy": "Sort By",
     "RankTooltip": "Rank reflects the current sort",
     "Contract": "Contract",
-    "SortedBy": "Sorted by {{label}}, descending"
+    "SortedBy": "Sorted by {{label}}, descending",
+    "Concentration": {
+      "VeryHigh": "Very high",
+      "High": "High",
+      "Moderate": "Moderate",
+      "Low": "Low"
+    },
+    "Segments": {
+      "Largest": "Largest holder",
+      "Ranks2to10": "Ranks 2-10",
+      "Ranks11to50": "Ranks 11-50",
+      "Rest": "Everyone else",
+      "Burned": "Burned (VOID)"
+    }
   },
   "Common": {
     "OpenAsset": "Open asset in a new tab",

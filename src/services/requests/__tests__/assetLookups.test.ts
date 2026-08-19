@@ -56,6 +56,47 @@ describe('ITOCall', () => {
     await expect(ITOCall('KLV')).rejects.toThrow('socket hang up');
   });
 
+  // The success path had no test at all, while assetPoolCall (rewritten the
+  // same way in the same commit) did. A regression in the window check would
+  // render as "this asset has no ITO", which is the failure the rewrite was
+  // written to prevent.
+  it('returns an active ITO that is inside its window', async () => {
+    const now = Date.now() / 1000;
+    apiGet.mockResolvedValueOnce({
+      error: '',
+      data: {
+        ito: { isActive: true, startTime: now - 60, endTime: now + 60 },
+      },
+    });
+    await expect(ITOCall('KLV')).resolves.toEqual({
+      isActive: true,
+      startTime: now - 60,
+      endTime: now + 60,
+    });
+  });
+
+  it('answers undefined for an ITO whose window has closed', async () => {
+    const now = Date.now() / 1000;
+    apiGet.mockResolvedValueOnce({
+      error: '',
+      data: {
+        ito: { isActive: true, startTime: now - 120, endTime: now - 60 },
+      },
+    });
+    await expect(ITOCall('KLV')).resolves.toBeUndefined();
+  });
+
+  it('answers undefined for an ITO that has not started', async () => {
+    const now = Date.now() / 1000;
+    apiGet.mockResolvedValueOnce({
+      error: '',
+      data: {
+        ito: { isActive: true, startTime: now + 60, endTime: now + 120 },
+      },
+    });
+    await expect(ITOCall('KLV')).resolves.toBeUndefined();
+  });
+
   it('answers undefined for an ITO that is not active', async () => {
     apiGet.mockResolvedValueOnce({
       error: '',

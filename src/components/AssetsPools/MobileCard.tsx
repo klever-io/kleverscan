@@ -53,7 +53,7 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
         />
         {!active && (
           <BadgePill $variant="warning" title={t(POOL_DISABLED_TOOLTIP)}>
-            Disabled
+            {t('assets:Pools.Disabled')}
           </BadgePill>
         )}
         <RowActions>
@@ -77,7 +77,7 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
           <MobileRateValue>
             {rate === undefined ? '--' : `${formatRate(rate)} ${displayTicker}`}
           </MobileRateValue>
-          <RateUnit>per 1 KLV</RateUnit>
+          <RateUnit>{t('assets:Pools.PerOneKlv')}</RateUnit>
         </MobileRateCell>
       </MobileTotalRow>
       <MobileMetaRow>

@@ -74,17 +74,17 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
         />
         {assetType === 'NonFungible' && (
           <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
-            NFT
+            {t('assets:List.Nft')}
           </BadgePill>
         )}
         {assetType === 'SemiFungible' && (
           <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
-            SFT
+            {t('assets:List.Sft')}
           </BadgePill>
         )}
         {attributes?.isPaused && (
           <BadgePill $variant="warning" title={t(ASSET_BADGE_TOOLTIPS.paused)}>
-            Paused
+            {t('assets:List.Paused')}
           </BadgePill>
         )}
         {hasKdaPool && (

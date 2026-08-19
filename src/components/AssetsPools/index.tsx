@@ -141,7 +141,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
             />
             {!active && (
               <BadgePill $variant="warning" title={t(POOL_DISABLED_TOOLTIP)}>
-                Disabled
+                {t('assets:Pools.Disabled')}
               </BadgePill>
             )}
             <RowActions>
@@ -168,7 +168,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
                 ? '--'
                 : `${formatRate(rate)} ${displayTicker}`}
             </RateValue>
-            <RateUnit>per 1 KLV</RateUnit>
+            <RateUnit>{t('assets:Pools.PerOneKlv')}</RateUnit>
           </RateCell>
         ),
         span: 1,

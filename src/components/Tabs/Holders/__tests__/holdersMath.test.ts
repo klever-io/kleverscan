@@ -23,17 +23,25 @@ const holder = (
 });
 
 describe('concentrationLevel', () => {
+  // Labels are translation keys, not sentences: this module has no translator,
+  // so the call site resolves them.
   it('maps the thresholds to the right verdicts', () => {
     expect(concentrationLevel(0.7)).toEqual({
-      label: 'Very high',
+      label: 'assets:Holders.Concentration.VeryHigh',
       tone: 'high',
     });
-    expect(concentrationLevel(0.4)).toEqual({ label: 'High', tone: 'high' });
+    expect(concentrationLevel(0.4)).toEqual({
+      label: 'assets:Holders.Concentration.High',
+      tone: 'high',
+    });
     expect(concentrationLevel(0.15)).toEqual({
-      label: 'Moderate',
+      label: 'assets:Holders.Concentration.Moderate',
       tone: 'moderate',
     });
-    expect(concentrationLevel(0.149)).toEqual({ label: 'Low', tone: 'low' });
+    expect(concentrationLevel(0.149)).toEqual({
+      label: 'assets:Holders.Concentration.Low',
+      tone: 'low',
+    });
   });
 });
 
@@ -90,6 +98,24 @@ describe('computeHoldersSummary', () => {
     expect(summary.segments[3]).toMatchObject({ amount: 900, share: 0.9 });
   });
 
+  // The current mainnet path: the API does not report voidedSupply yet, and
+  // the void address is outside the top 50, so resolveVoidAmount answers
+  // undefined and the burned segment has to disappear rather than swallow the
+  // remainder. Every other test seeds one or the other, so this fallback was
+  // the one route production actually takes and no test covered it.
+  it('omits the burned segment when the void amount is unknown', () => {
+    const summary = computeHoldersSummary(asset, [
+      holder(1, 400),
+      holder(2, 100),
+    ]);
+    expect(summary.segments.map(segment => segment.key)).toEqual([
+      'largest',
+      'ranks2to10',
+      'rest',
+    ]);
+    expect(summary.segments[2].amount).toBe(500);
+  });
+
   it('degrades to empty analytics without holder data', () => {
     const summary = computeHoldersSummary(asset, []);
     expect(summary.top10ShareNet).toBeUndefined();
@@ -130,6 +156,15 @@ describe('buildRowBar', () => {
 
   it('only fills the whole track for a holder owning everything', () => {
     expect(buildRowBar(holder(1, 1_000), 1_000)?.fillRatio).toBe(1);
+  });
+
+  // Ordinary on a staking chain: everything frozen, nothing liquid. The bar
+  // still fills, but none of the fill is the liquid segment.
+  it('reports no liquid fraction for a fully frozen holder', () => {
+    expect(buildRowBar(holder(1, 200, 200), 1_000)).toEqual({
+      fillRatio: 0.2,
+      liquidFraction: 0,
+    });
     expect(buildRowBar(holder(1, 262), 1_000)?.fillRatio).toBeCloseTo(0.262);
   });
 

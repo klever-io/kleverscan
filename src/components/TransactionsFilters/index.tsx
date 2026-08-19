@@ -35,7 +35,10 @@ const TransactionsFilters: React.FC<
   const getContractName = (): string => ContractsIndex[Number(query.type)];
 
   const handleSelected = (selected: string, filterType: string): void => {
-    const updatedQuery = { ...query };
+    // Every branch returns to the first page: a narrower result set can have
+    // fewer pages than the one being viewed, which would otherwise leave the
+    // table on an empty page with no pagination control to get back.
+    const updatedQuery: NextParsedUrlQuery = { ...query, page: String(1) };
     if (selected === 'All') {
       delete updatedQuery[filterType];
       if (filterType === 'type') {
@@ -49,13 +52,12 @@ const TransactionsFilters: React.FC<
       setQueryAndRouter(
         {
           ...updatedQuery,
-          page: String(1),
           [filterType]: String(getContractIndex(selected)),
         },
         router,
       );
     } else if (selected !== query[filterType]) {
-      setQueryAndRouter({ ...query, [filterType]: selected }, router);
+      setQueryAndRouter({ ...updatedQuery, [filterType]: selected }, router);
     }
   };
 

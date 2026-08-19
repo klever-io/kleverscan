@@ -19,6 +19,7 @@ import {
 import { IBlock, IBlockPage, IBlockResponse } from '@/types/blocks';
 import { setQueryAndRouter } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { blockTransactionsCall } from '@/services/requests/block';
 import {
   CenteredRowSpan,
   CommonSpan,
@@ -69,9 +70,7 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
     page: number,
     limit: number,
   ): Promise<ITransactionsResponse> =>
-    api.get({
-      route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
-    });
+    blockTransactionsCall(nonce, page, limit, router.query);
 
   useEffect(() => {
     if (!router.isReady) return;

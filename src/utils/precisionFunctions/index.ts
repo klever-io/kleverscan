@@ -8,11 +8,20 @@ import {
   Service,
 } from '@/types';
 import { toast } from 'react-toastify';
+import { capitalizeError } from '../errorMessage';
 import { KLV_PRECISION } from '../globalVariables';
 import {
   getAssetsAndCurrenciesList,
   getTransactionPrecision,
 } from '@/pages/transactions';
+
+/**
+ * Shared identity for every "precisions could not be resolved" toast, so a
+ * caller that adds its own message cannot stack a second one on top of this.
+ * Names the subject rather than one failure mode: the same lookup fails on a
+ * timeout, an error body and a transport error alike.
+ */
+export const PRECISION_TOAST_ID = 'assets-precisions';
 
 export function getPrecision<T extends string | string[]>(
   assetIds: T,
@@ -111,10 +120,9 @@ export const getPrecisionFromApi = async (
       tries: 10,
     });
     if (response.error) {
-      const messageError =
-        response.error.charAt(0).toUpperCase() + response.error.slice(1);
-      toast.error(messageError, { toastId: 'Fetch timeout' });
-      throw new Error(response.error);
+      const messageError = capitalizeError(response.error);
+      toast.error(messageError, { toastId: PRECISION_TOAST_ID });
+      throw new Error(messageError);
     }
 
     return response.data;

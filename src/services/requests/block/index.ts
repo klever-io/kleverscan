@@ -1,6 +1,7 @@
 import api from '@/services/api';
 import { ITransaction, ITransactionsResponse } from '@/types';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
+import { toast } from 'react-toastify';
 
 type RouterQuery = Record<string, string | string[] | undefined>;
 
@@ -41,6 +42,10 @@ export const blockTransactionsCall = async (
   FILTER_PARAMS.forEach(key => {
     const value = routerQuery[key];
     if (typeof value === 'string' && value !== '') {
+      // Encoded here rather than in `buildUrlQuery`, which would fix every
+      // caller at once but risks changing values other endpoints already
+      // accept. If that central fix ever lands, drop this call: encoding
+      // twice would turn a filter value into its escaped form on the wire.
       query[key] = encodeURIComponent(value);
     }
   });
@@ -67,7 +72,15 @@ export const blockTransactionsCall = async (
     // The precision lookup throws on its own failures. Keep the rows that the
     // list request already returned rather than reporting a block with
     // transactions as empty, which is indistinguishable from one without.
+    //
+    // Those rows then render at the KLV default of 6, so say so: without a
+    // signal the amounts look authoritative while being wrong for any asset
+    // with another precision. Only some of the throwing paths raise a toast
+    // themselves, hence one here for the rest.
     console.error(error);
+    toast.error('Amounts may be inaccurate: asset precisions failed to load', {
+      toastId: 'block-precisions',
+    });
   }
 
   return {

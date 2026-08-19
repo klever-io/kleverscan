@@ -1,6 +1,11 @@
 import api from '@/services/api';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
+import { toast } from 'react-toastify';
 import { blockTransactionsCall } from '../index';
+
+jest.mock('react-toastify', () => ({
+  toast: { error: jest.fn() },
+}));
 
 jest.mock('@/services/api', () => ({
   __esModule: true,
@@ -138,6 +143,25 @@ describe('blockTransactionsCall', () => {
     const result = await blockTransactionsCall(42, 1, 10);
 
     expect(result.data.transactions).toEqual([rawTransaction]);
+  });
+
+  it('warns that the kept rows may be inaccurate', async () => {
+    // Those rows render at the KLV default precision, so the failure must not
+    // be silent: a wrong amount otherwise looks like a correct one.
+    mockedParse.mockRejectedValue(new Error('Fetch timeout'));
+
+    await blockTransactionsCall(42, 1, 10);
+
+    expect(toast.error).toHaveBeenCalledWith(
+      expect.stringContaining('inaccurate'),
+      { toastId: 'block-precisions' },
+    );
+  });
+
+  it('does not warn when the precision lookup succeeds', async () => {
+    await blockTransactionsCall(42, 1, 10);
+
+    expect(toast.error).not.toHaveBeenCalled();
   });
 
   it('passes an error response through, so the table shows its error branch', async () => {

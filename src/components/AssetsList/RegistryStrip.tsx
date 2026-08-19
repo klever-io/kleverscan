@@ -1,7 +1,6 @@
 import SummaryLoading from '@/components/DataList/SummaryLoading';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import Skeleton from '@/components/Skeleton';
 import {
   DistBar,
   DistSegment,
@@ -64,7 +63,9 @@ const RegistryStrip: React.FC = () => {
   });
 
   if (isLoading) {
-    return <SummaryLoading label="Assets registry summary" tiles={4} bar />;
+    return (
+      <SummaryLoading label={t('assets:List.RegistryAria')} tiles={4} bar />
+    );
   }
 
   if (!counts) {
@@ -74,19 +75,19 @@ const RegistryStrip: React.FC = () => {
   const segments = [
     {
       type: 'Fungible',
-      label: 'Fungible',
+      label: t('assets:List.Fungible'),
       count: counts.fungible,
       color: theme.violet,
     },
     {
       type: 'NonFungible',
-      label: 'NonFungible',
+      label: t('assets:List.NftCollections'),
       count: counts.nonFungible,
       color: theme.purple,
     },
     {
       type: 'SemiFungible',
-      label: 'SemiFungible',
+      label: t('assets:List.SemiFungible'),
       count: counts.semiFungible,
       color: theme.lightPurple,
     },

@@ -10,7 +10,7 @@ import { parseAddress, parseHolders } from '@/utils/parseValues';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {

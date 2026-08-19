@@ -1,4 +1,4 @@
-import { IStaking } from '@/types';
+import { IAsset, IStaking } from '@/types';
 import {
   assetSupplyViews,
   getCapUsage,

@@ -1,7 +1,6 @@
 import SummaryLoading from '@/components/DataList/SummaryLoading';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import Skeleton from '@/components/Skeleton';
 import Tooltip from '@/components/Tooltip';
 import { useTheme } from '@/contexts/theme';
 import { IAsset } from '@/types';
@@ -104,7 +103,7 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
             Component={() => (
               <Chip>
                 <ChipDot $tone={level.tone} />
-                {level.label}
+                {t(level.label)}
               </Chip>
             )}
           />
@@ -133,7 +132,10 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
   const segmentSummary = summary.segments
     .map(
       segment =>
-        `${segment.label} ${formatShare(segment.amount, summary.grossSupply)}`,
+        `${t(segment.label)} ${formatShare(
+          segment.amount,
+          summary.grossSupply,
+        )}`,
     )
     .join(', ');
   const barLabel = t('assets:Holders.DistributionAria', {
@@ -152,7 +154,7 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
                 $color={segmentColor(segment.key, theme)}
                 $delay={index * 60}
                 style={{ width: `${segment.share * 100}%` }}
-                title={`${segment.label} · ${formatShare(
+                title={`${t(segment.label)} · ${formatShare(
                   segment.amount,
                   summary.grossSupply,
                 )} · ${formatAssetAmount(segment.amount)}`}
@@ -164,7 +166,7 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
             {summary.segments.map(segment => (
               <LegendItem key={segment.key}>
                 <LegendDot $color={segmentColor(segment.key, theme)} />
-                {segment.label}{' '}
+                {t(segment.label)}{' '}
                 <strong>
                   {formatShare(segment.amount, summary.grossSupply)}
                 </strong>

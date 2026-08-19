@@ -9,7 +9,6 @@ import {
   TileValue,
   TilesGrid,
 } from '@/components/DataList/styles';
-import Skeleton from '@/components/Skeleton';
 import { requestAllAssetsPools } from '@/services/requests/assetsPools';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useQuery } from '@tanstack/react-query';

@@ -1,4 +1,5 @@
 import SummaryLoading from '@/components/DataList/SummaryLoading';
+import { useTranslation } from 'next-i18next';
 import React from 'react';
 import Skeleton from '@/components/Skeleton';
 import Tooltip from '@/components/Tooltip';
@@ -33,9 +34,6 @@ interface IHoldersSummaryProps {
   isLoading: boolean;
 }
 
-const CONCENTRATION_TOOLTIP =
-  'Top 10 concentration, ignoring burned (VOID) tokens. Top holders can include exchanges.';
-
 /**
  * Analytics strip above the holders table: answers "is this concentrated?"
  * before the user reads a single row. Every figure comes from one cached
@@ -47,6 +45,7 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
   summary,
   isLoading,
 }) => {
+  const { t } = useTranslation(['assets']);
   const { theme } = useTheme();
 
   if (!Number.isFinite(summary.grossSupply) || summary.grossSupply <= 0) {
@@ -54,7 +53,9 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
   }
 
   if (isLoading) {
-    return <SummaryLoading label="Holder distribution summary" tiles={4} bar />;
+    return (
+      <SummaryLoading label={t('assets:Holders.SummaryAria')} tiles={4} bar />
+    );
   }
 
   const formatAssetAmount = (raw: number): string =>
@@ -68,9 +69,11 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
   if (typeof summary.totalHolders === 'number') {
     tiles.push(
       <Tile key="holders">
-        <TileLabel>Holders</TileLabel>
+        <TileLabel>{t('assets:Holders.Holders')}</TileLabel>
         <TileValue>{summary.totalHolders.toLocaleString('en-US')}</TileValue>
-        <TileSub>accounts holding {asset.ticker}</TileSub>
+        <TileSub>
+          {t('assets:Holders.AccountsHolding', { ticker: asset.ticker })}
+        </TileSub>
       </Tile>,
     );
   }
@@ -80,12 +83,12 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
     tiles.push(
       <Tile key="top10">
         <TileLabelRow>
-          <TileLabel>Top 10 hold</TileLabel>
+          <TileLabel>{t('assets:Holders.Top10Hold')}</TileLabel>
           <Tooltip
             msg={
               netMode
-                ? 'Shares are measured against the total supply. Only the verdict ignores burned (VOID) tokens.'
-                : 'Shares are measured against the circulating supply.'
+                ? t('assets:Holders.SharesAgainstTotalNet')
+                : t('assets:Holders.SharesAgainstTotal')
             }
             customStyles={{ place: 'right' }}
             maxVw={24}
@@ -96,7 +99,7 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
             {formatShare(summary.top10Amount, summary.grossSupply)}
           </TileValue>
           <Tooltip
-            msg={CONCENTRATION_TOOLTIP}
+            msg={t('assets:Holders.ConcentrationTooltip')}
             maxVw={24}
             Component={() => (
               <Chip>
@@ -114,7 +117,7 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
   if (summary.top50Amount > 0) {
     tiles.push(
       <Tile key="top50">
-        <TileLabel>Top 50 hold</TileLabel>
+        <TileLabel>{t('assets:Holders.Top50Hold')}</TileLabel>
         <TileValue>
           {formatShare(summary.top50Amount, summary.grossSupply)}
         </TileValue>
@@ -127,15 +130,18 @@ const HoldersSummary: React.FC<IHoldersSummaryProps> = ({
     return null;
   }
 
-  const barLabel = `Distribution of the total circulating supply: ${summary.segments
+  const segmentSummary = summary.segments
     .map(
       segment =>
         `${segment.label} ${formatShare(segment.amount, summary.grossSupply)}`,
     )
-    .join(', ')}.`;
+    .join(', ');
+  const barLabel = t('assets:Holders.DistributionAria', {
+    segments: segmentSummary,
+  });
 
   return (
-    <SummaryCard aria-label="Holder distribution summary">
+    <SummaryCard aria-label={t('assets:Holders.SummaryAria')}>
       <TilesGrid>{tiles}</TilesGrid>
       {summary.segments.length > 0 && (
         <>

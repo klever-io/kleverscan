@@ -8,6 +8,7 @@ import {
   Service,
 } from '@/types';
 import { toast } from 'react-toastify';
+import { capitalizeError } from '../errorMessage';
 import { KLV_PRECISION } from '../globalVariables';
 import {
   getAssetsAndCurrenciesList,
@@ -111,10 +112,9 @@ export const getPrecisionFromApi = async (
       tries: 10,
     });
     if (response.error) {
-      const messageError =
-        response.error.charAt(0).toUpperCase() + response.error.slice(1);
+      const messageError = capitalizeError(response.error);
       toast.error(messageError, { toastId: 'Fetch timeout' });
-      throw new Error(response.error);
+      throw new Error(messageError);
     }
 
     return response.data;

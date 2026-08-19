@@ -2,6 +2,7 @@ import { PropsWithChildren } from 'react';
 import { ArrowLeft, ArrowRight, WarningIcon } from '@/assets/calendar';
 import { Calendar as CalendarIcon } from '@/assets/icons';
 import { setQueryAndRouter } from '@/utils';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AiOutlineClose } from 'react-icons/ai';
@@ -80,7 +81,12 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
     }`;
   };
   const resetDate = () => {
-    const updatedQuery = { ...router.query };
+    // Back to the first page, for the same reason the other filters do it: a
+    // different result set can have fewer pages than the one being viewed.
+    const updatedQuery: NextParsedUrlQuery = {
+      ...router.query,
+      page: String(1),
+    };
     delete updatedQuery.startdate;
     delete updatedQuery.enddate;
     setQueryAndRouter(updatedQuery, router);
@@ -264,6 +270,7 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
     setQueryAndRouter(
       {
         ...router.query,
+        page: String(1),
         startdate: startDateWithTime.getTime().toString(),
         enddate: endDateWithTime.getTime().toString(),
       },

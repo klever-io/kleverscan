@@ -1,4 +1,27 @@
 import { IAsset } from '@/types';
+import { getCirculatingSupply } from '@/utils/voidSupply';
+
+export interface IAssetSupplyViews {
+  /** What the asset "has in circulation", void holdings excluded. */
+  circulating: number;
+  /** What the mint cap is measured against, void holdings included. */
+  capBasis: number;
+}
+
+/**
+ * The two supply figures an asset row needs, and the reason they differ.
+ *
+ * A cap limits minting: tokens parked on the void address were minted and
+ * never burned, so they still occupy headroom and the cap is measured gross.
+ * The displayed circulating figure excludes them, because they can never move
+ * again. Collapsing the two would read BLOCK-31F6 as 2% of its cap used when
+ * it is at 99.99%, which is why they are derived here once instead of at each
+ * of the two layouts.
+ */
+export const assetSupplyViews = (asset: IAsset): IAssetSupplyViews => ({
+  circulating: getCirculatingSupply(asset),
+  capBasis: asset.circulatingSupply,
+});
 
 export interface ICapUsage {
   hasCap: boolean;

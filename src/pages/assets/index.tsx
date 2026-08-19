@@ -6,7 +6,11 @@ import {
   ASSET_BADGE_TOOLTIPS,
   FPR_TOOLTIP,
 } from '@/components/AssetsList/badgeTexts';
-import { getCapUsage, getRewardsModel } from '@/components/AssetsList/helpers';
+import {
+  assetSupplyViews,
+  getCapUsage,
+  getRewardsModel,
+} from '@/components/AssetsList/helpers';
 import AssetsMobileCard from '@/components/AssetsList/MobileCard';
 import RegistryStrip from '@/components/AssetsList/RegistryStrip';
 import {
@@ -49,7 +53,6 @@ import { IAsset, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { formatAmount } from '@/utils/formatFunctions';
 import { useFetchPartial } from '@/utils/hooks';
-import { getCirculatingSupply } from '@/utils/voidSupply';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -152,11 +155,10 @@ const Assets: React.FC<PropsWithChildren> = () => {
     } = asset;
 
     const precisionDivisor = 10 ** precision;
-    const circulating = getCirculatingSupply(asset);
+    const { circulating, capBasis } = assetSupplyViews(asset);
     // The cap limits minted minus burned, which is the gross circulating
     // supply: tokens parked on the void address were minted and never
     // burned, so they still take up cap headroom.
-    const capBasis = asset.circulatingSupply;
     const cap = getCapUsage(capBasis, maxSupply);
     const rewards = getRewardsModel(staking);
     const totalStaked = staking?.totalStaked ?? 0;

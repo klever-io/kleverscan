@@ -18,10 +18,9 @@ import { formatShare } from '@/components/DataList/format';
 import AssetIdentity from '@/components/DataList/AssetIdentity';
 import { IAsset } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
-import { getCirculatingSupply } from '@/utils/voidSupply';
 import { IoIosInfinite } from 'react-icons/io';
 import { MobileCapCaption, RewardsRate, RewardsUnit } from './styles';
-import { getCapUsage, getRewardsModel } from './helpers';
+import { assetSupplyViews, getCapUsage, getRewardsModel } from './helpers';
 import { ASSET_BADGE_TOOLTIPS, FPR_TOOLTIP } from './badgeTexts';
 
 export interface IAssetsMobileCardProps {
@@ -52,10 +51,9 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
   } = asset;
 
   const precisionDivisor = 10 ** precision;
-  const circulating = getCirculatingSupply(asset);
+  const { circulating, capBasis } = assetSupplyViews(asset);
   // See the desktop row: the cap measures minted minus burned, so the void
   // balance counts towards it.
-  const capBasis = asset.circulatingSupply;
   const cap = getCapUsage(capBasis, maxSupply);
   const rewards = getRewardsModel(staking);
   const totalStaked = staking?.totalStaked ?? 0;

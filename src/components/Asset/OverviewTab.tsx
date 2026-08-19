@@ -10,7 +10,7 @@ import { IAsset } from '@/types';
 import { parseApr } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { VOID_ADDRESS } from '@/utils/globalVariables';
-import { getCirculatingSupply, hasVoidSupply } from '@/utils/voidSupply';
+import { getCirculatingSupply, voidRowState } from '@/utils/voidSupply';
 import { HoverAnchor, Row } from '@/views/assets/detail';
 import { ReceiveBackground } from '@/views/validator';
 import { useTranslation } from 'next-i18next';
@@ -47,10 +47,8 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
     enabled: !!router?.isReady,
   });
 
-  // While the asset is still loading we cannot know yet, so keep the rows and
-  // let them render their skeletons; only hide them once a loaded asset turns
-  // out to come from an API build that does not report the void figures.
-  const showVoidSupply = !asset || hasVoidSupply(asset);
+  const voidRows = voidRowState(asset);
+  const showVoidSupply = voidRows !== 'hidden';
 
   const isSftCollection =
     asset?.assetType === AssetTypeString.SemiFungible &&
@@ -74,15 +72,16 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
   ) => {
     if (isSftCollection) return value;
     if (!asset) return 'N/A';
+    // A missing figure is not zero. Rendering it as 0 would claim a supply
+    // that was never reported, which is the failure this metric prevents.
+    if (typeof value !== 'number') return 'N/A';
     if (infiniteOnZero && value === 0) return '∞';
-    return toLocaleFixed(
-      (value || 0) / 10 ** (asset?.precision || 0),
-      asset?.precision || 0,
-    );
+    return toLocaleFixed(value / 10 ** asset.precision, asset.precision);
   };
 
-  // Both void-derived rows mount before the asset resolves, so both need the
-  // same loading guard: formatSupply() would answer 'N/A' for a missing asset.
+  // Both void-derived rows mount before the asset resolves, so both render a
+  // skeleton first; formatSupply would answer 'N/A'. A missing asset is the
+  // 'loading' state of voidRowState, spelled out here so it narrows the type.
   const renderCirculatingSupply = () => {
     if (!asset) return <Skeleton />;
     return formatSupply(asset.netCirculatingSupply);

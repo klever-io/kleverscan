@@ -1,5 +1,10 @@
 import { IStaking } from '@/types';
-import { getCapUsage, getLatestAprPercent, getRewardsModel } from '../helpers';
+import {
+  assetSupplyViews,
+  getCapUsage,
+  getLatestAprPercent,
+  getRewardsModel,
+} from '../helpers';
 
 const staking = (overrides: Partial<IStaking>): IStaking =>
   ({
@@ -66,5 +71,34 @@ describe('getRewardsModel', () => {
     });
     expect(getRewardsModel(null)).toEqual({ kind: 'none' });
     expect(getRewardsModel(undefined)).toEqual({ kind: 'none' });
+  });
+});
+
+describe('assetSupplyViews', () => {
+  // The bug this guards against: measuring the cap against the net supply
+  // reads a fully minted asset as nearly empty. BLOCK-31F6 showed 2.09% of
+  // its cap used while it is at 99.99%.
+  it('measures the cap gross and displays circulating net', () => {
+    const views = assetSupplyViews({
+      circulatingSupply: 1000,
+      netCirculatingSupply: 21,
+      voidedSupply: 979,
+      maxSupply: 1000,
+    } as IAsset);
+
+    expect(views.capBasis).toBe(1000);
+    expect(views.circulating).toBe(21);
+    expect(getCapUsage(views.capBasis, 1000).usedShare).toBe(1);
+    expect(getCapUsage(views.circulating, 1000).usedShare).toBeCloseTo(0.021);
+  });
+
+  it('falls back to the raw supply for both when the API omits the fields', () => {
+    const views = assetSupplyViews({
+      circulatingSupply: 1000,
+      maxSupply: 1000,
+    } as IAsset);
+
+    expect(views.capBasis).toBe(1000);
+    expect(views.circulating).toBe(1000);
   });
 });

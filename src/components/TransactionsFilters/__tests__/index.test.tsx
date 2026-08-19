@@ -122,8 +122,10 @@ describe('TransactionsFilters page reset', () => {
     const contract = openFilter('Contract');
     fireEvent.click(within(contract).getByText('Transfer'));
 
+    // Transfer is index 0 in ContractsIndex, and the value is what makes this
+    // assertion mean something: page alone would pass with type omitted.
     expect(mockedSetQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ page: '1' }),
+      expect.objectContaining({ type: '0', page: '1' }),
       expect.anything(),
     );
   });

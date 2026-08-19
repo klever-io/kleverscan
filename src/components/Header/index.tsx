@@ -146,6 +146,25 @@ const Navbar: React.FC<PropsWithChildren> = () => {
     setModKey(isApple ? '⌘' : 'Ctrl');
   }, []);
 
+  // The navbar wraps to a second line below 1440px, so anything sticking
+  // underneath it has to follow its real height rather than assume one.
+  useEffect(() => {
+    const navbar = mobileNavbarRef.current;
+    if (!navbar || typeof ResizeObserver === 'undefined') return;
+
+    const publishHeight = () => {
+      document.documentElement.style.setProperty(
+        '--navbar-height',
+        `${Math.round(navbar.getBoundingClientRect().height)}px`,
+      );
+    };
+
+    publishHeight();
+    const observer = new ResizeObserver(publishHeight);
+    observer.observe(navbar);
+    return () => observer.disconnect();
+  }, [mobileNavbarRef]);
+
   const handleMobileScroll = () => {
     const navbar = mobileNavbarRef.current;
 

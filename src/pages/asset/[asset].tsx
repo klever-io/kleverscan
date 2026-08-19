@@ -18,6 +18,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, {
   PropsWithChildren,
+  ReactNode,
   useCallback,
   useEffect,
   useState,
@@ -30,23 +31,35 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets']);
 
+  // Unlike the two lookups below, assetCall answers undefined only when the
+  // request failed, so it keeps React Query's retry rather than reporting a
+  // failure as a successful "no asset".
   const { data: asset } = useQuery({
     queryKey: [`asset`, router.query.asset],
     queryFn: () => assetCall(router),
     enabled: !!router?.isReady,
   });
 
-  const { data: ITO } = useQuery({
+  // These two answer undefined only for a legitimate negative: no ITO, no
+  // pool, or an ITO that is inactive or outside its window. Real failures now
+  // throw out of the helper and reach React Query as errors. React Query
+  // rejects an undefined result outright as "data is undefined", so null
+  // carries that negative as a successful answer and the components keep
+  // receiving undefined.
+  const { data: ITOData } = useQuery({
     queryKey: [`ITOasset`, router.query.asset],
-    queryFn: () => ITOCall(router.query.asset as string),
+    queryFn: async () => (await ITOCall(router.query.asset as string)) ?? null,
     enabled: !!router?.isReady,
   });
+  const ITO = ITOData ?? undefined;
 
-  const { data: assetPool } = useQuery({
+  const { data: assetPoolData } = useQuery({
     queryKey: [`assetPool`, router.query.asset],
-    queryFn: () => assetPoolCall(router.query.asset as string),
+    queryFn: async () =>
+      (await assetPoolCall(router.query.asset as string)) ?? null,
     enabled: !!router?.isReady,
   });
+  const assetPool = assetPoolData ?? undefined;
   const getTableHeaders = useCallback(() => {
     let tableHeaders = [`${t('common:Titles.Transactions')}`];
     if (asset && asset.assetType !== AssetTypeString.SemiFungible) {
@@ -101,7 +114,10 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     Filters: TransactionsFilters,
   };
 
-  const SelectedTabComponent: React.FC<PropsWithChildren> = useCallback(() => {
+  // Rendered as elements, not as a component built during render: a fresh
+  // component identity remounts the whole tab, restarting its loading state
+  // and animations whenever the asset query resolves.
+  const renderSelectedTab = (): ReactNode => {
     switch (selectedTab) {
       case `${t('common:Titles.Transactions')}`:
         return <Table {...tableProps} />;
@@ -112,7 +128,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
       default:
         return <div />;
     }
-  }, [selectedTab, asset]);
+  };
 
   const tabProps: ITabs = {
     headers: getTableHeaders(),
@@ -140,9 +156,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
         }
       />
 
-      <Tabs {...tabProps}>
-        <SelectedTabComponent />
-      </Tabs>
+      <Tabs {...tabProps}>{renderSelectedTab()}</Tabs>
     </AssetPageContainer>
   );
 };

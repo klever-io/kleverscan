@@ -1,4 +1,9 @@
-import { CardContent, CardHeaderItem, Container } from '@/styles/common';
+import {
+  CardContent,
+  CardHeaderItem,
+  Container,
+  PAGE_TOP_SPACING,
+} from '@/styles/common';
 import styled, { css } from 'styled-components';
 
 export const Title = styled.div`
@@ -49,7 +54,22 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 
 export const AssetPageContainer = styled(Container)`
   max-width: 1440px;
-  margin: 0 auto;
+  margin: ${PAGE_TOP_SPACING} auto 0;
+`;
+
+export const AssetsListContainer = styled(Container)`
+  /* The title sits above the tab row, aligned with other page titles. */
+  margin-top: ${PAGE_TOP_SPACING};
+
+  > div {
+    margin-top: 1rem;
+  }
+
+  /* Same gap under the tab row as the asset detail page has under its
+     Transactions/Holders row (24px, measured in the browser). */
+  [data-testid^='tab-content'] {
+    margin-top: 1.5rem;
+  }
 `;
 
 export const AssetCardContent = styled(CardContent)`

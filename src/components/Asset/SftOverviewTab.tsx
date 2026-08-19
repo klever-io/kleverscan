@@ -68,7 +68,7 @@ export const SftOverviewTab: React.FC<PropsWithChildren<SftOverviewProps>> = ({
 
       <Row span={2}>
         <span>
-          <strong>{t('table:CirculatingSupply')}</strong>
+          <strong>{t('assets:Overview.Total Supply')}</strong>
         </span>
         <span>
           <small>

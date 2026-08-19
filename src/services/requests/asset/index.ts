@@ -129,49 +129,73 @@ export const holdersCall = async (
   }
 };
 
+/**
+ * The proxy answers a missing record with "cannot find ... in database". Its
+ * `code` is not dependable for this (a missing KDA pool comes back as
+ * `internal_issue`), so the message is what distinguishes a real negative
+ * from a transient failure.
+ */
+const isNotFound = (error?: string): boolean =>
+  typeof error === 'string' && error.toLowerCase().includes('cannot find');
+
 export const ITOCall = async (
   assetId: string,
 ): Promise<IParsedITO | undefined> => {
-  try {
-    const res = await api.get({
-      route: `ito/${assetId}`,
-    });
-    if (!res.error || res.error === '') {
-      const ITOresp = res as IITOResponse;
-      if (ITOresp?.data?.ito) {
-        const ITO = ITOresp?.data?.ito;
-
-        if (
-          !ITO.isActive ||
-          (ITO?.endTime && ITO.endTime < Date.now() / 1000) ||
-          (ITO?.startTime && ITO.startTime > Date.now() / 1000)
-        ) {
-          return undefined;
-        }
-
-        await parseITOs([ITO]);
-        return ITO as IParsedITO;
-      }
-    }
-
-    return undefined;
-  } catch (error) {
-    console.error(error);
+  const res = await api.get({
+    route: `ito/${assetId}`,
+    // Most assets have no ITO, and the API answers that with a 404. The
+    // request layer retries any error response three times with a pause in
+    // between, so a single try keeps a normal negative answer from costing
+    // three calls and a second of waiting.
+    tries: 1,
+  });
+  // A transient failure must not read as "this asset has no ITO". Deliberately
+  // not wrapped in a try/catch: catching here would return undefined, which
+  // the caller turns into a successful empty answer, and the section would
+  // stay hidden until the page remounts. String() because a network failure
+  // sets `error` to an Error rather than a message.
+  if (res.error && !isNotFound(res.error)) {
+    throw new Error(String(res.error));
   }
+  if (!res.error) {
+    const ITOresp = res as IITOResponse;
+    if (ITOresp?.data?.ito) {
+      const ITO = ITOresp?.data?.ito;
+
+      if (
+        !ITO.isActive ||
+        (ITO?.endTime && ITO.endTime < Date.now() / 1000) ||
+        (ITO?.startTime && ITO.startTime > Date.now() / 1000)
+      ) {
+        return undefined;
+      }
+
+      await parseITOs([ITO]);
+      return ITO as IParsedITO;
+    }
+  }
+
+  return undefined;
 };
 
 export const assetPoolCall = async (
   assetId: string,
 ): Promise<IAssetPool | undefined> => {
-  try {
-    const res = await api.get({
-      route: `assets/pool/${assetId}`,
-    });
-    if (!res.error || res.error === '') {
-      const assetPool = res as IAssetPoolResponse;
-      return assetPool.data.pool;
-    }
-  } catch (error) {
-    console.error(error);
+  const res = await api.get({
+    route: `assets/pool/${assetId}`,
+    // Same as the ITO lookup: an asset without a fee pool is a normal
+    // answer, not a failure worth retrying.
+    tries: 1,
+  });
+  // Same reasoning as ITOCall: a swallowed failure would drop the KDA Pool
+  // tab as if the asset had no pool.
+  if (res.error && !isNotFound(res.error)) {
+    throw new Error(String(res.error));
   }
+  if (!res.error) {
+    const assetPool = res as IAssetPoolResponse;
+    return assetPool.data.pool;
+  }
+
+  return undefined;
 };

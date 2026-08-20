@@ -1,19 +1,21 @@
 /**
- * These three handlers forward a route param into an upstream URL that carries
- * the validator API key. Interpolated raw, a `..%2F` in that param walked out
- * of /contract/ and reached any GET endpoint of that service, with the body
+ * These handlers forward a route param into an upstream URL that carries the
+ * validator API key. Interpolated raw, a `..%2F` in that param walked out of
+ * /contract/ and reached any GET endpoint of that service, with the body
  * returned to an anonymous caller.
  *
- * Five sibling handlers already escaped; these three validated only that the
- * param was a non-empty string, so the property is pinned here rather than left
- * to the next person noticing the inconsistency.
+ * The param is now pinned to a shape rather than merely escaped, because
+ * escaping leaves the request depending on how the upstream normalises a
+ * percent-encoded path, and that behaviour is not established here. `validate`
+ * and `visibility` were found raw by the same audit and pin `address` the same
+ * way; `check` already did.
  */
 import { NextApiRequest, NextApiResponse } from 'next';
 import infoHandler from '../[address]/info';
 import latestJobHandler from '../[address]/jobs/latest';
 import sourceHandler from '../[address]/versions/[version]/source';
 
-const TRAVERSAL = '../../settings?';
+const VALID_ADDRESS = `klv1${'a'.repeat(58)}`;
 
 const makeReq = (query: Record<string, string>): NextApiRequest =>
   ({ method: 'GET', query }) as unknown as NextApiRequest;
@@ -49,48 +51,28 @@ afterEach(() => {
 const fetchedUrl = (): string =>
   (global.fetch as jest.Mock).mock.calls[0][0] as string;
 
-describe('contract-validator proxies escape their route params', () => {
-  it('info keeps a traversal payload inside its segment', async () => {
-    await infoHandler(makeReq({ address: TRAVERSAL }), makeRes().res);
+const HOSTILE_ADDRESSES = [
+  '../../settings?',
+  '..%2F..%2Fsettings',
+  '..',
+  '.',
+  '../settings#',
+  `klv1${'a'.repeat(57)}`,
+  `${VALID_ADDRESS}/extra`,
+];
 
-    expect(fetchedUrl()).toBe(
-      'https://validator.example.com/contract/..%2F..%2Fsettings%3F/info',
-    );
-    expect(new URL(fetchedUrl()).pathname).toContain('/contract/');
-  });
-
-  it('latest job keeps a traversal payload inside its segment', async () => {
-    await latestJobHandler(makeReq({ address: TRAVERSAL }), makeRes().res);
-
-    expect(fetchedUrl()).toBe(
-      'https://validator.example.com/contract/..%2F..%2Fsettings%3F/jobs/latest',
-    );
-  });
-
-  it('source escapes both the address and the version', async () => {
-    await sourceHandler(
-      makeReq({ address: TRAVERSAL, version: '../../secrets' }),
-      makeRes().res,
-    );
-
-    expect(fetchedUrl()).toBe(
-      'https://validator.example.com/contract/..%2F..%2Fsettings%3F/versions/..%2F..%2Fsecrets/source',
-    );
-  });
-
-  it.each([
-    ['.', 'info', infoHandler],
-    ['..', 'info', infoHandler],
-    ['.', 'jobs/latest', latestJobHandler],
-    ['..', 'jobs/latest', latestJobHandler],
-  ])(
-    'rejects a bare %s on %s instead of escaping it',
+describe('the proxies reject an address that is not an address', () => {
+  it.each(
+    HOSTILE_ADDRESSES.flatMap(address => [
+      [address, 'info', infoHandler] as const,
+      [address, 'jobs/latest', latestJobHandler] as const,
+    ]),
+  )(
+    'rejects %s on %s without calling upstream',
     async (address, _route, handler) => {
-      // `.` and `..` survive encodeURIComponent and are then collapsed by URL
-      // parsing, so escaping alone does not keep the request inside /contract/.
       const { res, status, json } = makeRes();
 
-      await handler(makeReq({ address: address as string }), res);
+      await handler(makeReq({ address }), res);
 
       expect(status).toHaveBeenCalledWith(400);
       expect(json).toHaveBeenCalledWith({
@@ -100,26 +82,59 @@ describe('contract-validator proxies escape their route params', () => {
     },
   );
 
-  it('rejects a dot-only version', async () => {
-    const { res, status, json } = makeRes();
+  it.each(HOSTILE_ADDRESSES)(
+    'rejects %s on versions/source without calling upstream',
+    async address => {
+      const { res, status } = makeRes();
 
+      await sourceHandler(makeReq({ address, version: '1' }), res);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(global.fetch).not.toHaveBeenCalled();
+    },
+  );
+});
+
+describe('the source handler pins its version too', () => {
+  it.each(['..', '.', '../../secrets', 'abc', '1a', ''])(
+    'rejects version %s',
+    async version => {
+      const { res, status } = makeRes();
+
+      await sourceHandler(makeReq({ address: VALID_ADDRESS, version }), res);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(global.fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it('accepts a numeric version, which is what the client sends', async () => {
     await sourceHandler(
-      makeReq({ address: `klv1${'a'.repeat(58)}`, version: '..' }),
-      res,
+      makeReq({ address: VALID_ADDRESS, version: '12' }),
+      makeRes().res,
     );
 
-    expect(status).toHaveBeenCalledWith(400);
-    expect(json).toHaveBeenCalledWith({ message: 'Invalid version' });
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(fetchedUrl()).toBe(
+      `https://validator.example.com/contract/${VALID_ADDRESS}/versions/12/source`,
+    );
   });
+});
 
-  it('leaves an ordinary address untouched', async () => {
-    const address = `klv1${'a'.repeat(58)}`;
-
-    await infoHandler(makeReq({ address }), makeRes().res);
+describe('an ordinary address still reaches upstream unchanged', () => {
+  it('builds the info URL from the address as given', async () => {
+    await infoHandler(makeReq({ address: VALID_ADDRESS }), makeRes().res);
 
     expect(fetchedUrl()).toBe(
-      `https://validator.example.com/contract/${address}/info`,
+      `https://validator.example.com/contract/${VALID_ADDRESS}/info`,
+    );
+    expect(new URL(fetchedUrl()).pathname).toContain('/contract/');
+  });
+
+  it('builds the latest-job URL from the address as given', async () => {
+    await latestJobHandler(makeReq({ address: VALID_ADDRESS }), makeRes().res);
+
+    expect(fetchedUrl()).toBe(
+      `https://validator.example.com/contract/${VALID_ADDRESS}/jobs/latest`,
     );
   });
 });

@@ -35,3 +35,11 @@ export async function proxyToValidator(
     clearTimeout(timeoutId);
   }
 }
+
+/**
+ * `.` and `..` survive encodeURIComponent and are then collapsed by URL
+ * parsing, so escaping a segment does not on its own keep the request inside
+ * /contract/. Handlers that forward a route param reject these outright.
+ */
+export const isDotSegment = (value: string): boolean =>
+  value === '.' || value === '..';

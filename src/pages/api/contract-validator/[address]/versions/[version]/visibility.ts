@@ -22,11 +22,21 @@ export default async function handler(
   const { address, version } = req.query;
   const validatorUrl = process.env.DEFAULT_CONTRACT_VALIDATOR_URL;
 
-  if (typeof address !== 'string' || !address) {
+  // Same shape checks as the sibling handlers. This request carries the API
+  // key, so both segments are pinned rather than merely escaped.
+  if (typeof address !== 'string' || !/^klv1[0-9a-z]{58}$/.test(address)) {
     res.status(400).json({ message: 'Invalid contract address' });
     return;
   }
-  if (typeof version !== 'string' || !version) {
+  // Not pinned to a format: the sibling audits handler expects a 64-char hex
+  // hash, but this endpoint's own spec exercises '1', so the shape is not
+  // established. Escaped below, with dot segments rejected here.
+  if (
+    typeof version !== 'string' ||
+    !version ||
+    version === '.' ||
+    version === '..'
+  ) {
     res.status(400).json({ message: 'Invalid version' });
     return;
   }
@@ -71,7 +81,9 @@ export default async function handler(
 
   await proxyToValidator(
     res,
-    `${validatorUrl}/contract/${address}/versions/${version}/visibility`,
+    `${validatorUrl}/contract/${encodeURIComponent(
+      address,
+    )}/versions/${encodeURIComponent(version)}/visibility`,
     {
       method: 'POST',
       headers: {

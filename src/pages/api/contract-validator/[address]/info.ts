@@ -1,12 +1,7 @@
+import { isDotSegment } from '@/pages/api/contract-validator/_proxy';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
-
-// `.` and `..` survive encodeURIComponent and are then collapsed by URL
-// parsing, so an escaped segment alone does not keep the request inside
-// /contract/. Rejected here rather than escaped.
-const isDotSegment = (value: string): boolean =>
-  value === '.' || value === '..';
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +15,10 @@ export default async function handler(
   const { address } = req.query;
   const validatorUrl = process.env.DEFAULT_CONTRACT_VALIDATOR_URL;
 
-  if (typeof address !== 'string' || !address || isDotSegment(address)) {
+  // Pinned to the bech32 shape the six sibling handlers already require,
+  // rather than escaped only: this request carries the API key, so it should
+  // not depend on how the upstream normalises a percent-encoded path.
+  if (typeof address !== 'string' || !/^klv1[0-9a-z]{58}$/.test(address)) {
     res.status(400).json({ message: 'Invalid contract address' });
     return;
   }

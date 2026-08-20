@@ -4,7 +4,8 @@ import { NextRouter } from 'next/router';
 
 export const requestAssets = async (assets: string): Promise<IAsset[]> => {
   const res = await api.get({
-    route: `assets/list?asset=${assets}`,
+    route: 'assets/list',
+    query: { asset: assets },
   });
   if (!res || res.error) {
     return [];

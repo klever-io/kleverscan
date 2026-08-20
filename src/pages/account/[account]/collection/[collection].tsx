@@ -98,7 +98,10 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
         const actualLimit = searchValue.trim() !== '' ? 1000 : limit;
 
         const response = await api.get({
-          route: `address/${address}/collection/${collection}?page=${page}&limit=${actualLimit}`,
+          route: `address/${encodeURIComponent(
+            String(address),
+          )}/collection/${encodeURIComponent(String(collection))}`,
+          query: { page, limit: actualLimit },
         });
         let filteredNfts = [];
         const collectionData = response?.data?.collection || [];

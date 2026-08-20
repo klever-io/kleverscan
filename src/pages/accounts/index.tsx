@@ -54,7 +54,8 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
   const { t } = useTranslation(['common', 'accounts', 'table']);
   const requestAccounts = async (page: number, limit: number) =>
     await api.get({
-      route: `address/list?page=${page}&limit=${limit}`,
+      route: 'address/list',
+      query: { page, limit },
     });
 
   const loadInitialData = async () => {

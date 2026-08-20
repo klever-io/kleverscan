@@ -1,4 +1,3 @@
-import { isDotSegment } from '@/pages/api/contract-validator/_proxy';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
@@ -40,9 +39,6 @@ export default async function handler(
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10_000);
     const response = await fetch(
-      // Escaped because this request carries the API key: unescaped, a `..%2F`
-      // in either route param walks out of /contract/ and reaches any GET
-      // endpoint of the validator service, answer returned to the caller.
       `${validatorUrl}/contract/${encodeURIComponent(
         address,
       )}/versions/${encodeURIComponent(version)}/source`,

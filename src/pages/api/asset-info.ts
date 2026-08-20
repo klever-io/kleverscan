@@ -17,7 +17,6 @@ export default async function handler(
   try {
     const { asset_id } = req.query;
 
-    // Validate asset_id
     // encodeURIComponent leaves `.` and `..` alone and URL parsing then walks
     // up a level, so `..` reaches the collection endpoint instead of a record.
     if (

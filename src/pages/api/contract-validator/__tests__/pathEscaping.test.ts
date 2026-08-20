@@ -13,7 +13,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import infoHandler from '../[address]/info';
 import latestJobHandler from '../[address]/jobs/latest';
+import validateHandler from '../[address]/validate';
 import sourceHandler from '../[address]/versions/[version]/source';
+import visibilityHandler from '../[address]/versions/[version]/visibility';
 
 const VALID_ADDRESS = `klv1${'a'.repeat(58)}`;
 
@@ -136,5 +138,78 @@ describe('an ordinary address still reaches upstream unchanged', () => {
     expect(fetchedUrl()).toBe(
       `https://validator.example.com/contract/${VALID_ADDRESS}/jobs/latest`,
     );
+  });
+});
+
+/**
+ * The two POST handlers reject before any signature or body work, so these
+ * drive them with no wallet headers at all: a 400 here proves the address was
+ * refused on its shape rather than on a missing signature, which would be a
+ * 401. Without these, reverting either pin leaves the suite green.
+ */
+const makePostReq = (query: Record<string, string>): NextApiRequest =>
+  ({
+    method: 'POST',
+    query,
+    headers: {},
+    body: {},
+  }) as unknown as NextApiRequest;
+
+describe('the POST handlers pin their params before doing any wallet work', () => {
+  it.each(HOSTILE_ADDRESSES)(
+    'validate rejects %s without calling upstream',
+    async address => {
+      const { res, status, json } = makeRes();
+
+      await validateHandler(makePostReq({ address }), res);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith({
+        message: 'Invalid contract address',
+      });
+      expect(global.fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(HOSTILE_ADDRESSES)(
+    'visibility rejects %s without calling upstream',
+    async address => {
+      const { res, status } = makeRes();
+
+      await visibilityHandler(makePostReq({ address, version: '1' }), res);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(global.fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(['.', '..', '../settings?', 'abc', '1a', ''])(
+    'visibility rejects version %s without calling upstream',
+    async version => {
+      const { res, status, json } = makeRes();
+
+      await visibilityHandler(
+        makePostReq({ address: VALID_ADDRESS, version }),
+        res,
+      );
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith({ message: 'Invalid version' });
+      expect(global.fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it('lets a well-formed pair through to the wallet check, not to upstream', async () => {
+    // A 401 rather than a 400 is the point: the shape passed, the signature
+    // did not, so the pin is not swallowing valid input.
+    const { res, status } = makeRes();
+
+    await visibilityHandler(
+      makePostReq({ address: VALID_ADDRESS, version: '12' }),
+      res,
+    );
+
+    expect(status).toHaveBeenCalledWith(401);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 });

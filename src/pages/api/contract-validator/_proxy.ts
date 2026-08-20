@@ -37,9 +37,10 @@ export async function proxyToValidator(
 }
 
 /**
- * `.` and `..` survive encodeURIComponent and are then collapsed by URL
- * parsing, so escaping a segment does not on its own keep the request inside
- * /contract/. Handlers that forward a route param reject these outright.
+ * `.` and `..` survive encodeURIComponent, and URL parsing then collapses them.
+ * This is the fallback for a param with no established format, currently
+ * `asset-info`'s `asset_id`. The validator handlers do not need it: a bech32
+ * address or a digit version cannot be `.` or `..`.
  */
 export const isDotSegment = (value: string): boolean =>
   value === '.' || value === '..';

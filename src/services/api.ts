@@ -63,9 +63,11 @@ const pagination = {
  * interpolating it raw let it act as query syntax rather than as data: an `&`
  * added a parameter of its own and a `#` cut the request short at a fragment,
  * dropping every parameter written after it. The API resolves a repeated
- * parameter first-wins, and Next lists a search param ahead of a route param
- * of the same name in `router.query`, so the injected copy was emitted first
- * and decided the response.
+ * parameter first-wins, so a value carrying `&asset=KFI` decided the response
+ * rather than the real `asset` written later in the same query. The injection
+ * rides in the value of some other key, not in a second key of the same name:
+ * a route param and a search param that share a name are merged by Next long
+ * before this, and the route one wins.
  *
  * It is not only reachable through a crafted link. Labels the app writes to the
  * URL itself carry the same characters, `Staking & Royalties` among them.

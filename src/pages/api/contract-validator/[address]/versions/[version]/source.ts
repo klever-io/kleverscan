@@ -2,6 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_KEY = process.env.DEFAULT_CONTRACT_VALIDATOR_KEY || '';
 
+// `.` and `..` survive encodeURIComponent and are then collapsed by URL
+// parsing, so an escaped segment alone does not keep the request inside
+// /contract/. Rejected here rather than escaped.
+const isDotSegment = (value: string): boolean =>
+  value === '.' || value === '..';
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -14,12 +20,12 @@ export default async function handler(
   const { address, version } = req.query;
   const validatorUrl = process.env.DEFAULT_CONTRACT_VALIDATOR_URL;
 
-  if (typeof address !== 'string' || !address) {
+  if (typeof address !== 'string' || !address || isDotSegment(address)) {
     res.status(400).json({ message: 'Invalid contract address' });
     return;
   }
 
-  if (typeof version !== 'string' || !version) {
+  if (typeof version !== 'string' || !version || isDotSegment(version)) {
     res.status(400).json({ message: 'Invalid version' });
     return;
   }

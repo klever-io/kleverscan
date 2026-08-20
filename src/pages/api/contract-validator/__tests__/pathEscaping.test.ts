@@ -78,6 +78,41 @@ describe('contract-validator proxies escape their route params', () => {
     );
   });
 
+  it.each([
+    ['.', 'info', infoHandler],
+    ['..', 'info', infoHandler],
+    ['.', 'jobs/latest', latestJobHandler],
+    ['..', 'jobs/latest', latestJobHandler],
+  ])(
+    'rejects a bare %s on %s instead of escaping it',
+    async (address, _route, handler) => {
+      // `.` and `..` survive encodeURIComponent and are then collapsed by URL
+      // parsing, so escaping alone does not keep the request inside /contract/.
+      const { res, status, json } = makeRes();
+
+      await handler(makeReq({ address: address as string }), res);
+
+      expect(status).toHaveBeenCalledWith(400);
+      expect(json).toHaveBeenCalledWith({
+        message: 'Invalid contract address',
+      });
+      expect(global.fetch).not.toHaveBeenCalled();
+    },
+  );
+
+  it('rejects a dot-only version', async () => {
+    const { res, status, json } = makeRes();
+
+    await sourceHandler(
+      makeReq({ address: `klv1${'a'.repeat(58)}`, version: '..' }),
+      res,
+    );
+
+    expect(status).toHaveBeenCalledWith(400);
+    expect(json).toHaveBeenCalledWith({ message: 'Invalid version' });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
   it('leaves an ordinary address untouched', async () => {
     const address = `klv1${'a'.repeat(58)}`;
 

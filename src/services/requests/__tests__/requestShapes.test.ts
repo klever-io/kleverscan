@@ -34,6 +34,10 @@ import {
   KLVAllowancePromise,
   assetsRequest,
 } from '@/services/requests/account';
+import {
+  getAssetByPartialSymbol,
+  transactionCall,
+} from '@/services/requests/asset';
 import { requestAssets } from '@/services/requests/assets';
 import { collectionListCall } from '@/services/requests/collection';
 import { requestAssetsList } from '@/services/requests/ito';
@@ -43,6 +47,7 @@ import {
   dataProposalCall,
   requestProposals,
 } from '@/services/requests/proposals';
+import { smartContractTransactionDetailsCall } from '@/services/requests/smartContracts';
 import { NextRouter } from 'next/router';
 
 const routerWith = (query: Record<string, unknown>): NextRouter =>
@@ -186,6 +191,39 @@ describe('escaped route segments', () => {
 });
 
 describe('shapes that must not drift', () => {
+  it('getAssetByPartialSymbol sends the typed text as a query value', async () => {
+    mockGet.mockResolvedValue({ error: '', data: { assets: [{}] } });
+
+    await getAssetByPartialSymbol('KL&x=1');
+
+    expect(callArg()).toEqual({
+      route: 'assets/list',
+      query: { asset: 'KL&x=1' },
+    });
+  });
+
+  it('transactionCall sends the asset and limit as query values', async () => {
+    mockGet.mockResolvedValue({ error: '', pagination: {} });
+
+    await transactionCall('KID-36W3');
+
+    expect(callArg()).toEqual({
+      route: 'transaction/list',
+      query: { asset: 'KID-36W3', limit: 5 },
+    });
+  });
+
+  it('smartContractTransactionDetailsCall escapes the hash and sends withResults', async () => {
+    mockGet.mockResolvedValue({ error: '', data: { transaction: {} } });
+
+    await smartContractTransactionDetailsCall('abc?x=1&');
+
+    expect(callArg()).toEqual({
+      route: 'transaction/abc%3Fx%3D1%26',
+      query: { withResults: true },
+    });
+  });
+
   it('requestAssetsList still asks for the joined asset list', async () => {
     mockGet.mockResolvedValue({ error: '', data: { assets: [] } });
 

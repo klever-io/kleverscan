@@ -13,10 +13,11 @@ type RouterQuery = Record<string, string | string[] | undefined>;
  * table: TransactionsFilters writes asset, status, type and buyType, DateFilter
  * writes startdate and enddate.
  *
- * An allowlist rather than a denylist because `buildUrlQuery` interpolates
- * values into the query string unescaped, so anything reaching it from the URL
- * can inject further params. A repeated param (?status=a&status=b) arrives as
- * an array and is skipped for the same reason.
+ * An allowlist rather than a denylist so the request carries filters only. This
+ * page keeps its tab and card state in the URL as well, and forwarding those
+ * would hand the API this table's view state as if it were a filter. A repeated
+ * param (?status=a&status=b) arrives as an array, which the filter bar never
+ * writes, so it is skipped rather than joined into a single value.
  */
 const FILTER_PARAMS = [
   'asset',
@@ -45,11 +46,7 @@ export const blockTransactionsCall = async (
   FILTER_PARAMS.forEach(key => {
     const value = routerQuery[key];
     if (typeof value === 'string' && value !== '') {
-      // Encoded here rather than in `buildUrlQuery`, which would fix every
-      // caller at once but risks changing values other endpoints already
-      // accept. If that central fix ever lands, drop this call: encoding
-      // twice would turn a filter value into its escaped form on the wire.
-      query[key] = encodeURIComponent(value);
+      query[key] = value;
     }
   });
 

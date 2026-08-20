@@ -56,9 +56,29 @@ const pagination = {
   totalRecords: 0,
 };
 
-const buildUrlQuery = (query: IQuery): string =>
-  Object.keys(query)
-    .map(key => `${key}=${query[key]}`)
+/**
+ * Percent-encodes both sides of every pair.
+ *
+ * Next has already decoded `router.query` by the time a value reaches here, so
+ * interpolating it raw let it act as query syntax rather than as data: an `&`
+ * added a parameter of its own and a `#` cut the request short at a fragment,
+ * dropping every parameter written after it. The proxy resolves a repeated
+ * parameter first-wins, and search params sort ahead of route params, so an
+ * injected copy decided the response.
+ *
+ * It is not only reachable through a crafted link. Labels the app writes to the
+ * URL itself carry the same characters, `Staking & Royalties` among them.
+ *
+ * `String(value)` keeps exactly the coercion the template literal performed,
+ * including an array joining on a comma, so only characters that were already
+ * being sent as syntax change on the wire.
+ */
+export const buildUrlQuery = (query: IQuery): string =>
+  Object.entries(query)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
+    )
     .join('&');
 
 export const getHost = (

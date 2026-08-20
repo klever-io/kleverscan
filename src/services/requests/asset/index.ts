@@ -44,8 +44,10 @@ export const getAssetByPartialSymbol = async (
   } as IAssetResponse;
 
   if (assetRef?.length) {
+    // Through `query`: `assetRef` is whatever was typed into the search box.
     const res = await api.get({
-      route: `assets/list?asset=${assetRef}`,
+      route: 'assets/list',
+      query: { asset: assetRef },
     });
 
     if (res?.data?.assets?.length)

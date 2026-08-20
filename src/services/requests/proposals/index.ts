@@ -113,8 +113,12 @@ export const requestProposals = async (
   router: NextRouter,
 ): Promise<IResponse> => {
   const { status } = router.query;
+  // Through `query` rather than interpolated into the route: `status` comes
+  // from the URL, and a value carrying `&page=999` used to add a second `page`
+  // ahead of this one, which the proxy then answered instead.
   const proposals: IProposalsResponse = await api.get({
-    route: `proposals/list?status=${status || ''}&page=${page}&limit=${limit}`,
+    route: 'proposals/list',
+    query: { status: status || '', page, limit },
   });
   let parsedProposalResponse: any[] = [];
   parsedProposalResponse = parseAllProposals(proposals?.data?.proposals);

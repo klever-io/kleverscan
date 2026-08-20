@@ -13,9 +13,11 @@ export const collectionListCall = async (
   isSFT = false,
 ): Promise<ICollection[] | undefined> => {
   try {
-    const parsedCollection = JSON.parse(
-      router?.query?.contractDetails as string,
-    ).collection;
+    // Parsed out of the URL, so it is escaped before going into a route
+    // segment: unescaped, a `?` or `&` in it rewrote the request's parameters.
+    const parsedCollection = encodeURIComponent(
+      JSON.parse(router?.query?.contractDetails as string).collection,
+    );
 
     if (isSFT) {
       const res: IAssetsResponse = await api.get({
@@ -28,9 +30,8 @@ export const collectionListCall = async (
     }
 
     const res: ICollectionIdListResponse = await api.get({
-      route: `address/${walletAddress}/collection/${parsedCollection}?page=${
-        partialId ? Number(partialId) : 0
-      }`,
+      route: `address/${walletAddress}/collection/${parsedCollection}`,
+      query: { page: partialId ? Number(partialId) : 0 },
     });
 
     if (!res.error || res.error === '') {

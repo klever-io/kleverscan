@@ -132,7 +132,7 @@ const Collection: React.FC<PropsWithChildren<ICollectionPage>> = () => {
     try {
       const assetId = router.query.collection as string;
       const response = await api.get({
-        route: `assets/${assetId}`,
+        route: `assets/${encodeURIComponent(String(assetId))}`,
       });
       const uris = response.data.asset.uris;
       const metadataUri = uris?.find(

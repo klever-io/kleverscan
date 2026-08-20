@@ -223,7 +223,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   }
 
   const transaction: ITransactionResponse = await api.get({
-    route: `transaction/${hash}`,
+    route: `transaction/${encodeURIComponent(String(hash))}`,
   });
 
   const tx = transaction?.data?.transaction;

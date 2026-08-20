@@ -62,9 +62,10 @@ const pagination = {
  * Next has already decoded `router.query` by the time a value reaches here, so
  * interpolating it raw let it act as query syntax rather than as data: an `&`
  * added a parameter of its own and a `#` cut the request short at a fragment,
- * dropping every parameter written after it. The proxy resolves a repeated
- * parameter first-wins, and search params sort ahead of route params, so an
- * injected copy decided the response.
+ * dropping every parameter written after it. The API resolves a repeated
+ * parameter first-wins, and Next lists a search param ahead of a route param
+ * of the same name in `router.query`, so the injected copy was emitted first
+ * and decided the response.
  *
  * It is not only reachable through a crafted link. Labels the app writes to the
  * URL itself carry the same characters, `Staking & Royalties` among them.

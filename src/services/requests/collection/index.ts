@@ -15,6 +15,8 @@ export const collectionListCall = async (
   try {
     // Parsed out of the URL, so it is escaped before going into a route
     // segment: unescaped, a `?` or `&` in it rewrote the request's parameters.
+    // The wallet address below is escaped only for consistency, it comes from
+    // the extension rather than the URL and is not attacker-reachable.
     const parsedCollection = encodeURIComponent(
       JSON.parse(router?.query?.contractDetails as string).collection,
     );
@@ -30,7 +32,9 @@ export const collectionListCall = async (
     }
 
     const res: ICollectionIdListResponse = await api.get({
-      route: `address/${walletAddress}/collection/${parsedCollection}`,
+      route: `address/${encodeURIComponent(
+        walletAddress,
+      )}/collection/${parsedCollection}`,
       query: { page: partialId ? Number(partialId) : 0 },
     });
 

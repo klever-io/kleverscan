@@ -27,10 +27,16 @@ export default async function handler(
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10_000);
-    const response = await fetch(`${validatorUrl}/contract/${address}/info`, {
-      headers: { 'X-API-KEY': API_KEY },
-      signal: controller.signal,
-    });
+    // Escaped because this request carries the API key: unescaped, a `..%2F`
+    // in the route param walks out of /contract/ and reaches any GET endpoint
+    // of the validator service, with the answer returned to the caller.
+    const response = await fetch(
+      `${validatorUrl}/contract/${encodeURIComponent(address)}/info`,
+      {
+        headers: { 'X-API-KEY': API_KEY },
+        signal: controller.signal,
+      },
+    );
     clearTimeout(timeoutId);
 
     const contentType = response.headers.get('content-type') || '';

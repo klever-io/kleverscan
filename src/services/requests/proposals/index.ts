@@ -98,7 +98,10 @@ export const dataNetworkParams = async (): Promise<
 export const dataProposalCall = async (router: NextRouter): Promise<any> => {
   try {
     const res = await api.get({
-      route: `proposals/${router.query.number}`,
+      // Escaped for the same reason as the query values below: this segment
+      // comes from the URL, and an injected `?voteType=1&` would land ahead of
+      // the voteType below, which the API then answers first-wins.
+      route: `proposals/${encodeURIComponent(String(router.query.number))}`,
       query: { voteType: 0 },
     });
     return parseProposal(res);

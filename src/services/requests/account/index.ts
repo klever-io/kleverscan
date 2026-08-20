@@ -61,7 +61,7 @@ export const assetsRequest = (
       };
     }
     const accountResponse = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
     if (accountResponse.error) {
       return {
@@ -180,7 +180,7 @@ export const bucketsRequest = (
     limit: number,
   ): Promise<IPaginatedResponse | []> => {
     const accountResponse: IAccountResponse = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
     if (!accountResponse) return [];
 
@@ -296,7 +296,7 @@ export const accountCall = async (
 ): Promise<IAccount | undefined> => {
   try {
     const res = await api.get({
-      route: `address/${router.query.account || ''}`,
+      route: `address/${encodeURIComponent(String(router.query.account || ''))}`,
     });
     if (!res.error || res.error === '') {
       return res.data.account;
@@ -388,7 +388,7 @@ export const rewardsFPRPool = (
 ): ((page: number, limit: number) => Promise<IResponse | []>) => {
   const get = async (page: number, limit: number): Promise<IResponse | []> => {
     const accountResponse: IAccountResponse = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
     if (!accountResponse) return [];
     const bucketsTable: IAssetsBuckets[] = [];
@@ -536,7 +536,7 @@ export const nftCollectionsRequest = (
     }
 
     const res = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
 
     if (res.error && res.error !== '') {

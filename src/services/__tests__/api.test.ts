@@ -79,8 +79,11 @@ describe('getHost', () => {
   });
 
   it('omits the question mark when there is no query', () => {
-    expect(
-      getHost('assets/KLV', undefined, Service.PROXY, 'v1.0'),
-    ).not.toContain('?');
+    // Asserted from the route onwards rather than over the whole string: the
+    // host comes from the environment, so a configured host carrying its own
+    // query would fail this for a reason that has nothing to do with the sink.
+    const host = getHost('assets/KLV', undefined, Service.PROXY, 'v1.0');
+
+    expect(host.slice(host.indexOf('/assets/KLV'))).toBe('/assets/KLV');
   });
 });

@@ -145,7 +145,10 @@ const SmartContractsTransactions: React.FC<SmartContractsTransactionsProps> = ({
     try {
       const localQuery = { ...router.query, page, limit };
       const res = await api.get({
-        route: `sc/invokes/${contractAddress}`,
+        // Escaped: the address comes from the URL and the query is appended
+        // after this segment, so a `?` or `&` smuggled into it would land
+        // ahead of page and limit, which the API resolves first-wins.
+        route: `sc/invokes/${encodeURIComponent(contractAddress)}`,
         query: localQuery,
       });
 

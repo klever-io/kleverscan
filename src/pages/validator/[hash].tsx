@@ -95,7 +95,7 @@ const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
     if (router.isReady) {
       const requestValidator = async () => {
         const res = await api.get({
-          route: `validator/${router.query.hash}`,
+          route: `validator/${encodeURIComponent(String(router.query.hash))}`,
         });
         if (!res.error || res.error === '') {
           setValidator(res.data.validator);

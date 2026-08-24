@@ -365,15 +365,22 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
 
   const requestVoters = useCallback(
     async (page: number, limit: number): Promise<IParsedVoterResponse> => {
+      // Escaped: the proposal number comes from the URL, and `getHost` appends
+      // the query after the route, so a `?voteType=1&` smuggled into the
+      // segment lands ahead of the one below. The API resolves a repeated
+      // parameter first-wins, which rendered the No voters under the Yes tab.
+      const proposalRoute = `proposals/${encodeURIComponent(
+        String(router.query.number),
+      )}`;
       let response;
       if (selectedFilter === `${t('common:Statements.Yes')}`) {
         response = await api.get({
-          route: `proposals/${router.query.number}`,
+          route: proposalRoute,
           query: { pageVoters: page, limitVoters: limit, voteType: 0 },
         });
       } else {
         response = await api.get({
-          route: `proposals/${router.query.number}`,
+          route: proposalRoute,
           query: { pageVoters: page, limitVoters: limit, voteType: 1 },
         });
       }

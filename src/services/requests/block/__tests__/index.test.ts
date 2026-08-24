@@ -94,16 +94,18 @@ describe('blockTransactionsCall', () => {
     });
   });
 
-  it('encodes a filter value so it cannot inject another parameter', async () => {
-    await blockTransactionsCall(42, 1, 10, { status: '&blockNum=999' });
+  it('passes a filter value on unchanged, leaving the escaping to the sink', async () => {
+    // This module used to percent-encode here because `buildUrlQuery` did not.
+    // It does now, so encoding twice would put the escaped form on the wire.
+    // That the injection and the fragment are neutralised is asserted against
+    // the built URL instead, in the api spec.
+    await blockTransactionsCall(42, 1, 10, {
+      status: '&blockNum=999',
+      asset: 'KLV#',
+    });
 
-    expect(queryOf().status).toBe('%26blockNum%3D999');
-  });
-
-  it('encodes a filter value so it cannot truncate the query with a fragment', async () => {
-    await blockTransactionsCall(42, 1, 10, { asset: 'KLV#' });
-
-    expect(queryOf().asset).toBe('KLV%23');
+    expect(queryOf().status).toBe('&blockNum=999');
+    expect(queryOf().asset).toBe('KLV#');
   });
 
   it('ignores a repeated param, which arrives as an array', async () => {

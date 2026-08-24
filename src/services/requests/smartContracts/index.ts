@@ -176,7 +176,8 @@ const smartContractTransactionDetailsCall = async (
 ): Promise<{ transaction: SmartContractTransactionData } | undefined> => {
   try {
     const res = await api.get({
-      route: `transaction/${txHash}?withResults=true`,
+      route: `transaction/${encodeURIComponent(txHash)}`,
+      query: { withResults: true },
     });
 
     if (!res.error || res.error === '') {

@@ -44,8 +44,10 @@ export const getAssetByPartialSymbol = async (
   } as IAssetResponse;
 
   if (assetRef?.length) {
+    // Through `query`: `assetRef` is whatever was typed into the search box.
     const res = await api.get({
-      route: `assets/list?asset=${assetRef}`,
+      route: 'assets/list',
+      query: { asset: assetRef },
     });
 
     if (res?.data?.assets?.length)
@@ -102,7 +104,8 @@ export const transactionCall = async (
 ): Promise<IPagination | undefined> => {
   try {
     const res = await api.get({
-      route: `transaction/list?asset=${assetId}&limit=5`,
+      route: 'transaction/list',
+      query: { asset: assetId, limit: 5 },
     });
     if (!res.error || res.error === '') {
       const transactions = res as ITransactionsResponse;

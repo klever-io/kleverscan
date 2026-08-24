@@ -4,6 +4,12 @@ import Title from '@/components/Layout/Title';
 import LinkWithDropdown from '@/components/LinkWithDropdown';
 import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
+import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
+import {
+  getTransactionColumns,
+  showsInOut,
+  TransactionColumnKey,
+} from '@/components/TransactionsList/columns';
 import {
   CustomFieldWrapper,
   InOutSpan,
@@ -39,7 +45,6 @@ import {
   contractTypes,
   filteredSections,
   getLabelForTableField,
-  transactionTableHeaders,
 } from '@/utils/contracts';
 import { capitalizeString } from '@/utils/convertString';
 import { findReceipt } from '@/utils/findKey';
@@ -48,9 +53,13 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { TXType } from '@klever/connect';
+import { GetServerSideProps } from 'next';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
 import React, { PropsWithChildren } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 interface IRequestTxQuery {
   asset?: string;
@@ -264,8 +273,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
 
   const customFields = getCustomFields(contract, receipts, precision, data);
 
-  const sections: IRowSection[] = [
-    {
+  const sectionByColumn: Record<TransactionColumnKey, IRowSection> = {
+    hash: {
       element: props => (
         <DoubleRow {...props} key={hash}>
           <ExplorerLink
@@ -288,7 +297,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       ),
       span: 2,
     },
-    {
+    blockFees: {
       element: props => (
         <DoubleRow {...props} key={blockNum}>
           <ExplorerLink type="block" value={String(blockNum || 0)} compact />
@@ -299,7 +308,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       ),
       span: 1,
     },
-    {
+    fromTo: {
       element: props => (
         <DoubleRow {...props} key={sender}>
           {mobileAddressSectionElement(sender)}
@@ -308,8 +317,23 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
       ),
       span: 1,
     },
-
-    {
+    inOut: {
+      element: props => (
+        <DoubleRow {...props} key={inOrOut}>
+          <CenteredRow>
+            {contractType === 'TransferContractType' ? (
+              <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+                {inOrOut}
+              </InOutSpan>
+            ) : (
+              <InOutSpan status={'icon'}>- -</InOutSpan>
+            )}
+          </CenteredRow>
+        </DoubleRow>
+      ),
+      span: 1,
+    },
+    type: {
       element: props =>
         contractType === 'Multi contract' ? (
           <DoubleRow {...props}>
@@ -344,7 +368,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
         ),
       span: 1,
     },
-    {
+    misc: {
       element: props =>
         contractType ? (
           <DoubleRow {...props}>
@@ -374,39 +398,23 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
         ),
       span: 1,
     },
-  ];
-
-  const inOutRow: IRowSection = {
-    element: props => (
-      <DoubleRow {...props} key={inOrOut}>
-        <CenteredRow>
-          {contractType === 'TransferContractType' ? (
-            <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
-              {inOrOut}
-            </InOutSpan>
-          ) : (
-            <InOutSpan status={'icon'}>- -</InOutSpan>
-          )}
-        </CenteredRow>
-      </DoubleRow>
-    ),
-    span: 1,
   };
 
-  if (router?.query?.account) {
-    sections.splice(3, 0, inOutRow);
-    return sections;
-  }
-
-  return sections;
+  // Ordered by the column list rather than assembled here, so the cells and
+  // the headings above them come from the same decision.
+  return getTransactionColumns({ showInOut: showsInOut(router) }).map(
+    column => sectionByColumn[column.key],
+  );
 };
 
 const Transactions: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
+  const { t } = useTranslation(['common', 'transactions']);
+  const header = useTransactionHeaders();
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: transactionTableHeaders,
+    header,
     rowSections: transactionRowSections,
     dataName: 'transactions',
     request: (page, limit) => requestTransactionsDefault(page, limit, router),
@@ -416,12 +424,34 @@ const Transactions: React.FC<PropsWithChildren> = () => {
   return (
     <Container>
       <Header>
-        <Title title="Transactions" Icon={Icon} />
+        <Title title={t('common:Titles.Transactions')} Icon={Icon} />
       </Header>
 
       <Table {...tableProps} />
     </Container>
   );
+};
+
+/**
+ * The page carried no data method at all, so it loaded no translation
+ * namespace and `t()` here would have returned its own key. Server-rendered
+ * rather than static: `_app` defines getInitialProps, which already disables
+ * static optimisation app-wide, so this changes what the page receives and not
+ * how it renders. getStaticProps would have changed how it renders, by turning
+ * `router.isReady` false on the first render of any URL carrying a query
+ * string, which is every filtered link into this page.
+ */
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'transactions'],
+    nextI18nextConfig,
+    ['en'],
+  );
+
+  return { props };
 };
 
 export default Transactions;

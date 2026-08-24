@@ -772,7 +772,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const props = await serverSideTranslations(
     locale,
-    ['common', 'accounts'],
+    ['common', 'accounts', 'transactions'],
     nextI18nextConfig,
     ['en'],
   );

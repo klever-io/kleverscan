@@ -95,6 +95,10 @@ const AssetsFilters: React.FC<PropsWithChildren> = () => {
   const filters: IFilter[] = [
     {
       title: `${t('common:Titles.Assets')}`,
+      // Stated rather than inferred from the title. Filter used to match on
+      // `title === 'Asset'`, which this never was, so this box has been showing
+      // the generic prompt.
+      placeholder: 'Type the token ID',
       data: filterAssets.map(asset => asset.assetId),
       onClick: value => handleSelected(value, 'asset'),
       onChange: async value => {

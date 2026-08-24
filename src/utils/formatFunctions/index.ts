@@ -150,16 +150,32 @@ export const filterDate = (selectedDays: ISelectedDays): IFilterDater => {
 };
 
 /**
- * Shorthand version of toLocaleString for passing precision and always using user locale. It receives a number that will be formatted having a minimal precision according to the precision arg passed.
- * @param value
- * @param precision
- * @returns string
+ * A number with at least `precision` decimals.
+ *
+ * Formatted in en-US rather than in the reader's own locale, and that is
+ * deliberate. `toLocaleString(undefined, …)` asks the runtime for its default,
+ * which is the server's locale during SSR and the browser's afterwards. On a
+ * machine whose locale uses a comma decimal separator the two disagree
+ * ("1.000000" from the server, "1,000000" in the browser), and React discards
+ * the whole server-rendered tree and rebuilds it on the client. It is visible
+ * on every block page today for most of continental Europe.
+ *
+ * en-US is the honest choice here rather than an arbitrary one: `en` is the
+ * only locale this app ships (next-i18next.config.js), all of its copy is
+ * English, and the assets section already pins `toLocaleString('en-US')` in
+ * five places. This makes the rest of the app agree with that.
+ *
+ * The optional call is kept because a caller can still hand this an undefined
+ * at runtime past the type, but it now returns a string in that case rather
+ * than undefined. The signature said `string` while the body could return
+ * undefined, and the difference showed: in a template literal an undefined
+ * renders the word "undefined" next to the ticker, where an empty string
+ * renders nothing.
  */
-export const toLocaleFixed = (value: number, precision: number): string => {
-  return value?.toLocaleString(undefined, {
+export const toLocaleFixed = (value: number, precision: number): string =>
+  value?.toLocaleString('en-US', {
     minimumFractionDigits: precision,
-  });
-};
+  }) ?? '';
 
 export const isHex = (str: string): boolean => {
   const hexRegex = /^[0-9a-fA-F]+$/;

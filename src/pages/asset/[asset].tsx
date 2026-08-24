@@ -2,6 +2,7 @@ import { AssetSummary } from '@/components/Asset/AssetSummary';
 import { AssetTabs } from '@/components/Asset/AssetTabs';
 import Tabs, { ITabs } from '@/components/NewTabs';
 import Table, { ITable } from '@/components/Table';
+import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import Holders from '@/components/Tabs/Holders';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import api from '@/services/api';
@@ -9,7 +10,6 @@ import { assetCall, assetPoolCall, ITOCall } from '@/services/requests/asset';
 import { AssetTypeString } from '@/types/assets';
 import { IAssetPage } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
-import { transactionTableHeaders } from '@/utils/contracts';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
 import { AssetPageContainer } from '@/views/assets';
 import { GetServerSideProps } from 'next';
@@ -30,6 +30,7 @@ import { transactionRowSections } from '../transactions';
 const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'assets']);
+  const transactionHeaders = useTransactionHeaders();
 
   // Unlike the two lookups below, assetCall answers undefined only when the
   // request failed, so it keeps React Query's retry rather than reporting a
@@ -107,7 +108,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
 
   const tableProps: ITable = {
     type: 'transactions',
-    header: transactionTableHeaders,
+    header: transactionHeaders,
     rowSections: transactionRowSections,
     dataName: 'transactions',
     request: (page, limit) => requestTransactions(page, limit),
@@ -166,7 +167,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const props = await serverSideTranslations(
     locale,
-    ['common', 'assets', 'table'],
+    ['common', 'assets', 'table', 'transactions'],
     nextI18nextConfig,
     ['en'],
   );

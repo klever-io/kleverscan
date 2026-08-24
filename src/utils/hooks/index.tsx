@@ -100,51 +100,63 @@ export const useFetchPartial = <T,>(
   useEffect(() => {
     initialState();
   }, []);
+  // Skips rows whose field is not a string: the API can return rows with the
+  // field missing, and calling toUpperCase on one used to throw inside the
+  // timer below, where nothing rejects. The whole body is wrapped so the
+  // promise settles and the spinner resets no matter what fails; before, a
+  // throw in here left the caller's `await` hanging and its loading state on
+  // forever.
+  const matchesValue = (asset: T, value: string): boolean => {
+    const field = (asset as { [key: string]: unknown })[dataType];
+    return (
+      typeof field === 'string' &&
+      field.toUpperCase().includes(value.toUpperCase())
+    );
+  };
+
   return [
     items,
     value => {
       clearTimeout(fetchPartialTimeout);
       return new Promise(res => {
         fetchPartialTimeout = setTimeout(async () => {
-          let response: PartialResponse;
-          if (
-            value &&
-            !items.find(asset =>
-              (asset as { [key: string]: string })[dataType]
-                .toUpperCase()
-                .includes(value.toUpperCase()),
-            )
-          ) {
-            setLoading(true);
-            if (type !== 'assets') {
-              query = { ...query };
-              query[dataType] = value;
-              response = await api.get({
-                route: `${route}`,
-                query: {
-                  dataType: value,
-                  ...query,
-                },
-              });
+          try {
+            let response: PartialResponse;
+            if (value && !items.some(asset => matchesValue(asset, value))) {
+              setLoading(true);
+              if (type !== 'assets') {
+                query = { ...query };
+                query[dataType] = value;
+                response = await api.get({
+                  route: `${route}`,
+                  query: {
+                    dataType: value,
+                    ...query,
+                  },
+                });
+              } else {
+                response = await api.get({
+                  route: `${route}`,
+                  query: {
+                    asset: value,
+                    ...query,
+                  },
+                });
+              }
+              // The API's failure mode is HTTP 200 with data: null, so the
+              // read has to survive that as well as an empty list.
+              const found = response?.data?.[type] ?? [];
+              if (found.length) {
+                setItems([...items, ...found]);
+              }
+              res(found.length ? found : items);
             } else {
-              response = await api.get({
-                route: `${route}`,
-                query: {
-                  asset: value,
-                  ...query,
-                },
-              });
+              res(items);
             }
-            if (!response.data[type].length) {
-              setItems([...items]);
-            } else {
-              res(response.data[type]);
-              setItems([...items, ...response.data[type]]);
-            }
-            res(response.data[type]);
-            setLoading(false);
-          } else {
+          } catch (error) {
+            console.error(error);
             res(items);
+          } finally {
             setLoading(false);
           }
         }, 500);

@@ -172,11 +172,7 @@ export const MoreTab: React.FC<PropsWithChildren<AssetProps>> = ({ asset }) => {
         <>
           <Row>
             <span>
-              <strong>
-                {t('common:Properties.Can', {
-                  type: `${t('common:Properties.Pause')}`,
-                })}
-              </strong>
+              <strong>{t('common:Properties.Is Paused')}</strong>
             </span>
             <span>
               {asset ? (

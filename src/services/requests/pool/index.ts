@@ -7,7 +7,8 @@ export const getSomeAssetsPool = async (
   limit: number = 10,
 ): Promise<IAssetPoolsResponse> => {
   const res = await api.get({
-    route: `assets/pool/list?asset=${assets}&page=${page}&limit=${limit}`,
+    route: 'assets/pool/list',
+    query: { asset: assets, page, limit },
   });
 
   if (!res.error || res.error === '') {

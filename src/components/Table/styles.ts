@@ -37,9 +37,18 @@ export const TableGradientBorder = css`
   background-clip: padding-box, border-box;
 `;
 
-export const TableBody = styled.div<{ smaller?: boolean }>`
+export const TableBody = styled.div<{ smaller?: boolean; $stale?: boolean }>`
   min-width: fit-content;
   width: 100%;
+
+  /* The rows of the page being replaced stay in place and step back rather
+     than disappearing, so paging reads as a change instead of a flash. */
+  opacity: ${props => (props.$stale ? 0.55 : 1)};
+  transition: opacity 150ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 
   display: flex;
   flex-direction: column;
@@ -87,6 +96,55 @@ export const HeaderItem = styled.div<{
       padding: 4px 8px;
       padding-bottom: 16px;
     `}
+`;
+
+/**
+ * Opt-in sort control inside a header cell. Inherits the header typography so
+ * tables that do not pass sortable columns look exactly as before; the arrow
+ * only surfaces on the active column, or faintly on hover.
+ */
+export const HeaderSortButton = styled.button<{ $active?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+
+  svg {
+    flex-shrink: 0;
+    color: ${props => props.theme.violet};
+    opacity: ${props => (props.$active ? 1 : 0)};
+    transition: opacity 150ms ease-out;
+  }
+
+  &:hover svg,
+  &:focus-visible svg {
+    opacity: ${props => (props.$active ? 1 : 0.45)};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${props => props.theme.violet};
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ${props =>
+    props.$active &&
+    css`
+      color: ${props.theme.black};
+    `}
+
+  @media (prefers-reduced-motion: reduce) {
+    svg {
+      transition: none;
+    }
+  }
 `;
 
 export const TableRow = styled.div<TableRowProps>`

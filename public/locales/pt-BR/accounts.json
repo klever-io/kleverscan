@@ -1,8 +1,7 @@
 {
   "SingleAccount": {
     "Title": "Conta",
-    "BurnAddress": "ENDEREÇO DE QUEIMA",
-    "BlackHole": "BURACO NEGRO",
+    "Void": "Void",
     "Tabs": {
       "Permission": "Permissão",
       "ProprietaryAssets": "Ativos da Conta",

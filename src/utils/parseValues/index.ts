@@ -199,7 +199,8 @@ export const parseITOs = async (ITOs: any[]): Promise<IParsedITO | never[]> => {
   const assetsInput: string = ITOs.map(ITO => ITO.assetId).join(',');
   const packsPrecisionCalls: Promise<IITO>[] = [];
   const res = await api.get({
-    route: `assets/list?asset=${assetsInput}`,
+    route: 'assets/list',
+    query: { asset: assetsInput },
   });
   if (!res.error || res.error === '') {
     const assets = res.data.assets;

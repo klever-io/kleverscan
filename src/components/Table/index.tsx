@@ -9,7 +9,8 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from '@tanstack/react-query';
+import { MdArrowDownward } from 'react-icons/md';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
@@ -22,6 +23,7 @@ import {
   ExportContainer,
   FloatContainer,
   HeaderItem,
+  HeaderSortButton,
   IoReloadSharpWrapper,
   ItemContainer,
   LimitContainer,
@@ -37,7 +39,7 @@ import {
 } from './styles';
 import SmartContractCard from '../SmartContracts/SmartContractCard';
 
-export interface ITable {
+export interface ITable<TCard = Record<string, never>> {
   type:
     | 'transactions'
     | 'blocks'
@@ -74,6 +76,33 @@ export interface ITable {
   smaller?: boolean;
   showPagination?: boolean;
   refreshKey?: number;
+  /**
+   * Opt-in clickable column headers that switch the API sort field
+   * (descending only). Labels must match `header` entries exactly.
+   */
+  sortableColumns?: string[];
+  activeSortColumn?: string;
+  onSortColumn?: (column: string) => void;
+  /**
+   * Opt-in replacement for the generic labeled card on mobile and tablet.
+   * `item` is `any` for the same reason `rowSections` above is: this table
+   * serves every list on the site and the row type differs per caller.
+   */
+  MobileCard?: React.ComponentType<{ item: any; index: number } & TCard>;
+  /**
+   * Extra props for MobileCard, on top of `item` and `index`. Passing them
+   * here keeps the component type stable: a card built as a closure per
+   * render remounts every row and restarts its animations mid-scroll. The
+   * generic ties the two together, so a card whose props are missing from
+   * the bag fails to compile rather than at render time.
+   */
+  mobileCardProps?: TCard;
+  /**
+   * Opt-in for tables whose rows are a single line: the loading placeholder
+   * then draws one line per cell too, instead of the two-line default that
+   * suits tables stacking a value over a label.
+   */
+  singleLineSkeleton?: boolean;
 }
 
 const onErrorHandler = () => {
@@ -85,7 +114,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Table: React.FC<PropsWithChildren<ITable>> = ({
+const Table = <TCard,>({
   type,
   header,
   rowSections,
@@ -98,7 +127,13 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
   showLimit = true,
   showPagination = true,
   refreshKey,
-}) => {
+  sortableColumns,
+  activeSortColumn,
+  onSortColumn,
+  MobileCard,
+  mobileCardProps,
+  singleLineSkeleton = false,
+}: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
   const limits = [10, 20, 50];
@@ -121,9 +156,13 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         return responseFormatted;
       }
 
-      return [];
+      return { items: [], totalPages: 0 };
     } catch (error) {
+      // React Query rejects an undefined result outright ("data is
+      // undefined") instead of storing it, so a failed request would land the
+      // table in an error state; an empty page shows the empty state.
       console.error(error);
+      return { items: [], totalPages: 0 };
     }
   };
 
@@ -131,6 +170,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
     data: response,
     isLoading,
     isFetching,
+    isPlaceholderData,
     refetch,
   } = useQuery({
     queryKey: [
@@ -145,6 +185,10 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         Number(router.query?.page) || 1,
         Number(router.query?.limit) || 10,
       ),
+
+    // Keep the current rows on screen while the next page loads. Swapping
+    // them for placeholders and back made paging flicker.
+    placeholderData: keepPreviousData,
 
     ...onErrorHandler(),
   });
@@ -243,12 +287,17 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         </FloatContainer>
       )}
       <ContainerView ref={tableRef}>
-        <TableBody smaller={smaller} data-testid="table-body">
+        <TableBody
+          smaller={smaller}
+          data-testid="table-body"
+          $stale={isFetching && isPlaceholderData}
+        >
+          {/* The header stays while fetching: dropping it made the table lose
+              its height and snap back once the rows arrived. */}
           {!isMobile &&
             !isTablet &&
-            response?.items &&
-            response?.items.length !== 0 && (
-              <TableRow>
+            (isLoading || (response?.items && response.items.length !== 0)) && (
+              <TableRow data-testid="table-header">
                 {header?.map((item, index) => (
                   <HeaderItem
                     key={JSON.stringify(item)}
@@ -258,7 +307,23 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                     dynamicWidth={rowSections(item)?.[index]?.width}
                     maxWidth={rowSections(item)?.[index]?.maxWidth}
                   >
-                    {item}
+                    {sortableColumns?.includes(item) && onSortColumn ? (
+                      <HeaderSortButton
+                        type="button"
+                        $active={item === activeSortColumn}
+                        onClick={() => onSortColumn(item)}
+                        aria-label={
+                          item === activeSortColumn
+                            ? `Sorted by ${item}, descending`
+                            : `Sort by ${item}, descending`
+                        }
+                      >
+                        {item}
+                        <MdArrowDownward size={12} />
+                      </HeaderSortButton>
+                    ) : (
+                      item
+                    )}
                   </HeaderItem>
                 ))}
               </TableRow>
@@ -283,7 +348,9 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                           smaller={smaller}
                         >
                           <DoubleRow {...props}>
-                            {type !== 'accounts' && <Skeleton width="100%" />}
+                            {!singleLineSkeleton && type !== 'accounts' && (
+                              <Skeleton width="100%" />
+                            )}
                             <Skeleton width="100%" />
                           </DoubleRow>
                         </MobileCardItem>
@@ -299,17 +366,32 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
               let spanCount = 0;
               const isLastRow = index === response?.items?.length - 1;
 
-              return type === 'smartContracts' && (isMobile || isTablet) ? (
-                <SmartContractCard
-                  key={index}
-                  name={item?.name}
-                  timestamp={item?.timestamp}
-                  contractAddress={item?.contractAddress}
-                  deployer={item?.deployer}
-                  deployTxHash={item?.deployTxHash}
-                  totalTransactions={item?.totalTransactions}
-                />
-              ) : (
+              if ((isMobile || isTablet) && MobileCard) {
+                return (
+                  <MobileCard
+                    key={JSON.stringify(item)}
+                    {...(mobileCardProps as TCard)}
+                    item={item}
+                    index={index}
+                  />
+                );
+              }
+
+              if (type === 'smartContracts' && (isMobile || isTablet)) {
+                return (
+                  <SmartContractCard
+                    key={index}
+                    name={item?.name}
+                    timestamp={item?.timestamp}
+                    contractAddress={item?.contractAddress}
+                    deployer={item?.deployer}
+                    deployTxHash={item?.deployTxHash}
+                    totalTransactions={item?.totalTransactions}
+                  />
+                );
+              }
+
+              return (
                 <TableRow
                   key={JSON.stringify(item)}
                   {...props}

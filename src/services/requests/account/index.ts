@@ -61,7 +61,7 @@ export const assetsRequest = (
       };
     }
     const accountResponse = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
     if (accountResponse.error) {
       return {
@@ -89,7 +89,8 @@ export const assetsRequest = (
 
     assetsToRequest = assetsToRequest.slice(0, -1);
     const allAccountAssets = await api.get({
-      route: `assets/list?page=${page}&limit=${limit}&asset=${assetsToRequest}`,
+      route: 'assets/list',
+      query: { page, limit, asset: assetsToRequest },
     });
     if (!allAccountAssets.error || allAccountAssets.error === '') {
       assetsArray.forEach((asset: IAccountAsset, index) => {
@@ -179,7 +180,7 @@ export const bucketsRequest = (
     limit: number,
   ): Promise<IPaginatedResponse | []> => {
     const accountResponse: IAccountResponse = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
     if (!accountResponse) return [];
 
@@ -295,7 +296,7 @@ export const accountCall = async (
 ): Promise<IAccount | undefined> => {
   try {
     const res = await api.get({
-      route: `address/${router.query.account || ''}`,
+      route: `address/${encodeURIComponent(String(router.query.account || ''))}`,
     });
     if (!res.error || res.error === '') {
       return res.data.account;
@@ -334,7 +335,8 @@ export const KLVAllowancePromise = async (
 ): Promise<IAllowanceResponse | undefined> => {
   try {
     const res = await api.get({
-      route: `address/${address}/allowance?assetID=KLV`,
+      route: `address/${encodeURIComponent(address)}/allowance`,
+      query: { assetID: 'KLV' },
       service: Service.PROXY,
     });
     if (!res.error || res.error === '') {
@@ -351,7 +353,8 @@ export const KFIAllowancePromise = async (
 ): Promise<IAllowanceResponse | undefined> => {
   try {
     const res = await api.get({
-      route: `address/${address}/allowance?assetID=KFI`,
+      route: `address/${encodeURIComponent(address)}/allowance`,
+      query: { assetID: 'KFI' },
       service: Service.PROXY,
     });
     if (!res.error || res.error === '') {
@@ -385,7 +388,7 @@ export const rewardsFPRPool = (
 ): ((page: number, limit: number) => Promise<IResponse | []>) => {
   const get = async (page: number, limit: number): Promise<IResponse | []> => {
     const accountResponse: IAccountResponse = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
     if (!accountResponse) return [];
     const bucketsTable: IAssetsBuckets[] = [];
@@ -435,7 +438,8 @@ export const rewardsFPRPool = (
     const responseAll = await Promise.all(
       assetIdBuckets.map(async assetId => {
         const res = await api.get({
-          route: `address/${address}/allowance?assetID=${assetId}`,
+          route: `address/${encodeURIComponent(address)}/allowance`,
+          query: { assetID: assetId },
         });
         if (!res.error || res.error === '') {
           return {
@@ -532,7 +536,7 @@ export const nftCollectionsRequest = (
     }
 
     const res = await api.get({
-      route: `address/${address}`,
+      route: `address/${encodeURIComponent(address)}`,
     });
 
     if (res.error && res.error !== '') {

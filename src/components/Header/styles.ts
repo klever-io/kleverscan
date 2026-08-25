@@ -1,9 +1,6 @@
-import { Search } from '@/assets/icons';
 import { transparentize } from 'polished';
-import { AiOutlineClose } from 'react-icons/ai';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import styled, { css, keyframes } from 'styled-components';
-import { default as DefaultInput } from '../InputGlobal';
 import { DefaultCardStyleWithBorder } from '@/styles/common';
 
 interface IMobileMenu {
@@ -56,11 +53,10 @@ export const Content = styled.div<{ isMainNet?: boolean }>`
 
 export const HeaderContainer = styled.span<{
   isMainNet: boolean;
-  openSearch: boolean;
 }>`
   flex-direction: column;
   width: ${props => (props.isMainNet ? '15rem' : '17rem')};
-  display: ${props => (props.openSearch ? 'none' : 'flex')};
+  display: flex;
   span {
     color: ${props => props.theme.navbar.text};
     font-size: 0.8rem;
@@ -154,76 +150,6 @@ export const MobileItem = styled(Item)`
   font-size: 1.5rem;
 `;
 
-export const Input = styled(DefaultInput)`
-  border-color: ${props => props.theme.lightGray};
-  padding: 0.5rem 1rem;
-  max-width: 30rem;
-  input {
-    color: ${props => props.theme.text.inputHeader};
-    font-size: 0.9rem;
-    &::placeholder {
-      color: ${props => props.theme.text.inputHeader};
-    }
-  }
-  input:placeholder-shown {
-    text-overflow: ellipsis;
-  }
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-  }
-`;
-
-const fadeInContainer = keyframes`
-  from {
-    opacity: 0.3;
-    transform: translateX(-50%);
-
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
-
-export const SearchContainer = styled.div<{ $openSearch: boolean }>`
-  display: ${props => (props.$openSearch ? 'flex' : 'none')};
-  align-items: center;
-  width: 20vw;
-  max-width: 20rem;
-  gap: 0.2rem;
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-    max-width: 65vw;
-  }
-  animation: ${fadeInContainer} 0.3s;
-`;
-
-export const CloseSearch = styled(AiOutlineClose)<{ $openSearch: boolean }>`
-  display: ${props => (props.$openSearch ? 'block' : 'none')};
-  color: ${props => props.theme.black};
-  padding: 0.3rem;
-
-  height: 1.7rem;
-  width: 1.7rem;
-  cursor: pointer;
-`;
-export const SearchIcon = styled(Search)`
-  & path {
-    fill: ${props => props.theme.black};
-  }
-  cursor: pointer;
-  overflow: visible;
-`;
-
-export const SearchIconWrapper = styled.div<{ openSearch: boolean }>`
-  display: ${props => (props.openSearch ? 'none' : 'grid')};
-  padding: 0.5rem;
-  place-items: center;
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 1rem;
-  }
-  cursor: pointer;
-`;
 export const DesktopContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -245,6 +171,81 @@ export const DesktopSubWrapper = styled.div`
   width: 100%;
 `;
 
+export const SpotlightTrigger = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  height: 2.5rem;
+  padding: 0 0.7rem 0 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  color: ${props =>
+    props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+  background: ${props =>
+    props.theme.dark ? 'rgba(255, 255, 255, 0.04)' : props.theme.true.white};
+  border: 1px solid
+    ${props =>
+      props.theme.dark ? 'rgba(255, 255, 255, 0.1)' : props.theme.black10};
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.25rem;
+    padding: 0 0.35rem;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: ${props =>
+      props.theme.dark ? 'rgba(198, 199, 235, 0.85)' : props.theme.gray800};
+    background: ${props =>
+      props.theme.dark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)'};
+    border: 1px solid
+      ${props =>
+        props.theme.dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'};
+  }
+
+  svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+    }
+  }
+
+  &:hover {
+    border-color: ${props =>
+      props.theme.dark ? 'rgba(125, 63, 241, 0.45)' : props.theme.purple};
+    background: ${props =>
+      props.theme.dark
+        ? 'rgba(125, 63, 241, 0.08)'
+        : 'rgba(125, 63, 241, 0.06)'};
+  }
+
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: 2.25rem;
+    padding: 0 0.6rem;
+
+    span {
+      display: none;
+    }
+  }
+`;
+
 export const IconsMenu = styled.div`
   display: flex;
   width: 100%;
@@ -258,7 +259,7 @@ export const IconsMenu = styled.div`
   }
 `;
 
-export const MobileContainer = styled.div<{ $openSearch: boolean }>`
+export const MobileContainer = styled.div`
   z-index: 6;
   position: relative;
   display: none;
@@ -269,7 +270,7 @@ export const MobileContainer = styled.div<{ $openSearch: boolean }>`
     }
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: ${props => (props.$openSearch ? '100%' : 'auto')};
+    width: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;

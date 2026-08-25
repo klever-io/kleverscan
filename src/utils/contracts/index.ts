@@ -444,14 +444,6 @@ export const initialsTableHeaders = [
   'Contract',
 ];
 
-export const transactionTableHeaders = [
-  'Transaction Hash',
-  'Block/Fees',
-  'From/To',
-  'Type',
-  'Misc',
-];
-
 export const smartContractsTableHeaders = [
   'Contract',
   'Total Transactions',

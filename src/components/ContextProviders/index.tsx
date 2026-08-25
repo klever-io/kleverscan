@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import { ContractProvider } from '@/contexts/contract';
 import { FeesProvider } from '@/contexts/contract/fees';
 import { ModalsProvider } from '@/contexts/contract/modals';
@@ -10,6 +10,7 @@ import { KleverProvider } from '@klever/connect-react';
 import { InputSearchProvider } from '@/contexts/inputSearch';
 import { MobileProvider } from '@/contexts/mobile';
 import { ParticipateProvider } from '@/contexts/participate';
+import { SpotlightProvider } from '@/contexts/spotlight';
 import { InternalThemeProvider } from '@/contexts/theme';
 import { GetServerSideProps } from 'next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -17,13 +18,19 @@ import { ToastContainer } from 'react-toastify';
 import { NetworkParamsProvider } from '@/contexts/contract/networkParams';
 
 const ContextProviders: React.FC<PropsWithChildren> = ({ children }) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-      },
-    },
-  });
+  // Created once per session: rebuilding the client on every render threw the
+  // whole query cache away, so every re-render refetched everything and fast
+  // navigation produced request bursts the API answers with 429.
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+  );
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -45,11 +52,13 @@ const ContextProviders: React.FC<PropsWithChildren> = ({ children }) => {
                   <MulticontractProvider>
                     <ContractProvider>
                       <InputSearchProvider>
-                        <ParticipateProvider>
-                          <ContractModalProvider>
-                            <WizardProvider>{children}</WizardProvider>
-                          </ContractModalProvider>
-                        </ParticipateProvider>
+                        <SpotlightProvider>
+                          <ParticipateProvider>
+                            <ContractModalProvider>
+                              <WizardProvider>{children}</WizardProvider>
+                            </ContractModalProvider>
+                          </ParticipateProvider>
+                        </SpotlightProvider>
                       </InputSearchProvider>
                     </ContractProvider>
                   </MulticontractProvider>

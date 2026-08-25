@@ -223,7 +223,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   }
 
   const transaction: ITransactionResponse = await api.get({
-    route: `transaction/${hash}`,
+    route: `transaction/${encodeURIComponent(String(hash))}`,
   });
 
   const tx = transaction?.data?.transaction;
@@ -234,7 +234,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   if (tx?.contract.some(contract => contract.type == 63)) {
     const nodeTransaction: any = await api.get({
       service: Service.NODE,
-      route: `transaction/${hash}?withResults=true`,
+      route: `transaction/${encodeURIComponent(String(hash))}?withResults=true`,
     });
 
     const logs = nodeTransaction?.data?.transaction?.logs;

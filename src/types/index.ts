@@ -459,6 +459,10 @@ export interface IAsset {
   precision: number;
   initialSupply: number;
   circulatingSupply: number;
+  // Served by newer proxy builds only, so both are optional: an environment
+  // running an older build omits them and the UI falls back to the raw supply.
+  voidedSupply?: number;
+  netCirculatingSupply?: number;
   maxSupply: number;
   royalties: IRoyalties;
   mintedValue: number;
@@ -484,6 +488,8 @@ export interface IAsset {
   metadata?: string;
   mime?: string;
   stakingHolders: number;
+  /** Served by the assets list endpoint: the asset has a KDA fee pool. */
+  hasKdaPool?: boolean;
 }
 
 export interface ISftAsset extends IAsset {
@@ -538,6 +544,19 @@ export interface IAssetPool {
   hidden: boolean;
   verified: boolean;
   ratio: number;
+}
+
+/**
+ * A pool joined with its KDA's asset record. The pool payload carries only
+ * the asset id, while the amounts and the rate need the asset's precision to
+ * be read correctly, so the list request looks the assets up in one batch.
+ */
+export interface IAssetPoolRow extends IAssetPool {
+  name?: string;
+  logo?: string;
+  ticker?: string;
+  assetVerified?: boolean;
+  precision?: number;
 }
 
 export interface IParsedAsset extends IAsset {
@@ -850,7 +869,7 @@ export interface IAssetPoolResponse extends IResponse {
 
 export interface IAssetPoolsResponse extends IPaginatedResponse {
   data: {
-    pools: IAssetPool[];
+    pools: IAssetPoolRow[];
   };
 }
 

@@ -17,14 +17,14 @@ jobs:
         run: sudo timedatectl set-timezone America/Sao_Paulo
 
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Setup Node.js ${{ matrix.node-version }}
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
@@ -32,8 +32,20 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      # Speeds up `next build` on subsequent runs (TS/compile still re-run, but
+      # Turbopack/webpack cache in .next/cache is restored when lockfile matches).
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            nextjs-${{ runner.os }}-node-${{ matrix.node-version }}-
+            nextjs-${{ runner.os }}-
+
       - name: Cypress run
-        uses: cypress-io/github-action@v6
+        uses: cypress-io/github-action@v7
         with:
           build: yarn build
           start: yarn start
+          install: false

@@ -1,5 +1,6 @@
 import Copy from '@/components/Copy';
 import LinkWithDropdown from '@/components/LinkWithDropdown';
+import { menuForEntity } from '@/components/LinkWithDropdown/menu';
 import { CenteredRow, Mono } from '@/styles/common';
 import Link from 'next/link';
 import React from 'react';
@@ -59,7 +60,7 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
 
   if (compact) {
     return (
-      <LinkWithDropdown link={href} address={value || ''}>
+      <LinkWithDropdown link={href} address={value || ''} entity={type}>
         <Link href={href}>{text}</Link>
       </LinkWithDropdown>
     );
@@ -71,12 +72,14 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Open ${type} in a new tab`}
+        aria-label={`Open ${menuForEntity(type).noun} in a new tab`}
         title="Open in a new tab"
       >
         <IoOpenOutline size={20} />
       </a>
-      <Copy data={value} info={type} />
+      {/* The same table the hover menu uses, so this path cannot say
+          "account copied to clipboard" while the other says "Wallet Address". */}
+      <Copy data={value} info={menuForEntity(type).copyInfo} />
     </CenteredRow>
   );
 };

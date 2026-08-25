@@ -19,6 +19,7 @@ import {
 import { IBlock, IBlockPage, IBlockResponse } from '@/types/blocks';
 import { setQueryAndRouter } from '@/utils';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { blockTransactionsCall } from '@/services/requests/block';
 import {
   CenteredRowSpan,
   CommonSpan,
@@ -27,6 +28,8 @@ import {
   TooltipContainer,
 } from '@/views/blocks/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import nextI18nextConfig from '../../../next-i18next.config';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -69,9 +72,7 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
     page: number,
     limit: number,
   ): Promise<ITransactionsResponse> =>
-    api.get({
-      route: `transaction/list?page=${page}&blockNum=${nonce}&limit=${limit}`,
-    });
+    blockTransactionsCall(nonce, page, limit, router.query);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -348,6 +349,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps<IBlockPage> = async ({
   params,
+  locale = 'en',
 }) => {
   const props: IBlockPage = {
     block: {} as IBlock,
@@ -373,8 +375,18 @@ export const getStaticProps: GetStaticProps<IBlockPage> = async ({
 
   props.block = block.data.block;
 
+  // The page loaded no translation namespace at all, so every `t()` reachable
+  // from it, including the ones inside the shared transactions table and its
+  // filter bar, returned its own key.
+  const translations = await serverSideTranslations(
+    locale,
+    ['common', 'transactions'],
+    nextI18nextConfig,
+    ['en'],
+  );
+
   return {
-    props,
+    props: { ...props, ...translations },
   };
 };
 

@@ -6,7 +6,7 @@ import path from 'path';
  * a relative path against the server's working directory on every request.
  * A deployment whose working directory is not the project root then loads
  * every namespace empty and renders raw keys ("Titles.Accounts") site-wide,
- * which is why the location is stated explicitly there.
+ * which is why this config resolves the location before handing it over.
  */
 describe('next-i18next config', () => {
   const configPath = path.join(process.cwd(), 'next-i18next.config.js');
@@ -17,20 +17,11 @@ describe('next-i18next config', () => {
     return require(configPath);
   };
 
-  afterEach(() => {
-    delete process.env.LOCALES_PATH;
-  });
+  it('states an already-resolved path, not a relative one', () => {
+    const { localePath } = loadConfig();
 
-  it('takes the locale path from the environment when it is set', () => {
-    process.env.LOCALES_PATH = '/srv/app/public/locales';
-
-    expect(loadConfig().localePath).toBe('/srv/app/public/locales');
-  });
-
-  it('falls back to the project-relative path for local runs', () => {
-    delete process.env.LOCALES_PATH;
-
-    expect(loadConfig().localePath).toBe('./public/locales');
+    expect(path.isAbsolute(localePath)).toBe(true);
+    expect(localePath).toBe(path.resolve('./public/locales'));
   });
 
   it('points at a folder that holds the namespaces it declares', () => {

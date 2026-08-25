@@ -95,9 +95,18 @@ for (const page of PAGES) {
   buildId = data.buildId;
   const i18n = data?.props?.pageProps?._nextI18Next;
 
-  // A page that loads no namespaces translates nothing, which is a choice,
-  // not a fault: it has no keys to resolve.
-  if (!i18n) continue;
+  // Every page in PAGES asks for namespaces, so a missing payload is a fault
+  // rather than a page with nothing to translate. Passing it would also skip
+  // the two checks below, which is how a release gate goes quiet on the exact
+  // regression it exists to catch.
+  if (!i18n) {
+    failures.push(
+      `${page}: asked for no namespaces at all (the page lost its ` +
+        `serverSideTranslations, or this environment runs a build from ` +
+        `before it had them)`,
+    );
+    continue;
+  }
 
   localePath = i18n?.userConfig?.localePath ?? localePath;
   const store = i18n?.initialI18nStore?.en ?? {};

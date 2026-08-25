@@ -303,7 +303,17 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
     setEndTime(e.target.value);
   };
 
-  return router.isReady ? (
+  // Not gated on router.isReady. Next answers that differently on each side
+  // for a statically generated page: false while rendering on the server, true
+  // on the client's first render, so /block/<n> hydrated against a tree with no
+  // date filter in it and React discarded the whole page.
+  //
+  // `router.query` is read above, when building `dateFromRouter`, but the only
+  // things that fold it into what renders are `selectDays()` and
+  // `formatInputInitialValue()`, and both run from the effect. So the first
+  // render's output is router-independent on both sides. Keep it that way: move
+  // either call into the render body and the mismatch comes back.
+  return (
     <FilterContainer open={calendarOpen}>
       <span>Date Filter</span>
       <Container
@@ -427,7 +437,7 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
         )}
       </Container>
     </FilterContainer>
-  ) : null;
+  );
 };
 
 export default DateFilter;

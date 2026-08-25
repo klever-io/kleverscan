@@ -12,9 +12,25 @@ import { contracts } from '../../../src/configs/transactions';
 import { ContractsIndex } from '../../../src/types/contracts';
 
 const PAGE_TITLE_SELECTOR = 'h1';
-const STATUS_FILTER_SELECTOR = ':nth-child(2) > [data-testid="selector"]';
-const TYPE_FILTER_SELECTOR = ':nth-child(3) > [data-testid="selector"]';
+/**
+ * Reached by the filter's own identifier rather than by its position among its
+ * siblings. The positional form broke on any wrapper element, on reordering,
+ * and on the Buy Type filter appearing, and it would break again once the
+ * titles are translated.
+ */
+const STATUS_FILTER_SELECTOR =
+  '[data-testid="filter-status"] [data-testid="selector"]';
+const TYPE_FILTER_SELECTOR =
+  '[data-testid="filter-contract"] [data-testid="selector"]';
 const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
+
+/**
+ * Cypress defaults to 1000px wide and the app switches to its tablet layout
+ * below 1025, so without an explicit viewport the suite only ever exercises
+ * the card DOM and never the column table. Both are covered.
+ */
+const TABLET_VIEWPORT: [number, number] = [1000, 660];
+const DESKTOP_VIEWPORT: [number, number] = [1440, 900];
 
 const ADDRESS =
   'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
@@ -166,6 +182,9 @@ const visitTransactionDetail = (hash: string, retriesLeft = 3): void => {
 
 describe('Transactions Page', () => {
   beforeEach(() => {
+    // Stated rather than inherited from the Cypress default, so the layout
+    // these assertions describe cannot change by editing the config.
+    cy.viewport(...TABLET_VIEWPORT);
     stubTransactionListApis();
     cy.visit('/transactions');
     cy.wait('@txList', { timeout: 15000 });
@@ -202,6 +221,177 @@ describe('Transactions Page', () => {
         'have.length.at.least',
         1,
       );
+    });
+  });
+
+  it('labels every cell with its column, and shows no header row', () => {
+    // Below the tablet breakpoint the table renders as cards: there is no
+    // column header row, and each cell carries its own label instead.
+    cy.get(TABLE_ROW_SELECTOR, { timeout: 15000 }).should(
+      'have.length.at.least',
+      1,
+    );
+    cy.get('[data-testid="table-header"]').should('not.exist');
+    cy.get('[data-testid="table-row-0"]')
+      .first()
+      .should('contain.text', 'Transaction Hash');
+  });
+});
+
+describe('Transactions Page (desktop)', () => {
+  beforeEach(() => {
+    cy.viewport(...DESKTOP_VIEWPORT);
+    stubTransactionListApis();
+    cy.visit('/transactions');
+    cy.wait('@txList', { timeout: 15000 });
+  });
+
+  it('renders the column header row', () => {
+    cy.get('[data-testid="table-header"]', { timeout: 15000 })
+      .should('be.visible')
+      .children()
+      .should('have.length.at.least', 1);
+  });
+
+  /**
+   * The header count and the per-row cell count are produced by two separate
+   * code paths, so nothing stops them drifting apart. When they do, every
+   * column past the divergence sits under the wrong heading.
+   */
+  it('gives each row exactly one cell per column heading', () => {
+    cy.get('[data-testid="table-header"]', { timeout: 15000 })
+      .children()
+      .its('length')
+      .then(headerCount => {
+        expect(headerCount).to.be.greaterThan(0);
+        cy.get('[data-testid="table-row-0"]').should(
+          'have.length',
+          headerCount,
+        );
+      });
+  });
+
+  /**
+   * The shape the split actually broke. Without an account in the URL both
+   * lists were five long, so an assertion on `/transactions` alone passes on
+   * the bug too: this is the one that fails before the fix, where six cells
+   * rendered under five headings.
+   */
+  it('keeps headings and cells aligned once the list is scoped to an account', () => {
+    cy.visit(`/transactions?account=${ADDRESS}`);
+    cy.wait('@txList', { timeout: 15000 });
+
+    cy.get('[data-testid="table-header"]', { timeout: 15000 })
+      .children()
+      .then(headings => {
+        expect(headings).to.have.length(6);
+        expect(
+          [...headings].map(cell => cell.textContent?.trim()),
+        ).to.deep.equal([
+          'Transaction Hash',
+          'Block/Fees',
+          'From/To',
+          'In/Out',
+          'Type',
+          'Misc',
+        ]);
+        cy.get('[data-testid="table-row-0"]').should('have.length', 6);
+      });
+  });
+
+  /**
+   * Locks the namespace wiring. A t() whose namespace was never loaded does
+   * not fall back to English, it renders its own key, and every other
+   * assertion here would still pass on one: contains('Success') also matches
+   * "transactions:Status.Success". Exact matches do not.
+   */
+  it('renders translated filter texts, never raw keys', () => {
+    cy.get('[data-testid="filter-status"] > span')
+      .first()
+      .should('have.text', 'Status');
+    cy.get('[data-testid="filter-contract"] > span')
+      .first()
+      .should('have.text', 'Contract');
+
+    cy.get(STATUS_FILTER_SELECTOR).click();
+    cy.get('[data-testid="filter-status"]').contains(/^Success$/);
+    cy.get('body').should('not.contain.text', 'transactions:');
+  });
+
+  it('links the hash cell to the full transaction hash', () => {
+    const expectedHash = hashForType(0);
+    cy.get(`a[href*="/transaction/${expectedHash}"]`, {
+      timeout: 15000,
+    }).should('be.visible');
+  });
+});
+
+describe('Block Page i18n', () => {
+  // getStaticProps runs against the live API (intercepts cannot stub Node),
+  // like the detail suite below. One representative block is enough: the page
+  // loaded no translation namespace at all before this branch, so its filter
+  // bar rendered raw keys.
+  const API_BASE =
+    Cypress.env('DEFAULT_API_HOST') || 'https://api.testnet.klever.org';
+  const API_VERSION = Cypress.env('DEFAULT_API_VERSION') || 'v1.0';
+
+  /** Same bounded 429 backoff as the detail suite: the shared testnet API
+   * rate-limits, and cy.request fails outright on a non-2xx without
+   * failOnStatusCode. */
+  const requestLatestBlockNum = (
+    retriesLeft = 5,
+  ): Cypress.Chainable<number> => {
+    return cy
+      .request({
+        url: `${API_BASE}/${API_VERSION}/transaction/list`,
+        qs: { limit: 1, page: 1 },
+        failOnStatusCode: false,
+        timeout: 20000,
+      })
+      .then(res => {
+        if (res.status === 429 && retriesLeft > 0) {
+          cy.wait(2500);
+          return requestLatestBlockNum(retriesLeft - 1);
+        }
+        const blockNum = res.body?.data?.transactions?.[0]?.blockNum;
+        expect(blockNum, 'blockNum from the live list').to.be.a('number');
+        return cy.wrap(blockNum as number);
+      });
+  };
+
+  /** Bounded revisit, like visitTransactionDetail: getStaticProps runs its
+   * own lookup against the live API and answers notFound after its retries,
+   * so with failOnStatusCode off a rate-limited build lands on the 404 page
+   * and the filter assertion would only time out. */
+  const visitBlockPage = (blockNum: number, retriesLeft = 3): void => {
+    cy.visit(`/block/${blockNum}`, {
+      timeout: 60000,
+      failOnStatusCode: false,
+    });
+    cy.get('body', { timeout: 15000 }).then($body => {
+      if ($body.find('[data-testid="filter-status"]').length) {
+        return;
+      }
+      if (retriesLeft <= 0) {
+        throw new Error(
+          `Block page did not load for ${blockNum} after retries (likely API 429 / notFound)`,
+        );
+      }
+      cy.wait(3000);
+      visitBlockPage(blockNum, retriesLeft - 1);
+    });
+  };
+
+  it('serves the transactions tab with translated filters', () => {
+    requestLatestBlockNum().then(blockNum => {
+      cy.viewport(...DESKTOP_VIEWPORT);
+      visitBlockPage(blockNum);
+
+      cy.get('[data-testid="filter-status"] > span', { timeout: 20000 })
+        .first()
+        .should('have.text', 'Status');
+      cy.contains('Date Filter').should('be.visible');
+      cy.get('body').should('not.contain.text', 'transactions:');
     });
   });
 });

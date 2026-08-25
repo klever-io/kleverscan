@@ -1,11 +1,10 @@
 import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import TransactionsFilters from '@/components/TransactionsFilters';
+import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import { transactionRowSections } from '@/pages/transactions';
 import { IInnerTableProps } from '@/types/index';
-import { transactionTableHeaders } from '@/utils/contracts';
 import React from 'react';
-import { useRouter } from 'next/router';
 
 interface ITransactionsProps {
   transactionsTableProps: IInnerTableProps;
@@ -13,20 +12,16 @@ interface ITransactionsProps {
 
 const Transactions: React.FC<PropsWithChildren<ITransactionsProps>> = props => {
   const transactionTableProps = props.transactionsTableProps;
-  const router = useRouter();
+  // This wrapper used to widen the heading list itself, by copying the base
+  // list and splicing "In/Out" in at index 3 whenever the URL named an
+  // account. It was the only one of the four call sites that did, which is
+  // why the other three rendered a heading short.
+  const header = useTransactionHeaders();
 
-  let updatedTransactionTableHeaders = [...transactionTableHeaders];
-
-  if (
-    router?.query?.account &&
-    !updatedTransactionTableHeaders.includes('In/Out')
-  ) {
-    updatedTransactionTableHeaders.splice(3, 0, 'In/Out');
-  }
   const tableProps: ITable = {
     ...transactionTableProps,
     rowSections: transactionRowSections,
-    header: updatedTransactionTableHeaders,
+    header,
     type: 'transactions',
     Filters: TransactionsFilters,
   };

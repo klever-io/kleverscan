@@ -297,7 +297,7 @@ const Table = <TCard,>({
           {!isMobile &&
             !isTablet &&
             (isLoading || (response?.items && response.items.length !== 0)) && (
-              <TableRow>
+              <TableRow data-testid="table-header">
                 {header?.map((item, index) => (
                   <HeaderItem
                     key={JSON.stringify(item)}

@@ -10,8 +10,14 @@ import { ThemeProvider } from 'styled-components';
 
 const routerQuery: Record<string, string> = {};
 
+let routerIsReady = true;
+
 jest.mock('next/router', () => ({
-  useRouter: () => ({ isReady: true, query: routerQuery, push: jest.fn() }),
+  useRouter: () => ({
+    isReady: routerIsReady,
+    query: routerQuery,
+    push: jest.fn(),
+  }),
 }));
 
 jest.mock('@/utils', () => ({
@@ -114,5 +120,24 @@ describe('DateFilter page reset', () => {
     expect(query.page).toBe('1');
     expect(query).not.toHaveProperty('startdate');
     expect(query).not.toHaveProperty('enddate');
+  });
+});
+
+describe('DateFilter first paint', () => {
+  afterEach(() => {
+    routerIsReady = true;
+  });
+
+  it('renders before the router is ready, identically on both sides', () => {
+    // The server renders with isReady false and the client's first render can
+    // have it true. Gating the whole component on it made /block/<n> hydrate
+    // against a tree with no date filter in it, and React threw the tree away.
+    // The rest of this suite mocks isReady true, so putting the gate back
+    // would go green without this.
+    routerIsReady = false;
+
+    renderFilter({});
+
+    expect(screen.getByText('Date Filter')).toBeInTheDocument();
   });
 });

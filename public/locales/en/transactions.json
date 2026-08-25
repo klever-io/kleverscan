@@ -3,5 +3,50 @@
   "Daily Transactions": "Daily Transactions",
   "From": "From",
   "To": "To",
-  "Last Transactions": "Last Transactions"
+  "Last Transactions": "Last Transactions",
+  "Filters": {
+    "Coin": "Coin",
+    "CoinPlaceholder": "Type the token ID",
+    "Status": "Status",
+    "Contract": "Contract",
+    "ContractPlaceholder": "Type the contract",
+    "BuyType": "Buy Type",
+    "NotFound": "No match found"
+  },
+  "Status": {
+    "Success": "Success",
+    "Fail": "Fail"
+  },
+  "BuyTypes": {
+    "MarketBuy": "MarketBuy",
+    "ITOBuy": "ITOBuy"
+  },
+  "Contracts": {
+    "Transfer": "Transfer",
+    "Create Asset": "Create Asset",
+    "Create Validator": "Create Validator",
+    "Config Validator": "Config Validator",
+    "Freeze": "Freeze",
+    "Unfreeze": "Unfreeze",
+    "Delegate": "Delegate",
+    "Undelegate": "Undelegate",
+    "Withdraw": "Withdraw",
+    "Claim": "Claim",
+    "Unjail": "Unjail",
+    "Asset Trigger": "Asset Trigger",
+    "Set Account Name": "Set Account Name",
+    "Proposal": "Proposal",
+    "Vote": "Vote",
+    "Config ITO": "Config ITO",
+    "Set ITO": "Set ITO",
+    "Buy": "Buy",
+    "Sell": "Sell",
+    "Cancel Marketplace Order": "Cancel Marketplace Order",
+    "Create Marketplace": "Create Marketplace",
+    "Config Marketplace": "Config Marketplace",
+    "Update Account Permission": "Update Account Permission",
+    "Deposit": "Deposit",
+    "ITO Trigger": "ITO Trigger",
+    "Smart Contract": "Smart Contract"
+  }
 }

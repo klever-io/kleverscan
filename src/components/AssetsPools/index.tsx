@@ -86,6 +86,9 @@ const PoolsFilters: React.FC<PropsWithChildren> = () => {
 
   const filter: IFilter = {
     title: `${t('common:Titles.Assets')}`,
+    // See the assets list: Filter used to infer this from `title === 'Asset'`,
+    // which this never was, so the box has been showing the generic prompt.
+    placeholder: 'Type the token ID',
     data: (pools || [])
       .map(pool => pool.kda)
       .sort((a, b) => a.localeCompare(b)),

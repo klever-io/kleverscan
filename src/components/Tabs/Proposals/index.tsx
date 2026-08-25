@@ -69,6 +69,12 @@ const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
       onClick: selected => filterProposals(selected),
       current: router?.query?.status as string,
       isHiddenInput: false,
+      // Stated rather than inferred. Filter used to give this control a button
+      // input by comparing its title against the literal "Status", which this
+      // title only matches while the translation happens to be the English
+      // word: pt-BR already renders "Estado" and would have turned it into a
+      // free-text box.
+      inputType: 'button',
     },
   ];
 

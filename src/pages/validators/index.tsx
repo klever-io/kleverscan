@@ -362,6 +362,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
     return [
       {
         title: 'Name',
+        placeholder: 'Search name…',
         data: filterValidators
           .map(validator => validator.name)
           .filter(validator => !!validator) as string[],
@@ -385,6 +386,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
       },
       {
         title: 'Version',
+        placeholder: 'Search version…',
         data: versionStats.map(stat => stat.version),
         onClick: async value => {
           if (value === 'All') {

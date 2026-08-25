@@ -1,24 +1,22 @@
-/**
- * Where the translation files live.
- *
- * next-i18next resolves a relative path with path.resolve(process.cwd(), …)
- * on every request, so a relative value only finds the files while the
- * server's working directory happens to be the project root. Started from
- * anywhere else, every namespace loads empty and each t() renders its own
- * key ("Titles.Accounts" instead of "Accounts") across the whole site, which
- * is what testnet showed. Reproduced by serving one build from two working
- * directories.
- *
- * The deployment therefore states the absolute location itself, and the
- * relative value stays the default for local runs, where the working
- * directory is the project root anyway.
- */
-const localePath = process.env.LOCALES_PATH || './public/locales';
+const path = require('path');
 
+/**
+ * Where the translation files live, resolved once, here.
+ *
+ * next-i18next resolves a relative localePath with path.resolve(process.cwd(),
+ * …) on every request instead. In the Lambdas that serve this site the working
+ * directory at request time is not the application root, so a relative value
+ * loads every namespace empty and each t() renders its own key
+ * ("Titles.Accounts" instead of "Accounts") across the whole site. Resolving at
+ * module load captures the application root while the process still reports it.
+ *
+ * The cost is that next-i18next hands this config to the browser inside
+ * __NEXT_DATA__, so the absolute location is visible to visitors.
+ */
 module.exports = {
   i18n: {
     locales: ['en'],
     defaultLocale: 'en',
   },
-  localePath,
+  localePath: path.resolve('./public/locales'),
 };

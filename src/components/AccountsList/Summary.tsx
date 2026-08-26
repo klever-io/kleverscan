@@ -40,37 +40,22 @@ const AccountsSummary: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['accountsSummary'],
     queryFn: async () => {
-      // allSettled, not all: the two figures are independent, and one endpoint
-      // being down should cost its own tile rather than the whole strip. With
-      // Promise.all a single rejection throws the query away and the render
-      // below never gets to leave one tile out.
-      const [total, created] = await Promise.allSettled([
+      // Each call answers undefined for its own failure instead of throwing,
+      // because `api.get` resolves on failure rather than rejecting. That is
+      // what lets a degraded endpoint cost its own tile and leave the other
+      // standing, and it is why plain Promise.all is right here: after those
+      // guards there is nothing left to reject.
+      const [totalRecords, series] = await Promise.all([
         accountsTotalCall(),
         accountsCreatedCall(WINDOW_DAYS),
       ]);
-      const days =
-        created.status === 'fulfilled'
-          ? (created.value?.data?.number_by_day ?? [])
-          : [];
-      return {
-        totalRecords:
-          total.status === 'fulfilled'
-            ? total.value?.pagination?.totalRecords
-            : undefined,
-        // Newest entry first. Anything that is not a real count is dropped
-        // rather than carried: a single undefined would turn the week total
-        // into NaN and print "NaN" where a figure belongs.
-        series: days
-          .map(day => day?.doc_count)
-          .filter((count): count is number => Number.isFinite(count)),
-      };
+      // Newest entry first. An empty series and a failed request both end up
+      // as no tile, which is the honest rendering of either.
+      return { totalRecords, series: series ?? [] };
     },
     // These move by a handful of accounts a day, so a fresh look on every
     // mount would cost a round trip to show the same number.
     staleTime: 5 * 60 * 1000,
-    // No retry option on purpose: allSettled above swallows both rejections,
-    // so the query never fails and a retry setting here would be a line that
-    // declares a policy it can never apply.
   });
 
   if (isLoading) {

@@ -1,6 +1,12 @@
 import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  waitFor,
+  waitForElementToBeRemoved,
+  within,
+} from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
@@ -101,18 +107,11 @@ jest.mock('@/services/requests/accounts', () => ({
 
 import AccountsSummary from '../Summary';
 
-const totalResponse = (totalRecords: number) => ({
-  data: { accounts: [] },
-  pagination: { totalRecords },
-  error: '',
-  code: 'successful',
-});
-
-const seriesResponse = (counts: number[]) => ({
-  data: { number_by_day: counts.map((doc_count, key) => ({ doc_count, key })) },
-  error: '',
-  code: 'successful',
-});
+/**
+ * The request layer answers plain values now, and undefined for its own
+ * failure. That undefined is the shape to mock: `api.get` never rejects, so a
+ * mockRejectedValue would model something this layer cannot produce.
+ */
 
 const renderSummary = () =>
   render(
@@ -129,6 +128,12 @@ const renderSummary = () =>
     </QueryClientProvider>,
   );
 
+/** Resolves once the skeleton is gone, so an assertion cannot pass while the
+ *  card is still loading: the loading shape renders no text and no testid, and
+ *  both would satisfy an "is absent" check. */
+const settled = async (): Promise<void> =>
+  waitForElementToBeRemoved(() => screen.getByLabelText('Account statistics'));
+
 /** The loaded card, which the loading shape deliberately does not carry. */
 const loaded = async (): Promise<HTMLElement> =>
   waitFor(() => screen.getByTestId('accounts-summary'));
@@ -136,8 +141,8 @@ const loaded = async (): Promise<HTMLElement> =>
 describe('AccountsSummary', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    totalCall.mockResolvedValue(totalResponse(176197));
-    createdCall.mockResolvedValue(seriesResponse([10, 9, 4, 82, 12, 8, 8]));
+    totalCall.mockResolvedValue(176197);
+    createdCall.mockResolvedValue([10, 9, 4, 82, 12, 8, 8]);
   });
 
   it('asks for a week in one request, not a day in a second one', async () => {
@@ -171,7 +176,7 @@ describe('AccountsSummary', () => {
   });
 
   it('shows a fall without inventing a plus sign', async () => {
-    createdCall.mockResolvedValue(seriesResponse([4, 9]));
+    createdCall.mockResolvedValue([4, 9]);
     renderSummary();
     const card = await loaded();
 
@@ -179,7 +184,7 @@ describe('AccountsSummary', () => {
   });
 
   it('says nothing about yesterday when the series has only today', async () => {
-    createdCall.mockResolvedValue(seriesResponse([3]));
+    createdCall.mockResolvedValue([3]);
     renderSummary();
     const card = await loaded();
 
@@ -190,7 +195,7 @@ describe('AccountsSummary', () => {
   });
 
   it('keeps the day figures when the count request fails', async () => {
-    totalCall.mockRejectedValue(new Error('down'));
+    totalCall.mockResolvedValue(undefined);
     renderSummary();
     const card = await loaded();
 
@@ -201,7 +206,7 @@ describe('AccountsSummary', () => {
   });
 
   it('keeps the total when the day series fails', async () => {
-    createdCall.mockRejectedValue(new Error('down'));
+    createdCall.mockResolvedValue(undefined);
     renderSummary();
     const card = await loaded();
 
@@ -210,29 +215,30 @@ describe('AccountsSummary', () => {
   });
 
   it('renders nothing when neither request answers', async () => {
-    totalCall.mockRejectedValue(new Error('down'));
-    createdCall.mockRejectedValue(new Error('down'));
+    totalCall.mockResolvedValue(undefined);
+    createdCall.mockResolvedValue(undefined);
     const { container } = renderSummary();
 
-    await waitFor(() =>
-      expect(screen.queryByTestId('accounts-summary')).toBeNull(),
-    );
+    // Waiting for the skeleton to go, not merely for the testid to be absent.
+    // The loading shape carries no testid and no text, so both of the
+    // assertions below hold while the card is still loading and would pass
+    // against a component that never resolves.
+    await settled();
+
+    expect(screen.queryByTestId('accounts-summary')).toBeNull();
     expect(container.textContent).toBe('');
   });
 
-  it('drops a malformed day rather than printing NaN', async () => {
-    createdCall.mockResolvedValue({
-      data: { number_by_day: [{ doc_count: 5 }, { key: 2 }, { doc_count: 4 }] },
-      error: '',
-      code: 'successful',
-    });
+  it('sums only the days that carried a count', async () => {
+    createdCall.mockResolvedValue([5, 4]);
     renderSummary();
     const card = await loaded();
 
     expect(card.textContent).not.toContain('NaN');
-    // 5 + 4, with the entry that carried no count left out of both the sum and
-    // the day span.
-    expect(card.textContent).toContain('9');
+    // Matched as its own element, not as a substring of the card: the total
+    // tile above reads "176,197", which contains a 9 and would satisfy a
+    // textContent check on its own.
+    expect(within(card).getByText('9')).toBeTruthy();
     expect(card.textContent).toContain('across 2 days');
   });
 });

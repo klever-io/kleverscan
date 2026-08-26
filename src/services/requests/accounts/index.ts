@@ -53,9 +53,12 @@ export const accountsCall = async (
     }
   });
 
-  // Written after the allowlist, so a page or limit in the URL cannot reach
-  // the API through this path: these two come from the arguments, which is
-  // what the table controls.
+  // Written after the allowlist, so a `page` or `limit` sitting in the URL
+  // cannot reach the API through it. Worth being precise about what that does
+  // and does not buy: the caller is the shared Table, which derives these two
+  // from `router.query` itself and coerces them with `Number(...) || default`.
+  // So the values still originate in the URL; what cannot travel is anything
+  // that is not a number, and no extra parameter can ride along beside them.
   query.page = page;
   query.limit = limit;
 
@@ -63,14 +66,32 @@ export const accountsCall = async (
 };
 
 /**
- * Total number of accounts on chain.
+ * Total number of accounts on chain, or undefined if the request failed.
  *
- * `limit=1` because only `pagination.totalRecords` is read. Without it the
- * endpoint answers with ten full account objects, permission arrays included,
- * for a single number: 6KB against 1KB, measured against mainnet.
+ * The undefined matters, and it has to be produced here. `api.get` never
+ * rejects: on any failure it resolves to `{ data: null, error, code:
+ * 'internal_error', pagination }` where `pagination` is a module-level default
+ * carrying `totalRecords: 0` (`services/api.ts:49-56`). A caller that only
+ * reads `pagination.totalRecords` therefore cannot tell a degraded API from a
+ * chain with no accounts, and would print the zero as fact. Checking `error`
+ * here is the same guard `services/requests/transactions/summary.ts` applies
+ * for the same reason.
+ *
+ * `limit=1` because only the count is read. Without it the endpoint answers
+ * with ten full account objects, permission arrays included, for a single
+ * number: 6KB against 1KB, measured against mainnet.
  */
-export const accountsTotalCall = async (): Promise<IPaginatedResponse> =>
-  api.get({ route: 'address/list', query: { limit: 1 } });
+export const accountsTotalCall = async (): Promise<number | undefined> => {
+  const response: IPaginatedResponse = await api.get({
+    route: 'address/list',
+    query: { limit: 1 },
+  });
+  if (response?.error) return undefined;
+  const total = response?.pagination?.totalRecords;
+  // A null in the payload survives an `!== undefined` check and would then
+  // throw on toLocaleString in the middle of a render.
+  return Number.isFinite(total) ? total : undefined;
+};
 
 /**
  * New accounts per day over the last `days` days, newest entry first.
@@ -87,5 +108,24 @@ export const accountsTotalCall = async (): Promise<IPaginatedResponse> =>
  */
 export const accountsCreatedCall = async (
   days: number,
-): Promise<IYesterdayResponse> =>
-  api.get({ route: `address/list/count/${days}` });
+): Promise<number[] | undefined> => {
+  const response: IYesterdayResponse = await api.get({
+    // Escaped even though the only caller passes a module constant, because a
+    // route segment goes into the URL raw: `getHost` concatenates it without
+    // touching it, so unlike a query value it never reaches `buildUrlQuery`'s
+    // encoding. That is the convention #685 set for route segments, and it is
+    // what stops a later caller from handing this a value off the URL.
+    route: `address/list/count/${encodeURIComponent(String(days))}`,
+  });
+  // Same reason as the call above: a failure resolves rather than rejects, and
+  // an empty series is a different statement from a failed request.
+  if (response?.error) return undefined;
+  return (
+    (response?.data?.number_by_day ?? [])
+      .map(day => day?.doc_count)
+      // Anything that is not a real count is dropped rather than carried: one
+      // undefined would turn the sum into NaN and print "NaN" where a figure
+      // belongs.
+      .filter((count): count is number => Number.isFinite(count))
+  );
+};

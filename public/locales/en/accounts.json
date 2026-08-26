@@ -61,7 +61,8 @@
     "VersusYesterday": "{{change}} vs yesterday",
     "NewWindow": "New ({{days}}d)",
     "AcrossDays_one": "across {{count}} day",
-    "AcrossDays_other": "across {{count}} days"
+    "AcrossDays_other": "across {{count}} days",
+    "Nonce": "Nonce"
   },
   "Common": {
     "CopyAddress": "Copy address",

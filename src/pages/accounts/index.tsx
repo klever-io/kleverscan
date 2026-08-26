@@ -1,6 +1,7 @@
 import { Accounts as Icon } from '@/assets/title-icons';
 import AccountsMobileCard from '@/components/AccountsList/MobileCard';
 import AccountsSummary from '@/components/AccountsList/Summary';
+import { klvAmount } from '@/components/AccountsList/format';
 import { AccountsTableWrapper } from '@/components/AccountsList/styles';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
@@ -16,17 +17,12 @@ import Table, { ITable } from '@/components/Table';
 import { accountsCall } from '@/services/requests/accounts';
 import { Container, Header } from '@/styles/common';
 import { IAccount, IRowSection } from '@/types/index';
-import { formatAmount } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { PropsWithChildren } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
-
-const klvAmount = (raw: number): string =>
-  formatAmount(raw / 10 ** KLV_PRECISION);
 
 const Accounts: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
@@ -47,15 +43,19 @@ const Accounts: React.FC<PropsWithChildren> = () => {
       {
         element: () => (
           <IdentityCell>
-            {/* The whole address, as this page has always shown it here.
-                Truncation would have to cut the middle rather than ellipsise,
-                because the tail of a bech32 address is its checksum and hiding
-                it is what makes a look-alike address cheap to grind. This
-                builder only runs above the tablet breakpoint, where the column
-                has room; below it the mobile card takes over and shortens. */}
+            {/* The whole address, as this page has always shown it here, and
+                so no `title`: a tooltip repeating the visible text is announced
+                twice by some screen readers. The mobile card shortens and does
+                carry one.
+
+                Shortening here would have to cut the middle rather than
+                ellipsise, because the tail of a bech32 address is its checksum,
+                and hiding it is what makes a look-alike address cheap to grind.
+                It does not have to: this builder only runs above the tablet
+                breakpoint, where the column has the room. Below it the mobile
+                card takes over, which the e2e checks. */}
             <AddressLink
               href={`/account/${address}`}
-              title={address}
               data-testid="account-link"
             >
               {address}

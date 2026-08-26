@@ -140,8 +140,10 @@ describe('Accounts Page', () => {
     cy.get('[data-testid="accounts-summary"]', { timeout: 15000 })
       .should('be.visible')
       .within(() => {
-        // totalRecords from the stubbed pagination.
-        cy.contains('10').should('exist');
+        // totalRecords from the stubbed pagination. Anchored like the day
+        // count below, so it cannot be satisfied by a longer number that
+        // merely contains these digits.
+        cy.contains(/^10$/).should('exist');
         // The stub returns a single day, so the strip must not claim a
         // change against a yesterday it never received, and must render the
         // singular rather than "across 1 days".
@@ -152,6 +154,57 @@ describe('Accounts Page', () => {
         cy.contains(/^across 1 day$/).should('exist');
         cy.contains('vs yesterday').should('not.exist');
       });
+  });
+});
+
+/**
+ * Everything above runs at Cypress' 1000px default, which is below the 1025px
+ * tablet breakpoint, so it exercises the mobile card. The desktop table is a
+ * different code path: `rowSections` in the page, its four `element` closures,
+ * the column widths, and the header probe where the shared Table calls
+ * `rowSections` with a header *string* rather than an account. That probe is
+ * the shape that has crashed a page in this repo before, so it gets a viewport
+ * of its own.
+ */
+describe('Accounts Page, desktop table', () => {
+  beforeEach(() => {
+    cy.viewport(1400, 900);
+    stubAccountsApis();
+    cy.visit('/accounts');
+  });
+
+  it('renders the column headers, which means the header probe survived', () => {
+    cy.wait('@accountList', { timeout: 15000 });
+
+    cy.get('[data-testid="table-header"]', { timeout: 15000 })
+      .should('be.visible')
+      .within(() => {
+        cy.contains('Address').should('exist');
+        cy.contains('Nonce').should('exist');
+        cy.contains('KLV Balance').should('exist');
+        cy.contains('KLV Staked').should('exist');
+      });
+  });
+
+  it('prints the address in full, which is what the wide column is for', () => {
+    cy.wait('@accountList', { timeout: 15000 });
+
+    cy.get('[data-testid="account-link"]', { timeout: 15000 })
+      .first()
+      .invoke('text')
+      .should('eq', addressFor(0))
+      .and('have.length', 62);
+  });
+
+  it('lays the row out in four cells, one per column', () => {
+    cy.wait('@accountList', { timeout: 15000 });
+
+    // The card path renders one element per row; the table path renders one
+    // per column, so this also proves the breakpoint sent us down the table.
+    cy.get('[data-testid="table-row-0"]', { timeout: 15000 }).should(
+      'have.length',
+      4,
+    );
   });
 });
 

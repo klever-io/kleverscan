@@ -26,8 +26,8 @@ export const Description = styled.p`
 export const Panel = styled.div`
   width: 100%;
   padding: 1rem;
-  /* The raised surface, as everywhere else: #fff light, #151515 dark. */
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) =>
+    theme.dark ? theme.table.background : theme.white};
   border: 1px solid
     ${({ theme }) => (theme.dark ? theme.black20 : theme.black10)};
   border-radius: 24px;
@@ -318,8 +318,8 @@ export const ModalBox = styled.div`
   max-width: 440px;
   padding: 1.75rem;
   border-radius: 16px;
-  /* The raised surface, as everywhere else: #fff light, #151515 dark. */
-  background-color: ${({ theme }) => theme.white};
+  background-color: ${({ theme }) =>
+    theme.dark ? theme.table.background : theme.white};
   border: 1px solid
     ${({ theme }) => (theme.dark ? theme.black20 : theme.black10)};
   display: flex;

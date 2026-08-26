@@ -80,41 +80,31 @@ const headersFor = (
 };
 
 describe('useTransactionHeaders', () => {
-  it('gives the nine single-line headings when the list is not scoped', () => {
-    // The empty string is the deliberately unheaded column of the circled
-    // status arrow between From and To.
+  it('gives the five base headings when the list is not scoped', () => {
     expect(headersFor({})).toEqual([
       'Transaction Hash',
+      'Block/Fees',
+      'From/To',
       'Type',
-      'Block',
-      'Age',
-      'From',
-      '',
-      'To',
-      'Amount',
-      'Fee',
+      'Misc',
     ]);
   });
 
-  it('adds In/Out after To when the URL names an account', () => {
+  it('adds In/Out after From/To when the URL names an account', () => {
     // This suite only renders the headings hook. That the cells line up with
     // them is enforced end to end, not here.
     expect(headersFor({ account: 'klv1abc' })).toEqual([
       'Transaction Hash',
-      'Type',
-      'Block',
-      'Age',
-      'From',
-      '',
-      'To',
+      'Block/Fees',
+      'From/To',
       'In/Out',
-      'Amount',
-      'Fee',
+      'Type',
+      'Misc',
     ]);
   });
 
   it('ignores a repeated account parameter, which names no single account', () => {
-    expect(headersFor({ account: ['klv1abc', 'klv1def'] })).toHaveLength(9);
+    expect(headersFor({ account: ['klv1abc', 'klv1def'] })).toHaveLength(5);
   });
 
   it('leaves the column out on a route the account never filters', () => {
@@ -122,11 +112,11 @@ describe('useTransactionHeaders', () => {
     // list still holds everyone. A direction there would read "In" for
     // essentially every row.
     expect(headersFor({ account: 'klv1abc' }, '/asset/[asset]')).toHaveLength(
-      9,
+      5,
     );
   });
 
   it('ignores an empty account parameter', () => {
-    expect(headersFor({ account: '' })).toHaveLength(9);
+    expect(headersFor({ account: '' })).toHaveLength(5);
   });
 });

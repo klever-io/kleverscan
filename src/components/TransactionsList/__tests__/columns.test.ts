@@ -1,56 +1,40 @@
-import { getTransactionColumns, listsWholeChain, showsInOut } from '../columns';
+import {
+  getTransactionColumns,
+  getTransactionHeaders,
+  showsInOut,
+} from '../columns';
 
-const BASE_KEYS = [
-  'hash',
-  'type',
-  'block',
-  'age',
-  'from',
-  'direction',
-  'to',
-  'amount',
-  'fee',
-];
+const BASE_KEYS = ['hash', 'blockFees', 'fromTo', 'type', 'misc'];
 
 describe('transaction table columns', () => {
-  it('lists the nine single-line base columns in order', () => {
+  it('lists the five base columns in order', () => {
     expect(getTransactionColumns({ showInOut: false }).map(c => c.key)).toEqual(
       BASE_KEYS,
     );
   });
 
-  it('puts In/Out directly after To when the list is scoped to an account', () => {
+  it('puts In/Out directly after From/To when the list is scoped to an account', () => {
     expect(getTransactionColumns({ showInOut: true }).map(c => c.key)).toEqual([
       'hash',
-      'type',
-      'block',
-      'age',
-      'from',
-      'direction',
-      'to',
+      'blockFees',
+      'fromTo',
       'inOut',
-      'amount',
-      'fee',
+      'type',
+      'misc',
     ]);
   });
 
-  it('gives every column a non-empty heading, except the unheaded arrow', () => {
-    // Only that much. What the headings and the cells actually agreeing is
-    // worth is enforced end to end, in cypress/e2e/pages/transactions.cy.ts,
-    // since Jest cannot import the module the cells live in.
+  it('gives every column a non-empty heading, in both shapes', () => {
+    // Only that much. `getTransactionHeaders` is defined as this map, so
+    // asserting the two match would restate the implementation. What the
+    // headings and the cells actually agreeing is worth is enforced end to
+    // end, in cypress/e2e/pages/transactions.cy.ts, since Jest cannot import
+    // the module the cells live in.
     for (const showInOut of [false, true]) {
-      const columns = getTransactionColumns({ showInOut });
-      const headers = columns.map(column => column.header);
+      const headers = getTransactionHeaders({ showInOut });
 
-      columns.forEach((column, index) => {
-        if (column.key === 'direction') {
-          // The circled status arrow is deliberately unheaded, like the
-          // reference explorers.
-          expect(headers[index]).toBe('');
-        } else {
-          expect(headers[index].length).toBeGreaterThan(0);
-        }
-      });
+      expect(headers).toHaveLength(getTransactionColumns({ showInOut }).length);
+      expect(headers.every(header => header.length > 0)).toBe(true);
     }
   });
 
@@ -107,27 +91,6 @@ describe('transaction table columns', () => {
 
     it('is false when there is no router information at all', () => {
       expect(showsInOut({})).toBe(false);
-    });
-  });
-
-  describe('listsWholeChain', () => {
-    it('is true for a bare list and while paging through it', () => {
-      expect(listsWholeChain({ query: {} })).toBe(true);
-      expect(listsWholeChain({ query: { page: '3', limit: '50' } })).toBe(true);
-      expect(listsWholeChain({})).toBe(true);
-    });
-
-    it.each([
-      ['an account', { account: 'klv1abc' }],
-      ['a contract type', { type: '63' }],
-      ['a status', { status: 'Success' }],
-      ['an asset', { asset: 'KLV' }],
-      ['a date range', { startdate: '1787491255', enddate: '1787577655' }],
-      ['a filter alongside paging', { page: '2', type: '63' }],
-    ])('is false once the list is narrowed by %s', (_label, query) => {
-      // The summary above the list is chain-wide, so any narrowing at all
-      // makes it describe something other than the rows underneath it.
-      expect(listsWholeChain({ query })).toBe(false);
     });
   });
 });

@@ -142,8 +142,12 @@ const FILTER_KEYS = new Set([
  * also hid the card for `?utm_source=`, so every shared campaign link lost it.
  * A filter added later has to be added here too.
  */
+/** Next hands back an array for a repeated parameter, so `?type=&type=`
+ * arrives as `['', '']` and a comparison against `''` would call it a filter. */
+const narrows = (value: string | string[] | undefined): boolean =>
+  Array.isArray(value) ? value.some(Boolean) : Boolean(value);
+
 export const listsWholeChain = (router: { query?: ParsedUrlQuery }): boolean =>
   !Object.entries(router?.query ?? {}).some(
-    ([key, value]) =>
-      FILTER_KEYS.has(key) && value !== '' && value !== undefined,
+    ([key, value]) => FILTER_KEYS.has(key) && narrows(value),
   );

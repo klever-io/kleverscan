@@ -121,6 +121,10 @@ describe('transaction table columns', () => {
       ['a campaign parameter', { utm_source: 'twitter' }],
       ['a click id', { fbclid: 'abc123' }],
       ['a filter left empty by the UI', { type: '' }],
+      // Next hands back an array for a repeated parameter, and `?type=&type=`
+      // is what an empty filter submitted twice looks like.
+      ['the same empty filter twice', { type: ['', ''] }],
+      ['a filter with no values at all', { type: [] }],
     ])('is true with %s, which narrows nothing', (_label, query) => {
       // These reach the page on shared links. Reading anything unrecognised
       // as a filter hid the card on every one of them.
@@ -134,6 +138,8 @@ describe('transaction table columns', () => {
       ['an asset', { asset: 'KLV' }],
       ['a date range', { startdate: '1787491255', enddate: '1787577655' }],
       ['a filter alongside paging', { page: '2', type: '63' }],
+      ['a filter repeated with real values', { type: ['63', '0'] }],
+      ['a filter repeated with one real value', { type: ['', '63'] }],
     ])('is false once the list is narrowed by %s', (_label, query) => {
       // The summary above the list is chain-wide, so any narrowing at all
       // makes it describe something other than the rows underneath it.

@@ -35,7 +35,7 @@ export const DATA_LIST_ROW_HEIGHT = '60px';
  * spots (violet on dark cards is 3.3:1, red at badge size 3.4:1), so each
  * mode gets a hand-picked equivalent.
  */
-const accentText = ({ theme }: { theme: DefaultTheme }): string =>
+export const accentText = ({ theme }: { theme: DefaultTheme }): string =>
   theme.dark ? '#C95ED4' : theme.violet;
 
 const voidText = ({ theme }: { theme: DefaultTheme }): string =>
@@ -77,7 +77,7 @@ export const inCard = (display: string, fontWeight?: number) => css`
   }
 `;
 
-const focusRing = css`
+export const focusRing = css`
   &:focus-visible {
     outline: 2px solid ${props => props.theme.violet};
     outline-offset: 2px;
@@ -99,9 +99,16 @@ export const VisuallyHidden = styled.span`
 
 /* --------------------------------- badges -------------------------------- */
 
-type BadgeVariant = 'void' | 'contract' | 'neutral' | 'warning' | 'accent';
+export type BadgeVariant =
+  | 'void'
+  | 'contract'
+  | 'neutral'
+  | 'warning'
+  | 'accent'
+  | 'success'
+  | 'danger';
 
-const badgeColor = (
+export const badgeColor = (
   props: { theme: DefaultTheme },
   variant: BadgeVariant,
 ): string => {
@@ -118,10 +125,23 @@ const badgeColor = (
       return theme.dark ? '#EB9C27' : '#8F5A00';
     case 'accent':
       return accentText(props);
+    case 'success':
+      // successColor is derived for icon size, where 3:1 suffices. Badge
+      // text at 0.625rem needs 4.5:1, which the light value misses (3.33:1
+      // on the tint), so this spot darkens it further: 4.98:1 on the tint,
+      // 4.70:1 on a hovered row.
+      return theme.dark ? successColor(props) : '#217A50';
+    case 'danger':
+      // Red kin of the void badge; a separate name because a failed
+      // transaction and the burn address are unrelated concepts, and a
+      // slightly darker light value than voidText because the badge must
+      // hold 4.5:1 on a hovered row's violet tint (4.78:1; voidText dips
+      // to 4.39:1 there).
+      return theme.dark ? voidText(props) : '#BE3448';
   }
 };
 
-const badgeTint = (
+export const badgeTint = (
   props: { theme: DefaultTheme },
   variant: BadgeVariant,
 ): string => {
@@ -139,6 +159,12 @@ const badgeTint = (
       break;
     case 'accent':
       base = theme.violet;
+      break;
+    case 'success':
+      base = theme.green;
+      break;
+    case 'danger':
+      base = theme.red;
       break;
     default:
       base = theme.blueGray500;
@@ -531,7 +557,7 @@ export const MobileListCard = styled.div`
   border-radius: 8px;
   border: solid 1px
     ${props => (props.theme.dark ? props.theme.darkGray : props.theme.black10)};
-  background-color: ${props => props.theme.table.background};
+  background-color: ${props => props.theme.white};
 `;
 
 export const MobileTopRow = styled.div`
@@ -643,9 +669,13 @@ export const dataListTableSkin = css`
          (z-index 2) and the site navigation (6). */
       z-index: 1;
       padding: 12px;
+      /* Tinted against the card it sits on, not against the page. Mixing into
+         the page colour left the band darker than its own surface once the
+         card stopped borrowing that colour: 1.02 against the card, and the
+         wrong way round. Light mixes into the same surface and reads 1.07. */
       background-color: ${props =>
         props.theme.dark
-          ? mix(0.05, '#FFFFFF', props.theme.background)
+          ? mix(0.05, '#FFFFFF', props.theme.white)
           : mix(0.03, props.theme.black, props.theme.white)};
       border-bottom: 1px solid ${props => props.theme.black10};
       /* Typography inherits like every other table header on the site

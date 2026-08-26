@@ -3,6 +3,7 @@ import { NonFungibleView } from '@/components/Asset/NonFungibleView';
 import { SemiFungibleView } from '@/components/Asset/SemiFungibleView';
 import Title from '@/components/Layout/Title';
 import { ITable } from '@/components/Table';
+import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { transactionRowSections } from '@/pages/transactions';
@@ -65,6 +66,8 @@ const AssetNonce: React.FC<PropsWithChildren> = () => {
     dataName: 'transactions',
     request: (page, limit) => requestTransactions(page, limit),
     Filters: TransactionsFilters,
+    MobileCard: TransactionsMobileCard,
+    singleLineSkeleton: true,
   };
 
   return (

@@ -48,5 +48,33 @@
     "Deposit": "Deposit",
     "ITO Trigger": "ITO Trigger",
     "Smart Contract": "Smart Contract"
+  },
+  "Table": {
+    "TransactionHash": "Transaction Hash",
+    "BlockFees": "Block/Fees",
+    "InOut": "In/Out",
+    "Type": "Type",
+    "Block": "Block",
+    "CopyHash": "Copy transaction hash",
+    "HashCopied": "Transaction hash copied to clipboard",
+    "OpenTransaction": "Open transaction in a new tab",
+    "OpenInNewTab": "Open in a new tab",
+    "ActionType": "Action type",
+    "NotApplicable": "Not applicable",
+    "Age": "Age",
+    "Amount": "Amount",
+    "Fee": "Fee"
+  },
+  "Summary": {
+    "Breakdown": "Contract types in the last 24 hours",
+    "Down": "down {{percent}} compared with the previous 24 hours",
+    "FungibleBasis": "Leading fungible asset",
+    "Growth": "grew {{percent}} in the last 24 hours",
+    "Label": "Transaction statistics",
+    "Last24h": "Transactions (24h)",
+    "MostTransacted": "Most transacted",
+    "OtherTypes": "Other",
+    "Total": "Total transactions",
+    "Up": "up {{percent}} compared with the previous 24 hours"
   }
 }

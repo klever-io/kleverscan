@@ -1,20 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useIsFetching } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
+
+/** Waited no longer than this, in case the page never has work of its own. */
+const CEILING = 4000;
 
 /**
- * True once `delay` has passed since mount.
+ * True once the page's other requests have finished, and stays true.
  *
- * For work that belongs on the page but not in its opening burst.
- * requestIdleCallback was tried first and is not usable here: measured on the
- * same page it fired at 152ms on one load and 2.6s on the next, so the work
- * was either back in the burst or visibly late.
+ * For requests that belong on the page but must not compete with the one a
+ * reader is actually waiting for. This API answers a transaction-list query
+ * in about two seconds and does not serve them in parallel, so six at once
+ * turned a 2.1s list into a 7s one.
+ *
+ * It waits to see traffic before waiting for quiet: this mounts above the
+ * table, so at first paint there is nothing in flight yet and an idle check
+ * on its own would release immediately.
  */
-export const useDeferred = (delay: number): boolean => {
+export const useDeferred = (): boolean => {
+  const inFlight = useIsFetching();
+  const sawTraffic = useRef(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setReady(true), delay);
+    if (inFlight > 0) sawTraffic.current = true;
+    else if (sawTraffic.current) setReady(true);
+  }, [inFlight]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setReady(true), CEILING);
     return () => clearTimeout(timer);
-  }, [delay]);
+  }, []);
 
   return ready;
 };

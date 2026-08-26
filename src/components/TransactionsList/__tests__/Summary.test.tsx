@@ -1,6 +1,6 @@
 import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
@@ -128,7 +128,7 @@ beforeEach(() => {
   summaryCall.mockReset();
   breakdownCall.mockReset();
   breakdownCall.mockResolvedValue(COUNTS);
-  deferralPassed = false;
+  deferralPassed = true;
 });
 
 describe('TransactionsSummary', () => {
@@ -192,20 +192,24 @@ describe('TransactionsSummary', () => {
     expect(screen.queryByText('Transactions (24h)')).toBeNull();
   });
 
-  it('leaves the composition bar unasked for while the page is still working', async () => {
+  it('asks for nothing while the page still has work in flight', async () => {
+    deferralPassed = false;
     summaryCall.mockResolvedValue(FULL);
 
     renderSummary();
 
-    // The tiles are there, so the card has rendered and the query had its
-    // chance; four requests for the bar simply were not spent yet.
-    expect(await screen.findByText('Total transactions')).toBeTruthy();
+    // The card reserves its space and spends nothing. Both of its tile
+    // requests are transaction-list queries, which this API answers in about
+    // two seconds and will not serve alongside the rows.
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    expect(summaryCall).not.toHaveBeenCalled();
     expect(breakdownCall).not.toHaveBeenCalled();
-    expect(screen.queryByLabelText(/Contract types/)).toBeNull();
+    expect(screen.getByLabelText('Transaction statistics')).toBeTruthy();
   });
 
-  it('asks for it once the page falls idle, against the window it belongs to', async () => {
-    deferralPassed = true;
+  it('asks once the page falls quiet', async () => {
     summaryCall.mockResolvedValue(FULL);
 
     renderSummary();
@@ -213,6 +217,7 @@ describe('TransactionsSummary', () => {
     expect(
       await screen.findByLabelText('Contract types in the last 24 hours'),
     ).toBeTruthy();
+    expect(summaryCall).toHaveBeenCalled();
     expect(breakdownCall).toHaveBeenCalled();
   });
 

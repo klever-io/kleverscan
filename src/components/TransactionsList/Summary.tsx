@@ -37,6 +37,14 @@ import {
 } from './styles';
 
 /**
+ * A quarter of an hour. These are 24 hour figures, so a fresh reading moves
+ * them by fractions of a percent, and every refetch costs two of the slow
+ * transaction-list queries. Kept past the last observer too, so paging away
+ * and back does not pay for them again.
+ */
+const FIGURE_CACHE = { staleTime: 15 * 60_000, gcTime: 15 * 60_000 };
+
+/**
  * Percentage with its sign, e.g. "+18.6%". A rate, not a share, so it has no
  * ceiling: a figure that more than doubled reads "+140%" rather than being
  * clamped. The precision is a parameter because the day-on-day change lands
@@ -58,17 +66,18 @@ const TransactionsSummary: React.FC = () => {
   const label = t('transactions:Summary.Label', {
     defaultValue: 'Transaction statistics',
   });
-  const { data: summary, isLoading } = useQuery({
+
+  const deferred = useDeferred();
+
+  const { data: summary } = useQuery({
     queryKey: ['transactionsSummary'],
     queryFn: transactionsSummaryCall,
-    // The figures move by the second; refetching on every mount would make
-    // the card flicker without telling the reader anything new.
-    staleTime: 60_000,
+    // Behind the list, not beside it. Two of these three are transaction-list
+    // queries costing about two seconds each, and racing them against the
+    // rows is what a reader actually feels.
+    enabled: deferred,
+    ...FIGURE_CACHE,
   });
-
-  // Long enough that a reader who clicks straight through never spends these
-  // four, short enough that the bar is not visibly late.
-  const deferred = useDeferred(600);
 
   const { data: typeCounts } = useQuery({
     queryKey: ['transactionsBreakdown'],
@@ -77,10 +86,10 @@ const TransactionsSummary: React.FC = () => {
     // opening burst. Not gated on the tiles: waiting for the total first put
     // the bar six seconds out when the API answered slowly.
     enabled: deferred,
-    staleTime: 60_000,
+    ...FIGURE_CACHE,
   });
 
-  if (isLoading) {
+  if (!summary) {
     return <PageSummaryLoading label={label} tiles={3} bar />;
   }
 

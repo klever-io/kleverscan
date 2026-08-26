@@ -260,6 +260,21 @@ describe('AccountsSummary', () => {
     expect(within(card).getByText('10')).toBeTruthy();
   });
 
+  it('keeps the window tile when today is the hole and the total is gone', async () => {
+    // The sparse case: no record count, no figure for today, but the rest of
+    // the window did answer. Testing only the first two figures for the empty
+    // state would drop a tile that has something to say.
+    totalCall.mockResolvedValue(undefined);
+    createdCall.mockResolvedValue([undefined, 4]);
+    renderSummary();
+    const card = await loaded();
+
+    expect(within(card).getByText('4')).toBeTruthy();
+    expect(card.textContent).toContain('across 1 day');
+    expect(card.textContent).not.toContain('New (24h)');
+    expect(card.textContent).not.toContain('Total Accounts');
+  });
+
   it('still reads yesterday from position one when an older day is missing', async () => {
     createdCall.mockResolvedValue([10, 9, undefined, 4]);
     renderSummary();

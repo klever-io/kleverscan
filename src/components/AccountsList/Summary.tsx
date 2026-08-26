@@ -92,10 +92,18 @@ const AccountsSummary: React.FC = () => {
       ? today - yesterday
       : undefined;
 
-  // Nothing to show is better than a card of blanks: every figure here comes
-  // from one of the two requests, so if both came back empty the strip has no
-  // subject.
-  if (totalRecords === undefined && today === undefined) return null;
+  // Nothing to show is better than a card of blanks. All three figures have to
+  // be missing before that is true, and `weekTotal` is genuinely a third one:
+  // since the series keeps holes, today can be absent while the rest of the
+  // window still carries figures, and testing only the first two would hide a
+  // tile that has something to say.
+  if (
+    totalRecords === undefined &&
+    today === undefined &&
+    weekTotal === undefined
+  ) {
+    return null;
+  }
 
   // Carries a testid as well as the label, because the loading shape above
   // renders the same aria-label: an assertion aimed at the label alone can

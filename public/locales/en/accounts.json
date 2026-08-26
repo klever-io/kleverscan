@@ -54,9 +54,19 @@
       "PermissionsName": "Permissions Name"
     }
   },
-  "AccountsPage": {
-    "Number of Accounts": "Number of Accounts",
-    "Accounts created in the last 24h": "Accounts created in the last 24h",
-    "List Of Accounts": "List of Accounts"
+  "List": {
+    "SummaryAria": "Account statistics",
+    "OnChain": "on chain",
+    "New24h": "New (24h)",
+    "VersusYesterday": "{{change}} vs yesterday",
+    "NewWindow": "New ({{days}}d)",
+    "AcrossDays_one": "across {{count}} day",
+    "AcrossDays_other": "across {{count}} days"
+  },
+  "Common": {
+    "CopyAddress": "Copy address",
+    "AddressCopied": "Address copied to clipboard",
+    "OpenAccount": "Open account in a new tab",
+    "OpenInNewTab": "Open in a new tab"
   }
 }

@@ -108,6 +108,51 @@ describe('Accounts Page', () => {
       cy.get(`a[href*="${account.address}"]`).should('exist');
     });
   });
+
+  it('marks each row with the account-link testid the smoke suite clicks', () => {
+    cy.wait('@accountList', { timeout: 15000 });
+    cy.get('[data-testid="account-link"]', { timeout: 15000 })
+      .should('have.length.at.least', accountsAmount)
+      .first()
+      .should('have.attr', 'href')
+      .and('include', '/account/');
+  });
+
+  it('shortens the address below the desktop breakpoint', () => {
+    // Cypress runs at its default 1000px viewport and `isTablet` covers
+    // everything under 1025px, so this spec exercises the card, not the table.
+    // The desktop row prints the address in full, which only fits because that
+    // builder never runs at this width; the card must therefore shorten. The
+    // ellipsis is what parseAddress puts in the middle.
+    cy.wait('@accountList', { timeout: 15000 });
+    cy.get('[data-testid="account-link"]', { timeout: 15000 })
+      .first()
+      .invoke('text')
+      .should('match', /^klv1.*\.\.\..+$/);
+  });
+
+  it('shows the summary figures, and counts one day as a day', () => {
+    cy.wait('@accountCount', { timeout: 15000 });
+
+    // The testid, not the aria-label: the loading shape carries the same
+    // label, so waiting on the label alone lands on the skeleton and asserts
+    // against empty tiles.
+    cy.get('[data-testid="accounts-summary"]', { timeout: 15000 })
+      .should('be.visible')
+      .within(() => {
+        // totalRecords from the stubbed pagination.
+        cy.contains('10').should('exist');
+        // The stub returns a single day, so the strip must not claim a
+        // change against a yesterday it never received, and must render the
+        // singular rather than "across 1 days".
+        //
+        // Anchored, not a substring: `cy.contains('across 1 day')` also
+        // matches "across 1 days", so the plain form asserts nothing about
+        // the plural it claims to guard.
+        cy.contains(/^across 1 day$/).should('exist');
+        cy.contains('vs yesterday').should('not.exist');
+      });
+  });
 });
 
 describe('Account Details Page', () => {

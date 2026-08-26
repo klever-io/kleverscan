@@ -1,179 +1,99 @@
-import { PropsWithChildren } from 'react';
 import { Accounts as Icon } from '@/assets/title-icons';
-import ExplorerLink from '@/components/ExplorerLink';
+import AccountsMobileCard from '@/components/AccountsList/MobileCard';
+import AccountsSummary from '@/components/AccountsList/Summary';
+import { AccountsTableWrapper } from '@/components/AccountsList/styles';
+import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/DataList/ExplorerLink';
+import {
+  AddressLink,
+  AmountMuted,
+  AmountPrimary,
+  IdentityCell,
+  RowActions,
+} from '@/components/DataList/styles';
 import Title from '@/components/Layout/Title';
-import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
-import { useMobile } from '@/contexts/mobile';
-import api from '@/services/api';
-import { Card, CardContainer, Container, Header } from '@/styles/common';
-import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
+import { accountsCall } from '@/services/requests/accounts';
+import { Container, Header } from '@/styles/common';
+import { IAccount, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { parseAddress } from '@/utils/parseValues';
-import { getAge } from '@/utils/timeFunctions';
-import { TableContainer } from '@/views/accounts';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { PropsWithChildren } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { GetServerSideProps } from 'next';
 
-interface IAccounts {
-  accounts: IAccount[];
-  pagination: IPagination;
-  createdYesterday: number;
-}
+const klvAmount = (raw: number): string =>
+  formatAmount(raw / 10 ** KLV_PRECISION);
 
-interface IAccountResponse extends IResponse {
-  data: {
-    accounts: IAccount[];
-  };
-  pagination: IPagination;
-}
+const Accounts: React.FC<PropsWithChildren> = () => {
+  const router = useRouter();
+  const { t } = useTranslation(['common', 'accounts', 'table']);
 
-interface IAccountRangeOfLastDays extends IResponse {
-  data: {
-    number_by_day: [
+  /**
+   * Built inside the component so the row actions can be translated, the way
+   * the assets list does it. Note the shared Table also calls this with a
+   * header *string* to read each column's width, so nothing here may touch the
+   * argument outside an `element` closure: those are not invoked for that
+   * probe, the destructure below simply yields undefined, and the page keeps
+   * rendering its header.
+   */
+  const rowSections = (account: IAccount): IRowSection[] => {
+    const { address, balance, frozenBalance, nonce } = account;
+
+    return [
       {
-        doc_count: number;
+        element: () => (
+          <IdentityCell>
+            {/* The whole address, as this page has always shown it here.
+                Truncation would have to cut the middle rather than ellipsise,
+                because the tail of a bech32 address is its checksum and hiding
+                it is what makes a look-alike address cheap to grind. This
+                builder only runs above the tablet breakpoint, where the column
+                has room; below it the mobile card takes over and shortens. */}
+            <AddressLink
+              href={`/account/${address}`}
+              title={address}
+              data-testid="account-link"
+            >
+              {address}
+            </AddressLink>
+            <RowActions>
+              <CopyAction
+                value={address}
+                label={t('accounts:Common.CopyAddress')}
+                announcement={t('accounts:Common.AddressCopied')}
+              />
+              <ExplorerLink
+                href={`/account/${address}`}
+                label={t('accounts:Common.OpenAccount')}
+                title={t('accounts:Common.OpenInNewTab')}
+              />
+            </RowActions>
+          </IdentityCell>
+        ),
+        span: 2,
+      },
+      {
+        element: () => <AmountMuted>{nonce}</AmountMuted>,
+        span: 1,
+        width: 100,
+      },
+      {
+        element: () => <AmountPrimary>{klvAmount(balance)} KLV</AmountPrimary>,
+        span: 1,
+        width: 190,
+      },
+      {
+        element: () => (
+          <AmountMuted>{klvAmount(frozenBalance)} KLV</AmountMuted>
+        ),
+        span: 1,
+        width: 190,
       },
     ];
-  };
-}
-
-interface ICard {
-  title: string;
-  headers: string[];
-  values: Array<string | React.ReactElement>;
-}
-
-const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
-  const [pagination, setPagination] = useState<null | IPagination>(null);
-  const [createdYesterday, setCreatedYesterday] = useState<null | number>(null);
-  const { t } = useTranslation(['common', 'accounts', 'table']);
-  const requestAccounts = async (page: number, limit: number) =>
-    await api.get({
-      route: 'address/list',
-      query: { page, limit },
-    });
-
-  const loadInitialData = async () => {
-    const accountsCall = new Promise<IAccountResponse>(
-      async (resolve, reject) => {
-        const res = await api.get({
-          route: 'address/list',
-        });
-
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
-
-        reject(res.error);
-      },
-    );
-
-    const yesterdayAccountsCall = new Promise<IAccountRangeOfLastDays>(
-      async (resolve, reject) => {
-        const res = await api.get({
-          route: 'address/list/count/1',
-        });
-
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
-
-        reject(res.error);
-      },
-    );
-
-    await Promise.allSettled([accountsCall, yesterdayAccountsCall]).then(
-      responses => {
-        responses.map((res, index) => {
-          if (res.status !== 'rejected') {
-            const { value }: any = res;
-            switch (index) {
-              case 0:
-                setPagination(value.pagination);
-                break;
-
-              case 1:
-                setCreatedYesterday(value.data.number_by_day[0]?.doc_count);
-                break;
-
-              default:
-                break;
-            }
-          }
-        });
-      },
-    );
-  };
-
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const cards: ICard[] = [
-    {
-      title: t('accounts:AccountsPage.Number of Accounts'),
-      headers: [
-        t('accounts:AccountsPage.Accounts created in the last 24h'),
-        t('common:Cards.Total Accounts'),
-      ],
-      values: [
-        createdYesterday === pagination?.totalRecords
-          ? '--'
-          : (createdYesterday?.toLocaleString() ?? <Skeleton />),
-        pagination?.totalRecords?.toLocaleString() ?? <Skeleton />,
-      ],
-    },
-  ];
-
-  const CardContent: React.FC<PropsWithChildren<ICard>> = ({
-    title,
-    headers,
-    values,
-  }) => {
-    const [uptime] = useState(new Date().getTime());
-    const [age, setAge] = useState(getAge(new Date(), t));
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        const newAge = getAge(new Date(uptime / 1000), t);
-
-        setAge(newAge);
-      }, 1 * 1000); // 1 sec
-
-      return () => {
-        clearInterval(interval);
-      };
-    }, []);
-
-    return (
-      <Card>
-        <div>
-          <span>
-            <strong>{title}</strong>
-          </span>
-          <p>
-            {age} {t('common:Date.Elapsed_Time')}
-          </p>
-        </div>
-        <div>
-          <span>
-            <small>{headers[0]}</small>
-          </span>
-          <span>
-            <small>{headers[1]}</small>
-          </span>
-        </div>
-        <div>
-          <span>{values[0]}</span>
-          <span>{values[1]}</span>
-        </div>
-      </Card>
-    );
   };
 
   const header = [
@@ -183,53 +103,14 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
     `KLV ${t('table:Staked')}`,
   ];
 
-  const { isMobile } = useMobile();
-
-  const rowSections = (account: IAccount): IRowSection[] => {
-    const { address, balance, frozenBalance, nonce } = account;
-    const sections: IRowSection[] = [
-      {
-        element: props => (
-          <ExplorerLink
-            type="account"
-            value={address}
-            label={isMobile ? parseAddress(address, 24) : address}
-            compact
-          />
-        ),
-        span: 2,
-      },
-      {
-        element: props => <span key={nonce}>{nonce}</span>,
-        span: 1,
-        width: 100,
-      },
-      {
-        element: props => (
-          <span key={balance}>
-            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
-          </span>
-        ),
-        span: 1,
-      },
-      {
-        element: props => (
-          <span key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
-          </span>
-        ),
-        span: 1,
-      },
-    ];
-    return sections;
-  };
-
   const tableProps: ITable = {
     type: 'accounts',
     header,
     rowSections,
-    request: (page, limit) => requestAccounts(page, limit),
+    request: (page, limit) => accountsCall(page, limit, router.query),
     dataName: 'accounts',
+    MobileCard: AccountsMobileCard,
+    singleLineSkeleton: true,
   };
 
   return (
@@ -238,16 +119,11 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
         <Title title={t('common:Titles.Accounts')} Icon={Icon} />
       </Header>
 
-      <CardContainer>
-        {cards.map((card, index) => (
-          <CardContent key={String(index)} {...card} />
-        ))}
-      </CardContainer>
+      <AccountsSummary />
 
-      <TableContainer>
-        <h3>{t('accounts:AccountsPage.List Of Accounts')}</h3>
+      <AccountsTableWrapper>
         <Table {...tableProps} />
-      </TableContainer>
+      </AccountsTableWrapper>
     </Container>
   );
 };

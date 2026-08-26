@@ -54,9 +54,19 @@
       "PermissionsName": "Nome das Permissões"
     }
   },
-  "AccountsPage": {
-    "Number of Accounts": "Número de Contas",
-    "Accounts created in the last 24h": "Contas criadas nas últimas 24 horas",
-    "List Of Accounts": "Lista de Contas"
+  "List": {
+    "SummaryAria": "Estatísticas de contas",
+    "OnChain": "na rede",
+    "New24h": "Novas (24h)",
+    "VersusYesterday": "{{change}} em relação a ontem",
+    "NewWindow": "Novas ({{days}}d)",
+    "AcrossDays_one": "em {{count}} dia",
+    "AcrossDays_other": "em {{count}} dias"
+  },
+  "Common": {
+    "CopyAddress": "Copiar endereço",
+    "AddressCopied": "Endereço copiado para a área de transferência",
+    "OpenAccount": "Abrir conta em uma nova aba",
+    "OpenInNewTab": "Abrir em uma nova aba"
   }
 }

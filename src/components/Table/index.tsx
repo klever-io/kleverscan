@@ -190,6 +190,21 @@ const Table = <TCard,>({
     // them for placeholders and back made paging flicker.
     placeholderData: keepPreviousData,
 
+    // A step out and back is a common move, and every list here costs a
+    // round trip the API answers in about a second. Inside this window the
+    // rows a reader just looked at are shown again without asking for them a
+    // second time. A page load, a filter change and the refresh control all
+    // bypass it, so nothing here can pin a stale list on screen.
+    //
+    // Only a list that actually has rows. `tableRequest` turns every failure
+    // into an empty result and react-query files that as a success, so
+    // without this an API that was briefly down would keep answering "no data
+    // here" from cache for ten seconds instead of retrying on the next mount.
+    staleTime: query =>
+      (query.state.data as { items?: unknown[] } | undefined)?.items?.length
+        ? 10_000
+        : 0,
+
     ...onErrorHandler(),
   });
 

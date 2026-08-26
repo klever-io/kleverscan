@@ -17,10 +17,14 @@ export const Container = styled.div`
   right: 0;
   z-index: 6;
   transition: top 0.1s linear;
-  background-color: ${props =>
-    props.theme.dark ? props.theme.background : props.theme.true.white};
+  /* The raised surface, the same one the cards and tables sit on: #fff in the
+     light theme, #151515 in the dark one. Reading the background token for
+     dark gave the bar the page's own colour, so it had no edge of its own and
+     only its hairline told a reader where the chrome ended. Identical in
+     light, where both tokens are #fff. */
+  background-color: ${props => props.theme.white};
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
+    ${props => (props.theme.dark ? props.theme.black20 : props.theme.black10)};
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
     justify-content: space-between;
@@ -478,7 +482,7 @@ export const ConnectionWrapper = styled.div`
   z-index: 3;
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
+    ${props => (props.theme.dark ? props.theme.black20 : props.theme.black10)};
   display: flex;
   justify-content: space-between;
   align-items: center;

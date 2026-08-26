@@ -122,8 +122,11 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
 
   gap: 0.25rem;
 
-  background-color: ${props =>
-    props.theme.dark ? props.theme.background : props.theme.white};
+  /* The raised surface, as everywhere else. This one matters most: the panel
+     floats over the page, and reading the background token gave it the page's
+     own colour, so an overlay had nothing separating it from what it covered.
+     Reads #fff in the light theme and #151515 in the dark one. */
+  background-color: ${props => props.theme.white};
 
   border: 1px solid ${props => props.theme.black10};
   border-radius: 16px;

@@ -8,9 +8,6 @@ interface ISummaryLoadingProps {
   tiles: number;
   /** Strips that end in a distribution bar reserve its height too. */
   bar?: boolean;
-  /** Lets a page add its own spacing without the loaded card and this one
-   * drifting apart, which would jump the page once the figures arrive. */
-  className?: string;
 }
 
 /**
@@ -22,9 +19,8 @@ const SummaryLoading: React.FC<ISummaryLoadingProps> = ({
   label,
   tiles,
   bar,
-  className,
 }) => (
-  <SummaryCard aria-label={label} className={className}>
+  <SummaryCard aria-label={label}>
     <SummarySkeletonRow>
       {Array.from({ length: tiles }, (_, index) => (
         <Skeleton key={index} width={150} height={56} />

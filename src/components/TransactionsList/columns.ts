@@ -13,24 +13,15 @@ import { ParsedUrlQuery } from 'querystring';
  *
  * Both now come from `getTransactionColumns`, so they cannot disagree: a
  * column is one entry, carrying its key and its heading together.
- *
- * Single-line variant: every datum that used to live on a cell's second line
- * (timestamp, fee, receiver, first custom field) has its own column instead,
- * the Basescan-style layout under comparison against the two-line benchmark
- * (tag benchmark/two-line-rows).
  */
 
 export type TransactionColumnKey =
   | 'hash'
-  | 'type'
-  | 'block'
-  | 'age'
-  | 'from'
-  | 'direction'
-  | 'to'
+  | 'blockFees'
+  | 'fromTo'
   | 'inOut'
-  | 'amount'
-  | 'fee';
+  | 'type'
+  | 'misc';
 
 export interface ITransactionColumn {
   key: TransactionColumnKey;
@@ -39,9 +30,12 @@ export interface ITransactionColumn {
 }
 
 /**
- * Headings here are the canonical English literals; display goes through
- * `t()` in `useTransactionHeaders`, with these as the fallback, so this
- * module stays free of i18n plumbing and usable outside React.
+ * Headings are still the English literals they have always been. They are
+ * safe to translate, unlike the filter values, because no route passes
+ * `sortableColumns` for this table and so no heading doubles as a sort key
+ * (issue #678 blocks the holders table for exactly that reason). Doing it
+ * belongs with the work that moves the cells themselves, not here, where the
+ * point is that the two lists stop drifting apart.
  *
  * A cell's `span` is not repeated here. It lives on the `IRowSection` the row
  * builder returns, which is the only place `Table` reads it from; a copy here
@@ -49,16 +43,10 @@ export interface ITransactionColumn {
  */
 const BASE_COLUMNS: ITransactionColumn[] = [
   { key: 'hash', header: 'Transaction Hash' },
+  { key: 'blockFees', header: 'Block/Fees' },
+  { key: 'fromTo', header: 'From/To' },
   { key: 'type', header: 'Type' },
-  { key: 'block', header: 'Block' },
-  { key: 'age', header: 'Age' },
-  { key: 'from', header: 'From' },
-  // The circled status arrow between the addresses; deliberately unheaded,
-  // like the reference explorers.
-  { key: 'direction', header: '' },
-  { key: 'to', header: 'To' },
-  { key: 'amount', header: 'Amount' },
-  { key: 'fee', header: 'Fee' },
+  { key: 'misc', header: 'Misc' },
 ];
 
 const IN_OUT_COLUMN: ITransactionColumn = {
@@ -66,8 +54,8 @@ const IN_OUT_COLUMN: ITransactionColumn = {
   header: 'In/Out',
 };
 
-/** Position of the In/Out column, directly after To. */
-const IN_OUT_INDEX = 7;
+/** Position of the In/Out column, directly after From/To. */
+const IN_OUT_INDEX = 3;
 
 /**
  * The routes whose request layer actually narrows the list to one account.
@@ -103,6 +91,10 @@ export const getTransactionColumns = ({
   return columns;
 };
 
+export const getTransactionHeaders = (
+  context: ITransactionColumnsContext,
+): string[] => getTransactionColumns(context).map(column => column.header);
+
 /**
  * Whether this list carries a direction. Both the headings and the cells ask
  * this, so they agree about the column's existence by construction.
@@ -119,21 +111,3 @@ export const showsInOut = (router: {
   // never equal, so the column would read "In" for every row.
   return typeof account === 'string' && account !== '';
 };
-
-/** Walking the list, not narrowing it. Neither changes which rows qualify. */
-const PAGINATION_KEYS = new Set(['page', 'limit']);
-
-/**
- * Whether this list still holds the whole chain.
- *
- * Asked by the summary above it, whose figures are chain-wide. Every filter
- * this page offers narrows the rows underneath while leaving those figures
- * alone, and nothing in their labels says "network", so a card reading 8.19K
- * transactions and a bar two thirds transfers would sit above a table of
- * nothing but smart contract calls and read as its summary.
- *
- * Any parameter that is not paging counts as a filter, so a filter added
- * later is covered without anyone remembering to list it here.
- */
-export const listsWholeChain = (router: { query?: ParsedUrlQuery }): boolean =>
-  Object.keys(router?.query ?? {}).every(key => PAGINATION_KEYS.has(key));

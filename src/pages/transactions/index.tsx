@@ -2,39 +2,31 @@ import { Transactions as Icon } from '@/assets/title-icons';
 import ExplorerLink from '@/components/ExplorerLink';
 import Title from '@/components/Layout/Title';
 import LinkWithDropdown from '@/components/LinkWithDropdown';
+import { MultiContractToolTip } from '@/components/MultiContractToolTip';
 import Table, { ITable } from '@/components/Table';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import {
   getTransactionColumns,
-  listsWholeChain,
   showsInOut,
   TransactionColumnKey,
 } from '@/components/TransactionsList/columns';
-import { BadgePill, VisuallyHidden } from '@/components/DataList/styles';
-import { CustomFieldWrapper } from '@/components/Table/styles';
 import {
-  InOutBadge,
-  MultiContractBadge,
-  statusVariant,
-  TransactionTypeBadge,
-} from '@/components/TransactionsList/badges';
-import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
-import ContractTargetLabel from '@/components/TransactionsList/ContractTargetLabel';
-import {
-  getTransactionRowDetails,
-  valueDirection,
-} from '@/components/TransactionsList/rowDetails';
-import TransactionsSummary from '@/components/TransactionsList/Summary';
-import {
-  ContractMark,
-  DirectionStatusBadge,
-  TransactionsTableWrapper,
-} from '@/components/TransactionsList/styles';
+  CustomFieldWrapper,
+  InOutSpan,
+  Status,
+  TimestampInfo,
+} from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import { useMobile } from '@/contexts/mobile';
 import api from '@/services/api';
-import { CenteredRow, Container, Header, Mono } from '@/styles/common';
+import {
+  CenteredRow,
+  Container,
+  DoubleRow,
+  Header,
+  Mono,
+} from '@/styles/common';
 import {
   IAssetTransactionResponse,
   IClaimReceipt,
@@ -43,9 +35,11 @@ import {
   ITransaction,
 } from '@/types';
 import {
+  Contract,
   ContractsName,
   IBuyContractPayload,
   IContract,
+  ITransferContract,
 } from '@/types/contracts';
 import {
   contractTypes,
@@ -54,22 +48,12 @@ import {
 } from '@/utils/contracts';
 import { capitalizeString } from '@/utils/convertString';
 import { findReceipt } from '@/utils/findKey';
-import {
-  formatAmount,
-  formatDate,
-  formatDateWithSeconds,
-} from '@/utils/formatFunctions';
+import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { TXType } from '@klever/connect';
 import { GetServerSideProps } from 'next';
-import {
-  MdAccessTime,
-  MdArrowForward,
-  MdOutlineDescription,
-  MdPriorityHigh,
-} from 'react-icons/md';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -81,17 +65,8 @@ interface IRequestTxQuery {
   asset?: string;
   address?: string;
 }
-
-/** One glyph per status, so the arrow's color is never the only signal. */
-const DIRECTION_GLYPHS = {
-  success: MdArrowForward,
-  danger: MdPriorityHigh,
-  warning: MdAccessTime,
-  neutral: MdArrowForward,
-} as const;
 export const toAddressSectionElement = (
   toAddress: string,
-  chars = 16,
 ): React.ReactElement => {
   if (toAddress === '--') {
     return <Mono>{toAddress}</Mono>;
@@ -99,27 +74,26 @@ export const toAddressSectionElement = (
   return (
     <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
       <Link href={`/account/${toAddress}`} key={toAddress} className="address">
-        <Mono>{parseAddress(toAddress, chars)}</Mono>
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
       </Link>
     </LinkWithDropdown>
   );
 };
 export const mobileAddressSectionElement = (
   toAddress: string,
-  chars = 16,
 ): React.ReactElement => {
   const { isMobile } = useMobile();
   if (isMobile) {
     return (
       <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
-        <Mono>{parseAddress(toAddress, chars)}</Mono>
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
       </LinkWithDropdown>
     );
   }
   return (
     <LinkWithDropdown link={`/account/${toAddress}`} address={toAddress}>
       <Link href={`/account/${toAddress}`} key={toAddress} className="address">
-        <Mono>{parseAddress(toAddress, chars)}</Mono>
+        <Mono>{parseAddress(toAddress, 16)}</Mono>
       </Link>
     </LinkWithDropdown>
   );
@@ -287,254 +261,142 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
   } = props;
   const router = useRouter();
 
+  let toAddress = '--';
   const contractType = contractTypes(contract);
-  // The counterparty, the second type badge and the contract-mark tooltip,
-  // straight from the raw parameter (the misc columns' element output cannot
-  // feed a string tooltip).
-  const details = getTransactionRowDetails({
-    contract,
-    contractType,
-    data,
-    sender,
-    receipts,
-  });
+  if (contractType === Contract.Transfer) {
+    const parameter = contract[0].parameter as ITransferContract;
 
-  const inOrOut = valueDirection({
-    account:
-      typeof router?.query?.account === 'string'
-        ? router.query.account
-        : undefined,
-    sender,
-    contractType,
-    receipts,
-  });
+    toAddress = parameter.toAddress;
+  }
+
+  const inOrOut = router?.query?.account === sender ? 'Out' : 'In';
 
   const customFields = getCustomFields(contract, receipts, precision, data);
-  const customLabels = getLabelForTableField(contractType) ?? [];
-  // Amount first, else Price: a buy or a sell moves the amount its price
-  // names, and those label sets carry no field literally called Amount.
-  //
-  // This reads a position out of `contractLabels` and uses it to index the
-  // elements `filteredSections` built, so the two lists have to stay in the
-  // same order. They do today, checked per type: Transfer 0, Freeze 0,
-  // Claim 0, Vote 1, Withdraw 1, Buy 2, Sell 2, Deposit 2. Reordering either
-  // one alone puts the wrong field in this column with nothing to catch it,
-  // and nothing can: both modules reach the ESM dependency Jest cannot
-  // transform, so neither is importable by a unit test. If you touch the
-  // order in `@/utils/contracts` or `@/utils/transactionListSections`, this
-  // is what you break.
-  const amountLabelIndex = customLabels.indexOf('Amount');
-  const amountIndex =
-    amountLabelIndex >= 0 ? amountLabelIndex : customLabels.indexOf('Price');
-
-  // Computed once per row render, not inside the tooltip: the tooltip body
-  // mounts on hover, and a fresh formatDate there made the visible elapsed
-  // time jump the moment the pointer touched it.
-  const ageFullDate = formatDateWithSeconds(timestamp || Date.now());
-  // formatDate's elapsed form is "<n> <unit> ago (<date> UTC)"; the column
-  // shows the first half, the tooltip the full date.
-  const ageElapsed = formatDate(timestamp || Date.now(), {
-    showElapsedTime: true,
-  }).split(' (')[0];
-
-  const emptyCell = (
-    <>
-      {/* English like every other literal this builder renders: t() is out
-          of reach here, the builder also runs for the header-string probe
-          outside any i18n context. */}
-      <span aria-hidden="true">- -</span>
-      <VisuallyHidden>Not applicable</VisuallyHidden>
-    </>
-  );
 
   const sectionByColumn: Record<TransactionColumnKey, IRowSection> = {
     hash: {
       element: props => (
-        <CenteredRow key={hash}>
+        <DoubleRow {...props} key={hash}>
           <ExplorerLink
             type="transaction"
             value={hash}
-            label={parseAddress(hash, 14)}
+            label={parseAddress(hash, 24)}
             compact
-            dataTestId="transaction-link"
           />
-        </CenteredRow>
-      ),
-      span: 1,
-      // Hinted like every other column: the one unhinted column would
-      // absorb all of the table's slack and open a gulf behind the hash.
-      width: 190,
-    },
-    type: {
-      element: props => (
-        <CenteredRow key={contractType}>
-          {contractType === 'Multi contract' ? (
-            <MultiContractBadge contract={contract} />
-          ) : (
-            <TransactionTypeBadge
-              label={
-                ContractsName[contractType as keyof typeof ContractsName] ??
-                contractType
-              }
-              contractType={contractType}
-            />
-          )}
-          {/* The refinement the Misc column used to carry (StakingClaim,
-              Mint, MarketBuy, ...), now riding with its type. */}
-          {details.typeDetail && (
-            <BadgePill $variant="neutral">{details.typeDetail}</BadgePill>
-          )}
-        </CenteredRow>
-      ),
-      span: 1,
-      width: 170,
-    },
-    block: {
-      element: props => (
-        <ExplorerLink type="block" value={String(blockNum || 0)} compact />
-      ),
-      span: 1,
-      width: 95,
-    },
-    age: {
-      element: props => (
-        <Tooltip
-          msg={ageFullDate}
-          focusable
-          Component={() => (
-            <CustomFieldWrapper>{ageElapsed}</CustomFieldWrapper>
-          )}
-        />
-      ),
-      span: 1,
-      width: 110,
-    },
-    from: {
-      element: props => (
-        <CenteredRow key={sender}>
-          {/* 16, the same as everywhere else, and not the 12 this column
-              briefly used to buy width.
-
-              A bech32 address ends in a six character checksum and opens with
-              a constant prefix, so 12 shows an attacker two free characters
-              to reproduce where 16 shows six: 2^40 against 2^60, hours of
-              grinding on one GPU against longer than anyone will wait. That
-              is the price of a poisoned row whose From cell reads exactly
-              like a real one, and the cell offers a prefilled transfer.
-
-              The width it bought did not settle anything either. Measured at
-              this font, the four characters are 33.7px a column and 67px
-              across both, against a 100px overflow at a 1100px viewport: the
-              table scrolled sideways at 12 as well, and at 1280 it scrolls at
-              neither. */}
-          {mobileAddressSectionElement(sender, 16)}
-        </CenteredRow>
-      ),
-      span: 1,
-      width: 140,
-    },
-    direction: {
-      element: props => {
-        // Glyph and color vary together (arrow, exclamation, clock), so the
-        // state survives color blindness; the word rides in the focusable
-        // tooltip and in hidden text.
-        const DirectionGlyph = DIRECTION_GLYPHS[statusVariant(status)];
-        return (
-          <CenteredRow key={status}>
-            <Tooltip
-              msg={capitalizeString(status ?? '')}
-              focusable
-              Component={() => (
-                <DirectionStatusBadge $variant={statusVariant(status)}>
-                  <DirectionGlyph size={11} aria-hidden="true" />
-                  <VisuallyHidden>
-                    {`Status: ${capitalizeString(status ?? '')}`}
-                  </VisuallyHidden>
-                </DirectionStatusBadge>
-              )}
-            />
+          <CenteredRow>
+            <TimestampInfo>
+              {formatDate(timestamp || Date.now(), {
+                showElapsedTime: true,
+              })}
+            </TimestampInfo>
+            <Status status={status?.toLowerCase()}>
+              {capitalizeString(status)}
+            </Status>
           </CenteredRow>
-        );
-      },
-      span: 1,
-      width: 36,
+        </DoubleRow>
+      ),
+      span: 2,
     },
-    to: {
+    blockFees: {
       element: props => (
-        <CenteredRow key={details.target?.address ?? '--'}>
-          {details.target ? (
-            <>
-              <ExplorerLink
-                type={details.target.isContract ? 'smart-contract' : 'account'}
-                value={details.target.address}
-                label={
-                  <ContractTargetLabel
-                    address={details.target.address}
-                    isContract={details.target.isContract}
-                    truncateTo={16}
-                  />
-                }
-                // The label brings its own typography: a resolved contract
-                // name is words, the address it falls back to is a hash.
-                mono={false}
-                compact
-              />
-              {/* After the address, not before: this way every address in
-                  the column starts at the same x. */}
-              {details.target.isContract && (
-                <Tooltip
-                  msg={details.contractTooltip ?? 'Contract'}
-                  focusable
-                  Component={() => (
-                    <ContractMark>
-                      <MdOutlineDescription size={14} aria-hidden="true" />
-                      <VisuallyHidden>
-                        {details.contractTooltip ?? 'Contract'}
-                      </VisuallyHidden>
-                    </ContractMark>
-                  )}
-                />
-              )}
-            </>
-          ) : (
-            emptyCell
-          )}
-        </CenteredRow>
+        <DoubleRow {...props} key={blockNum}>
+          <ExplorerLink type="block" value={String(blockNum || 0)} compact />
+          <span>
+            {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+          </span>
+        </DoubleRow>
       ),
       span: 1,
-      width: 150,
+    },
+    fromTo: {
+      element: props => (
+        <DoubleRow {...props} key={sender}>
+          {mobileAddressSectionElement(sender)}
+          {toAddressSectionElement(toAddress)}
+        </DoubleRow>
+      ),
+      span: 1,
     },
     inOut: {
       element: props => (
-        <CenteredRow key={inOrOut}>
-          {/* No badge where the transaction says nothing about direction: a
-              delegation aimed at this validator, or a send that failed and
-              moved nothing. Claiming one would be worse than leaving it. */}
-          {inOrOut ? <InOutBadge direction={inOrOut} /> : emptyCell}
-        </CenteredRow>
+        <DoubleRow {...props} key={inOrOut}>
+          <CenteredRow>
+            {contractType === 'TransferContractType' ? (
+              <InOutSpan status={inOrOut === 'In' ? 'success' : 'pending'}>
+                {inOrOut}
+              </InOutSpan>
+            ) : (
+              <InOutSpan status={'icon'}>- -</InOutSpan>
+            )}
+          </CenteredRow>
+        </DoubleRow>
       ),
       span: 1,
-      width: 70,
     },
-    amount: {
-      element: props => (
-        <CenteredRow>
-          {amountIndex >= 0 && customFields[amountIndex]
-            ? customFields[amountIndex]
-            : emptyCell}
-        </CenteredRow>
-      ),
+    type: {
+      element: props =>
+        contractType === 'Multi contract' ? (
+          <DoubleRow {...props}>
+            <MultiContractToolTip
+              contract={contract}
+              contractType={contractType}
+            />
+            <CenteredRow>- -</CenteredRow>
+          </DoubleRow>
+        ) : (
+          <DoubleRow {...props}>
+            <CenteredRow key={contractType}>
+              <span>
+                {ContractsName[contractType as keyof typeof ContractsName]}
+              </span>
+            </CenteredRow>
+            <CenteredRow>
+              {getLabelForTableField(contractType)?.[0] ? (
+                <Tooltip
+                  msg={getLabelForTableField(contractType)[0]}
+                  Component={() => (
+                    <>
+                      <CustomFieldWrapper>{customFields[0]}</CustomFieldWrapper>
+                    </>
+                  )}
+                />
+              ) : (
+                <span> - - </span>
+              )}
+            </CenteredRow>
+          </DoubleRow>
+        ),
       span: 1,
-      width: 130,
     },
-    fee: {
-      element: props => (
-        <span>
-          {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
-        </span>
-      ),
+    misc: {
+      element: props =>
+        contractType ? (
+          <DoubleRow {...props}>
+            {getLabelForTableField(contractType)?.[1] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[1]}
+                Component={() => (
+                  <CustomFieldWrapper>{customFields[1]}</CustomFieldWrapper>
+                )}
+              />
+            ) : (
+              <span> - - </span>
+            )}
+            {getLabelForTableField(contractType)?.[2] ? (
+              <Tooltip
+                msg={getLabelForTableField(contractType)[2]}
+                Component={() => (
+                  <CustomFieldWrapper>{customFields[2]}</CustomFieldWrapper>
+                )}
+              />
+            ) : (
+              <span> - - </span>
+            )}
+          </DoubleRow>
+        ) : (
+          <></>
+        ),
       span: 1,
-      width: 100,
     },
   };
 
@@ -557,8 +419,6 @@ const Transactions: React.FC<PropsWithChildren> = () => {
     dataName: 'transactions',
     request: (page, limit) => requestTransactionsDefault(page, limit, router),
     Filters: TransactionsFilters,
-    MobileCard: TransactionsMobileCard,
-    singleLineSkeleton: true,
   };
 
   return (
@@ -567,16 +427,7 @@ const Transactions: React.FC<PropsWithChildren> = () => {
         <Title title={t('common:Titles.Transactions')} Icon={Icon} />
       </Header>
 
-      {/* Only above an unscoped list. Every filter this page offers narrows
-          the rows below while leaving these figures chain-wide, so above a
-          filtered table they would describe something the reader is not
-          looking at. `?account=` is one of those filters: the query is mapped
-          onto `address` before the request goes out. */}
-      {listsWholeChain(router) && <TransactionsSummary />}
-
-      <TransactionsTableWrapper>
-        <Table {...tableProps} />
-      </TransactionsTableWrapper>
+      <Table {...tableProps} />
     </Container>
   );
 };

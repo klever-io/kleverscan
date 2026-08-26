@@ -70,19 +70,9 @@ export const CardContainer = styled.section`
   }
 `;
 
-/**
- * The surface a field, a select or a small card sits on.
- *
- * `white` in both themes: the token is the raised surface, not the colour
- * white, so it reads #fff in the light theme and #151515 in the dark one.
- * Dark used to reach for the table background here instead, which measured
- * 1.03 against the page where the light theme's equivalent measures 1.10, and
- * which was a third value agreeing with neither the page nor the cards. The
- * light theme already puts fields and cards on one surface; this makes dark
- * do the same.
- */
 export const DefaultCardStyles = css`
-  background-color: ${props => props.theme.white};
+  background-color: ${props =>
+    props.theme.dark ? props.theme.table.background : props.theme.white};
 `;
 
 export const DefaultCardStyleWithBorder = css`

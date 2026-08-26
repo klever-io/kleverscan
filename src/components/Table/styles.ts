@@ -17,22 +17,13 @@ export const ContainerView = styled.div`
   width: 100%;
 `;
 
-/**
- * The card's own surface, plus the gradient hairline around it.
- *
- * The fill is `white` in both themes on purpose. That token is the raised
- * surface, not the colour white: #fff in the light theme and #151515 in the
- * dark one. Filling the dark card with `background` instead, as this did,
- * gave it exactly the page's own colour, so a table and a summary card had no
- * surface at all and the hairline was left holding them together on its own.
- * Measured: interior against page was 1.00 in dark and 1.10 in light; reading
- * `white` in both makes it 1.11, the same step the light theme has.
- */
 export const TableGradientBorder = css`
   border: 1px solid transparent;
   background-image: linear-gradient(
-      ${props => props.theme.white},
-      ${props => props.theme.white}
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white},
+      ${props =>
+        props.theme.dark ? props.theme.background : props.theme.white}
     ),
     linear-gradient(
       to bottom,
@@ -175,7 +166,7 @@ export const TableRow = styled.div<TableRowProps>`
       ${props =>
         props.theme.dark ? props.theme.darkGray : props.theme.black10};
 
-    background-color: ${props => props.theme.white};
+    background-color: ${props => props.theme.table.background};
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -362,6 +353,10 @@ export const Status = styled.span<IStatus>`
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     width: fit-content;
   }
+`;
+
+export const InOutSpan = styled(Status)`
+  min-width: 50px !important;
 `;
 
 export const EmptyRow = styled.div`

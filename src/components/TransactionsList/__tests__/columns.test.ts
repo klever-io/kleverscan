@@ -118,6 +118,16 @@ describe('transaction table columns', () => {
     });
 
     it.each([
+      ['a campaign parameter', { utm_source: 'twitter' }],
+      ['a click id', { fbclid: 'abc123' }],
+      ['a filter left empty by the UI', { type: '' }],
+    ])('is true with %s, which narrows nothing', (_label, query) => {
+      // These reach the page on shared links. Reading anything unrecognised
+      // as a filter hid the card on every one of them.
+      expect(listsWholeChain({ query })).toBe(true);
+    });
+
+    it.each([
       ['an account', { account: 'klv1abc' }],
       ['a contract type', { type: '63' }],
       ['a status', { status: 'Success' }],

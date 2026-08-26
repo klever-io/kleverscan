@@ -108,7 +108,7 @@ export const accountsTotalCall = async (): Promise<number | undefined> => {
  */
 export const accountsCreatedCall = async (
   days: number,
-): Promise<number[] | undefined> => {
+): Promise<(number | undefined)[] | undefined> => {
   const response: IYesterdayResponse = await api.get({
     // Escaped even though the only caller passes a module constant, because a
     // route segment goes into the URL raw: `getHost` concatenates it without
@@ -120,12 +120,13 @@ export const accountsCreatedCall = async (
   // Same reason as the call above: a failure resolves rather than rejects, and
   // an empty series is a different statement from a failed request.
   if (response?.error) return undefined;
-  return (
-    (response?.data?.number_by_day ?? [])
-      .map(day => day?.doc_count)
-      // Anything that is not a real count is dropped rather than carried: one
-      // undefined would turn the sum into NaN and print "NaN" where a figure
-      // belongs.
-      .filter((count): count is number => Number.isFinite(count))
+  return (response?.data?.number_by_day ?? []).map(day =>
+    // A day that carries no usable count becomes a hole, not a missing entry.
+    // Filtering it out instead would slide every later day forward, and the
+    // caller reads position 1 as yesterday: given [10, undefined, 4] it would
+    // report the day before yesterday as yesterday's figure, and call two
+    // non-adjacent days a two-day span. A hole keeps the positions honest and
+    // still keeps the value out of any sum.
+    Number.isFinite(day?.doc_count) ? day.doc_count : undefined,
   );
 };

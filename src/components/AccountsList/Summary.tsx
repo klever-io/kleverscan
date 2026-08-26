@@ -19,6 +19,14 @@ import {
   TrendNote,
 } from './styles';
 
+/**
+ * Pinned rather than left to the browser, the way the assets registry strip
+ * pins its own counts. Bare toLocaleString() formats in the reader's browser
+ * locale, which can differ from the page's: a Dutch browser would print
+ * 176.197 beside English labels, and the site ships one locale.
+ */
+const NUMBER_LOCALE = 'en-US';
+
 /** Days of history fetched. The first entry is the running 24 hours. */
 const WINDOW_DAYS = 7;
 
@@ -65,12 +73,18 @@ const AccountsSummary: React.FC = () => {
   if (!data) return null;
 
   const { totalRecords, series } = data;
+  // Read by position, because that is what makes them today and yesterday. A
+  // hole is undefined here, which is not the same as a day on which nothing
+  // happened, and the tiles below leave it out rather than printing a zero.
   const today = series[0];
-  // Undefined where the series is too short to have one, which is not the same
-  // as a day on which nothing happened.
-  const yesterday = series.length > 1 ? series[1] : undefined;
-  const weekTotal = series.length
-    ? series.reduce((sum, count) => sum + count, 0)
+  const yesterday = series[1];
+  // Summed over the days that carried a figure, and the span below counts
+  // those same days, so the total and its label describe one set of days.
+  const counted = series.filter(
+    (count): count is number => count !== undefined,
+  );
+  const weekTotal = counted.length
+    ? counted.reduce((sum, count) => sum + count, 0)
     : undefined;
 
   const change =
@@ -97,7 +111,9 @@ const AccountsSummary: React.FC = () => {
                   reader may want to quote. Locale-formatted like the home
                   page renders the same number; the query is unresolved during
                   SSR, so the server renders the skeleton and never this. */}
-              <TileValue>{totalRecords.toLocaleString()}</TileValue>
+              <TileValue>
+                {totalRecords.toLocaleString(NUMBER_LOCALE)}
+              </TileValue>
             </TileValueRow>
             <TileSub>
               {t('accounts:List.OnChain', { defaultValue: 'on chain' })}
@@ -111,7 +127,7 @@ const AccountsSummary: React.FC = () => {
               {t('accounts:List.New24h', { defaultValue: 'New (24h)' })}
             </TileLabel>
             <TileValueRow>
-              <TileValue>{today.toLocaleString()}</TileValue>
+              <TileValue>{today.toLocaleString(NUMBER_LOCALE)}</TileValue>
             </TileValueRow>
             {change !== undefined && (
               <TileSub>
@@ -122,7 +138,7 @@ const AccountsSummary: React.FC = () => {
                 <TrendNote>
                   {t('accounts:List.VersusYesterday', {
                     defaultValue: '{{change}} vs yesterday',
-                    change: `${change > 0 ? '+' : ''}${change.toLocaleString()}`,
+                    change: `${change > 0 ? '+' : ''}${change.toLocaleString(NUMBER_LOCALE)}`,
                   })}
                 </TrendNote>
               </TileSub>
@@ -139,7 +155,7 @@ const AccountsSummary: React.FC = () => {
               })}
             </TileLabel>
             <TileValueRow>
-              <TileValue>{weekTotal.toLocaleString()}</TileValue>
+              <TileValue>{weekTotal.toLocaleString(NUMBER_LOCALE)}</TileValue>
             </TileValueRow>
             <TileSub>
               {/* The days actually summed, not the days asked for: a short
@@ -147,7 +163,7 @@ const AccountsSummary: React.FC = () => {
                   through i18next's `count`, so the one-day case the API can
                   return does not read "across 1 days". */}
               {t('accounts:List.AcrossDays', {
-                count: series.length,
+                count: counted.length,
                 defaultValue_one: 'across {{count}} day',
                 defaultValue_other: 'across {{count}} days',
               })}

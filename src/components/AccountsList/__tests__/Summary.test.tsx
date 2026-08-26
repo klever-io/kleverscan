@@ -132,7 +132,12 @@ const renderSummary = () =>
  *  card is still loading: the loading shape renders no text and no testid, and
  *  both would satisfy an "is absent" check. */
 const settled = async (): Promise<void> =>
-  waitForElementToBeRemoved(() => screen.getByLabelText('Account statistics'));
+  // queryBy, not getBy: the callback form lets waitForElementToBeRemoved say
+  // "already absent" instead of throwing the getter's own not-found error,
+  // which would read as a failure of the thing being waited for.
+  waitForElementToBeRemoved(() =>
+    screen.queryByLabelText('Account statistics'),
+  );
 
 /** The loaded card, which the loading shape deliberately does not carry. */
 const loaded = async (): Promise<HTMLElement> =>
@@ -229,8 +234,8 @@ describe('AccountsSummary', () => {
     expect(container.textContent).toBe('');
   });
 
-  it('sums only the days that carried a count', async () => {
-    createdCall.mockResolvedValue([5, 4]);
+  it('sums only the days that carried a count, and counts those days', async () => {
+    createdCall.mockResolvedValue([5, undefined, 4]);
     renderSummary();
     const card = await loaded();
 
@@ -239,6 +244,28 @@ describe('AccountsSummary', () => {
     // tile above reads "176,197", which contains a 9 and would satisfy a
     // textContent check on its own.
     expect(within(card).getByText('9')).toBeTruthy();
+    // Two days carried a figure out of the three the window returned, and the
+    // label describes the days that were summed.
     expect(card.textContent).toContain('across 2 days');
+  });
+
+  it('says nothing about yesterday when yesterday is the hole', async () => {
+    createdCall.mockResolvedValue([10, undefined, 4]);
+    renderSummary();
+    const card = await loaded();
+
+    // The trap this guards: compacting the series to [10, 4] would make the
+    // day before yesterday stand in for yesterday and report "+6".
+    expect(card.textContent).not.toContain('vs yesterday');
+    expect(within(card).getByText('10')).toBeTruthy();
+  });
+
+  it('still reads yesterday from position one when an older day is missing', async () => {
+    createdCall.mockResolvedValue([10, 9, undefined, 4]);
+    renderSummary();
+    const card = await loaded();
+
+    expect(card.textContent).toContain('+1 vs yesterday');
+    expect(card.textContent).toContain('across 3 days');
   });
 });

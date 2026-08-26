@@ -170,14 +170,33 @@ describe('accountsCreatedCall', () => {
     await expect(accountsCreatedCall(7)).resolves.toBeUndefined();
   });
 
-  it('drops a day that carries no count, rather than yielding NaN later', async () => {
+  it('leaves a hole for a day with no count, keeping the later days in place', async () => {
     mockedGet.mockResolvedValue({
       data: { number_by_day: [{ doc_count: 5 }, { key: 2 }, { doc_count: 4 }] },
       error: '',
       code: 'successful',
     });
 
-    await expect(accountsCreatedCall(7)).resolves.toEqual([5, 4]);
+    // Not [5, 4]. Compacting slides day two into position one, and the caller
+    // reads position one as yesterday, so it would report the day before
+    // yesterday as yesterday's figure.
+    await expect(accountsCreatedCall(7)).resolves.toEqual([5, undefined, 4]);
+  });
+
+  it('treats a non-numeric count as a hole rather than passing it on', async () => {
+    mockedGet.mockResolvedValue({
+      data: {
+        number_by_day: [
+          { doc_count: 5 },
+          { doc_count: null },
+          { doc_count: 4 },
+        ],
+      },
+      error: '',
+      code: 'successful',
+    });
+
+    await expect(accountsCreatedCall(7)).resolves.toEqual([5, undefined, 4]);
   });
 
   it('escapes the segment, so a caller cannot extend the path', async () => {

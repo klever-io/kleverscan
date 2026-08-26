@@ -17,8 +17,10 @@ import {
 import { formatShare } from '@/components/DataList/format';
 import {
   ITransactionTypeShare,
+  buildBreakdown,
   summaryVariation,
   totalGrowth,
+  transactionsBreakdownCall,
   transactionsSummaryCall,
 } from '@/services/requests/transactions/summary';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -26,6 +28,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useTheme } from 'styled-components';
+import { useDeferred } from './useDeferred';
 import {
   PageSummaryCard,
   PageSummaryLoading,
@@ -63,6 +66,20 @@ const TransactionsSummary: React.FC = () => {
     staleTime: 60_000,
   });
 
+  // Long enough that a reader who clicks straight through never spends these
+  // four, short enough that the bar is not visibly late.
+  const deferred = useDeferred(600);
+
+  const { data: typeCounts } = useQuery({
+    queryKey: ['transactionsBreakdown'],
+    queryFn: transactionsBreakdownCall,
+    // Four requests for a bar nobody waits on, so they stay out of the
+    // opening burst. Not gated on the tiles: waiting for the total first put
+    // the bar six seconds out when the API answered slowly.
+    enabled: deferred,
+    staleTime: 60_000,
+  });
+
   if (isLoading) {
     return <PageSummaryLoading label={label} tiles={3} bar />;
   }
@@ -87,10 +104,10 @@ const TransactionsSummary: React.FC = () => {
 
   // The shares sum to the window's own total; using that sum rather than
   // last24h keeps the bar full even if the parts answered moments apart.
-  const breakdownTotal = summary.breakdown.reduce(
-    (sum, share) => sum + share.count,
-    0,
-  );
+  const breakdown = typeCounts
+    ? buildBreakdown(summary.last24h, typeCounts)
+    : [];
+  const breakdownTotal = breakdown.reduce((sum, share) => sum + share.count, 0);
 
   return (
     <PageSummaryCard aria-label={label}>
@@ -210,7 +227,7 @@ const TransactionsSummary: React.FC = () => {
       {/* Same shape as the assets registry strip, deliberately: tiles, then
           the bar, then its legend, with no heading in between, so both
           summary cards stand the same height on their pages. */}
-      {summary.breakdown.length > 1 && breakdownTotal > 0 && (
+      {breakdown.length > 1 && breakdownTotal > 0 && (
         <>
           <DistBar
             role="img"
@@ -218,7 +235,7 @@ const TransactionsSummary: React.FC = () => {
               defaultValue: 'Contract types in the last 24 hours',
             })}
           >
-            {summary.breakdown.map((share, index) => (
+            {breakdown.map((share, index) => (
               <DistSegment
                 key={share.name}
                 $color={segmentColor(share, index)}
@@ -232,7 +249,7 @@ const TransactionsSummary: React.FC = () => {
             ))}
           </DistBar>
           <LegendRow>
-            {summary.breakdown.map((share, index) => (
+            {breakdown.map((share, index) => (
               <LegendItem key={share.name}>
                 <LegendDot $color={segmentColor(share, index)} />
                 {share.name === 'Other'

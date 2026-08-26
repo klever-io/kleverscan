@@ -78,13 +78,18 @@ jest.mock('react-dom', () => {
 });
 
 const summaryCall = jest.fn();
+const breakdownCall = jest.fn();
 
-// Only the request is replaced. The arithmetic beside it stays real, so a
+// Only the requests are replaced. The arithmetic beside them stays real, so a
 // change to what "grew by" means is caught here as well as in its own spec.
 jest.mock('@/services/requests/transactions/summary', () => ({
   ...jest.requireActual('@/services/requests/transactions/summary'),
   transactionsSummaryCall: () => summaryCall(),
+  transactionsBreakdownCall: () => breakdownCall(),
 }));
+
+let deferralPassed = false;
+jest.mock('../useDeferred', () => ({ useDeferred: () => deferralPassed }));
 
 import TransactionsSummary from '../Summary';
 
@@ -93,12 +98,10 @@ const FULL = {
   previous24h: 8000,
   totalTransactions: 58558891,
   mostTransactedAsset: { assetId: 'KLV', count: 4000 },
-  breakdown: [
-    { name: 'Transfer', count: 5000 },
-    { name: 'Smart Contract', count: 2000 },
-    { name: 'Other', count: 1247 },
-  ],
 };
+
+/** Raw counts per named type, in the order the bar draws them. */
+const COUNTS = [5000, 2000, 600, 400];
 
 const renderSummary = () =>
   render(
@@ -123,6 +126,9 @@ const digitsOf = (text: string): string => text.replace(/\D/g, '');
 
 beforeEach(() => {
   summaryCall.mockReset();
+  breakdownCall.mockReset();
+  breakdownCall.mockResolvedValue(COUNTS);
+  deferralPassed = false;
 });
 
 describe('TransactionsSummary', () => {
@@ -186,8 +192,32 @@ describe('TransactionsSummary', () => {
     expect(screen.queryByText('Transactions (24h)')).toBeNull();
   });
 
+  it('leaves the composition bar unasked for while the page is still working', async () => {
+    summaryCall.mockResolvedValue(FULL);
+
+    renderSummary();
+
+    // The tiles are there, so the card has rendered and the query had its
+    // chance; four requests for the bar simply were not spent yet.
+    expect(await screen.findByText('Total transactions')).toBeTruthy();
+    expect(breakdownCall).not.toHaveBeenCalled();
+    expect(screen.queryByLabelText(/Contract types/)).toBeNull();
+  });
+
+  it('asks for it once the page falls idle, against the window it belongs to', async () => {
+    deferralPassed = true;
+    summaryCall.mockResolvedValue(FULL);
+
+    renderSummary();
+
+    expect(
+      await screen.findByLabelText('Contract types in the last 24 hours'),
+    ).toBeTruthy();
+    expect(breakdownCall).toHaveBeenCalled();
+  });
+
   it('draws no card at all when every figure is missing', async () => {
-    summaryCall.mockResolvedValue({ breakdown: [] });
+    summaryCall.mockResolvedValue({});
 
     renderSummary();
 

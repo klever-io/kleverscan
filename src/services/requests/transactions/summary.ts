@@ -40,8 +40,6 @@ export interface ITransactionTypeShare {
 export interface ITransactionsSummary {
   last24h?: number;
   previous24h?: number;
-  /** Last 24 hours by contract type, largest first, with the remainder. */
-  breakdown: ITransactionTypeShare[];
   totalTransactions?: number;
   mostTransactedAsset?: { assetId: string; count: number };
 }
@@ -91,7 +89,7 @@ const mostTransactedCall = async (): Promise<
  * for two dozen more counts, and it is clamped at zero because its parts
  * are separate requests that can answer moments apart.
  */
-const buildBreakdown = (
+export const buildBreakdown = (
   total: number | undefined,
   typeCounts: Array<number | undefined>,
 ): ITransactionTypeShare[] => {
@@ -115,41 +113,50 @@ const buildBreakdown = (
 };
 
 /**
- * One request per figure, in parallel. Each part answers a neutral value on
- * failure rather than throwing: the summary sits above the transactions
- * table and must never be the reason a reader cannot see the list.
+ * The three tiles. One request per figure, in parallel, each answering a
+ * neutral value on failure rather than throwing: the summary sits above the
+ * transactions table and must never be the reason a reader cannot see it.
+ *
+ * The composition bar is not here. It costs one request per named type, four
+ * of the seven this card used to spend before the list had painted, so it is
+ * asked for separately once the page is idle.
  */
 export const transactionsSummaryCall =
   async (): Promise<ITransactionsSummary> => {
-    const [buckets, totalTransactions, mostTransactedAsset, ...typeBuckets] =
-      await Promise.all([
-        countsCall(),
-        totalCall(),
-        mostTransactedCall(),
-        ...BREAKDOWN_TYPES.map(type => countsCall(type)),
-      ]);
-
-    const last24h = buckets?.[0]?.doc_count;
+    const [buckets, totalTransactions, mostTransactedAsset] = await Promise.all(
+      [countsCall(), totalCall(), mostTransactedCall()],
+    );
 
     return {
-      last24h,
+      last24h: buckets?.[0]?.doc_count,
       previous24h: buckets?.[1]?.doc_count,
-      breakdown: buildBreakdown(
-        last24h,
-        // The distinction survives only here: countsCall answers undefined
-        // for a request that failed and an empty list for one that succeeded
-        // with nothing to report. Read straight off the bucket both look the
-        // same, and a failure would be drawn as a genuine zero.
-        typeBuckets.map(typeBucket =>
-          typeBucket === undefined
-            ? undefined
-            : (typeBucket[0]?.doc_count ?? 0),
-        ),
-      ),
       totalTransactions,
       mostTransactedAsset,
     };
   };
+
+/**
+ * One count per named type, in the order the bar draws them.
+ *
+ * The window's own total is not needed here and is deliberately not waited
+ * for: asking for it first made these four queue behind the tiles, which on a
+ * slow answer put the bar six seconds out. `buildBreakdown` folds the two
+ * together once both have landed.
+ */
+export const transactionsBreakdownCall = async (): Promise<
+  Array<number | undefined>
+> => {
+  const typeBuckets = await Promise.all(
+    BREAKDOWN_TYPES.map(type => countsCall(type)),
+  );
+
+  // countsCall answers undefined for a request that failed and an empty list
+  // for one that succeeded with nothing to report. Read straight off the
+  // bucket both look the same, and a failure would draw as a real zero.
+  return typeBuckets.map(typeBucket =>
+    typeBucket === undefined ? undefined : (typeBucket[0]?.doc_count ?? 0),
+  );
+};
 
 /**
  * Change from the previous 24 hours, as a fraction. Undefined when there is

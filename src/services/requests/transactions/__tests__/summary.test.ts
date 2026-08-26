@@ -1,7 +1,9 @@
 import api from '@/services/api';
 import {
+  buildBreakdown,
   summaryVariation,
   totalGrowth,
+  transactionsBreakdownCall,
   transactionsSummaryCall,
 } from '../summary';
 
@@ -83,7 +85,7 @@ describe('transactionsSummaryCall', () => {
   it('breaks the window down by contract type, largest first', async () => {
     answerEach({ count: { data: { number_by_day: buckets } } });
 
-    const { breakdown } = await transactionsSummaryCall();
+    const breakdown = buildBreakdown(8447, await transactionsBreakdownCall());
 
     expect(breakdown).toEqual([
       { name: 'Transfer', count: 5747 },
@@ -98,7 +100,7 @@ describe('transactionsSummaryCall', () => {
   it('leaves a type out when it did nothing in the window', async () => {
     answerEach({ count: { data: { number_by_day: buckets } } }, { 0: 8447 });
 
-    const { breakdown } = await transactionsSummaryCall();
+    const breakdown = buildBreakdown(8447, await transactionsBreakdownCall());
 
     expect(breakdown).toEqual([{ name: 'Transfer', count: 8447 }]);
   });
@@ -114,7 +116,7 @@ describe('transactionsSummaryCall', () => {
       },
     );
 
-    const { breakdown } = await transactionsSummaryCall();
+    const breakdown = buildBreakdown(100, await transactionsBreakdownCall());
 
     expect(breakdown.map(share => share.name)).toEqual([
       'Transfer',
@@ -134,7 +136,6 @@ describe('transactionsSummaryCall', () => {
     expect(summary).toEqual({
       last24h: undefined,
       previous24h: undefined,
-      breakdown: [],
       totalTransactions: undefined,
       mostTransactedAsset: undefined,
     });
@@ -155,7 +156,6 @@ describe('transactionsSummaryCall', () => {
 
     expect(summary.last24h).toBeUndefined();
     expect(summary.previous24h).toBeUndefined();
-    expect(summary.breakdown).toEqual([]);
     expect(summary.totalTransactions).toBe(58_500_000);
     expect(summary.mostTransactedAsset?.assetId).toBe('KLV');
   });
@@ -180,7 +180,8 @@ describe('transactionsSummaryCall', () => {
       },
     );
 
-    const { breakdown, last24h } = await transactionsSummaryCall();
+    const { last24h } = await transactionsSummaryCall();
+    const breakdown = buildBreakdown(8447, await transactionsBreakdownCall());
 
     // The tile above it still has its figure; only the composition is dropped.
     expect(last24h).toBe(8447);

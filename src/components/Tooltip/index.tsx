@@ -10,6 +10,13 @@ interface ITooltipProps {
   customStyles?: ICustomStyles;
   minMsgLength?: number;
   maxVw?: number;
+  /**
+   * Opt-in: the trigger joins the tab order and the tooltip opens on focus,
+   * for tooltips whose message is not readable anywhere else on the page.
+   * Off by default so existing hover-hint tooltips do not become extra tab
+   * stops.
+   */
+  focusable?: boolean;
 }
 
 const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
@@ -18,6 +25,7 @@ const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
   customStyles,
   minMsgLength = 0,
   maxVw,
+  focusable = false,
 }) => {
   const [displayMessage, setDisplayMessage] = useState(false);
   const parsedMsgs = msg.split('\n');
@@ -26,6 +34,11 @@ const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
       className="button-tooltip"
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
+      {...(focusable && {
+        tabIndex: 0,
+        onFocus: () => setDisplayMessage(true),
+        onBlur: () => setDisplayMessage(false),
+      })}
       maxVw={maxVw}
     >
       {Component ? (

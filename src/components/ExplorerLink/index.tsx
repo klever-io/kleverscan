@@ -28,9 +28,18 @@ const routes: Record<ExplorerLinkType, string> = {
 interface ExplorerLinkProps {
   type: ExplorerLinkType;
   value?: string;
-  label?: string;
+  /** Plain text, or a node for a label that decides its own typography. */
+  label?: React.ReactNode;
   /** Use in table row sections — hides icons inside a hover dropdown */
   compact?: boolean;
+  /** Testid for the link itself, e.g. the smoke suite's transaction-link. */
+  dataTestId?: string;
+  /**
+   * Overrides the monospace an address type gets by default. A label that
+   * renders a name rather than a hash sets this, because a name belongs in
+   * the page font.
+   */
+  mono?: boolean;
 }
 
 const monoTypes: ExplorerLinkType[] = [
@@ -45,6 +54,8 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
   value,
   label,
   compact,
+  dataTestId,
+  mono,
 }) => {
   if (!value) {
     return <span>{label || '--'}</span>;
@@ -52,22 +63,27 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
 
   const href = `${routes[type]}/${value}`;
   const displayText = label || value;
-  const text = monoTypes.includes(type) ? (
-    <Mono>{displayText}</Mono>
-  ) : (
-    displayText
-  );
+  const text =
+    (mono ?? monoTypes.includes(type)) ? (
+      <Mono>{displayText}</Mono>
+    ) : (
+      displayText
+    );
 
   if (compact) {
     return (
       <LinkWithDropdown link={href} address={value || ''} entity={type}>
-        <Link href={href}>{text}</Link>
+        <Link href={href} data-testid={dataTestId}>
+          {text}
+        </Link>
       </LinkWithDropdown>
     );
   }
   return (
     <CenteredRow>
-      <Link href={href}>{text}</Link>
+      <Link href={href} data-testid={dataTestId}>
+        {text}
+      </Link>
       <a
         href={href}
         target="_blank"

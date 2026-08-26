@@ -3,7 +3,7 @@ import { TableGradientBorder } from '@/components/Table/styles';
 import { DefaultCardStyles } from '@/styles/common';
 import { DataCardDefaultStyles } from '@/views/home';
 import Image from 'next/legacy/image';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 interface IVariation {
   positive: boolean;
 }
@@ -106,16 +106,16 @@ export const CardContentError = styled(CardContent)`
   justify-content: center;
 `;
 
+/**
+ * The loading shape sits inside the coin card, so it takes the same surface
+ * the card does in both themes. It used to hardcode the near-black the card
+ * itself once borrowed from the page; now that the card has a surface of its
+ * own, that value would draw a darker rectangle where the seam should be
+ * invisible.
+ */
 export const CardContainerSkeleton = styled(CardContainer)`
   padding: 1.5rem 1.5rem 1.5rem 1.5rem;
-  ${props =>
-    props.theme.dark
-      ? css`
-          background-color: ${props.theme.true.newBlack} !important;
-        `
-      : css`
-          ${DefaultCardStyles}
-        `};
+  ${DefaultCardStyles}
 `;
 
 export const HeaderContainer = styled.div`

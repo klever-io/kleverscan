@@ -542,12 +542,6 @@ export const LegendDot = styled.span<{ $color: string }>`
   background-color: ${props => props.$color};
 `;
 
-export const SummarySkeletonRow = styled.div`
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-`;
-
 /* ------------------------------ mobile card ------------------------------ */
 
 export const MobileListCard = styled.div`

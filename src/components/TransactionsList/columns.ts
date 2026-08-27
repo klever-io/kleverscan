@@ -120,20 +120,34 @@ export const showsInOut = (router: {
   return typeof account === 'string' && account !== '';
 };
 
-/** Walking the list, not narrowing it. Neither changes which rows qualify. */
-const PAGINATION_KEYS = new Set(['page', 'limit']);
+/** The parameters that narrow this list, named rather than inferred. */
+const FILTER_KEYS = new Set([
+  'type',
+  'status',
+  'asset',
+  'buyType',
+  'account',
+  'startdate',
+  'enddate',
+]);
 
 /**
  * Whether this list still holds the whole chain.
  *
- * Asked by the summary above it, whose figures are chain-wide. Every filter
- * this page offers narrows the rows underneath while leaving those figures
- * alone, and nothing in their labels says "network", so a card reading 8.19K
- * transactions and a bar two thirds transfers would sit above a table of
- * nothing but smart contract calls and read as its summary.
+ * Asked by the summary above it, whose figures are chain-wide. A filter
+ * narrows the rows underneath while leaving those figures alone, so the card
+ * would read as a summary of a table it does not describe.
  *
- * Any parameter that is not paging counts as a filter, so a filter added
- * later is covered without anyone remembering to list it here.
+ * Named filters rather than "anything that is not paging": that inverted form
+ * also hid the card for `?utm_source=`, so every shared campaign link lost it.
+ * A filter added later has to be added here too.
  */
+/** Next hands back an array for a repeated parameter, so `?type=&type=`
+ * arrives as `['', '']` and a comparison against `''` would call it a filter. */
+const narrows = (value: string | string[] | undefined): boolean =>
+  Array.isArray(value) ? value.some(Boolean) : Boolean(value);
+
 export const listsWholeChain = (router: { query?: ParsedUrlQuery }): boolean =>
-  Object.keys(router?.query ?? {}).every(key => PAGINATION_KEYS.has(key));
+  !Object.entries(router?.query ?? {}).some(
+    ([key, value]) => FILTER_KEYS.has(key) && narrows(value),
+  );

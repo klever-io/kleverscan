@@ -237,6 +237,20 @@ describe('accountsCreatedCall', () => {
   });
 });
 
+/** A page with no pagination block at all, which is what a degraded or
+ *  changed endpoint can answer beside a perfectly good 200. */
+const noCountPage = (count: number, offset = 0) => ({
+  data: {
+    validators: Array.from({ length: count }, (_, i) => ({
+      ownerAddress: `owner${offset + i}`,
+      registerNonce: 5,
+      list: 'eligible',
+    })),
+  },
+  error: '',
+  code: 'successful',
+});
+
 const validatorPage = (
   owners: { address: string; nonce?: number; list?: string }[],
   totalRecords: number,
@@ -299,9 +313,53 @@ describe('validatorOwnersCall', () => {
       ),
     );
 
-    await validatorOwnersCall();
-
+    await expect(validatorOwnersCall()).resolves.toBeUndefined();
     expect(mockedGet).toHaveBeenCalledTimes(50);
+  });
+
+  it('keeps paging a full page that carries no count at all', async () => {
+    // The count is the only thing that ends the loop early, so a body without
+    // one used to break and hand back page 1 as the whole set: 100 owners
+    // where mainnet has 208, and every validator past the break un-badged.
+    mockedGet
+      .mockResolvedValueOnce(noCountPage(100))
+      .mockResolvedValueOnce(noCountPage(100, 100))
+      .mockResolvedValueOnce(noCountPage(8, 200));
+
+    const owners = await validatorOwnersCall();
+
+    expect(mockedGet).toHaveBeenCalledTimes(3);
+    expect(Object.keys(owners ?? {})).toHaveLength(208);
+  });
+
+  it('takes a short page without a count as the whole set', async () => {
+    // The other side of the same rule: a page the endpoint could not fill is
+    // the end of the data, so it must not cost a second request.
+    mockedGet.mockResolvedValueOnce(noCountPage(7));
+
+    const owners = await validatorOwnersCall();
+
+    expect(mockedGet).toHaveBeenCalledTimes(1);
+    expect(Object.keys(owners ?? {})).toHaveLength(7);
+  });
+
+  it('rejects a count that arrives as something other than a number', async () => {
+    // `totalRecords: null` and `"208"` both fail the `typeof` test, and a full
+    // page under either has to keep going rather than settle.
+    mockedGet
+      .mockResolvedValueOnce({
+        ...noCountPage(100),
+        pagination: { totalRecords: '208' },
+      })
+      .mockResolvedValueOnce({
+        ...noCountPage(4, 100),
+        pagination: { totalRecords: null },
+      });
+
+    const owners = await validatorOwnersCall();
+
+    expect(mockedGet).toHaveBeenCalledTimes(2);
+    expect(Object.keys(owners ?? {})).toHaveLength(104);
   });
 
   it('stops on an empty page even when the count disagrees', async () => {
@@ -444,8 +502,9 @@ describe('genesisAccountsCall', () => {
     expect(queryOf(1).page).toBe(2);
   });
 
-  it('stops at the page cap when the count never becomes reachable', async () => {
-    // Without the cap this runs forever; an off-by-one in the bound stays invisible until a chain reaches it.
+  it('gives up at the page cap rather than returning the pages it did get', async () => {
+    // Without the cap this runs forever, and stopping at it used to hand back
+    // 2000 accounts against a claimed million as though that were the window.
     mockedGet.mockResolvedValue({
       data: {
         accounts: Array.from({ length: 100 }, (_, i) => ({ address: `a${i}` })),
@@ -455,10 +514,39 @@ describe('genesisAccountsCall', () => {
       code: 'successful',
     });
 
-    await expect(genesisAccountsCall(1656680400000)).resolves.toHaveLength(
-      2000,
-    );
+    await expect(genesisAccountsCall(1656680400000)).resolves.toBeUndefined();
     expect(mockedGet).toHaveBeenCalledTimes(20);
+  });
+
+  it('keeps paging a full window page that carries no count', async () => {
+    const page = (count: number, offset: number) => ({
+      data: {
+        accounts: Array.from({ length: count }, (_, i) => ({
+          address: `a${offset + i}`,
+        })),
+      },
+      error: '',
+      code: 'successful',
+    });
+    mockedGet
+      .mockResolvedValueOnce(page(100, 0))
+      .mockResolvedValueOnce(page(12, 100));
+
+    await expect(genesisAccountsCall(1656680400000)).resolves.toHaveLength(112);
+    expect(mockedGet).toHaveBeenCalledTimes(2);
+  });
+
+  it('takes a short window page without a count as the whole window', async () => {
+    mockedGet.mockResolvedValueOnce({
+      data: {
+        accounts: Array.from({ length: 40 }, (_, i) => ({ address: `a${i}` })),
+      },
+      error: '',
+      code: 'successful',
+    });
+
+    await expect(genesisAccountsCall(1656680400000)).resolves.toHaveLength(40);
+    expect(mockedGet).toHaveBeenCalledTimes(1);
   });
 
   it('gives up entirely when a later page fails, not a short window', async () => {

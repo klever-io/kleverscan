@@ -125,7 +125,7 @@ export const validatorOwnersCall = async (): Promise<
     if (response?.error) return undefined;
 
     const validators = response?.data?.validators ?? [];
-    if (validators.length === 0) break;
+    if (validators.length === 0) return owners;
 
     validators.forEach(
       (validator: {
@@ -143,10 +143,19 @@ export const validatorOwnersCall = async (): Promise<
 
     collected += validators.length;
     total = response?.pagination?.totalRecords;
-    if (typeof total !== 'number' || collected >= total) break;
+    // Without a usable count, a page the endpoint could not fill is the end of
+    // the set; a full one is not, because complete and truncated look the same
+    // from here, so it keeps asking until a short or empty page proves it.
+    const complete =
+      typeof total === 'number'
+        ? collected >= total
+        : validators.length < VALIDATOR_PAGE_SIZE;
+    if (complete) return owners;
   }
 
-  return owners;
+  // The cap ran out with the set still unfinished: returning what was collected
+  // would present a truncated map as the whole validator set.
+  return undefined;
 };
 
 /** The moment the chain started. Fetched, not hardcoded: mainnet opened
@@ -201,12 +210,18 @@ export const genesisAccountsCall = async (
     if (response?.error) return undefined;
 
     const batch = response?.data?.accounts ?? [];
-    if (batch.length === 0) break;
+    if (batch.length === 0) return accounts;
     accounts.push(...batch);
 
     total = response?.pagination?.totalRecords;
-    if (typeof total !== 'number' || accounts.length >= total) break;
+    // Same rule as the validator set above: a short page ends it, a full one
+    // without a count does not.
+    const complete =
+      typeof total === 'number'
+        ? accounts.length >= total
+        : batch.length < GENESIS_PAGE_SIZE;
+    if (complete) return accounts;
   }
 
-  return accounts;
+  return undefined;
 };

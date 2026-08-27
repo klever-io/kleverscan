@@ -108,6 +108,10 @@ export interface ITable<TCard = Record<string, never>> {
   rightAlignedSkeletonColumns?: number[];
 }
 
+/** Floor for a loading bar, so a narrow column gets a placeholder rather than
+ *  a sliver. Below the 58px the narrowest column measured while loading. */
+const SKELETON_MIN_WIDTH = '2rem';
+
 const onErrorHandler = () => {
   return {
     onError: (err: unknown): void => {
@@ -366,24 +370,31 @@ const Table = <TCard,>({
                           <DoubleRow {...props}>
                             {/* A block inside a column flex, so the cell's
                                 text-align does not reach it; the skin decides
-                                per column which edge the bar hugs. */}
+                                per column which edge the bar hugs. The floor
+                                is for narrow columns: the proposals table has
+                                one 58px wide while loading, where a bare 30%
+                                is an 8px sliver that reads as an artefact. */}
                             {!singleLineSkeleton && (
                               <Skeleton
                                 width={index2 === 0 ? '40%' : '30%'}
-                                containerCustomStyles={
-                                  rightAlignedSkeletonColumns.includes(index2)
+                                containerCustomStyles={{
+                                  minWidth: SKELETON_MIN_WIDTH,
+                                  ...(rightAlignedSkeletonColumns.includes(
+                                    index2,
+                                  )
                                     ? { marginLeft: 'auto' }
-                                    : undefined
-                                }
+                                    : {}),
+                                }}
                               />
                             )}
                             <Skeleton
                               width={index2 === 0 ? '70%' : '40%'}
-                              containerCustomStyles={
-                                rightAlignedSkeletonColumns.includes(index2)
+                              containerCustomStyles={{
+                                minWidth: SKELETON_MIN_WIDTH,
+                                ...(rightAlignedSkeletonColumns.includes(index2)
                                   ? { marginLeft: 'auto' }
-                                  : undefined
-                              }
+                                  : {}),
+                              }}
                             />
                           </DoubleRow>
                         </MobileCardItem>

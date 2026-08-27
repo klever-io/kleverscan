@@ -4,7 +4,7 @@ import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { processRowSectionsLayout } from '@/utils/table';
+import { normalizePageParam, processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
@@ -103,7 +103,14 @@ export interface ITable<TCard = Record<string, never>> {
    * suits tables stacking a value over a label.
    */
   singleLineSkeleton?: boolean;
+  /** Column indexes whose loading bar hugs the right edge, matching a skin
+   *  that right-aligns those cells; default all-left, as unskinned tables. */
+  rightAlignedSkeletonColumns?: number[];
 }
+
+/** Floor for a loading bar, so a narrow column gets a placeholder rather than
+ *  a sliver. Below the 58px the narrowest column measured while loading. */
+const SKELETON_MIN_WIDTH = '2rem';
 
 const onErrorHandler = () => {
   return {
@@ -133,6 +140,7 @@ const Table = <TCard,>({
   MobileCard,
   mobileCardProps,
   singleLineSkeleton = false,
+  rightAlignedSkeletonColumns = [],
 }: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -141,8 +149,11 @@ const Table = <TCard,>({
 
   const tableRef = React.useRef<HTMLDivElement>(null);
 
-  const page = Number(router.query?.page) || 1;
-  const limit = Number(router.query?.limit) || 10;
+  // Clamped where they enter and used everywhere below, request included: the
+  // API answers 500 "invalid pagination parameter" for a raw `3.5`, and the
+  // loading render's `Array(limit)` RangeError lands server-side as a 500.
+  const page = normalizePageParam(router.query?.page, 1);
+  const limit = normalizePageParam(router.query?.limit, 10, 100);
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -152,17 +163,18 @@ const Table = <TCard,>({
         responseFormatted = {
           items: response.data[dataName],
           totalPages: response?.pagination?.totalPages,
+          perPage: response?.pagination?.perPage,
         };
         return responseFormatted;
       }
 
-      return { items: [], totalPages: 0 };
+      return { items: [], totalPages: 0, perPage: 0 };
     } catch (error) {
       // React Query rejects an undefined result outright ("data is
       // undefined") instead of storing it, so a failed request would land the
       // table in an error state; an empty page shows the empty state.
       console.error(error);
-      return { items: [], totalPages: 0 };
+      return { items: [], totalPages: 0, perPage: 0 };
     }
   };
 
@@ -180,26 +192,14 @@ const Table = <TCard,>({
       refreshKey,
     ],
 
-    queryFn: () =>
-      tableRequest(
-        Number(router.query?.page) || 1,
-        Number(router.query?.limit) || 10,
-      ),
+    queryFn: () => tableRequest(page, limit),
 
     // Keep the current rows on screen while the next page loads. Swapping
     // them for placeholders and back made paging flicker.
     placeholderData: keepPreviousData,
 
-    // A step out and back is a common move, and every list here costs a
-    // round trip the API answers in about a second. Inside this window the
-    // rows a reader just looked at are shown again without asking for them a
-    // second time. A page load, a filter change and the refresh control all
-    // bypass it, so nothing here can pin a stale list on screen.
-    //
-    // Only a list that actually has rows. `tableRequest` turns every failure
-    // into an empty result and react-query files that as a success, so
-    // without this an API that was briefly down would keep answering "no data
-    // here" from cache for ten seconds instead of retrying on the next mount.
+    // Re-shows just-read rows on a step out and back (a round trip costs about
+    // a second). Only lists with rows: failures arrive as empty successes.
     staleTime: query =>
       (query.state.data as { items?: unknown[] } | undefined)?.items?.length
         ? 10_000
@@ -271,7 +271,7 @@ const Table = <TCard,>({
                         );
                         refetch();
                       }}
-                      active={value === (Number(router.query?.limit) || limit)}
+                      active={value === limit}
                     >
                       {value}
                     </ItemContainer>
@@ -293,7 +293,12 @@ const Table = <TCard,>({
                   <ExportButton
                     items={response?.items}
                     tableRequest={tableRequest}
-                    totalRecords={response?.totalPages * limit || 10000}
+                    // `perPage` as the API applied it: it caps a page at 100,
+                    // so multiplying by the asked-for limit halves the export.
+                    totalRecords={
+                      response?.totalPages * (response?.perPage || limit) ||
+                      10000
+                    }
                   />
                 )}
               </ExportContainer>
@@ -363,10 +368,34 @@ const Table = <TCard,>({
                           smaller={smaller}
                         >
                           <DoubleRow {...props}>
-                            {!singleLineSkeleton && type !== 'accounts' && (
-                              <Skeleton width="100%" />
+                            {/* A block inside a column flex, so the cell's
+                                text-align does not reach it; the skin decides
+                                per column which edge the bar hugs. The floor
+                                is for narrow columns: the proposals table has
+                                one 58px wide while loading, where a bare 30%
+                                is an 8px sliver that reads as an artefact. */}
+                            {!singleLineSkeleton && (
+                              <Skeleton
+                                width={index2 === 0 ? '40%' : '30%'}
+                                containerCustomStyles={{
+                                  minWidth: SKELETON_MIN_WIDTH,
+                                  ...(rightAlignedSkeletonColumns.includes(
+                                    index2,
+                                  )
+                                    ? { marginLeft: 'auto' }
+                                    : {}),
+                                }}
+                              />
                             )}
-                            <Skeleton width="100%" />
+                            <Skeleton
+                              width={index2 === 0 ? '70%' : '40%'}
+                              containerCustomStyles={{
+                                minWidth: SKELETON_MIN_WIDTH,
+                                ...(rightAlignedSkeletonColumns.includes(index2)
+                                  ? { marginLeft: 'auto' }
+                                  : {}),
+                              }}
+                            />
                           </DoubleRow>
                         </MobileCardItem>
                       );
@@ -471,7 +500,7 @@ const Table = <TCard,>({
             <Pagination
               tableRef={tableRef}
               count={response?.totalPages}
-              page={Number(router.query?.page) || page}
+              page={page}
               onPaginate={page => {
                 setQueryAndRouter(
                   { ...router.query, page: page.toString() },

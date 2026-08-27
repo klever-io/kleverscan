@@ -30,6 +30,10 @@ export const useContractName = (
     staleTime: CONTRACT_NAME_STALE_TIME,
     // A contract without a name is a settled answer, not a failure to retry.
     retry: false,
+    // A failed lookup must not re-arm on every remount: the shared Table
+    // rebuilds each cell on re-render, and `staleTime` does not cover an
+    // errored query where `retryOnMount` does. Failure rate: see names.ts.
+    retryOnMount: false,
   });
 
   return data ?? undefined;

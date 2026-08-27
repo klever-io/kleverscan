@@ -16,4 +16,19 @@ describe('formatDateWithSeconds', () => {
     expect(formatDateWithSeconds(0)).toBe('01/01/70 00:00:00 UTC');
     expect(formatDateWithSeconds(Number.NaN)).toBe('01/01/70 00:00:00 UTC');
   });
+
+  it('renders the epoch for a timestamp past the Date range', () => {
+    // Beyond 8.64e15 a Date is Invalid and every getter answers NaN; both scaling loops
+    // fall through (NaN compares false either way) and the output was "NaN/NaN/aN NaN:NaN:NaN UTC".
+    expect(formatDateWithSeconds(9e15)).toBe('01/01/70 00:00:00 UTC');
+    expect(formatDateWithSeconds(Number.MAX_SAFE_INTEGER)).toBe(
+      '01/01/70 00:00:00 UTC',
+    );
+  });
+
+  it('scales a timestamp above the year 3000 back down', () => {
+    // The other half of the normalisation, and the only path that divides.
+    // 4e13 ms is the year 3237, inside the Date range, so it reaches the loop rather than the guard.
+    expect(formatDateWithSeconds(4e13)).toBe('04/08/71 23:06:40 UTC');
+  });
 });

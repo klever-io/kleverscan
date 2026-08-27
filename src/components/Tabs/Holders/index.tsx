@@ -345,6 +345,7 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
     MobileCard: HoldersMobileCard,
     mobileCardProps: { asset, summary, sortedByTotal },
     singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [2, 3, 4],
   };
 
   return (

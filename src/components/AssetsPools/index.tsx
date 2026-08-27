@@ -254,6 +254,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
     MobileCard: PoolsMobileCard,
     Filters,
     singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [1, 2, 3],
   };
 
   // The assets page renders one shared title above its tabs, so this tab

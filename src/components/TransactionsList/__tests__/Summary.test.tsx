@@ -89,7 +89,9 @@ jest.mock('@/services/requests/transactions/summary', () => ({
 }));
 
 let deferralPassed = false;
-jest.mock('../useDeferred', () => ({ useDeferred: () => deferralPassed }));
+jest.mock('@/components/DataList/useDeferred', () => ({
+  useDeferred: () => deferralPassed,
+}));
 
 import TransactionsSummary from '../Summary';
 

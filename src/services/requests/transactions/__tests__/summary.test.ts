@@ -200,6 +200,17 @@ describe('transactionsSummaryCall', () => {
     expect(summary.totalTransactions).toBe(0);
   });
 
+  it('treats a null total as absent rather than passing it on', async () => {
+    // `!== undefined` upstream lets a null through, and the tile then calls toLocaleString on it mid-render.
+    answerEach({
+      list: { pagination: { totalRecords: null } },
+    });
+
+    const summary = await transactionsSummaryCall();
+
+    expect(summary.totalTransactions).toBeUndefined();
+  });
+
   it('survives a statistics answer with no assets in it', async () => {
     answerEach({ statistics: { data: { most_transacted: [] } } });
 

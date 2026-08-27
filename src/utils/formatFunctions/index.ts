@@ -2,7 +2,7 @@ import { ISelectedDays } from '@/components/DateFilter';
 import { IFilterDater } from '@/types';
 import { bech32 } from 'bech32';
 import { format } from 'date-fns';
-import { getAge } from '../timeFunctions';
+import { getAge, normalizeTimestamp } from '../timeFunctions';
 import { TFunction } from 'i18next';
 
 /**
@@ -17,15 +17,7 @@ export const formatDate = (
     t: undefined,
   },
 ): string => {
-  while (new Date(timestamp).getFullYear() < 2000) {
-    timestamp = timestamp * 10 ** 3;
-  }
-
-  while (new Date(timestamp).getFullYear() > 3000) {
-    timestamp = timestamp / 10 ** 3;
-  }
-
-  const date = new Date(timestamp || 0);
+  const date = new Date(normalizeTimestamp(timestamp));
   const relativeTime = getAge(date, t);
 
   const year = date.getUTCFullYear();
@@ -48,22 +40,7 @@ export const formatDate = (
  * milliseconds depending on the endpoint.
  */
 export const formatDateWithSeconds = (timestamp: number): string => {
-  // Multiplying 0 (or anything non-positive) never reaches the year 2000,
-  // so without this clamp the normalization below would loop forever; the
-  // epoch renders instead.
-  if (!Number.isFinite(timestamp) || timestamp <= 0) {
-    timestamp = 0;
-  }
-
-  while (timestamp > 0 && new Date(timestamp).getFullYear() < 2000) {
-    timestamp = timestamp * 10 ** 3;
-  }
-
-  while (new Date(timestamp).getFullYear() > 3000) {
-    timestamp = timestamp / 10 ** 3;
-  }
-
-  const date = new Date(timestamp || 0);
+  const date = new Date(normalizeTimestamp(timestamp));
   const year = String(date.getUTCFullYear()).slice(-2);
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
   const day = String(date.getUTCDate()).padStart(2, '0');

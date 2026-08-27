@@ -4,7 +4,7 @@ import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { processRowSectionsLayout } from '@/utils/table';
+import { normalizePageParam, processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
@@ -148,11 +148,8 @@ const Table = <TCard,>({
   // that throw happens server-side and answers 500; `?limit=1e9` allocates a
   // billion rows there first. 100 is well above the 10/20/50 the control offers,
   // and is also where the API caps a page.
-  const page = Math.max(1, Math.floor(Number(router.query?.page) || 1));
-  const limit = Math.min(
-    Math.max(1, Math.floor(Number(router.query?.limit) || 10)),
-    100,
-  );
+  const page = normalizePageParam(router.query?.page, 1);
+  const limit = normalizePageParam(router.query?.limit, 10, 100);
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -284,7 +281,7 @@ const Table = <TCard,>({
                         );
                         refetch();
                       }}
-                      active={value === (Number(router.query?.limit) || limit)}
+                      active={value === limit}
                     >
                       {value}
                     </ItemContainer>
@@ -510,7 +507,7 @@ const Table = <TCard,>({
             <Pagination
               tableRef={tableRef}
               count={response?.totalPages}
-              page={Number(router.query?.page) || page}
+              page={page}
               onPaginate={page => {
                 setQueryAndRouter(
                   { ...router.query, page: page.toString() },

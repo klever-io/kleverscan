@@ -71,8 +71,12 @@ const AccountsSummary: React.FC = () => {
       const cached = query.state.data as
         | { totalRecords?: number; series?: unknown[] }
         | undefined;
+      // At least one figure that actually arrived. A series is positional and
+      // keeps a hole for a day with no usable count, so its length alone is
+      // true for `[undefined, undefined, ...]`, which is a failed strip.
       const answered =
-        cached?.totalRecords !== undefined || !!cached?.series?.length;
+        cached?.totalRecords !== undefined ||
+        !!cached?.series?.some(day => day !== undefined);
       return answered ? 5 * 60 * 1000 : 0;
     },
   });

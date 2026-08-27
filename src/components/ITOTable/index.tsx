@@ -3,7 +3,7 @@ import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { processRowSectionsLayout } from '@/utils/table';
+import { normalizePageParam, processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
@@ -106,11 +106,8 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
   // throw happens on the server and answers 500; `?limit=1e9` allocates a
   // billion rows there before it can. 100 is the largest size the control
   // offers.
-  const limit = Math.min(
-    Math.max(1, Math.floor(Number(router.query?.limit) || 10)),
-    100,
-  );
-  const page = Math.max(1, Math.floor(Number(router.query?.page) || 1));
+  const limit = normalizePageParam(router.query?.limit, 10, 100);
+  const page = normalizePageParam(router.query?.page, 1);
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -227,7 +224,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                       );
                       refetch();
                     }}
-                    active={value === (Number(router.query?.limit) || limit)}
+                    active={value === limit}
                   >
                     {value}
                   </ItemContainer>
@@ -343,7 +340,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
           <PaginationContainer>
             <Pagination
               count={response?.totalPages}
-              page={Number(router.query?.page) || page}
+              page={page}
               onPaginate={page => {
                 setQueryAndRouter(
                   { ...router.query, page: page.toString() },

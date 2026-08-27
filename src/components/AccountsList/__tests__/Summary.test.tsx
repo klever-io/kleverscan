@@ -139,6 +139,18 @@ const settled = async (): Promise<void> =>
     screen.queryByLabelText('Account statistics'),
   );
 
+/** Two mounts sharing one cache, which is what a client-side navigation back
+ *  to this page is. renderSummary builds a fresh client per call, so it can
+ *  never observe what the strip does or does not re-request. */
+const renderShared = (client: QueryClient) =>
+  render(
+    <QueryClientProvider client={client}>
+      <ThemeProvider theme={theme}>
+        <AccountsSummary />
+      </ThemeProvider>
+    </QueryClientProvider>,
+  );
+
 /** The loaded card, which the loading shape deliberately does not carry. */
 const loaded = async (): Promise<HTMLElement> =>
   waitFor(() => screen.getByTestId('accounts-summary'));
@@ -282,5 +294,43 @@ describe('AccountsSummary', () => {
 
     expect(card.textContent).toContain('+1 vs yesterday');
     expect(card.textContent).toContain('across 3 days');
+  });
+
+  it('asks again on the next mount when nothing but holes came back', async () => {
+    // A series is positional and keeps a hole for a day with no usable count,
+    // so its length is non-zero even when every entry is a hole. That is a
+    // wholly failed strip, which the queryFn still files as a success, and
+    // measuring the answer by length alone pinned it for five minutes: the
+    // strip stayed gone across client-side navigation until a full reload.
+    totalCall.mockResolvedValue(undefined);
+    createdCall.mockResolvedValue([undefined, undefined, undefined]);
+
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    const first = renderShared(client);
+    await waitFor(() => expect(createdCall).toHaveBeenCalledTimes(1));
+    expect(first.container.textContent).toBe('');
+    first.unmount();
+
+    renderShared(client);
+    await waitFor(() => expect(createdCall).toHaveBeenCalledTimes(2));
+  });
+
+  it('keeps a real answer out of a second request on the next mount', async () => {
+    // The other half of the same rule, so the fix above cannot be "never
+    // cache": a strip that answered stays cached across a remount.
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    renderShared(client).unmount();
+    await waitFor(() => expect(createdCall).toHaveBeenCalledTimes(1));
+
+    renderShared(client);
+    await loaded();
+    expect(createdCall).toHaveBeenCalledTimes(1);
+    expect(totalCall).toHaveBeenCalledTimes(1);
   });
 });

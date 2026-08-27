@@ -22,6 +22,17 @@ const LABEL = 15;
 const VALUE = 27.5;
 const SUB = 16.5;
 
+/**
+ * Bar widths, set just above the median of what the real lines occupy.
+ * Measured across the three strips that render this: the labels take 14 to 36
+ * percent of a tile, the values 6 to 28, the subs 12 to 32. The previous
+ * 55/45/35 drew a bar seven times the width of "86", which is what made the
+ * loading state read as a different layout rather than the same one.
+ */
+const LABEL_W = '32%';
+const VALUE_W = '18%';
+const SUB_W = '24%';
+
 /** The bar and the legend under it, each with the margin above it. */
 const BAR = 8;
 const LEGEND = 16.5;
@@ -65,10 +76,10 @@ const SummaryLoading: React.FC<ISummaryLoadingProps> = ({
     <TilesGrid>
       {Array.from({ length: tiles }, (_, index) => (
         <Tile key={index}>
-          <Skeleton width="55%" height={LABEL} />
-          <Skeleton width="45%" height={VALUE} />
+          <Skeleton width={LABEL_W} height={LABEL} />
+          <Skeleton width={VALUE_W} height={VALUE} />
           <Skeleton
-            width="35%"
+            width={SUB_W}
             height={SUB}
             containerCustomStyles={{ marginTop: 2 }}
           />

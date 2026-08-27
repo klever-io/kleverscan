@@ -29,7 +29,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useTheme } from 'styled-components';
-import { useDeferred } from './useDeferred';
+import { useDeferred } from '@/components/DataList/useDeferred';
 import {
   PageSummaryCard,
   PageSummaryLoading,

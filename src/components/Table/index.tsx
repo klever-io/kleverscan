@@ -363,8 +363,10 @@ const Table = <TCard,>({
                           smaller={smaller}
                         >
                           <DoubleRow {...props}>
-                            {!singleLineSkeleton && <Skeleton width="100%" />}
-                            <Skeleton width="100%" />
+                            {!singleLineSkeleton && (
+                              <Skeleton width={index2 === 0 ? '40%' : '30%'} />
+                            )}
+                            <Skeleton width={index2 === 0 ? '70%' : '40%'} />
                           </DoubleRow>
                         </MobileCardItem>
                       );

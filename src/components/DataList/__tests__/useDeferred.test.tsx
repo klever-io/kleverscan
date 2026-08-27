@@ -205,4 +205,22 @@ describe('useDeferred', () => {
 
     expect(state()).toBe('yes');
   });
+
+  it('releases at the hard ceiling even while a request is still in flight', () => {
+    // The narrowed ceiling above is right, but `api.get` sets no fetch timeout,
+    // so a stalled connection would otherwise hold the deferred request for the
+    // life of the page. Late is better than never.
+    fetching.count = 1;
+    renderProbe();
+
+    act(() => {
+      jest.advanceTimersByTime(14000);
+    });
+    expect(state()).toBe('no');
+
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+    expect(state()).toBe('yes');
+  });
 });

@@ -113,7 +113,14 @@ export const accountsFilteredCall = async ({
     return emptyPage('validator set unavailable');
   }
 
-  const genesis = await genesisAccountsCall(genesisTimestamp);
+  // Through the cache too, keyed on the instant it was fetched for. The set is
+  // as immutable as block 0 is, so paging inside a filter costs nothing after
+  // the first page instead of re-fetching the whole window each time.
+  const genesis = await queryClient.fetchQuery({
+    queryKey: ['genesisAccounts', genesisTimestamp],
+    queryFn: async () => (await genesisAccountsCall(genesisTimestamp)) ?? null,
+    staleTime: query => (query.state.data == null ? 0 : Infinity),
+  });
   if (!genesis) return emptyPage('genesis accounts unavailable');
 
   // Through accountBadges, so filter and badge cannot disagree. They did once:

@@ -28,6 +28,11 @@ jest.mock('next/router', () => ({
 // toAddress, which made "Transfer without toAddress", the crash shape the
 // card guards against, unrepresentable in this suite.
 const customLabels = { current: ['Amount'] as string[] };
+/** Controllable for the same reason `customLabels` is: the card pairs the two
+ *  by index, so a case needs both sides. */
+const customFields = {
+  current: [<span key="amount">1 KLV</span>] as React.ReactNode[],
+};
 
 jest.mock('@/utils/contracts', () => ({
   contractTypes: (contracts: { type?: number }[]) => {
@@ -36,7 +41,7 @@ jest.mock('@/utils/contracts', () => ({
       ? 'TransferContractType'
       : 'FreezeContractType';
   },
-  filteredSections: () => [<span key="amount">1 KLV</span>],
+  filteredSections: () => customFields.current,
   getLabelForTableField: () => customLabels.current,
 }));
 
@@ -163,6 +168,7 @@ const renderCard = (
 
 beforeEach(() => {
   customLabels.current = ['Amount'];
+  customFields.current = [<span key="amount">1 KLV</span>];
 });
 
 describe('TransactionsMobileCard', () => {
@@ -245,5 +251,34 @@ describe('TransactionsMobileCard', () => {
     });
     expect(screen.queryByText('Out')).toBeNull();
     expect(screen.queryByText('In')).toBeNull();
+  });
+
+  it('gives colliding custom labels distinct keys', () => {
+    // The rows were keyed on the label alone. No label set repeats a name
+    // today, but several already name their first field "Type", and React
+    // reconciles a duplicate key by reusing the wrong row on the next render.
+    // Asserted on React's own warning, because a first render draws both
+    // either way: the damage only shows once the list updates.
+    const errors: unknown[] = [];
+    const original = console.error;
+    console.error = (...args: unknown[]) => errors.push(args[0]);
+
+    try {
+      customLabels.current = ['Type', 'Type'];
+      customFields.current = [
+        <span key="a">first value</span>,
+        <span key="b">second value</span>,
+      ];
+
+      renderCard(transfer());
+      const card = screen.getByTestId('table-row-3');
+
+      expect(card.textContent).toContain('first value');
+      expect(card.textContent).toContain('second value');
+    } finally {
+      console.error = original;
+    }
+
+    expect(errors.filter(e => String(e).includes('same key'))).toHaveLength(0);
   });
 });

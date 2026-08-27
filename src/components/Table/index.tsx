@@ -141,8 +141,18 @@ const Table = <TCard,>({
 
   const tableRef = React.useRef<HTMLDivElement>(null);
 
-  const page = Number(router.query?.page) || 1;
-  const limit = Number(router.query?.limit) || 10;
+  // Clamped where they enter, and used everywhere below including the request.
+  // The loading render does `Array(limit)`, so a hand-edited `?limit=3.5` or
+  // `?limit=-5` throws `RangeError: Invalid array length` from there. Nothing
+  // in this app is an error boundary and every page has `getInitialProps`, so
+  // that throw happens server-side and answers 500; `?limit=1e9` allocates a
+  // billion rows there first. 100 is well above the 10/20/50 the control offers,
+  // and is also where the API caps a page.
+  const page = Math.max(1, Math.floor(Number(router.query?.page) || 1));
+  const limit = Math.min(
+    Math.max(1, Math.floor(Number(router.query?.limit) || 10)),
+    100,
+  );
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -152,17 +162,21 @@ const Table = <TCard,>({
         responseFormatted = {
           items: response.data[dataName],
           totalPages: response?.pagination?.totalPages,
+          // Carried through for the export total: the API caps a page at 100
+          // while still reporting `totalPages` against the size that was asked
+          // for, so the two have to be read together.
+          perPage: response?.pagination?.perPage,
         };
         return responseFormatted;
       }
 
-      return { items: [], totalPages: 0 };
+      return { items: [], totalPages: 0, perPage: 0 };
     } catch (error) {
       // React Query rejects an undefined result outright ("data is
       // undefined") instead of storing it, so a failed request would land the
       // table in an error state; an empty page shows the empty state.
       console.error(error);
-      return { items: [], totalPages: 0 };
+      return { items: [], totalPages: 0, perPage: 0 };
     }
   };
 
@@ -180,11 +194,10 @@ const Table = <TCard,>({
       refreshKey,
     ],
 
-    queryFn: () =>
-      tableRequest(
-        Number(router.query?.page) || 1,
-        Number(router.query?.limit) || 10,
-      ),
+    // The clamped values, not the raw ones: passing `3.5` on made the API
+    // answer 500 "invalid pagination parameter", so the page traded a crash
+    // for a permanently empty table with a Retry that could not help.
+    queryFn: () => tableRequest(page, limit),
 
     // Keep the current rows on screen while the next page loads. Swapping
     // them for placeholders and back made paging flicker.
@@ -293,7 +306,14 @@ const Table = <TCard,>({
                   <ExportButton
                     items={response?.items}
                     tableRequest={tableRequest}
-                    totalRecords={response?.totalPages * limit || 10000}
+                    // `perPage` as the API actually applied it, not the limit
+                    // we asked for: it caps a page at 100 while still reporting
+                    // `totalPages` against the larger number, so multiplying by
+                    // the clamped limit would halve an "All pages" export.
+                    totalRecords={
+                      response?.totalPages * (response?.perPage || limit) ||
+                      10000
+                    }
                   />
                 )}
               </ExportContainer>
@@ -363,10 +383,29 @@ const Table = <TCard,>({
                           smaller={smaller}
                         >
                           <DoubleRow {...props}>
+                            {/* Pushed to the same edge the loaded value sits
+                                on. The bar is a block inside a column flex,
+                                so the cell's text-align does not reach it and
+                                it would hug the left in right-aligned
+                                columns, then jump when the data lands. */}
                             {!singleLineSkeleton && (
-                              <Skeleton width={index2 === 0 ? '40%' : '30%'} />
+                              <Skeleton
+                                width={index2 === 0 ? '40%' : '30%'}
+                                containerCustomStyles={
+                                  index2 === 0
+                                    ? undefined
+                                    : { marginLeft: 'auto' }
+                                }
+                              />
                             )}
-                            <Skeleton width={index2 === 0 ? '70%' : '40%'} />
+                            <Skeleton
+                              width={index2 === 0 ? '70%' : '40%'}
+                              containerCustomStyles={
+                                index2 === 0
+                                  ? undefined
+                                  : { marginLeft: 'auto' }
+                              }
+                            />
                           </DoubleRow>
                         </MobileCardItem>
                       );

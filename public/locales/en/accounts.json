@@ -81,7 +81,10 @@
       "elected": "Elected",
       "eligible": "Eligible",
       "waiting": "Waiting",
-      "jailed": "Jailed"
+      "jailed": "Jailed",
+      "inactive": "Inactive",
+      "leaving": "Leaving",
+      "observer": "Observer"
     }
   },
   "Filters": {

@@ -2,6 +2,7 @@ import {
   genesisTimestampCall,
   validatorOwnersCall,
 } from '@/services/requests/accounts';
+import { QueryClient } from '@tanstack/react-query';
 import { genesisTimestampQuery, validatorOwnersQuery } from '../badgeQueries';
 
 jest.mock('@/services/requests/accounts', () => ({
@@ -56,6 +57,53 @@ describe('badge query options', () => {
     // makes it reuse whatever the row badges already loaded.
     expect(genesisTimestampQuery.queryKey).toEqual(['genesisTimestamp']);
     expect(validatorOwnersQuery.queryKey).toEqual(['validatorOwners']);
-    expect(genesisTimestampQuery.staleTime).toBe(Infinity);
+    // A function, not a constant: a real answer is good for the session, a
+    // failed one must go stale immediately so the next mount asks again.
+    const stale = genesisTimestampQuery.staleTime as (q: unknown) => number;
+    expect(stale({ state: { data: 1656680400000 } })).toBe(Infinity);
+    expect(stale({ state: { data: null } })).toBe(0);
+    const ownersStale = validatorOwnersQuery.staleTime as (
+      q: unknown,
+    ) => number;
+    expect(ownersStale({ state: { data: {} } })).toBe(10 * 60 * 1000);
+    expect(ownersStale({ state: { data: null } })).toBe(0);
+  });
+
+  it('asks again after a failure instead of caching it for the session', () => {
+    // The property the staleTime function exists for, through a real cache
+    // rather than by reading the option back. `?? null` turns a failure into
+    // something react-query files as a success, so without this one bad
+    // request would leave every Foundation badge off the page and both filters
+    // on the empty state until a full reload.
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    mockedTimestamp.mockResolvedValueOnce(undefined);
+    return client
+      .fetchQuery(genesisTimestampQuery)
+      .then(first => {
+        expect(first).toBeNull();
+        mockedTimestamp.mockResolvedValueOnce(1656680400000);
+        return client.fetchQuery(genesisTimestampQuery);
+      })
+      .then(second => {
+        expect(second).toBe(1656680400000);
+        expect(mockedTimestamp).toHaveBeenCalledTimes(2);
+      });
+  });
+
+  it('serves a good answer from cache rather than asking twice', () => {
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    mockedTimestamp.mockResolvedValue(1656680400000);
+    return client
+      .fetchQuery(genesisTimestampQuery)
+      .then(() => client.fetchQuery(genesisTimestampQuery))
+      .then(() => {
+        expect(mockedTimestamp).toHaveBeenCalledTimes(1);
+      });
   });
 });

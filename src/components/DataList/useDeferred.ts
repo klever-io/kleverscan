@@ -1,8 +1,18 @@
 import { useIsFetching } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 
-/** Ceiling, so a page with no traffic of its own never defers forever. */
+/** Ceiling for a page that never asks for anything. */
 const CEILING_MS = 4000;
+
+/**
+ * Hard stop, whatever the page is doing.
+ *
+ * The ceiling above only releases a page with no traffic, which is right, but
+ * `api.get` sets no fetch timeout of its own: a stalled connection would keep
+ * `useIsFetching` above zero and hold the deferred request for the life of the
+ * page. That is worse than releasing late.
+ */
+const HARD_CEILING_MS = 15000;
 
 /**
  * True once the page's other requests have gone quiet, and true from then on,
@@ -28,13 +38,17 @@ export const useDeferred = (): boolean => {
   }, [inFlight]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      // Only for a page that never asked for anything. Releasing here while a
-      // request is still in flight is the one thing this hook exists to
-      // prevent, and on a slow connection that is exactly when it fires.
+    // Only for a page that never asked for anything. Releasing here while a
+    // request is still in flight is the one thing this hook exists to prevent,
+    // and on a slow connection that is exactly when it fires.
+    const soon = setTimeout(() => {
       if (!sawTraffic.current) setReady(true);
     }, CEILING_MS);
-    return () => clearTimeout(timer);
+    const latest = setTimeout(() => setReady(true), HARD_CEILING_MS);
+    return () => {
+      clearTimeout(soon);
+      clearTimeout(latest);
+    };
   }, []);
 
   return ready;

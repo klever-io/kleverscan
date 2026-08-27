@@ -200,7 +200,10 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
       </CardRow>
       {customLabels.map((label, fieldIndex) =>
         customFields[fieldIndex] ? (
-          <CardRow key={label}>
+          // Index in the key too: no label set repeats a name today, but
+          // several already name their first field "Type", and a repeat would
+          // silently collapse two rows into one.
+          <CardRow key={`${fieldIndex}-${label}`}>
             <CardLabel>
               {label === 'Type'
                 ? // Several label sets (Smart Contract, ITO Trigger) name

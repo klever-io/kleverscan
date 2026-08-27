@@ -3,6 +3,7 @@ import {
   genesisAccountsCall,
 } from '@/services/requests/accounts';
 import { accountBadges } from '../badges';
+import { genesisTimestampQuery, validatorOwnersQuery } from '../badgeQueries';
 import { accountsFilteredCall } from '../filteredList';
 
 jest.mock('@/services/requests/accounts', () => ({
@@ -21,10 +22,19 @@ const sources: { genesisTimestamp: unknown; owners: unknown } = {
   genesisTimestamp: undefined,
   owners: undefined,
 };
-const fetchQuery = jest.fn(async (options: { queryKey: string[] }) =>
-  options.queryKey[0] === 'genesisTimestamp'
-    ? sources.genesisTimestamp
-    : sources.owners,
+/**
+ * Dispatches on the key, and runs the real `queryFn` for the genesis window so
+ * the module's own call still goes through `genesisAccountsCall`. The two
+ * badge sources are answered from `sources` because their options come from
+ * `badgeQueries`, which this file does not exercise.
+ */
+const fetchQuery = jest.fn(
+  async (options: { queryKey: unknown[]; queryFn: () => Promise<unknown> }) => {
+    if (options.queryKey[0] === 'genesisTimestamp')
+      return sources.genesisTimestamp;
+    if (options.queryKey[0] === 'validatorOwners') return sources.owners;
+    return options.queryFn();
+  },
 );
 
 const mockedList = accountsCall as jest.Mock;
@@ -203,9 +213,11 @@ describe('accountsFilteredCall', () => {
 
     expect(response.data.accounts).toHaveLength(10);
     expect(response.pagination?.totalRecords).toBe(40);
+    // Asserted as an absence, because the window itself is fetched through the
+    // cache too now: what must not appear is the validator set.
     expect(
       fetchQuery.mock.calls.map(([options]) => options.queryKey[0]),
-    ).toEqual(['genesisTimestamp']);
+    ).not.toContain('validatorOwners');
   });
 
   it('clamps a hand-edited limit instead of losing rows off the page', async () => {
@@ -349,5 +361,25 @@ describe('accountsFilteredCall', () => {
 
     expect(response.error).toBeTruthy();
     expect(response.data.accounts).toHaveLength(0);
+  });
+
+  it('fetches its sources through the same options the badges use', () => {
+    // The module's docblock claims this reuses whatever the row badges already
+    // loaded, and that claim rests entirely on the two sharing an options
+    // object. Asserted by identity, because a locally rebuilt object with the
+    // same key would satisfy every other test in this file while quietly
+    // dropping the staleTime that keeps a failed source from sticking.
+    return call({ filter: 'genesisValidator' }).then(() => {
+      const used = fetchQuery.mock.calls.map(([options]) => options);
+      expect(used).toContain(genesisTimestampQuery);
+      expect(used).toContain(validatorOwnersQuery);
+      // The window goes through the cache too, keyed on the instant it was
+      // fetched for. Without this the direct call would satisfy every other
+      // assertion here, because the fake falls through to the queryFn.
+      expect(used.map(o => o.queryKey)).toContainEqual([
+        'genesisAccounts',
+        GENESIS_MS,
+      ]);
+    });
   });
 });

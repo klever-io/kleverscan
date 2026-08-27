@@ -72,7 +72,7 @@ const SummaryLoading: React.FC<ISummaryLoadingProps> = ({
   bar,
   className,
 }) => (
-  <SummaryCard aria-label={label} className={className}>
+  <SummaryCard aria-busy="true" aria-label={label} className={className}>
     <TilesGrid>
       {Array.from({ length: tiles }, (_, index) => (
         <Tile key={index}>

@@ -31,7 +31,7 @@ describe('smartContractNameCall', () => {
     // not need.
     mockedGet.mockResolvedValue({ error: 'boom' });
 
-    await smartContractNameCall('klv1contract');
+    await expect(smartContractNameCall('klv1contract')).rejects.toThrow();
 
     expect(mockedGet.mock.calls[0][0].tries).toBe(1);
   });
@@ -44,18 +44,24 @@ describe('smartContractNameCall', () => {
     await expect(smartContractNameCall('klv1contract')).resolves.toBeNull();
   });
 
-  it('answers null instead of throwing when the lookup fails', async () => {
-    // The name decorates a link that works without it, so a failure here must
-    // never reach the row, let alone a toast.
+  it('throws on a failed lookup rather than calling it an unnamed contract', async () => {
+    // These are different answers and the caller caches them differently: an
+    // errored query stays stale, so the next mount asks again, while a null is
+    // settled for the hour. Collapsing them left the three-in-nine contracts
+    // that answer 500 unnamed for the rest of the session.
     mockedGet.mockResolvedValue({ error: 'not found' });
 
-    await expect(smartContractNameCall('klv1contract')).resolves.toBeNull();
+    await expect(smartContractNameCall('klv1contract')).rejects.toThrow(
+      'contract name unavailable',
+    );
   });
 
-  it('answers null when the request itself throws', async () => {
+  it('lets a thrown request through for the same reason', async () => {
     mockedGet.mockRejectedValue(new Error('network down'));
 
-    await expect(smartContractNameCall('klv1contract')).resolves.toBeNull();
+    await expect(smartContractNameCall('klv1contract')).rejects.toThrow(
+      'network down',
+    );
   });
 
   it('asks nothing at all without an address', async () => {

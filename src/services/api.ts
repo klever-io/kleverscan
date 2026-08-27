@@ -173,9 +173,22 @@ export const withoutBody = async (
       });
 
       if (!response.ok) {
+        // Falls back to the status, and tolerates a body that is not JSON at
+        // all. An error body without an `error` key yielded `error: undefined`,
+        // which every `if (response?.error)` guard in the request modules reads
+        // as success: the caller then took the module-default pagination and
+        // printed its `totalRecords: 0` as a fact.
+        const body = await response.json().catch(() => null);
+        // Spelled out rather than `||`, and deliberately not `??`: a body
+        // carrying `error: ''` must not survive either, because every caller
+        // reads a falsy error as success.
+        const message =
+          typeof body?.error === 'string' && body.error.length > 0
+            ? body.error
+            : `request failed with status ${response.status}`;
         return {
           data: null,
-          error: (await response.json()).error,
+          error: message,
           code: 'internal_error',
           pagination,
         };
@@ -414,9 +427,17 @@ export const withText = async (
       });
 
       if (!response.ok) {
+        // Same shape as `withoutBody` above, and for the same reason: an error
+        // body without a string `error` used to yield `error: undefined`, which
+        // every caller reads as success, and a body that is not JSON threw
+        // inside this expression.
+        const body = await response.json().catch(() => null);
         return {
           data: null,
-          error: (await response.json()).error,
+          error:
+            typeof body?.error === 'string' && body.error.length > 0
+              ? body.error
+              : `request failed with status ${response.status}`,
           code: 'internal_error',
           pagination,
         };

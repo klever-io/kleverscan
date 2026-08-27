@@ -32,6 +32,20 @@ import { useRouter } from 'next/router';
 import React, { PropsWithChildren } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
+/**
+ * Widths and spans per column, with no cell content.
+ *
+ * The shared Table calls `rowSections` with a header string to read these, and
+ * that probe happens twice per header cell on every render. Answering it from
+ * here keeps the real builder off that path entirely.
+ */
+const COLUMN_LAYOUT: IRowSection[] = [
+  { element: () => null, span: 2 },
+  { element: () => null, span: 1, width: 100 },
+  { element: () => null, span: 1, width: 190 },
+  { element: () => null, span: 1, width: 190 },
+];
+
 const Accounts: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'accounts', 'table']);
@@ -44,7 +58,13 @@ const Accounts: React.FC<PropsWithChildren> = () => {
    * probe, the destructure below simply yields undefined, and the page keeps
    * rendering its header.
    */
-  const rowSections = (account: IAccount): IRowSection[] => {
+  const rowSections = (account: IAccount | string): IRowSection[] => {
+    // The shared Table calls this with a header string to read column widths.
+    // Handled explicitly rather than relying on a string destructuring to
+    // undefined: the compiler cannot catch a future line that dereferences the
+    // argument, and the probe runs twice per header cell on every render.
+    if (typeof account !== 'object' || account === null) return COLUMN_LAYOUT;
+
     const { address, balance, frozenBalance, nonce, timestamp } = account;
     // Survives the header-string probe: every field reads undefined, which
     // answers "no badges".
@@ -112,13 +132,16 @@ const Accounts: React.FC<PropsWithChildren> = () => {
   const filter = isAccountFilter(router.query.type)
     ? router.query.type
     : undefined;
-  // Eager under a filter: the request resolves these before it has rows, so
-  // deferring only delays badges the reader is already looking at.
-  const { owners, genesisTimestamp } = useAccountBadgeSources(!!filter);
+  // Eager only for the filter that decides which rows exist from this set.
+  // Under `foundation` the request reads nothing from it, so eagerness there
+  // would put three validator pages in front of the rows for nothing.
+  const { owners, genesisTimestamp } = useAccountBadgeSources(
+    filter === 'genesisValidator',
+  );
 
   const header = [
     `${t('table:Address')}`,
-    'Nonce',
+    `${t('accounts:List.Nonce')}`,
     `KLV ${t('table:Balance')}`,
     `KLV ${t('table:Staked')}`,
   ];

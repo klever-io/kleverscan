@@ -19,15 +19,35 @@ export const toMilliseconds = (timestamp: number): number =>
  * @param t
  * @returns string
  */
-export const getAge = (dateInput: Date, t?: TFunction): string => {
-  let date = dateInput;
-  while (new Date(date).getFullYear() < 2000) {
-    date = new Date(date.getTime() * 10 ** 3);
-  }
+/**
+ * A chain timestamp scaled until the year looks sane, in milliseconds.
+ *
+ * Both formatters below need this because timestamps arrive in seconds or in
+ * milliseconds depending on the endpoint. Two inputs break the scaling on
+ * their own and are handled here rather than in each caller: 0 multiplies to 0
+ * forever, which hangs the render, and anything past the Date range makes
+ * every getter answer NaN, which both loops fall straight through because NaN
+ * compares false either way, printing "NaN/NaN/aN".
+ */
+export const normalizeTimestamp = (timestamp: number): number => {
+  if (!Number.isFinite(timestamp) || timestamp <= 0) return 0;
+  if (Number.isNaN(new Date(timestamp).getTime())) return 0;
 
-  while (new Date(date).getFullYear() > 3000) {
-    date = new Date(date.getTime() / 10 ** 3);
+  let value = timestamp;
+  while (new Date(value).getFullYear() < 2000) {
+    value = value * 10 ** 3;
   }
+  while (new Date(value).getFullYear() > 3000) {
+    value = value / 10 ** 3;
+  }
+  return value;
+};
+
+export const getAge = (dateInput: Date, t?: TFunction): string => {
+  // Through the same normalisation the formatters use. This loop used to sit
+  // here unguarded in a second copy, where a zero multiplied to zero forever
+  // and hung the render, and an out-of-range date fell through into NaN.
+  const date = new Date(normalizeTimestamp(dateInput?.getTime?.() ?? NaN));
 
   const diff = Math.abs(new Date().getTime() - date.getTime());
   const sec = Math.floor(diff / 1000);

@@ -3,5 +3,78 @@
   "Daily Transactions": "Transações Diárias",
   "From": "De",
   "To": "Para",
-  "Last Transactions": "Últimas Transações"
+  "Last Transactions": "Últimas Transações",
+  "Filters": {
+    "Coin": "Moeda",
+    "CoinPlaceholder": "Digite o ID do token",
+    "Status": "Status",
+    "Contract": "Contrato",
+    "ContractPlaceholder": "Digite o contrato",
+    "BuyType": "Tipo de compra",
+    "NotFound": "Nenhum resultado encontrado"
+  },
+  "Status": {
+    "Success": "Sucesso",
+    "Fail": "Falha"
+  },
+  "BuyTypes": {
+    "MarketBuy": "Compra no mercado",
+    "ITOBuy": "Compra em ITO"
+  },
+  "Contracts": {
+    "Transfer": "Transferência",
+    "Create Asset": "Criar ativo",
+    "Create Validator": "Criar validador",
+    "Config Validator": "Configurar validador",
+    "Freeze": "Congelar",
+    "Unfreeze": "Descongelar",
+    "Delegate": "Delegar",
+    "Undelegate": "Cancelar delegação",
+    "Withdraw": "Sacar",
+    "Claim": "Resgatar",
+    "Unjail": "Retirar da prisão",
+    "Asset Trigger": "Gatilho de ativo",
+    "Set Account Name": "Definir nome da conta",
+    "Proposal": "Proposta",
+    "Vote": "Voto",
+    "Config ITO": "Configurar ITO",
+    "Set ITO": "Definir ITO",
+    "Buy": "Comprar",
+    "Sell": "Vender",
+    "Cancel Marketplace Order": "Cancelar ordem do marketplace",
+    "Create Marketplace": "Criar marketplace",
+    "Config Marketplace": "Configurar marketplace",
+    "Update Account Permission": "Atualizar permissão da conta",
+    "Deposit": "Depositar",
+    "ITO Trigger": "Gatilho de ITO",
+    "Smart Contract": "Contrato inteligente"
+  },
+  "Table": {
+    "TransactionHash": "Hash da transação",
+    "BlockFees": "Bloco/Taxas",
+    "InOut": "Entrada/Saída",
+    "Type": "Tipo",
+    "Block": "Bloco",
+    "CopyHash": "Copiar hash da transação",
+    "HashCopied": "Hash da transação copiado para a área de transferência",
+    "OpenTransaction": "Abrir transação em uma nova aba",
+    "OpenInNewTab": "Abrir em uma nova aba",
+    "ActionType": "Tipo de ação",
+    "NotApplicable": "Não aplicável",
+    "Age": "Idade",
+    "Amount": "Valor",
+    "Fee": "Taxa"
+  },
+  "Summary": {
+    "Breakdown": "Tipos de contrato nas últimas 24 horas",
+    "Down": "queda de {{percent}} em relação às 24 horas anteriores",
+    "FungibleBasis": "Principal ativo fungível",
+    "Growth": "crescimento de {{percent}} nas últimas 24 horas",
+    "Label": "Estatísticas de transações",
+    "Last24h": "Transações (24h)",
+    "MostTransacted": "Mais transacionado",
+    "OtherTypes": "Outros",
+    "Total": "Total de transações",
+    "Up": "alta de {{percent}} em relação às 24 horas anteriores"
+  }
 }

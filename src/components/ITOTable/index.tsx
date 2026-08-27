@@ -99,8 +99,18 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
   const [scrollTop, setScrollTop] = useState<boolean>(false);
   const tableRef = useRef<HTMLDivElement>(null);
 
-  const page = Number(router.query?.page) || 1;
-  const limit = Number(router.query?.limit) || 10;
+  // Clamped where it enters, and used everywhere below including the request:
+  // the loading render does `Array(limit)`, so a hand-edited `?limit=3.5` or
+  // `?limit=-5` throws `RangeError: Invalid array length`. There is no error
+  // boundary anywhere in this app and every page has `getInitialProps`, so that
+  // throw happens on the server and answers 500; `?limit=1e9` allocates a
+  // billion rows there before it can. 100 is the largest size the control
+  // offers.
+  const limit = Math.min(
+    Math.max(1, Math.floor(Number(router.query?.limit) || 10)),
+    100,
+  );
+  const page = Math.max(1, Math.floor(Number(router.query?.page) || 1));
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -132,11 +142,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
       router.pathname,
     ],
 
-    queryFn: () =>
-      tableRequest(
-        Number(router.query?.page) || 1,
-        Number(router.query?.limit) || 10,
-      ),
+    queryFn: () => tableRequest(page, limit),
 
     ...onErrorHandler(),
   });

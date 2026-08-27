@@ -1,4 +1,4 @@
-import { buildUrlQuery, getHost } from '@/services/api';
+import api, { buildUrlQuery, getHost } from '@/services/api';
 import { Service } from '@/types/index';
 
 const queryOf = (host: string): string => host.split('?')[1] ?? '';
@@ -85,5 +85,56 @@ describe('getHost', () => {
     const host = getHost('assets/KLV', undefined, Service.PROXY, 'v1.0');
 
     expect(host.slice(host.indexOf('/assets/KLV'))).toBe('/assets/KLV');
+  });
+});
+
+describe('api.get failure shape', () => {
+  const withFetch = async (
+    response: Partial<Response> & { json: () => Promise<unknown> },
+  ) => {
+    const original = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue(response) as never;
+    try {
+      return await api.get({ route: 'address/list' });
+    } finally {
+      global.fetch = original;
+    }
+  };
+
+  it('always carries an error when the request failed', async () => {
+    // An error body without an `error` key used to produce `error: undefined`,
+    // which every `if (response?.error)` guard reads as success. The caller
+    // then printed the module-default `totalRecords: 0` as a fact.
+    const result = await withFetch({
+      ok: false,
+      status: 500,
+      json: async () => ({ message: 'something else' }),
+    });
+
+    expect(result.error).toBeTruthy();
+    expect(result.error).toContain('500');
+    expect(result.data).toBeNull();
+  });
+
+  it('survives an error body that is not JSON at all', async () => {
+    const result = await withFetch({
+      ok: false,
+      status: 502,
+      json: async () => {
+        throw new Error('Unexpected token <');
+      },
+    });
+
+    expect(result.error).toContain('502');
+  });
+
+  it('prefers the error the body carries', async () => {
+    const result = await withFetch({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: 'invalid address' }),
+    });
+
+    expect(result.error).toBe('invalid address');
   });
 });

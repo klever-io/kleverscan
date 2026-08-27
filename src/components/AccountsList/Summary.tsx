@@ -62,8 +62,19 @@ const AccountsSummary: React.FC = () => {
       return { totalRecords, series: series ?? [] };
     },
     // These move by a handful of accounts a day, so a fresh look on every
-    // mount would cost a round trip to show the same number.
-    staleTime: 5 * 60 * 1000,
+    // mount would cost a round trip to show the same number. A function, not a
+    // constant, for the reason `badgeQueries` spells out: both calls answer
+    // undefined on failure and the queryFn wraps them in an object, so a wholly
+    // failed strip is filed as a success and a flat value would pin it for five
+    // minutes across client-side navigation.
+    staleTime: query => {
+      const cached = query.state.data as
+        | { totalRecords?: number; series?: unknown[] }
+        | undefined;
+      const answered =
+        cached?.totalRecords !== undefined || !!cached?.series?.length;
+      return answered ? 5 * 60 * 1000 : 0;
+    },
   });
 
   if (isLoading) {

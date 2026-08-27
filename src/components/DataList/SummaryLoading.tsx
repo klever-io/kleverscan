@@ -27,6 +27,28 @@ const BAR = 8;
 const LEGEND = 16.5;
 
 /**
+ * The space a distribution bar and its legend will take.
+ *
+ * Exported because a card whose tiles have arrived while its bar has not is a
+ * state of its own: without this it drew the tiles alone and lost 48px, so
+ * the card shrank between its skeleton and its finished self.
+ */
+export const SummaryBarPlaceholder: React.FC = () => (
+  <>
+    <Skeleton
+      width="100%"
+      height={BAR}
+      containerCustomStyles={{ marginTop: 16 }}
+    />
+    <Skeleton
+      width="70%"
+      height={LEGEND}
+      containerCustomStyles={{ marginTop: 8 }}
+    />
+  </>
+);
+
+/**
  * Loading shape for a summary strip.
  *
  * Built from the same grid and tile the loaded card uses, so both the column
@@ -53,20 +75,7 @@ const SummaryLoading: React.FC<ISummaryLoadingProps> = ({
         </Tile>
       ))}
     </TilesGrid>
-    {bar && (
-      <>
-        <Skeleton
-          width="100%"
-          height={BAR}
-          containerCustomStyles={{ marginTop: 16 }}
-        />
-        <Skeleton
-          width="70%"
-          height={LEGEND}
-          containerCustomStyles={{ marginTop: 8 }}
-        />
-      </>
-    )}
+    {bar && <SummaryBarPlaceholder />}
   </SummaryCard>
 );
 

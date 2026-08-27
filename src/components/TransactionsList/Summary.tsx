@@ -15,6 +15,7 @@ import {
 // The same percent policy the holders and assets legends use, so the two
 // visually identical legends cannot format the same quantity differently.
 import { formatShare } from '@/components/DataList/format';
+import { SummaryBarPlaceholder } from '@/components/DataList/SummaryLoading';
 import {
   ITransactionTypeShare,
   buildBreakdown,
@@ -79,7 +80,7 @@ const TransactionsSummary: React.FC = () => {
     ...FIGURE_CACHE,
   });
 
-  const { data: typeCounts } = useQuery({
+  const { data: typeCounts, isPending: breakdownPending } = useQuery({
     queryKey: ['transactionsBreakdown'],
     queryFn: transactionsBreakdownCall,
     // Four requests for a bar nobody waits on, so they stay out of the
@@ -99,17 +100,16 @@ const TransactionsSummary: React.FC = () => {
       ? theme.blueGray500
       : [theme.violet, theme.purple, theme.lightPurple, theme.green][index % 4];
 
-  const variation = summary ? summaryVariation(summary) : undefined;
-  const growth = summary ? totalGrowth(summary) : undefined;
+  const variation = summaryVariation(summary);
+  const growth = totalGrowth(summary);
   // Each figure is shown only when its own request answered; a failed part
   // leaves its tile out instead of printing a zero the chain never had.
   const hasFigures =
-    summary &&
-    (summary.last24h !== undefined ||
-      summary.totalTransactions !== undefined ||
-      summary.mostTransactedAsset !== undefined);
+    summary.last24h !== undefined ||
+    summary.totalTransactions !== undefined ||
+    summary.mostTransactedAsset !== undefined;
 
-  if (!summary || !hasFigures) return null;
+  if (!hasFigures) return null;
 
   // The shares sum to the window's own total; using that sum rather than
   // last24h keeps the bar full even if the parts answered moments apart.
@@ -235,8 +235,14 @@ const TransactionsSummary: React.FC = () => {
 
       {/* Same shape as the assets registry strip, deliberately: tiles, then
           the bar, then its legend, with no heading in between, so both
-          summary cards stand the same height on their pages. */}
-      {breakdown.length > 1 && breakdownTotal > 0 && (
+          summary cards stand the same height on their pages.
+
+          The tiles and the bar answer on separate requests, so the card is
+          drawn once with only the first of them. Holding the bar's space
+          until its own request settles keeps that middle state the same
+          height as the two around it. */}
+      {breakdownPending && <SummaryBarPlaceholder />}
+      {!breakdownPending && breakdown.length > 1 && breakdownTotal > 0 && (
         <>
           <DistBar
             role="img"

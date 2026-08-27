@@ -209,6 +209,21 @@ describe('TransactionsSummary', () => {
     expect(screen.getByLabelText('Transaction statistics')).toBeTruthy();
   });
 
+  it('holds the space for the bar while only the tiles have answered', async () => {
+    // The two halves answer on separate requests. Drawing the tiles alone
+    // dropped the bar and its legend, so the card lost 48px between its
+    // skeleton and its finished self and then grew back.
+    summaryCall.mockResolvedValue(FULL);
+    breakdownCall.mockReturnValue(new Promise(() => undefined));
+
+    renderSummary();
+
+    expect(await screen.findByText('Total transactions')).toBeTruthy();
+    const kaart = screen.getByLabelText('Transaction statistics');
+    expect(kaart.querySelectorAll('[data-testid="skeleton"]').length).toBe(2);
+    expect(screen.queryByLabelText(/Contract types/)).toBeNull();
+  });
+
   it('asks once the page falls quiet', async () => {
     summaryCall.mockResolvedValue(FULL);
 

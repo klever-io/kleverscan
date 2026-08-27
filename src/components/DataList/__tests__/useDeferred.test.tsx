@@ -145,6 +145,38 @@ describe('useDeferred', () => {
     expect(state()).toBe('yes');
   });
 
+  it('does not release on the ceiling while a request is still in flight', () => {
+    // The ceiling is for a page that never asked for anything. Firing it on a
+    // page whose own request is still running does the one thing this hook
+    // exists to prevent, and a slow connection is exactly when it happens.
+    const client = new QueryClient();
+    fetching.count = 1;
+    const { rerender } = render(
+      <QueryClientProvider client={client}>
+        <Probe />
+      </QueryClientProvider>,
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    expect(state()).toBe('no');
+
+    // And it still releases once that request finishes, so the ceiling is not
+    // simply disabled for a page that does have traffic.
+    act(() => {
+      fetching.count = 0;
+      rerender(
+        <QueryClientProvider client={client}>
+          <Probe />
+        </QueryClientProvider>,
+      );
+    });
+
+    expect(state()).toBe('yes');
+  });
+
   it('stays released when a later refetch starts', () => {
     // Paging or the refresh control must not hide badges that are already on
     // screen.

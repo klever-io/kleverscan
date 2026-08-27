@@ -28,7 +28,12 @@ export const useDeferred = (): boolean => {
   }, [inFlight]);
 
   useEffect(() => {
-    const timer = setTimeout(() => setReady(true), CEILING_MS);
+    const timer = setTimeout(() => {
+      // Only for a page that never asked for anything. Releasing here while a
+      // request is still in flight is the one thing this hook exists to
+      // prevent, and on a slow connection that is exactly when it fires.
+      if (!sawTraffic.current) setReady(true);
+    }, CEILING_MS);
     return () => clearTimeout(timer);
   }, []);
 

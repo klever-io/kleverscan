@@ -76,7 +76,13 @@
     "Validator": "Validador",
     "ValidatorTooltip": "Possui um nó validador registrado",
     "GenesisValidator": "Validador genesis",
-    "GenesisValidatorTooltip": "Possui um validador registrado no bloco genesis"
+    "GenesisValidatorTooltip": "Possui um validador registrado no bloco genesis",
+    "ListState": {
+      "elected": "Eleito",
+      "eligible": "Elegível",
+      "waiting": "Aguardando",
+      "jailed": "Penalizado"
+    }
   },
   "Filters": {
     "Type": "Tipo de conta",

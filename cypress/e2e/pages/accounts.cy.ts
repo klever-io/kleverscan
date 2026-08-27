@@ -346,6 +346,10 @@ describe('Accounts Page, when the validator set fails', () => {
       'have.length.at.least',
       accountsAmount,
     );
+    // Waited for, not assumed: without this the row is badgeless simply
+    // because the request has not come back yet, and the assertion below
+    // would pass whatever the failure path does.
+    cy.wait('@validatorListDown', { timeout: 15000 });
     // Account 2 is a genesis validator in the working stub. With the set
     // unavailable the row must fall silent, not assert the opposite.
     cy.get('[data-testid="table-row-2"]')

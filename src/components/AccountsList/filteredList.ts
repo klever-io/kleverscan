@@ -42,13 +42,16 @@ const paginate = (accounts: IAccount[], page: number, limit: number) => {
   // hand-edited URL arrives intact. A negative start makes slice count from
   // the end; a negative size drops rows off a page that claims to hold them.
   const size = Math.max(1, Math.floor(limit));
-  const start = Math.max(0, Math.floor(page - 1)) * size;
+  const current = Math.max(1, Math.floor(page));
+  const start = (current - 1) * size;
   return {
     data: { accounts: accounts.slice(start, start + size) },
     pagination: {
-      self: page,
-      next: page + 1,
-      previous: Math.max(1, page - 1),
+      // The clamped page, not the requested one: reporting `self: -1` beside
+      // the rows of page one describes a page that does not exist.
+      self: current,
+      next: current + 1,
+      previous: Math.max(1, current - 1),
       perPage: size,
       totalPages: Math.max(1, Math.ceil(accounts.length / size)),
       totalRecords: accounts.length,

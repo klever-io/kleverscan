@@ -76,7 +76,13 @@
     "Validator": "Validator",
     "ValidatorTooltip": "Owns a registered validator node",
     "GenesisValidator": "Genesis validator",
-    "GenesisValidatorTooltip": "Owns a validator registered in the genesis block"
+    "GenesisValidatorTooltip": "Owns a validator registered in the genesis block",
+    "ListState": {
+      "elected": "Elected",
+      "eligible": "Eligible",
+      "waiting": "Waiting",
+      "jailed": "Jailed"
+    }
   },
   "Filters": {
     "Type": "Account type",

@@ -18,7 +18,10 @@ jest.mock('next-i18next', () => {
     '../../../../public/locales/en/accounts.json',
   );
 
-  const translate = (key: string): string => {
+  const translate = (
+    key: string,
+    options?: { defaultValue?: string },
+  ): string => {
     const path = key.includes(':') ? key.split(':')[1] : key;
     const value = path
       .split('.')
@@ -29,10 +32,11 @@ jest.mock('next-i18next', () => {
             : undefined,
         bundle,
       );
-    if (typeof value !== 'string') {
-      throw new Error(`missing accounts locale key: ${key}`);
-    }
-    return value;
+    if (typeof value === 'string') return value;
+    // Mirrors i18next: a caller that supplies a fallback gets it. Only a key
+    // with neither is a mistake worth failing on.
+    if (options?.defaultValue) return options.defaultValue;
+    throw new Error(`missing accounts locale key: ${key}`);
   };
 
   return { useTranslation: () => ({ t: translate }) };
@@ -121,7 +125,18 @@ describe('AccountBadges', () => {
     renderBadges({ validator: true, validatorList: 'jailed' });
 
     expect(screen.getByText('Validator').getAttribute('title')).toBe(
-      'Owns a registered validator node (jailed)',
+      'Owns a registered validator node (Jailed)',
+    );
+  });
+
+  it('falls back to the raw state for one the bundle does not carry', () => {
+    // `list` is an untyped string on the chain, and the four states here are
+    // the ones measured live plus the one this repo already renders elsewhere.
+    // A fifth must read as itself rather than as a raw key.
+    renderBadges({ validator: true, validatorList: 'somethingNew' });
+
+    expect(screen.getByText('Validator').getAttribute('title')).toBe(
+      'Owns a registered validator node (somethingNew)',
     );
   });
 
@@ -134,7 +149,7 @@ describe('AccountBadges', () => {
 
     const pill = screen.getByText('Genesis validator');
     expect(pill.getAttribute('title')).toBe(
-      'Owns a validator registered in the genesis block (elected)',
+      'Owns a validator registered in the genesis block (Elected)',
     );
     // A genesis validator is a validator; saying both would say it twice.
     expect(screen.queryByText('Validator')).toBeNull();

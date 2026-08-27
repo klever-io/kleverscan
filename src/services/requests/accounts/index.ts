@@ -230,8 +230,10 @@ const GENESIS_PAGE_CAP = 20;
 /**
  * Every account created in the genesis block: 40 on mainnet, 22 on testnet.
  *
- * The API filters on the stored value, so the window catches both units these
- * rows are written in. Asked for in milliseconds; seconds returns nothing.
+ * The window is milliseconds only; the same range in seconds returns nothing.
+ * It still matches the rows whose `timestamp` comes back as seconds, because
+ * the API filters on its stored value rather than on what it serialises.
+ * Measured: this window answers 40, of which 21 serialise as seconds.
  */
 export const genesisAccountsCall = async (
   genesisTimestamp: number,

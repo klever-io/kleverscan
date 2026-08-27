@@ -19,6 +19,13 @@ const AccountBadges: React.FC<IAccountBadgesProps> = ({ badges }) => {
   // validator, so showing both would say the same thing twice.
   const roleKey = genesisValidator ? 'GenesisValidator' : 'Validator';
   const roleTooltip = t(`accounts:Badges.${roleKey}Tooltip`);
+  // Through the bundle so the sentence is not half-translated, falling back to
+  // the raw value because the chain field is untyped.
+  const listState = validatorList
+    ? t(`accounts:Badges.ListState.${validatorList}`, {
+        defaultValue: validatorList,
+      })
+    : '';
 
   return (
     <>
@@ -35,9 +42,7 @@ const AccountBadges: React.FC<IAccountBadgesProps> = ({ badges }) => {
           $variant={genesisValidator ? 'success' : 'neutral'}
           // List state rides in the tooltip, not its own badge: it changes per
           // epoch and this row is not where someone comes to read it.
-          title={
-            validatorList ? `${roleTooltip} (${validatorList})` : roleTooltip
-          }
+          title={listState ? `${roleTooltip} (${listState})` : roleTooltip}
         >
           {t(`accounts:Badges.${roleKey}`)}
         </BadgePill>

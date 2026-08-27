@@ -69,5 +69,19 @@
     "AddressCopied": "Endereço copiado para a área de transferência",
     "OpenAccount": "Abrir conta em uma nova aba",
     "OpenInNewTab": "Abrir em uma nova aba"
+  },
+  "Badges": {
+    "Foundation": "Fundação",
+    "FoundationTooltip": "Criada no primeiro bloco da rede",
+    "Validator": "Validador",
+    "ValidatorTooltip": "Possui um nó validador registrado",
+    "GenesisValidator": "Validador genesis",
+    "GenesisValidatorTooltip": "Possui um validador registrado no bloco genesis"
+  },
+  "Filters": {
+    "Type": "Tipo de conta",
+    "All": "Todas",
+    "foundation": "Fundação",
+    "genesisValidator": "Validador genesis"
   }
 }

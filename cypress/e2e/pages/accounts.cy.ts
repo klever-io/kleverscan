@@ -22,7 +22,9 @@ const rawAccounts = Array.from({ length: accountsAmount }, (_, index) => ({
   frozenBalance: 100_000_000,
   allowance: 0,
   permissions: [],
-  timestamp: 1_700_000_000 + index,
+  // Accounts 0 and 2 share the genesis second; the rest are a second apart.
+  // Account 2 is also the stubbed genesis validator, so it carries both badges.
+  timestamp: index === 2 ? 1_700_000_000 : 1_700_000_000 + index,
   assets: {},
 }));
 
@@ -64,6 +66,37 @@ const detailResponseFor = (index: number) => {
   };
 };
 
+/** Block 0 answers in milliseconds while the stub accounts carry seconds,
+ *  which is the mismatch mainnet returns in this one field. */
+const GENESIS_BLOCK_MS = 1_700_000_000_000;
+
+const blockZeroResponse = {
+  data: { block: { nonce: 0, timestamp: GENESIS_BLOCK_MS } },
+  error: '',
+  code: 'successful',
+};
+
+/** Account 2 registered in the genesis block, account 3 long after it. */
+const validatorListResponse = {
+  data: {
+    validators: [
+      {
+        ownerAddress: addressFor(2),
+        registerNonce: 0,
+        list: 'elected',
+      },
+      {
+        ownerAddress: addressFor(3),
+        registerNonce: 500_000,
+        list: 'eligible',
+      },
+    ],
+  },
+  pagination: { totalRecords: 2 },
+  error: '',
+  code: 'successful',
+};
+
 const stubAccountsApis = (): void => {
   // Scope to API version path only so Next.js /account/<address> navigations
   // are not intercepted as JSON.
@@ -71,6 +104,16 @@ const stubAccountsApis = (): void => {
     statusCode: 200,
     body: countResponse,
   }).as('accountCount');
+
+  cy.intercept('GET', '**/v1.0/block/by-nonce/0*', {
+    statusCode: 200,
+    body: blockZeroResponse,
+  }).as('blockZero');
+
+  cy.intercept('GET', '**/v1.0/validator/list*', {
+    statusCode: 200,
+    body: validatorListResponse,
+  }).as('validatorList');
 
   cy.intercept('GET', '**/v1.0/address/list*', {
     statusCode: 200,
@@ -119,16 +162,76 @@ describe('Accounts Page', () => {
   });
 
   it('shortens the address below the desktop breakpoint', () => {
-    // Cypress runs at its default 1000px viewport and `isTablet` covers
-    // everything under 1025px, so this spec exercises the card, not the table.
-    // The desktop row prints the address in full, which only fits because that
-    // builder never runs at this width; the card must therefore shorten. The
-    // ellipsis is what parseAddress puts in the middle.
+    // Below the 1025px tablet breakpoint, so this is the card, not the table.
+    // The ellipsis is what parseAddress puts in the middle.
     cy.wait('@accountList', { timeout: 15000 });
     cy.get('[data-testid="account-link"]', { timeout: 15000 })
       .first()
       .invoke('text')
       .should('match', /^klv1.*\.\.\..+$/);
+  });
+
+  it('badges what the chain says each account is', () => {
+    cy.wait('@accountList', { timeout: 15000 });
+    // The validator set is fetched after the table on purpose, so it has its
+    // own wait rather than riding on the list.
+    cy.wait('@validatorList', { timeout: 15000 });
+
+    const rowOf = (index: number) =>
+      cy.get(`[data-testid="table-row-${index}"]`, { timeout: 15000 });
+
+    // Account 0 carries the genesis moment in seconds where block 0 answers in
+    // milliseconds, which is the mismatch mainnet returns. A comparison that
+    // skips the unit finds nothing here.
+    rowOf(0).should('contain.text', 'Foundation');
+
+    // Created a second later, so no badge at all.
+    rowOf(1)
+      .should('not.contain.text', 'Foundation')
+      .and('not.contain.text', 'alidator');
+
+    // Registered in the genesis block, and created in it, so both are true and
+    // both are shown. Account 2 carries the same genesis second as account 0.
+    rowOf(2)
+      .should('contain.text', 'Genesis validator')
+      .and('contain.text', 'Foundation');
+
+    // Registered later: the plain role badge.
+    rowOf(3)
+      .should('contain.text', 'Validator')
+      .and('not.contain.text', 'Genesis validator');
+  });
+
+  it('narrows the list to genesis validators, and back again', () => {
+    // The stub returns the same ten accounts for every address/list call, so
+    // what is asserted here is the narrowing, not the row data: account 2 is
+    // the only registerNonce-zero owner in the stubbed validator list.
+    cy.wait('@accountList', { timeout: 15000 });
+    cy.get('[data-testid="account-link"]', { timeout: 15000 }).should(
+      'have.length.at.least',
+      accountsAmount,
+    );
+
+    cy.visit('/accounts?type=genesisValidator');
+    cy.wait('@validatorList', { timeout: 15000 });
+
+    cy.get('[data-testid="account-link"]', { timeout: 15000 }).should(
+      'have.length',
+      1,
+    );
+    cy.contains('Genesis validator').should('exist');
+
+    // A value the page does not recognise must fall back to the whole list
+    // rather than filtering on it or showing nothing.
+    cy.visit('/accounts?type=nonsense');
+    cy.wait('@accountList', { timeout: 15000 });
+    cy.get('[data-testid="account-link"]', { timeout: 15000 }).should(
+      'have.length.at.least',
+      accountsAmount,
+    );
+    // And the control has to agree with the list it sits above: it read
+    // "nonsense" over an unfiltered list until this was fixed.
+    cy.get('[data-testid="selector"]').should('have.text', 'All');
   });
 
   it('shows the summary figures, and counts one day as a day', () => {
@@ -144,13 +247,8 @@ describe('Accounts Page', () => {
         // count below, so it cannot be satisfied by a longer number that
         // merely contains these digits.
         cy.contains(/^10$/).should('exist');
-        // The stub returns a single day, so the strip must not claim a
-        // change against a yesterday it never received, and must render the
-        // singular rather than "across 1 days".
-        //
         // Anchored, not a substring: `cy.contains('across 1 day')` also
-        // matches "across 1 days", so the plain form asserts nothing about
-        // the plural it claims to guard.
+        // matches "across 1 days" and would guard nothing.
         cy.contains(/^across 1 day$/).should('exist');
         cy.contains('vs yesterday').should('not.exist');
       });
@@ -158,13 +256,9 @@ describe('Accounts Page', () => {
 });
 
 /**
- * Everything above runs at Cypress' 1000px default, which is below the 1025px
- * tablet breakpoint, so it exercises the mobile card. The desktop table is a
- * different code path: `rowSections` in the page, its four `element` closures,
- * the column widths, and the header probe where the shared Table calls
- * `rowSections` with a header *string* rather than an account. That probe is
- * the shape that has crashed a page in this repo before, so it gets a viewport
- * of its own.
+ * Everything above runs below the tablet breakpoint, so it exercises the card.
+ * The desktop table is a different path, including the header probe that calls
+ * `rowSections` with a string; that has crashed a page here before.
  */
 describe('Accounts Page, desktop table', () => {
   beforeEach(() => {
@@ -196,6 +290,21 @@ describe('Accounts Page, desktop table', () => {
       .and('have.length', 62);
   });
 
+  it('badges the desktop row, which no other test renders', () => {
+    // The badge test above runs below the tablet breakpoint, so it exercises
+    // the card. Deleting <AccountBadges> from `rowSections` left the whole
+    // suite green; this is the only place that path is rendered.
+    cy.wait('@accountList', { timeout: 15000 });
+    cy.wait('@validatorList', { timeout: 15000 });
+
+    cy.get('[data-testid="table-row-0"]', { timeout: 15000 })
+      .first()
+      .should('contain.text', 'Foundation');
+    cy.get('[data-testid="table-row-2"]')
+      .first()
+      .should('contain.text', 'Genesis validator');
+  });
+
   it('lays the row out in four cells, one per column', () => {
     cy.wait('@accountList', { timeout: 15000 });
 
@@ -205,6 +314,43 @@ describe('Accounts Page, desktop table', () => {
       'have.length',
       4,
     );
+  });
+});
+
+describe('Accounts Page, when the validator set fails', () => {
+  beforeEach(() => {
+    stubAccountsApis();
+    // Overrides the stub above: same route, last intercept wins.
+    cy.intercept('GET', '**/v1.0/validator/list*', { statusCode: 500 }).as(
+      'validatorListDown',
+    );
+  });
+
+  it('still lists the foundation filter, which reads nothing from that set', () => {
+    // The regression that started this round, at the layer where the wiring
+    // actually exists: the foundation filter waited on a request it reads
+    // nothing from, and a failure there left the page on "no data" for good.
+    cy.visit('/accounts?type=foundation');
+
+    cy.get('[data-testid="account-link"]', { timeout: 15000 }).should(
+      'have.length.at.least',
+      1,
+    );
+    cy.contains('Apparently no data here').should('not.exist');
+  });
+
+  it('badges nothing rather than claiming an address is not a validator', () => {
+    cy.visit('/accounts');
+
+    cy.get('[data-testid="account-link"]', { timeout: 15000 }).should(
+      'have.length.at.least',
+      accountsAmount,
+    );
+    // Account 2 is a genesis validator in the working stub. With the set
+    // unavailable the row must fall silent, not assert the opposite.
+    cy.get('[data-testid="table-row-2"]')
+      .first()
+      .should('not.contain.text', 'alidator');
   });
 });
 

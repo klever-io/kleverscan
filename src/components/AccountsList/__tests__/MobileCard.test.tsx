@@ -101,12 +101,18 @@ const account = {
   frozenBalance: 12_500_000,
 } as never;
 
-const renderCard = (overrides: Record<string, unknown> = {}) =>
+const GENESIS_MS = 1656680400000;
+
+const renderCard = (
+  overrides: Record<string, unknown> = {},
+  sources: Record<string, unknown> = {},
+) =>
   render(
     <ThemeProvider theme={theme}>
       <AccountsMobileCard
         item={{ ...(account as object), ...overrides } as never}
         index={3}
+        {...(sources as never)}
       />
     </ThemeProvider>,
   );
@@ -119,6 +125,31 @@ describe('AccountsMobileCard', () => {
     expect(link.getAttribute('href')).toBe(`/account/${ADDRESS}`);
     // The whole address in the tooltip, because the visible text is shortened.
     expect(link.getAttribute('title')).toBe(ADDRESS);
+  });
+
+  it('badges the card from the same sources as the desktop row', () => {
+    // The card path was only ever rendered without the two sources, so the
+    // "no badges" branch was the only one any test reached. Everything else
+    // about badges on this path was covered by Cypress alone.
+    renderCard(
+      { timestamp: GENESIS_MS },
+      {
+        genesisTimestamp: GENESIS_MS,
+        owners: { [ADDRESS]: { isGenesis: true, list: 'elected' } },
+      },
+    );
+    const card = screen.getByTestId('table-row-3');
+
+    expect(card.textContent).toContain('Foundation');
+    expect(card.textContent).toContain('Genesis validator');
+  });
+
+  it('shows no badge while the sources are still unknown', () => {
+    renderCard({ timestamp: GENESIS_MS });
+    const card = screen.getByTestId('table-row-3');
+
+    expect(card.textContent).not.toContain('Foundation');
+    expect(card.textContent).not.toContain('alidator');
   });
 
   it('carries the row index, which is what the table keys its rows on', () => {

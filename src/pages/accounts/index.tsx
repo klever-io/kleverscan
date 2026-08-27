@@ -1,8 +1,15 @@
 import { Accounts as Icon } from '@/assets/title-icons';
-import AccountsMobileCard from '@/components/AccountsList/MobileCard';
+import AccountBadges from '@/components/AccountsList/AccountBadges';
+import AccountsMobileCard, {
+  type IAccountsMobileCardExtras,
+} from '@/components/AccountsList/MobileCard';
+import AccountsFilters from '@/components/AccountsList/Filters';
 import AccountsSummary from '@/components/AccountsList/Summary';
+import { accountBadges } from '@/components/AccountsList/badges';
+import { accountsFilteredCall } from '@/components/AccountsList/filteredList';
 import { klvAmount } from '@/components/AccountsList/format';
 import { AccountsTableWrapper } from '@/components/AccountsList/styles';
+import { useAccountBadgeSources } from '@/components/AccountsList/useAccountBadgeSources';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
@@ -14,9 +21,10 @@ import {
 } from '@/components/DataList/styles';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
-import { accountsCall } from '@/services/requests/accounts';
+import { isAccountFilter } from '@/services/requests/accounts';
 import { Container, Header } from '@/styles/common';
 import { IAccount, IRowSection } from '@/types/index';
+import { useQueryClient } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -37,7 +45,10 @@ const Accounts: React.FC<PropsWithChildren> = () => {
    * rendering its header.
    */
   const rowSections = (account: IAccount): IRowSection[] => {
-    const { address, balance, frozenBalance, nonce } = account;
+    const { address, balance, frozenBalance, nonce, timestamp } = account;
+    // Survives the header-string probe: every field reads undefined, which
+    // answers "no badges".
+    const badges = accountBadges(address, timestamp, genesisTimestamp, owners);
 
     return [
       {
@@ -60,6 +71,7 @@ const Accounts: React.FC<PropsWithChildren> = () => {
             >
               {address}
             </AddressLink>
+            <AccountBadges badges={badges} />
             <RowActions>
               <CopyAction
                 value={address}
@@ -96,6 +108,14 @@ const Accounts: React.FC<PropsWithChildren> = () => {
     ];
   };
 
+  const queryClient = useQueryClient();
+  const filter = isAccountFilter(router.query.type)
+    ? router.query.type
+    : undefined;
+  // Eager under a filter: the request resolves these before it has rows, so
+  // deferring only delays badges the reader is already looking at.
+  const { owners, genesisTimestamp } = useAccountBadgeSources(!!filter);
+
   const header = [
     `${t('table:Address')}`,
     'Nonce',
@@ -103,13 +123,27 @@ const Accounts: React.FC<PropsWithChildren> = () => {
     `KLV ${t('table:Staked')}`,
   ];
 
-  const tableProps: ITable = {
+  const tableProps: ITable<IAccountsMobileCardExtras> = {
     type: 'accounts',
     header,
     rowSections,
-    request: (page, limit) => accountsCall(page, limit, router.query),
+    request: (page, limit) =>
+      accountsFilteredCall({
+        page,
+        limit,
+        filter,
+        routerQuery: router.query,
+        queryClient,
+      }),
     dataName: 'accounts',
+    // No refreshKey: the filtered request awaits its own sources, and the row
+    // badges recompute from a plain re-render when the validator set lands,
+    // so there is nothing left for a changing key to trigger.
+    Filters: AccountsFilters,
     MobileCard: AccountsMobileCard,
+    // Once here, not per card: ten cards calling the hook would open ten
+    // subscriptions to the same two queries.
+    mobileCardProps: { owners, genesisTimestamp },
     singleLineSkeleton: true,
   };
 

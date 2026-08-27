@@ -1,4 +1,5 @@
 import api from '@/services/api';
+import { toMilliseconds } from '@/utils/timeFunctions';
 import {
   IAccount,
   IPaginatedResponse,
@@ -129,4 +130,137 @@ export const accountsCreatedCall = async (
     // still keeps the value out of any sum.
     Number.isFinite(day?.doc_count) ? day.doc_count : undefined,
   );
+};
+
+/* ----------------------------- badge sources ----------------------------- */
+
+/** What the chain says about an address, as far as the list badges care. */
+export interface IValidatorFlags {
+  /** Registered in the genesis block rather than by a later transaction. */
+  isGenesis: boolean;
+  /** `elected`, `eligible`, `jailed`. Not badged, but carried for the title. */
+  list: string;
+}
+
+export type ValidatorOwners = Record<string, IValidatorFlags>;
+
+const VALIDATOR_PAGE_SIZE = 100;
+/** Bound on a malformed `totalRecords`. 208 validators at 100 a page is 3. */
+const VALIDATOR_PAGE_CAP = 50;
+
+/**
+ * Every validator owner address, with the flags the badges read.
+ *
+ * Paged on the item count, not on a page size: `validator/list` silently caps a
+ * page at 100 whatever `limit` asks, so one page of 100 beside a
+ * `totalRecords: 208` is how you conclude the chain has 2 genesis validators
+ * when it has 21.
+ */
+export const validatorOwnersCall = async (): Promise<
+  ValidatorOwners | undefined
+> => {
+  const owners: ValidatorOwners = {};
+  let collected = 0;
+  let total: number | undefined;
+
+  for (let page = 1; page <= VALIDATOR_PAGE_CAP; page++) {
+    const response = await api.get({
+      route: 'validator/list',
+      query: { page, limit: VALIDATOR_PAGE_SIZE },
+    });
+    // A failure resolves rather than rejects, so a partial set would read as
+    // the whole set and un-badge every validator past the break.
+    if (response?.error) return undefined;
+
+    const validators = response?.data?.validators ?? [];
+    if (validators.length === 0) break;
+
+    validators.forEach(
+      (validator: {
+        ownerAddress?: string;
+        registerNonce?: number;
+        list?: string;
+      }) => {
+        if (!validator?.ownerAddress) return;
+        owners[validator.ownerAddress] = {
+          isGenesis: validator.registerNonce === 0,
+          list: validator.list ?? '',
+        };
+      },
+    );
+
+    collected += validators.length;
+    total = response?.pagination?.totalRecords;
+    if (typeof total !== 'number' || collected >= total) break;
+  }
+
+  return owners;
+};
+
+/**
+ * The moment the chain started. Fetched, not hardcoded: mainnet opened
+ * 2022-07-01 and testnet 2025-02-07, so a baked-in value badges nothing there.
+ */
+export const genesisTimestampCall = async (): Promise<number | undefined> => {
+  const response = await api.get({ route: 'block/by-nonce/0' });
+  if (response?.error) return undefined;
+  const timestamp = response?.data?.block?.timestamp;
+  // Normalised here so one unit travels downstream: the badge comparison
+  // normalises both sides, but the window below goes to the API raw and a
+  // seconds value there returns nothing.
+  return Number.isFinite(timestamp) ? toMilliseconds(timestamp) : undefined;
+};
+
+/* -------------------------------- filters -------------------------------- */
+
+/** The values the type filter writes into the URL. */
+export const ACCOUNT_FILTERS = ['foundation', 'genesisValidator'] as const;
+export type AccountFilter = (typeof ACCOUNT_FILTERS)[number];
+
+export const isAccountFilter = (value: unknown): value is AccountFilter =>
+  typeof value === 'string' &&
+  (ACCOUNT_FILTERS as readonly string[]).includes(value);
+
+/** Slack around the genesis instant; the next account on chain is minutes
+ *  later, so a second costs nothing. */
+const GENESIS_WINDOW_MS = 1000;
+const GENESIS_PAGE_SIZE = 100;
+const GENESIS_PAGE_CAP = 20;
+
+/**
+ * Every account created in the genesis block: 40 on mainnet, 22 on testnet.
+ *
+ * The API filters on the stored value, so the window catches both units these
+ * rows are written in. Asked for in milliseconds; seconds returns nothing.
+ */
+export const genesisAccountsCall = async (
+  genesisTimestamp: number,
+): Promise<IAccount[] | undefined> => {
+  const accounts: IAccount[] = [];
+  let total: number | undefined;
+
+  // Paged for the same reason as above: one page of a capped endpoint looks
+  // exactly like a complete answer, and a truncated set here would under-report
+  // both filters while the rows kept badging what the filter had dropped.
+  for (let page = 1; page <= GENESIS_PAGE_CAP; page++) {
+    const response = await api.get({
+      route: 'address/list',
+      query: {
+        startdate: genesisTimestamp,
+        enddate: genesisTimestamp + GENESIS_WINDOW_MS,
+        page,
+        limit: GENESIS_PAGE_SIZE,
+      },
+    });
+    if (response?.error) return undefined;
+
+    const batch = response?.data?.accounts ?? [];
+    if (batch.length === 0) break;
+    accounts.push(...batch);
+
+    total = response?.pagination?.totalRecords;
+    if (typeof total !== 'number' || accounts.length >= total) break;
+  }
+
+  return accounts;
 };

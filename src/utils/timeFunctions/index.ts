@@ -1,5 +1,18 @@
 import { TFunction } from 'next-i18next';
 
+/** 1e12 ms is 2001 and 1e12 seconds is the year 33658, so no chain timestamp
+ *  lands near this in either unit. */
+const MILLISECOND_FLOOR = 1e12;
+
+/**
+ * A chain timestamp in milliseconds, whichever unit it arrived in. `address/
+ * list` returns both in one field: a genesis validator carries 1656680400
+ * where a foundation account carries 1656680400000, same instant. `getAge`
+ * below fixes the same thing for display.
+ */
+export const toMilliseconds = (timestamp: number): number =>
+  timestamp < MILLISECOND_FLOOR ? timestamp * 1000 : timestamp;
+
 /**
  * Receives a Date instance and calculate how many time has passed between now and this Date. Will return a string indicating how many time passed. Second arg is for translation option (optional).
  * @param date

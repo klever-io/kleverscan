@@ -11,11 +11,18 @@ import {
 } from '@/components/DataList/styles';
 import { IAccount } from '@/types/index';
 import { parseAddress } from '@/utils/parseValues';
+import AccountBadges from './AccountBadges';
+import { accountBadges } from './badges';
 import { klvAmount } from './format';
+import type { IAccountBadgeSources } from './useAccountBadgeSources';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 
-export interface IAccountsMobileCardProps {
+/** Resolved once by the page and handed down, so ten cards do not each
+ *  subscribe to the same two queries. */
+export type IAccountsMobileCardExtras = IAccountBadgeSources;
+
+export interface IAccountsMobileCardProps extends IAccountsMobileCardExtras {
   item: IAccount;
   index: number;
 }
@@ -29,9 +36,12 @@ export interface IAccountsMobileCardProps {
 const AccountsMobileCard: React.FC<IAccountsMobileCardProps> = ({
   item,
   index,
+  owners,
+  genesisTimestamp,
 }) => {
   const { t } = useTranslation(['accounts', 'table']);
-  const { address, nonce, balance, frozenBalance } = item;
+  const { address, nonce, balance, frozenBalance, timestamp } = item;
+  const badges = accountBadges(address, timestamp, genesisTimestamp, owners);
 
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
@@ -43,6 +53,7 @@ const AccountsMobileCard: React.FC<IAccountsMobileCardProps> = ({
         >
           {parseAddress(address, 20)}
         </AddressLink>
+        <AccountBadges badges={badges} />
         {/* No `defaultValue` on these four, so they read the same way the
             desktop row calls the same keys. A key nobody added shows up as a
             failing test rather than as readable text here and a raw key

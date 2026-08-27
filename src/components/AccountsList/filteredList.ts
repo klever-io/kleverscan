@@ -36,13 +36,20 @@ const emptyPage = (error: string): IAccountsResponse => ({
   code: 'internal_error',
 });
 
+/** What the shared Table falls back to, so a rejected size matches it. */
+const DEFAULT_LIMIT = 10;
+
 const paginate = (accounts: IAccount[], page: number, limit: number) => {
-  // Both clamped, because the shared Table derives them as
-  // `Number(query.page) || 1` and `Number(query.limit) || 10`, so a
-  // hand-edited URL arrives intact. A negative start makes slice count from
-  // the end; a negative size drops rows off a page that claims to hold them.
-  const size = Math.max(1, Math.floor(limit));
-  const current = Math.max(1, Math.floor(page));
+  // The shared Table derives these as `Number(query.page) || 1` and
+  // `Number(query.limit) || 10`, so a hand-edited URL arrives intact,
+  // `Infinity` included. Three ways it goes wrong unguarded: a negative start
+  // makes slice count from the end, a negative size drops rows off a page that
+  // claims to hold them, and `0 * Infinity` is NaN, which slices to nothing
+  // while the pager still reports the full set.
+  const size = Number.isFinite(limit)
+    ? Math.max(1, Math.floor(limit))
+    : DEFAULT_LIMIT;
+  const current = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1;
   const start = (current - 1) * size;
   return {
     data: { accounts: accounts.slice(start, start + size) },

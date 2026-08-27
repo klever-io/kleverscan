@@ -255,6 +255,24 @@ describe('accountsFilteredCall', () => {
     expect(response.error).toBeFalsy();
   });
 
+  it('falls back to a usable page size for a non-finite limit', async () => {
+    // `?limit=Infinity` passes the shared Table's `Number(...) || 10` intact,
+    // and `(1 - 1) * Infinity` is NaN, which sliced to nothing while the pager
+    // still reported the full 40 records.
+    const response = await call({ filter: 'foundation', limit: Infinity });
+
+    expect(response.data.accounts).toHaveLength(10);
+    expect(response.pagination?.totalRecords).toBe(40);
+    expect(response.pagination?.totalPages).toBe(4);
+  });
+
+  it('falls back to the first page for a non-finite page', async () => {
+    const response = await call({ filter: 'foundation', page: Infinity });
+
+    expect(response.data.accounts).toHaveLength(10);
+    expect(response.pagination?.self).toBe(1);
+  });
+
   it('does not serve rows from the end for a negative page', async () => {
     // The shared Table derives `page` as `Number(router.query.page) || 1`, so a
     // hand-edited `?page=-1` arrives intact. An unclamped `start` makes `slice`

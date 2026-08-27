@@ -9,14 +9,12 @@ export interface IAccountBadgeSources {
 }
 
 export const useAccountBadgeSources = (
-  /** Skips the wait. A filtered list resolves these itself before it has rows,
-   *  so deferring there only delays badges the reader is already looking at. */
+  /** Skips the wait: a filtered list resolves these before it has rows. */
   eager = false,
 ): IAccountBadgeSources => {
   const tableSettled = useDeferred();
 
-  // Runs with the table: one 5KB request feeding the only badge that shows on
-  // page one.
+  // Runs with the table: one 5KB request feeding page one's only badge.
   const { data: genesisTimestamp } = useQuery(genesisTimestampQuery);
 
   // Waits: three requests, 58.5KB over the wire, feeding badges that appear 8

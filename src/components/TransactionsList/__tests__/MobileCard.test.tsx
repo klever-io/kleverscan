@@ -28,8 +28,7 @@ jest.mock('next/router', () => ({
 // toAddress, which made "Transfer without toAddress", the crash shape the
 // card guards against, unrepresentable in this suite.
 const customLabels = { current: ['Amount'] as string[] };
-/** Controllable for the same reason `customLabels` is: the card pairs the two
- *  by index, so a case needs both sides. */
+/** Controllable for the same reason `customLabels` is: the card pairs the two by index, so a case needs both sides. */
 const customFields = {
   current: [<span key="amount">1 KLV</span>] as React.ReactNode[],
 };
@@ -254,11 +253,8 @@ describe('TransactionsMobileCard', () => {
   });
 
   it('gives colliding custom labels distinct keys', () => {
-    // The rows were keyed on the label alone. No label set repeats a name
-    // today, but several already name their first field "Type", and React
-    // reconciles a duplicate key by reusing the wrong row on the next render.
-    // Asserted on React's own warning, because a first render draws both
-    // either way: the damage only shows once the list updates.
+    // The rows were keyed on the label alone, several sets already name their first field "Type", and React reconciles a duplicate key by reusing the wrong row on the next render.
+    // Asserted on React's own warning: a first render draws both either way.
     const errors: unknown[] = [];
     const original = console.error;
     console.error = (...args: unknown[]) => errors.push(args[0]);

@@ -1,10 +1,6 @@
-/**
- * A page or size parameter as a positive integer, whatever the URL carried.
- *
- * `Number('Infinity')` is truthy, so a plain `|| fallback` lets it through: the
- * page number then reached the API as `Infinity`, and the size reached
- * `Array(limit)`, which throws `RangeError: Invalid array length`.
- */
+/** A page or size parameter as a positive integer, whatever the URL carried:
+ *  `Number('Infinity')` is truthy, so a plain `|| fallback` let it through to
+ *  the API and to `Array(limit)`, which throws RangeError. */
 export const normalizePageParam = (
   value: unknown,
   fallback: number,

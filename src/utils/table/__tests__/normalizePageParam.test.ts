@@ -1,10 +1,7 @@
 import { normalizePageParam } from '../index';
 
-/**
- * The URL is the only source for these two, and both feed something that
- * breaks on the wrong shape: the page number goes to the API, and the size
- * goes to `Array(limit)`, which throws on a non-integer or negative length.
- */
+/** The URL is the only source for these two, and both feed something that breaks on the wrong shape:
+ *  the page number goes to the API, and the size to `Array(limit)`, which throws on a non-integer or negative length. */
 describe('normalizePageParam', () => {
   it('passes an ordinary value through', () => {
     expect(normalizePageParam('3', 1)).toBe(3);
@@ -12,8 +9,7 @@ describe('normalizePageParam', () => {
   });
 
   it('rejects a non-finite value rather than passing it on', () => {
-    // `Number('Infinity')` is truthy, so a plain `|| fallback` let it through
-    // and the page number reached the API as Infinity.
+    // `Number('Infinity')` is truthy, so a plain `|| fallback` let it through and the page number reached the API as Infinity.
     expect(normalizePageParam('Infinity', 1)).toBe(1);
     expect(normalizePageParam('-Infinity', 1)).toBe(1);
     expect(normalizePageParam('NaN', 1)).toBe(1);

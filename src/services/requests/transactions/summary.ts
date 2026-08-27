@@ -67,9 +67,8 @@ const totalCall = async (): Promise<number | undefined> => {
   });
   if (response?.error) return undefined;
   const total = response?.pagination?.totalRecords;
-  // A null in the payload survives an `!== undefined` check upstream and would
-  // then throw on toLocaleString in the middle of a render. Same guard the
-  // accounts request carries, which cites this module as its model.
+  // A null in the payload survives an `!== undefined` check upstream and
+  // would then throw on toLocaleString in the middle of a render.
   return Number.isFinite(total) ? total : undefined;
 };
 

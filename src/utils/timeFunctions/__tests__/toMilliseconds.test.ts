@@ -18,9 +18,8 @@ describe('toMilliseconds', () => {
   });
 
   it('separates the units either side of the threshold', () => {
-    // 1e12 ms is 2001-09-09 and 1e12 seconds is the year 33658, so no real
-    // chain timestamp lands near the boundary in either unit. These two are the
-    // boundary itself, which is what fixes which side each range falls on.
+    // 1e12 ms is 2001-09-09 and 1e12 seconds is the year 33658, so no real chain timestamp
+    // lands near the boundary in either unit; these two are the boundary itself.
     expect(toMilliseconds(1e12)).toBe(1e12);
     expect(toMilliseconds(1e12 - 1)).toBe((1e12 - 1) * 1000);
   });

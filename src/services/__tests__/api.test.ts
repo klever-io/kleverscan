@@ -102,9 +102,8 @@ describe('api.get failure shape', () => {
   };
 
   it('always carries an error when the request failed', async () => {
-    // An error body without an `error` key used to produce `error: undefined`,
-    // which every `if (response?.error)` guard reads as success. The caller
-    // then printed the module-default `totalRecords: 0` as a fact.
+    // An error body without an `error` key used to produce `error: undefined`, which every
+    // `if (response?.error)` guard reads as success; the caller then printed the module-default `totalRecords: 0` as fact.
     const result = await withFetch({
       ok: false,
       status: 500,
@@ -153,8 +152,7 @@ describe('api.post failure shape', () => {
   };
 
   it('always carries an error when the request failed', async () => {
-    // Same defect class as api.get: `error: undefined` here read as success
-    // to `asyncDoIf`, so a failed broadcast passed its guard on the first try.
+    // Same defect class as api.get: `error: undefined` read as success to `asyncDoIf`, so a failed broadcast passed its guard on the first try.
     const result = await withFetch({
       ok: false,
       status: 500,

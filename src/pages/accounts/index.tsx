@@ -32,13 +32,9 @@ import { useRouter } from 'next/router';
 import React, { PropsWithChildren } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-/**
- * Widths and spans per column, with no cell content.
- *
- * The shared Table calls `rowSections` with a header string to read these, and
- * that probe happens twice per header cell on every render. Answering it from
- * here keeps the real builder off that path entirely.
- */
+/** Widths and spans with no cell content: the shared Table calls `rowSections`
+ *  with a header string to read them, twice per header cell on every render,
+ *  and answering from here keeps the real builder off that path. */
 const COLUMN_LAYOUT: IRowSection[] = [
   { element: () => null, span: 2 },
   { element: () => null, span: 1, width: 100 },
@@ -50,13 +46,10 @@ const Accounts: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'accounts', 'table']);
 
-  // Built inside the component so the row actions can be translated, the way
-  // the assets list does it.
+  // Inside the component so the row actions can be translated.
   const rowSections = (account: IAccount | string): IRowSection[] => {
-    // The shared Table calls this with a header string to read column widths.
-    // Handled explicitly rather than relying on a string destructuring to
-    // undefined: the compiler cannot catch a future line that dereferences the
-    // argument, and the probe runs twice per header cell on every render.
+    // The shared Table calls this with a header string to read column widths;
+    // handled explicitly so a future dereference of the argument cannot crash.
     if (typeof account !== 'object' || account === null) return COLUMN_LAYOUT;
 
     const { address, balance, frozenBalance, nonce, timestamp } = account;
@@ -66,17 +59,10 @@ const Accounts: React.FC<PropsWithChildren> = () => {
       {
         element: () => (
           <IdentityCell>
-            {/* The whole address, as this page has always shown it here, and
-                so no `title`: a tooltip repeating the visible text is announced
-                twice by some screen readers. The mobile card shortens and does
-                carry one.
-
-                Shortening here would have to cut the middle rather than
-                ellipsise, because the tail of a bech32 address is its checksum,
-                and hiding it is what makes a look-alike address cheap to grind.
-                It does not have to: this builder only runs above the tablet
-                breakpoint, where the column has the room. Below it the mobile
-                card takes over, which the e2e checks. */}
+            {/* The whole address and no `title`: a tooltip repeating visible
+                text is announced twice by some screen readers, and the tail of
+                a bech32 address is its checksum, the part a look-alike grind
+                hides. Below tablet width the mobile card takes over. */}
             <AddressLink
               href={`/account/${address}`}
               data-testid="account-link"
@@ -124,9 +110,8 @@ const Accounts: React.FC<PropsWithChildren> = () => {
   const filter = isAccountFilter(router.query.type)
     ? router.query.type
     : undefined;
-  // Eager only for the filter that decides which rows exist from this set.
-  // Under `foundation` the request reads nothing from it, so eagerness there
-  // would put three validator pages in front of the rows for nothing.
+  // Eager only for the filter that decides which rows exist from this set:
+  // under `foundation` it would put three validator pages before the rows.
   const { owners, genesisTimestamp } = useAccountBadgeSources(
     filter === 'genesisValidator',
   );
@@ -151,9 +136,8 @@ const Accounts: React.FC<PropsWithChildren> = () => {
         queryClient,
       }),
     dataName: 'accounts',
-    // No refreshKey: the filtered request awaits its own sources, and the row
-    // badges recompute from a plain re-render when the validator set lands,
-    // so there is nothing left for a changing key to trigger.
+    // No refreshKey: the request awaits its own sources and the badges
+    // recompute on a plain re-render, leaving a changing key nothing to do.
     Filters: AccountsFilters,
     MobileCard: AccountsMobileCard,
     // Once here, not per card: ten cards calling the hook would open ten

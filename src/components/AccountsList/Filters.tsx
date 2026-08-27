@@ -10,12 +10,9 @@ import React from 'react';
 /** The value Filter prepends to every list, and what "drop this filter" means. */
 const ALL_VALUE = 'All';
 
-/**
- * Two types, though the rows badge three. Both of these are subsets of the
- * genesis block, which the API returns in one request; the plain validator
- * badge has no such source, so filtering on it would mean one request per
- * validator.
- */
+/** Two types, though the rows badge three: both are subsets of the genesis
+ *  block, one API request; the plain validator badge has no such source, so
+ *  filtering on it would mean one request per validator. */
 const AccountsFilters: React.FC = () => {
   const router = useRouter();
   const { t } = useTranslation(['accounts']);

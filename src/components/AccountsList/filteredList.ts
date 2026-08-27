@@ -17,9 +17,8 @@ export interface IFilteredListArgs {
   queryClient: QueryClient;
 }
 
-// A function, not a shared constant: returning one object by identity to every
-// caller means a consumer that ever sorts or splices `data.accounts` in place
-// changes what the next caller receives.
+// A function, not a shared constant: one object handed out by identity means a
+// caller that sorts or splices `data.accounts` changes what the next one gets.
 const emptyPage = (error: string): IAccountsResponse => ({
   data: { accounts: [] },
   pagination: {
@@ -30,8 +29,7 @@ const emptyPage = (error: string): IAccountsResponse => ({
     totalPages: 0,
     totalRecords: 0,
   },
-  // Required, because every path that reaches this one is a source that did
-  // not answer. A filter with genuinely no matches goes through `paginate`.
+  // Only reached when a source did not answer; no-match filters use paginate.
   error,
   code: 'internal_error',
 });
@@ -40,12 +38,9 @@ const emptyPage = (error: string): IAccountsResponse => ({
 const DEFAULT_LIMIT = 10;
 
 const paginate = (accounts: IAccount[], page: number, limit: number) => {
-  // Defense in depth behind the Table's `normalizePageParam` clamp: a URL
-  // value no longer arrives here raw, but this function is also callable
-  // directly. Unguarded, a negative start makes slice count from the end, a
-  // negative size drops rows off a page that claims to hold them, and
-  // `0 * Infinity` is NaN, which slices to nothing while the pager still
-  // reports the full set.
+  // Defense in depth behind the Table's `normalizePageParam` clamp, for direct
+  // callers: a negative start makes slice count from the end, and `0 * Infinity`
+  // is NaN, which slices to nothing while the pager still reports the full set.
   const size = Number.isFinite(limit)
     ? Math.max(1, Math.floor(limit))
     : DEFAULT_LIMIT;
@@ -54,8 +49,7 @@ const paginate = (accounts: IAccount[], page: number, limit: number) => {
   return {
     data: { accounts: accounts.slice(start, start + size) },
     pagination: {
-      // The clamped page, not the requested one: reporting `self: -1` beside
-      // the rows of page one describes a page that does not exist.
+      // The clamped page: `self: -1` beside page one's rows describes no page.
       self: current,
       next: current + 1,
       previous: Math.max(1, current - 1),
@@ -68,22 +62,12 @@ const paginate = (accounts: IAccount[], page: number, limit: number) => {
   } as IAccountsResponse;
 };
 
-/**
- * One page of the account list, filtered or not.
- *
- * Both filters are subsets of the accounts created in the genesis block, which
- * arrive in a single request, so filtered paging happens here rather than at
- * the API: letting it page the window and then narrowing the page would give
- * ragged pages and a page count describing a different set than the rows.
- *
- * The badge sources are awaited here rather than passed in as values. Handed
- * in, they are undefined for the first second of the page and this resolved a
- * successful empty page, which the shared Table cannot tell from "there are
- * none": a filtered URL showed "Apparently no data here" before it had asked
- * for anything. Awaiting them keeps the request in flight, so the table stays
- * on its skeleton. They go through the shared query cache, so this reuses
- * whatever the row badges already fetched rather than asking twice.
- */
+// Both filters are subsets of the genesis accounts, which arrive in a single
+// request, so filtered paging happens here rather than at the API.
+// The badge sources are awaited rather than passed in: handed in they are
+// undefined for the first second, which resolved a successful empty page and
+// showed "Apparently no data here" before anything had been asked. Awaiting
+// keeps the request in flight, so the table stays on its skeleton.
 export const accountsFilteredCall = async ({
   page,
   limit,
@@ -103,8 +87,7 @@ export const accountsFilteredCall = async ({
     return emptyPage('genesis block unavailable');
   }
 
-  // Only the validator filter reads the validator set, and it is the expensive
-  // one, so the foundation filter must not wait on it.
+  // The expensive source; the foundation filter must not wait on it.
   const owners =
     filter === 'genesisValidator'
       ? await queryClient.fetchQuery(validatorOwnersQuery)
@@ -113,9 +96,8 @@ export const accountsFilteredCall = async ({
     return emptyPage('validator set unavailable');
   }
 
-  // Through the cache too, keyed on the instant it was fetched for. The set is
-  // as immutable as block 0 is, so paging inside a filter costs nothing after
-  // the first page instead of re-fetching the whole window each time.
+  // Keyed on the instant it was fetched for; the set is as immutable as block
+  // 0, so paging inside a filter reuses the first page's fetch.
   const genesis = await queryClient.fetchQuery({
     queryKey: ['genesisAccounts', genesisTimestamp],
     queryFn: async () => (await genesisAccountsCall(genesisTimestamp)) ?? null,
@@ -123,9 +105,8 @@ export const accountsFilteredCall = async ({
   });
   if (!genesis) return emptyPage('genesis accounts unavailable');
 
-  // Through accountBadges, so filter and badge cannot disagree. They did once:
-  // the badge suppressed itself on genesis validators while the filter kept
-  // them, so a Foundation-filtered row showed only "Genesis validator".
+  // Through accountBadges, so filter and badge cannot disagree; they did once,
+  // and a Foundation-filtered row showed only "Genesis validator".
   const matching = genesis.filter(account => {
     const badges = accountBadges(
       account.address,

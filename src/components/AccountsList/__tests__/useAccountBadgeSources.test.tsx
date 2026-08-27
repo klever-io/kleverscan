@@ -8,11 +8,8 @@ import React from 'react';
 
 const settled = { value: false };
 
-/**
- * `useDeferred` has its own spec, so here it is replaced by the one bit the
- * hook reads from it. What is under test is the wiring: which of the two
- * requests waits for that signal, and which does not.
- */
+/** `useDeferred` has its own spec, so it is replaced by the one bit the hook reads from it.
+ *  Under test is the wiring: which of the two requests waits for that signal, and which does not. */
 jest.mock('@/components/DataList/useDeferred', () => ({
   useDeferred: () => settled.value,
 }));
@@ -98,8 +95,7 @@ describe('useAccountBadgeSources', () => {
   });
 
   it('fetches the genesis moment with the table, not after it', async () => {
-    // It feeds the only badge that shows on page one, and it is one small
-    // request, so it must not wait on the deferral.
+    // It feeds the only badge on page one and is one small request, so it must not wait on the deferral.
     renderProbe();
 
     await waitFor(() => expect(state()).toBe(`${GENESIS_MS}|-`));
@@ -121,9 +117,8 @@ describe('useAccountBadgeSources', () => {
   });
 
   it('skips the wait when asked to be eager', async () => {
-    // This is the whole contract of the argument. The genesis validator filter
-    // decides which rows exist from this set, so deferring it there shows an
-    // empty table that fills in afterwards, which reads as "no results".
+    // The genesis validator filter decides which rows exist from this set, so deferring
+    // it there shows an empty table that fills in afterwards, which reads as "no results".
     settled.value = false;
     renderProbe({ eager: true });
 
@@ -131,8 +126,7 @@ describe('useAccountBadgeSources', () => {
   });
 
   it('defers by default, so a caller that passes nothing does not fetch early', async () => {
-    // Guards the default value of the parameter itself: `useAccountBadgeSources()`
-    // with no argument must behave as the unfiltered list, not as the filter.
+    // Guards the parameter's own default: `useAccountBadgeSources()` with no argument must behave as the unfiltered list.
     renderProbe({ eager: undefined });
 
     await waitFor(() => expect(mockedGenesis).toHaveBeenCalled());

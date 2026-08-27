@@ -103,11 +103,8 @@ export interface ITable<TCard = Record<string, never>> {
    * suits tables stacking a value over a label.
    */
   singleLineSkeleton?: boolean;
-  /**
-   * Column indexes whose loading bar hugs the right edge, matching a skin
-   * that right-aligns those cells. Default none: an unskinned table lays its
-   * values out left, and a right-hugging bar there jumps on load.
-   */
+  /** Column indexes whose loading bar hugs the right edge, matching a skin
+   *  that right-aligns those cells; default all-left, as unskinned tables. */
   rightAlignedSkeletonColumns?: number[];
 }
 
@@ -148,13 +145,9 @@ const Table = <TCard,>({
 
   const tableRef = React.useRef<HTMLDivElement>(null);
 
-  // Clamped where they enter, and used everywhere below including the request.
-  // The loading render does `Array(limit)`, so a hand-edited `?limit=3.5` or
-  // `?limit=-5` throws `RangeError: Invalid array length` from there. Nothing
-  // in this app is an error boundary and every page has `getInitialProps`, so
-  // that throw happens server-side and answers 500; `?limit=1e9` allocates a
-  // billion rows there first. 100 is well above the 10/20/50 the control offers,
-  // and is also where the API caps a page.
+  // Clamped where they enter and used everywhere below, request included: the
+  // API answers 500 "invalid pagination parameter" for a raw `3.5`, and the
+  // loading render's `Array(limit)` RangeError lands server-side as a 500.
   const page = normalizePageParam(router.query?.page, 1);
   const limit = normalizePageParam(router.query?.limit, 10, 100);
 
@@ -166,9 +159,6 @@ const Table = <TCard,>({
         responseFormatted = {
           items: response.data[dataName],
           totalPages: response?.pagination?.totalPages,
-          // Carried through for the export total: the API caps a page at 100
-          // while still reporting `totalPages` against the size that was asked
-          // for, so the two have to be read together.
           perPage: response?.pagination?.perPage,
         };
         return responseFormatted;
@@ -198,25 +188,14 @@ const Table = <TCard,>({
       refreshKey,
     ],
 
-    // The clamped values, not the raw ones: passing `3.5` on made the API
-    // answer 500 "invalid pagination parameter", so the page traded a crash
-    // for a permanently empty table with a Retry that could not help.
     queryFn: () => tableRequest(page, limit),
 
     // Keep the current rows on screen while the next page loads. Swapping
     // them for placeholders and back made paging flicker.
     placeholderData: keepPreviousData,
 
-    // A step out and back is a common move, and every list here costs a
-    // round trip the API answers in about a second. Inside this window the
-    // rows a reader just looked at are shown again without asking for them a
-    // second time. A page load, a filter change and the refresh control all
-    // bypass it, so nothing here can pin a stale list on screen.
-    //
-    // Only a list that actually has rows. `tableRequest` turns every failure
-    // into an empty result and react-query files that as a success, so
-    // without this an API that was briefly down would keep answering "no data
-    // here" from cache for ten seconds instead of retrying on the next mount.
+    // Re-shows just-read rows on a step out and back (a round trip costs about
+    // a second). Only lists with rows: failures arrive as empty successes.
     staleTime: query =>
       (query.state.data as { items?: unknown[] } | undefined)?.items?.length
         ? 10_000
@@ -310,10 +289,8 @@ const Table = <TCard,>({
                   <ExportButton
                     items={response?.items}
                     tableRequest={tableRequest}
-                    // `perPage` as the API actually applied it, not the limit
-                    // we asked for: it caps a page at 100 while still reporting
-                    // `totalPages` against the larger number, so multiplying by
-                    // the clamped limit would halve an "All pages" export.
+                    // `perPage` as the API applied it: it caps a page at 100,
+                    // so multiplying by the asked-for limit halves the export.
                     totalRecords={
                       response?.totalPages * (response?.perPage || limit) ||
                       10000
@@ -387,11 +364,9 @@ const Table = <TCard,>({
                           smaller={smaller}
                         >
                           <DoubleRow {...props}>
-                            {/* Pushed to the same edge the loaded value sits
-                                on. The bar is a block inside a column flex,
-                                so the cell's text-align does not reach it,
-                                and the consumer's skin decides per column
-                                which edge that is. */}
+                            {/* A block inside a column flex, so the cell's
+                                text-align does not reach it; the skin decides
+                                per column which edge the bar hugs. */}
                             {!singleLineSkeleton && (
                               <Skeleton
                                 width={index2 === 0 ? '40%' : '30%'}

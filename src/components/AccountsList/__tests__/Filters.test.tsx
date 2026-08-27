@@ -14,8 +14,7 @@ jest.mock('next/router', () => ({
   useRouter: () => ({ query, pathname: '/accounts', push: jest.fn() }),
 }));
 
-// next/jest hands an SVG import back as an object, and the shared Filter
-// renders one as a component, so React rejects the whole tree without this.
+// next/jest hands an SVG import back as an object, and the shared Filter renders one as a component; React rejects the tree without this.
 jest.mock('@/assets/icons', () => ({
   FilterArrowDown: () => null,
 }));
@@ -25,10 +24,7 @@ jest.mock('@/utils', () => ({
   setQueryAndRouter: (...args: unknown[]) => setQuery(...args),
 }));
 
-/**
- * Resolved from the shipped bundle, so an option whose label nobody added
- * fails here rather than rendering "Filters.genesisValidator" in the dropdown.
- */
+/** Resolved from the shipped bundle, so an option whose label nobody added fails here rather than rendering "Filters.genesisValidator". */
 jest.mock('next-i18next', () => {
   const bundle = jest.requireActual(
     '../../../../public/locales/en/accounts.json',
@@ -104,9 +100,7 @@ describe('AccountsFilters', () => {
     const { container } = renderFilters();
     open();
 
-    // Asserted as the whole option set, not as "these two are present": a
-    // third option added later would slip past a presence check, and matching
-    // it by label is fragile because an untranslated value renders as itself.
+    // The whole option set, not "these two are present": a third option added later slips past a presence check.
     const options = [
       ...container.querySelectorAll('[data-testid="selector-item"]'),
     ]
@@ -116,9 +110,7 @@ describe('AccountsFilters', () => {
     expect(new Set(options)).toEqual(
       new Set(['All', 'Foundation', 'Genesis validator']),
     );
-    // The plain validator badge exists on rows, but 208 accounts spread across
-    // the whole balance range cannot be listed from validator/list, so it is
-    // deliberately not offered here.
+    // The plain validator badge exists on rows, but 208 accounts across the whole balance range cannot be listed from validator/list, so it is not offered.
   });
 
   it('writes the value, not the label, into the query', () => {
@@ -133,10 +125,8 @@ describe('AccountsFilters', () => {
   });
 
   it('keeps the rest of the query, so a filter does not reset the view', () => {
-    // Both other tests here pass against a filter that writes `{ page: '1' }`
-    // and throws the URL away, because they only assert what that mutation
-    // happens to produce. A reader who set a page size or a date range keeps
-    // both when they pick a type.
+    // The other tests pass against a filter that writes `{ page: '1' }` and throws
+    // the URL away; a reader's page size and date range must survive picking a type.
     query.limit = '50';
     query.startdate = '1787000000000';
     renderFilters();
@@ -154,8 +144,7 @@ describe('AccountsFilters', () => {
   });
 
   it('returns to the first page on every change', () => {
-    // A narrower set has fewer pages. Staying on page 30 of the unfiltered
-    // list would land on an empty page with no control to get back from.
+    // A narrower set has fewer pages; staying on page 30 would land on an empty page with no control to get back from.
     query.page = '30';
     renderFilters();
     open();
@@ -168,11 +157,8 @@ describe('AccountsFilters', () => {
   });
 
   it('reads All when the URL carries a type the list does not narrow on', () => {
-    // Measured in a browser: `?type=nonsense` leaves the list unfiltered, but
-    // the control used to echo the URL value back, so the dropdown read
-    // "nonsense" above ten unfiltered rows. The control said filtered and the
-    // list was not, which is the same control-versus-content contradiction the
-    // foundation filter had.
+    // Measured in a browser: the control used to echo the URL value back, reading "nonsense"
+    // above ten unfiltered rows, the same control-versus-content contradiction the foundation filter had.
     query.type = 'nonsense';
     renderFilters();
 

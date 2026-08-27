@@ -27,12 +27,8 @@ export interface IAccountsMobileCardProps extends IAccountsMobileCardExtras {
   index: number;
 }
 
-/**
- * Card layout for mobile and tablet: the address with its row actions on top,
- * then the balance, then staked and nonce on one meta line. Replaces the
- * generic heading-per-cell card the shared Table falls back to, which laid the
- * four cells out in a two-column grid and left the last half empty.
- */
+/** Replaces the generic heading-per-cell card the shared Table falls back to,
+ *  which laid these four cells out in a two-column grid, half of it empty. */
 const AccountsMobileCard: React.FC<IAccountsMobileCardProps> = ({
   item,
   index,
@@ -54,10 +50,8 @@ const AccountsMobileCard: React.FC<IAccountsMobileCardProps> = ({
           {parseAddress(address, 20)}
         </AddressLink>
         <AccountBadges badges={badges} />
-        {/* No `defaultValue` on these four, so they read the same way the
-            desktop row calls the same keys. A key nobody added shows up as a
-            failing test rather than as readable text here and a raw key
-            there. */}
+        {/* No `defaultValue` on these four: a key nobody added fails a test
+            instead of reading as text here and a raw key on the desktop row. */}
         <RowActions>
           <CopyAction
             value={address}
@@ -81,9 +75,8 @@ const AccountsMobileCard: React.FC<IAccountsMobileCardProps> = ({
         <MobileMetaItem>
           {`KLV ${t('table:Staked')}`} {klvAmount(frozenBalance)}
         </MobileMetaItem>
-        {/* Translated, unlike the desktop column heading of the same name:
-            that one doubles as a sort key, which is what issue #678 is about.
-            This label carries no such duty. */}
+        {/* Translated, unlike the desktop heading of the same name, which
+            doubles as a sort key (#678); this label has no such duty. */}
         <MobileMetaItem>
           {t('accounts:List.Nonce')} {nonce}
         </MobileMetaItem>

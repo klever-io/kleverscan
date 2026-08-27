@@ -1,4 +1,3 @@
-/** The figures a daily-creations series yields for the summary tiles. */
 export interface ISummaryFigures {
   today: number | undefined;
   yesterday: number | undefined;
@@ -8,15 +7,9 @@ export interface ISummaryFigures {
   countedDays: number;
 }
 
-/**
- * Derives the tile figures from a positional series, newest entry first.
- *
- * A hole is undefined, which is not the same as a day on which nothing
- * happened: position is what makes an entry today or yesterday, so holes are
- * kept and the tiles leave a missing figure out rather than printing a zero.
- * The total sums only the days that carried a figure, and `countedDays`
- * counts those same days, so the total and its label describe one set.
- */
+// Positional, newest first. A hole (undefined) is not a zero day, and holes
+// stay holes because position is what makes an entry today or yesterday; the
+// tiles leave a missing figure out rather than printing a zero.
 export const summaryFigures = (
   series: (number | undefined)[],
 ): ISummaryFigures => {

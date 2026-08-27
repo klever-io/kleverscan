@@ -1,13 +1,7 @@
 import { formatDate } from '@/utils/formatFunctions';
 
-/**
- * Deliberately no mock of `@/utils/timeFunctions`.
- *
- * The first version of this file mocked `getAge`, which is exactly where the
- * unguarded scaling loop lived, so it asserted a return value for inputs that
- * never returned in production and certified the bug as fixed. Every case here
- * has to run the real chain to mean anything.
- */
+/** Deliberately no mock of `@/utils/timeFunctions`: the first version mocked `getAge`, exactly where
+ *  the unguarded scaling loop lived, and certified the bug as fixed. Every case runs the real chain. */
 describe('formatDate', () => {
   it.each([
     ['zero', 0],
@@ -16,9 +10,8 @@ describe('formatDate', () => {
     ['infinite', Infinity],
     ['not a number', NaN],
   ])('returns for a %s timestamp instead of looping', (_label, input) => {
-    // `0 * 1000` is 0, so the scaling loop never reached the year 2000 and
-    // spun forever, taking the render with it. The out-of-range cases fell
-    // through both loops into NaN arithmetic instead.
+    // `0 * 1000` is 0, so the scaling loop never reached the year 2000 and spun forever,
+    // taking the render with it; the out-of-range cases fell through into NaN arithmetic.
     expect(formatDate(input as number)).toContain('01/01/70');
   });
 

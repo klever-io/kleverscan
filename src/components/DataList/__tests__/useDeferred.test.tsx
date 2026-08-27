@@ -8,11 +8,8 @@ import React from 'react';
 
 const fetching = { count: 0 };
 
-/**
- * `useIsFetching` is the only thing the hook reads, so it is the only thing
- * replaced. Driving a real query to a controlled in-flight state would test
- * react-query rather than this hook.
- */
+/** `useIsFetching` is the only thing the hook reads, so it is the only thing replaced:
+ *  driving a real query to a controlled in-flight state would test react-query, not this hook. */
 jest.mock('@tanstack/react-query', () => ({
   ...jest.requireActual('@tanstack/react-query'),
   useIsFetching: () => fetching.count,
@@ -79,9 +76,8 @@ describe('useDeferred', () => {
   });
 
   it('does not release on the idle moment before the page has asked for anything', () => {
-    // The hook mounts above the table, so its first effect runs before that
-    // table has started fetching. An idle check alone would release here and
-    // defer nothing, which is the whole point of the hook.
+    // The hook mounts above the table, so its first effect runs before the table
+    // starts fetching; an idle check alone would release here and defer nothing.
     renderProbe();
 
     expect(state()).toBe('no');
@@ -133,8 +129,7 @@ describe('useDeferred', () => {
   });
 
   it('releases on the ceiling even if no request ever happens', () => {
-    // Without this a page with nothing of its own to wait on would hold the
-    // deferred request forever.
+    // Without this a page with nothing of its own to wait on would hold the deferred request forever.
     renderProbe();
     expect(state()).toBe('no');
 
@@ -146,9 +141,8 @@ describe('useDeferred', () => {
   });
 
   it('does not release on the ceiling while a request is still in flight', () => {
-    // The ceiling is for a page that never asked for anything. Firing it on a
-    // page whose own request is still running does the one thing this hook
-    // exists to prevent, and a slow connection is exactly when it happens.
+    // Firing the ceiling while the page's own request still runs does the one thing
+    // this hook exists to prevent, and a slow connection is exactly when it happens.
     const client = new QueryClient();
     fetching.count = 1;
     const { rerender } = render(
@@ -163,8 +157,7 @@ describe('useDeferred', () => {
 
     expect(state()).toBe('no');
 
-    // And it still releases once that request finishes, so the ceiling is not
-    // simply disabled for a page that does have traffic.
+    // And it still releases once that request finishes, so the ceiling is not simply disabled for a busy page.
     act(() => {
       fetching.count = 0;
       rerender(
@@ -178,8 +171,7 @@ describe('useDeferred', () => {
   });
 
   it('stays released when a later refetch starts', () => {
-    // Paging or the refresh control must not hide badges that are already on
-    // screen.
+    // Paging or the refresh control must not hide badges already on screen.
     const client = new QueryClient();
     const wrap = () => (
       <QueryClientProvider client={client}>
@@ -207,9 +199,7 @@ describe('useDeferred', () => {
   });
 
   it('releases at the hard ceiling even while a request is still in flight', () => {
-    // The narrowed ceiling above is right, but a queryFn that pages
-    // sequentially can hold in-flight state far past any single request's
-    // timeout. Late is better than never.
+    // A queryFn that pages sequentially can hold in-flight state far past any single request's timeout; late is better than never.
     fetching.count = 1;
     renderProbe();
 

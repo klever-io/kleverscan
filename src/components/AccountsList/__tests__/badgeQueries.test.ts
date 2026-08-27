@@ -13,12 +13,9 @@ jest.mock('@/services/requests/accounts', () => ({
 const mockedTimestamp = genesisTimestampCall as jest.Mock;
 const mockedOwners = validatorOwnersCall as jest.Mock;
 
-/**
- * The whole reason this file exists: react-query 5 throws on an undefined
- * result rather than storing it, which drops the query into its error state
- * and spends three retries on a call that already answered. Both request
- * functions answer `undefined` on failure, so the mapping is load-bearing.
- */
+/** react-query 5 throws on an undefined result rather than storing it, dropping the query into
+ *  its error state and spending three retries on a call that already answered. Both request
+ *  functions answer `undefined` on failure, so the mapping is load-bearing. */
 describe('badge query options', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -45,20 +42,17 @@ describe('badge query options', () => {
   });
 
   it('keeps a zero timestamp rather than mapping it to null', async () => {
-    // `??`, not `||`: the two differ only at 0, and this is the same
-    // zero-versus-absent boundary the filter and the badge both pin.
+    // `??`, not `||`: the two differ only at 0, the same zero-versus-absent boundary the filter and the badge pin.
     mockedTimestamp.mockResolvedValue(0);
 
     await expect(genesisTimestampQuery.queryFn()).resolves.toBe(0);
   });
 
   it('keys both on names the filtered list can reuse from cache', async () => {
-    // The filtered request fetches through these same keys, which is what
-    // makes it reuse whatever the row badges already loaded.
+    // The filtered request fetches through these same keys, which is what makes it reuse what the row badges loaded.
     expect(genesisTimestampQuery.queryKey).toEqual(['genesisTimestamp']);
     expect(validatorOwnersQuery.queryKey).toEqual(['validatorOwners']);
-    // A function, not a constant: a real answer is good for the session, a
-    // failed one must go stale immediately so the next mount asks again.
+    // A function, not a constant: a real answer is good for the session, a failed one goes stale immediately.
     const stale = genesisTimestampQuery.staleTime as (q: unknown) => number;
     expect(stale({ state: { data: 1656680400000 } })).toBe(Infinity);
     expect(stale({ state: { data: null } })).toBe(0);
@@ -70,11 +64,8 @@ describe('badge query options', () => {
   });
 
   it('asks again after a failure instead of caching it for the session', () => {
-    // The property the staleTime function exists for, through a real cache
-    // rather than by reading the option back. `?? null` turns a failure into
-    // something react-query files as a success, so without this one bad
-    // request would leave every Foundation badge off the page and both filters
-    // on the empty state until a full reload.
+    // Through a real cache: `?? null` files a failure as a success, so without immediate staleness one
+    // bad request left every Foundation badge off the page and both filters empty until a full reload.
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });

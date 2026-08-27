@@ -45,10 +45,8 @@ describe('smartContractNameCall', () => {
   });
 
   it('throws on a failed lookup rather than calling it an unnamed contract', async () => {
-    // These are different answers and the caller caches them differently: an
-    // errored query stays stale, so the next mount asks again, while a null is
-    // settled for the hour. Collapsing them left the three-in-nine contracts
-    // that answer 500 unnamed for the rest of the session.
+    // An errored query stays stale so the next mount asks again, while a null is settled for the
+    // hour; collapsing them left the three-in-nine contracts that answer 500 unnamed all session.
     mockedGet.mockResolvedValue({ error: 'not found' });
 
     await expect(smartContractNameCall('klv1contract')).rejects.toThrow(

@@ -201,8 +201,7 @@ describe('transactionsSummaryCall', () => {
   });
 
   it('treats a null total as absent rather than passing it on', async () => {
-    // `!== undefined` upstream lets a null through, and the tile then calls
-    // toLocaleString on it in the middle of a render.
+    // `!== undefined` upstream lets a null through, and the tile then calls toLocaleString on it mid-render.
     answerEach({
       list: { pagination: { totalRecords: null } },
     });

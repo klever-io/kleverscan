@@ -7,12 +7,8 @@ import { ThemeProvider } from 'styled-components';
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-/**
- * Resolved against the shipped English bundle, so a badge label or tooltip key
- * that nobody added fails here instead of rendering "Badges.Foundation" at a
- * reader. That is not hypothetical: it is exactly what the page showed after
- * the keys were added but before the dev server was restarted.
- */
+/** Resolved against the shipped English bundle, so a missing badge label or tooltip key fails here
+ *  instead of rendering "Badges.Foundation": exactly what the page showed before the dev server restart. */
 jest.mock('next-i18next', () => {
   const bundle = jest.requireActual(
     '../../../../public/locales/en/accounts.json',
@@ -33,8 +29,7 @@ jest.mock('next-i18next', () => {
         bundle,
       );
     if (typeof value === 'string') return value;
-    // Mirrors i18next: a caller that supplies a fallback gets it. Only a key
-    // with neither is a mistake worth failing on.
+    // Mirrors i18next: a caller supplying a fallback gets it; only a key with neither fails.
     if (options?.defaultValue) return options.defaultValue;
     throw new Error(`missing accounts locale key: ${key}`);
   };
@@ -106,9 +101,7 @@ describe('AccountBadges', () => {
 
     const pill = screen.getByText('Foundation');
     expect(screen.queryByText('Validator')).toBeNull();
-    // Asserted because the validator pill's title was checked twice and this
-    // one never: swapping the two keys passed the whole suite, and the i18n
-    // mock only proves a key exists, not that it is on the right pill.
+    // The validator pill's title was checked twice and this one never: swapping the two keys passed the whole suite.
     expect(pill.getAttribute('title')).toBe(
       "Created in the chain's first block",
     );
@@ -130,9 +123,8 @@ describe('AccountBadges', () => {
   });
 
   it('falls back to the raw state for one the bundle does not carry', () => {
-    // `list` is an untyped string on the chain, and the four states here are
-    // the ones measured live plus the one this repo already renders elsewhere.
-    // A fifth must read as itself rather than as a raw key.
+    // `list` is an untyped string on the chain; the four states are the ones
+    // measured live, and a fifth must read as itself rather than a raw key.
     renderBadges({ validator: true, validatorList: 'somethingNew' });
 
     expect(screen.getByText('Validator').getAttribute('title')).toBe(
@@ -156,8 +148,7 @@ describe('AccountBadges', () => {
   });
 
   it('shows both badges when an account is foundation and a validator', () => {
-    // Suppression happens upstream in accountBadges, not here: this component
-    // renders what it is handed, so the combination has to work.
+    // Suppression happens upstream in accountBadges; this component renders what it is handed.
     renderBadges({ foundation: true, validator: true });
 
     expect(screen.getByText('Foundation')).toBeTruthy();

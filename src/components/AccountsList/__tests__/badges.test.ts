@@ -10,9 +10,8 @@ describe('isFoundationAccount', () => {
   });
 
   it('matches across the unit mismatch the endpoint actually returns', () => {
-    // Measured on mainnet: the 21 genesis validators carry seconds while the
-    // other 19 genesis accounts carry milliseconds, in the same field of the
-    // same response. Comparing raw finds one group and misses the other.
+    // Measured on mainnet: the 21 genesis validators carry seconds while the other 19 genesis
+    // accounts carry milliseconds in the same field; comparing raw finds one group and misses the other.
     expect(isFoundationAccount(GENESIS_S, GENESIS_MS)).toBe(true);
     expect(isFoundationAccount(GENESIS_MS, GENESIS_S)).toBe(true);
   });
@@ -32,10 +31,8 @@ describe('isFoundationAccount', () => {
   });
 
   it('treats zero as a number, not as absent', () => {
-    // Found by mutation: `Number.isFinite` swapped for a truthiness test
-    // survived, and the two differ only at 0. Zero is the one value where
-    // "missing" and "a real timestamp" look alike to a falsy check, and the
-    // same distinction already drifted once in this feature's refresh key.
+    // Found by mutation: a truthiness swap for `Number.isFinite` survived, and the two differ
+    // only at 0; the same distinction already drifted once in this feature's refresh key.
     expect(isFoundationAccount(0, 0)).toBe(true);
     expect(isFoundationAccount(0, GENESIS_MS)).toBe(false);
   });
@@ -79,8 +76,7 @@ describe('accountBadges', () => {
   });
 
   it('badges a genesis validator as both, because it is both', () => {
-    // All 21 genesis validators were created in block 0, so they are genesis
-    // accounts as well. The row states both facts rather than picking one.
+    // All 21 genesis validators were created in block 0, so the row states both facts rather than picking one.
     const badges = accountBadges('genesisNode', GENESIS_S, GENESIS_MS, owners);
 
     expect(badges.foundation).toBe(true);
@@ -88,8 +84,7 @@ describe('accountBadges', () => {
   });
 
   it('treats an unloaded validator set as unknown, never as "not a validator"', () => {
-    // The set arrives after the rows on purpose. Until it does, the row shows
-    // no role badge rather than asserting the account has no node.
+    // The set arrives after the rows on purpose; until then the row shows no role badge rather than asserting no node.
     const badges = accountBadges(
       'genesisNode',
       GENESIS_S,
@@ -99,8 +94,7 @@ describe('accountBadges', () => {
 
     expect(badges.validator).toBe(false);
     expect(badges.genesisValidator).toBe(false);
-    // The foundation badge does not wait on it, which is why it is the one
-    // that shows on the first page without a delay.
+    // The foundation badge does not wait on it, which is why it shows on the first page without delay.
     expect(badges.foundation).toBe(true);
   });
 });

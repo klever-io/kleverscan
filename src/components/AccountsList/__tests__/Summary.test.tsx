@@ -14,12 +14,9 @@ import { ThemeProvider } from 'styled-components';
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-/**
- * Keys are resolved from the shipped bundles rather than echoed back, so a key
- * the strip asks for that nobody ever added fails this suite instead of
- * rendering "accounts:List.New24h" at a reader. Plural forms go through the
- * same `_one`/`_other` selection i18next applies.
- */
+/** Keys resolve from the shipped bundles rather than echoing back, so a key nobody
+ *  added fails this suite instead of rendering "accounts:List.New24h" at a reader.
+ *  Plurals go through the same `_one`/`_other` selection i18next applies. */
 jest.mock('next-i18next', () => {
   const bundles: Record<string, unknown> = {
     accounts: jest.requireActual('../../../../public/locales/en/accounts.json'),
@@ -61,8 +58,7 @@ jest.mock('next-i18next', () => {
   return { useTranslation: () => ({ t: translate }) };
 });
 
-// The installed testing-library still calls the removed ReactDOM.render; every
-// component suite in this repo carries the same createRoot shim.
+// The installed testing-library still calls the removed ReactDOM.render; every component suite carries this createRoot shim.
 jest.mock('react-dom', () => {
   const actual = jest.requireActual('react-dom');
   const client = jest.requireActual('react-dom/client');
@@ -107,11 +103,7 @@ jest.mock('@/services/requests/accounts', () => ({
 
 import AccountsSummary from '../Summary';
 
-/**
- * The request layer answers plain values now, and undefined for its own
- * failure. That undefined is the shape to mock: `api.get` never rejects, so a
- * mockRejectedValue would model something this layer cannot produce.
- */
+/** The request layer answers undefined for its own failure: `api.get` never rejects, so mockRejectedValue would model an impossible shape. */
 
 const renderSummary = () =>
   render(
@@ -128,20 +120,14 @@ const renderSummary = () =>
     </QueryClientProvider>,
   );
 
-/** Resolves once the skeleton is gone, so an assertion cannot pass while the
- *  card is still loading: the loading shape renders no text and no testid, and
- *  both would satisfy an "is absent" check. */
+/** Resolves once the skeleton is gone: the loading shape renders no text and no testid, so an "is absent" check passes while still loading. */
 const settled = async (): Promise<void> =>
-  // queryBy, not getBy: the callback form lets waitForElementToBeRemoved say
-  // "already absent" instead of throwing the getter's own not-found error,
-  // which would read as a failure of the thing being waited for.
+  // queryBy, not getBy: lets waitForElementToBeRemoved say "already absent" instead of throwing the getter's own not-found error.
   waitForElementToBeRemoved(() =>
     screen.queryByLabelText('Account statistics'),
   );
 
-/** Two mounts sharing one cache, which is what a client-side navigation back
- *  to this page is. renderSummary builds a fresh client per call, so it can
- *  never observe what the strip does or does not re-request. */
+/** Two mounts sharing one cache, which is what a client-side navigation back is; renderSummary's fresh client per call can never observe re-requests. */
 const renderShared = (client: QueryClient) =>
   render(
     <QueryClientProvider client={client}>
@@ -186,8 +172,7 @@ describe('AccountsSummary', () => {
     renderSummary();
     const card = await loaded();
 
-    // 10 today against 9 yesterday. A percentage would read "+11%" and claim a
-    // precision a single account does not support.
+    // 10 against 9: a percentage would read "+11%" and claim a precision a single account does not support.
     expect(card.textContent).toContain('+1 vs yesterday');
     expect(card.textContent).not.toContain('%');
   });
@@ -236,10 +221,8 @@ describe('AccountsSummary', () => {
     createdCall.mockResolvedValue(undefined);
     const { container } = renderSummary();
 
-    // Waiting for the skeleton to go, not merely for the testid to be absent.
-    // The loading shape carries no testid and no text, so both of the
-    // assertions below hold while the card is still loading and would pass
-    // against a component that never resolves.
+    // Wait for the skeleton to go, not merely for the testid to be absent: the loading
+    // shape carries neither, so both assertions pass against a component that never resolves.
     await settled();
 
     expect(screen.queryByTestId('accounts-summary')).toBeNull();
@@ -252,12 +235,9 @@ describe('AccountsSummary', () => {
     const card = await loaded();
 
     expect(card.textContent).not.toContain('NaN');
-    // Matched as its own element, not as a substring of the card: the total
-    // tile above reads "176,197", which contains a 9 and would satisfy a
-    // textContent check on its own.
+    // Matched as its own element: the total tile's "176,197" contains a 9 and satisfies a substring check.
     expect(within(card).getByText('9')).toBeTruthy();
-    // Two days carried a figure out of the three the window returned, and the
-    // label describes the days that were summed.
+    // Two of the three window days carried a figure; the label describes the summed days.
     expect(card.textContent).toContain('across 2 days');
   });
 
@@ -266,16 +246,13 @@ describe('AccountsSummary', () => {
     renderSummary();
     const card = await loaded();
 
-    // The trap this guards: compacting the series to [10, 4] would make the
-    // day before yesterday stand in for yesterday and report "+6".
+    // Compacting the series to [10, 4] would let the day before yesterday report "+6".
     expect(card.textContent).not.toContain('vs yesterday');
     expect(within(card).getByText('10')).toBeTruthy();
   });
 
   it('keeps the window tile when today is the hole and the total is gone', async () => {
-    // The sparse case: no record count, no figure for today, but the rest of
-    // the window did answer. Testing only the first two figures for the empty
-    // state would drop a tile that has something to say.
+    // No count, no figure for today, but the rest of the window answered: the tile still has something to say.
     totalCall.mockResolvedValue(undefined);
     createdCall.mockResolvedValue([undefined, 4]);
     renderSummary();
@@ -297,11 +274,8 @@ describe('AccountsSummary', () => {
   });
 
   it('asks again on the next mount when nothing but holes came back', async () => {
-    // A series is positional and keeps a hole for a day with no usable count,
-    // so its length is non-zero even when every entry is a hole. That is a
-    // wholly failed strip, which the queryFn still files as a success, and
-    // measuring the answer by length alone pinned it for five minutes: the
-    // strip stayed gone across client-side navigation until a full reload.
+    // All-holes is a wholly failed strip the queryFn still files as a success; measured by
+    // length alone it pinned for five minutes, gone across client-side navigation until a full reload.
     totalCall.mockResolvedValue(undefined);
     createdCall.mockResolvedValue([undefined, undefined, undefined]);
 
@@ -319,8 +293,7 @@ describe('AccountsSummary', () => {
   });
 
   it('keeps a real answer out of a second request on the next mount', async () => {
-    // The other half of the same rule, so the fix above cannot be "never
-    // cache": a strip that answered stays cached across a remount.
+    // The other half of the same rule, so the fix above cannot be "never cache".
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });

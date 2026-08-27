@@ -15,8 +15,7 @@ const AccountBadges: React.FC<IAccountBadgesProps> = ({ badges }) => {
 
   if (!foundation && !validator) return null;
 
-  // One badge with two forms, not two: a genesis validator is also a
-  // validator, so showing both would say the same thing twice.
+  // One badge with two forms: a genesis validator is also a validator.
   const roleKey = genesisValidator ? 'GenesisValidator' : 'Validator';
   const roleTooltip = t(`accounts:Badges.${roleKey}Tooltip`);
   // Through the bundle so the sentence is not half-translated, falling back to

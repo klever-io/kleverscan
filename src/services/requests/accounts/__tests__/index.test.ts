@@ -57,8 +57,7 @@ describe('accountsCall', () => {
 
   it('drops every parameter outside the allowlist', async () => {
     await accountsCall(1, 10, {
-      // View state the page may keep in the URL, and a parameter the API
-      // ignores. Neither narrows the list, so neither belongs in the request.
+      // View state the page keeps in the URL plus a parameter the API ignores; neither belongs in the request.
       tab: 'Overview',
       address: 'klv1spoofed',
       foundation: 'true',
@@ -69,10 +68,7 @@ describe('accountsCall', () => {
   });
 
   it('takes paging from the query object it was passed, not the URL copy', async () => {
-    // Scoped to this function on purpose. It ignores `page`/`limit` sitting in
-    // the query object; it does not clamp them itself, because the shared
-    // Table already clamps both through `normalizePageParam` before passing
-    // them in as arguments.
+    // No clamping here: the shared Table already clamps both through `normalizePageParam` before passing them in.
     await accountsCall(2, 10, { page: '999', limit: '10000' });
 
     expect(queryOf()).toEqual({ page: 2, limit: 10 });
@@ -106,12 +102,8 @@ describe('accountsCall', () => {
   });
 });
 
-/**
- * What `api.get` actually resolves to when a request fails: it never rejects,
- * and it substitutes a module-level default pagination whose `totalRecords` is
- * 0 (`services/api.ts:49-56`). Mocking a rejection instead would model a shape
- * this layer cannot produce, and would let a caller that prints that 0 pass.
- */
+/** What `api.get` resolves to on failure: it never rejects, and substitutes a
+ *  default pagination whose `totalRecords` is 0 (`services/api.ts:49-56`). */
 const apiFailure = {
   data: null,
   error: 'internal error',
@@ -146,10 +138,7 @@ describe('accountsTotalCall', () => {
   });
 
   it('reports a genuine zero as zero, not as a failure', async () => {
-    // The mirror of the test above it. `api.get` substitutes `totalRecords: 0`
-    // on failure, which is why `error` is checked first; a successful response
-    // carrying 0 is a chain with no accounts and must survive as 0. A
-    // truthiness test here collapses the two back together.
+    // Mirror of the test above: a successful 0 is a chain with no accounts, and a truthiness test collapses the two.
     mockedGet.mockResolvedValue({
       ...listResponse,
       pagination: { totalRecords: 0 },
@@ -197,17 +186,13 @@ describe('accountsCreatedCall', () => {
       code: 'successful',
     });
 
-    // Not [5, 4]. Compacting slides day two into position one, and the caller
-    // reads position one as yesterday, so it would report the day before
-    // yesterday as yesterday's figure.
+    // Not [5, 4]: compacting slides day two into position one, which the caller reads as yesterday.
     await expect(accountsCreatedCall(7)).resolves.toEqual([5, undefined, 4]);
   });
 
   it('keeps a zero count as zero, because no new accounts is a real answer', async () => {
-    // Found by mutation: `Number.isFinite(doc_count)` swapped for a truthiness
-    // test survived every test here. It differs only at 0, and 0 is ordinary
-    // data. Turning it into a hole would drop the day out of the week total and
-    // let the caller read the next day as this one.
+    // Found by mutation: a truthiness swap for `Number.isFinite(doc_count)`
+    // survived every test here; it differs only at 0, and 0 is ordinary data.
     mockedGet.mockResolvedValue({
       data: { number_by_day: [{ doc_count: 0 }, { doc_count: 4 }] },
       error: '',
@@ -242,10 +227,8 @@ describe('accountsCreatedCall', () => {
   });
 
   it('escapes the segment, so a caller cannot extend the path', async () => {
-    // The signature says number and today's only caller passes a constant, so
-    // this cast stands in for a future caller that hands it something off the
-    // URL. A route segment never reaches buildUrlQuery's encoding: getHost
-    // concatenates it as-is.
+    // A route segment never reaches buildUrlQuery's encoding: getHost concatenates it as-is.
+    // The cast stands in for a future caller handing this something off the URL.
     await accountsCreatedCall('1/../../address/list' as unknown as number);
 
     expect(argsOf().route).toBe(
@@ -274,9 +257,7 @@ describe('validatorOwnersCall', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('keeps paging until it has as many owners as totalRecords claims', async () => {
-    // The trap this guards: `validator/list` silently caps a page at 100 no
-    // matter what `limit` asks for, and answers with a totalRecords beside it.
-    // Stopping after one page reports 2 genesis validators where there are 21.
+    // `validator/list` silently caps a page at 100 whatever `limit` asks; stopping after one page reports 2 genesis validators where there are 21.
     mockedGet
       .mockResolvedValueOnce(validatorPage([{ address: 'a' }], 3))
       .mockResolvedValueOnce(validatorPage([{ address: 'b' }], 3))
@@ -299,10 +280,8 @@ describe('validatorOwnersCall', () => {
   });
 
   it('gives up entirely when a later page fails, not a partial set', async () => {
-    // The contract the comment above the guard claims, and the one no test
-    // reached: only a page-1 failure was exercised. Mainnet needs three pages,
-    // so a 500 on page 2 is ordinary, and returning what page 1 held would
-    // silently un-badge every validator past the break.
+    // Only a page-1 failure was exercised before. Mainnet needs three pages, so a
+    // 500 on page 2 is ordinary, and a partial set un-badges everyone past the break.
     mockedGet
       .mockResolvedValueOnce(validatorPage([{ address: 'a' }], 300))
       .mockResolvedValueOnce(apiFailure);
@@ -312,8 +291,7 @@ describe('validatorOwnersCall', () => {
   });
 
   it('stops at the page cap when the count never becomes reachable', async () => {
-    // Same bound as the genesis loop, different constant. A count no number of
-    // pages can satisfy is the only thing standing between this and forever.
+    // The cap is the only thing between an unsatisfiable count and forever.
     mockedGet.mockResolvedValue(
       validatorPage(
         Array.from({ length: 100 }, (_, i) => ({ address: `owner${i}` })),
@@ -356,10 +334,8 @@ describe('validatorOwnersCall', () => {
   });
 
   it('does not read a missing register nonce as genesis', async () => {
-    // `=== 0` rather than a falsy check, and nothing reached it: the page
-    // helper defaults the nonce, so no fixture could produce an absent one.
-    // Genesis validator is the strongest claim this page makes about an
-    // address, and a missing field must not earn it.
+    // Nothing reached the `=== 0` before: the page helper defaults the nonce.
+    // Genesis validator is the strongest claim here; a missing field must not earn it.
     mockedGet.mockResolvedValue({
       data: { validators: [{ ownerAddress: 'unknown' }] },
       pagination: { totalRecords: 1 },
@@ -373,8 +349,7 @@ describe('validatorOwnersCall', () => {
   });
 
   it('treats a body with no validators array as an empty page', async () => {
-    // The `?? []` fallback. A 200 whose shape is not what was expected has to
-    // stop the loop, not throw halfway through building the map.
+    // The `?? []` fallback: a misshapen 200 has to stop the loop, not throw mid-map.
     mockedGet.mockResolvedValue({
       data: {},
       pagination: { totalRecords: 5 },
@@ -413,8 +388,7 @@ describe('isAccountFilter', () => {
   });
 
   it('rejects anything a hand-edited URL might carry', () => {
-    // The page falls back to the unfiltered list on a no, so this guard is
-    // what stops `?type=validator` from quietly returning an empty table.
+    // The page falls back to the unfiltered list on a no; this stops `?type=validator` quietly returning an empty table.
     expect(isAccountFilter('validator')).toBe(false);
     expect(isAccountFilter('')).toBe(false);
     expect(isAccountFilter(undefined)).toBe(false);
@@ -441,9 +415,7 @@ describe('genesisAccountsCall', () => {
     expect(queryOf()).toEqual({
       startdate: 1656680400000,
       enddate: 1656680401000,
-      // Genesis is 40 on mainnet and 22 on testnet, so the first page holds the
-      // whole set on both. It is still asked for by page, because a capped
-      // endpoint's first page looks exactly like a complete answer.
+      // Genesis is 40 on mainnet and 22 on testnet, so page one holds the whole set; still paged, because a capped first page looks complete.
       page: 1,
       limit: 100,
     });
@@ -454,10 +426,7 @@ describe('genesisAccountsCall', () => {
   });
 
   it('keeps reading while the count says there is more', async () => {
-    // The same trap `validatorOwnersCall` was written for: one page of a capped
-    // endpoint is indistinguishable from a complete answer. Truncating here
-    // would shrink both filters while the unfiltered rows kept badging the
-    // accounts the filter had dropped.
+    // Same trap as `validatorOwnersCall`: one page of a capped endpoint is indistinguishable from a complete answer.
     const page = (n: number, total: number) => ({
       data: {
         accounts: Array.from({ length: n }, (_, i) => ({ address: `a${i}` })),
@@ -476,9 +445,7 @@ describe('genesisAccountsCall', () => {
   });
 
   it('stops at the page cap when the count never becomes reachable', async () => {
-    // A count the pages can never satisfy. Without the cap this runs forever;
-    // the exact bound matters because an off-by-one there is invisible until a
-    // chain is large enough to reach it.
+    // Without the cap this runs forever; an off-by-one in the bound stays invisible until a chain reaches it.
     mockedGet.mockResolvedValue({
       data: {
         accounts: Array.from({ length: 100 }, (_, i) => ({ address: `a${i}` })),
@@ -495,9 +462,7 @@ describe('genesisAccountsCall', () => {
   });
 
   it('gives up entirely when a later page fails, not a short window', async () => {
-    // Same gap as in the validator loop. A truncated genesis window would make
-    // both filters under-report while the unfiltered rows kept badging the
-    // accounts the filter had dropped.
+    // A truncated window would under-report both filters while the unfiltered rows kept badging the dropped accounts.
     mockedGet
       .mockResolvedValueOnce({
         data: {
@@ -549,11 +514,8 @@ describe('genesisTimestampCall', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('normalises a seconds timestamp, so one unit travels downstream', async () => {
-    // Mainnet answers in milliseconds today, so this branch is about the two
-    // readers rather than the chain: the badge comparison normalises both
-    // sides, but the genesis window is handed to the API raw and a seconds
-    // value there returns zero accounts. Normalising at the source is what
-    // stops the badges being right while both filters are silently empty.
+    // The genesis window is handed to the API raw, and a seconds value there
+    // returns zero accounts: badges right, both filters silently empty.
     mockedGet.mockResolvedValue({
       data: { block: { nonce: 0, timestamp: GENESIS_S } },
       error: '',
@@ -581,8 +543,7 @@ describe('genesisTimestampCall', () => {
   });
 
   it('passes a zero timestamp through rather than calling it missing', async () => {
-    // Same 0-versus-falsy boundary as in the filter. `Number.isFinite` is what
-    // separates "the block said zero" from "the block said nothing".
+    // `Number.isFinite` separates "the block said zero" from "the block said nothing".
     mockedGet.mockResolvedValue({
       data: { block: { nonce: 0, timestamp: 0 } },
       error: '',

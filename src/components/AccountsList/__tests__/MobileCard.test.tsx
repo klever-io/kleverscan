@@ -7,23 +7,15 @@ import { ThemeProvider } from 'styled-components';
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-/**
- * The real module reaches `services/requests/ito` and from there the ESM chain
- * Jest cannot transform, so it is replaced wholesale, the way the transactions
- * card's own suite does it. The truncation itself is therefore not what this
- * file checks; the e2e covers that, at a viewport where this card is what
- * renders.
- */
+/** The real module reaches `services/requests/ito` and from there the ESM chain Jest
+ *  cannot transform, so it is replaced wholesale, the way the transactions card's own
+ *  suite does it. Truncation itself is covered by the e2e at a card viewport. */
 jest.mock('@/utils/parseValues', () => ({
   parseAddress: (value: string, max: number) =>
     `${value.slice(0, max / 2)}...${value.slice(-(max / 2))}`,
 }));
 
-/**
- * Resolved against the shipped English bundles rather than echoed back, so a
- * key the card asks for that nobody ever added fails here instead of rendering
- * "accounts:Common.CopyAddress" at a reader.
- */
+/** Resolved against the shipped English bundles, so a key nobody added fails here instead of rendering "accounts:Common.CopyAddress" at a reader. */
 jest.mock('next-i18next', () => {
   const bundles: Record<string, unknown> = {
     accounts: jest.requireActual('../../../../public/locales/en/accounts.json'),
@@ -52,8 +44,7 @@ jest.mock('next-i18next', () => {
   return { useTranslation: () => ({ t: translate }) };
 });
 
-// The installed testing-library still calls the removed ReactDOM.render; every
-// component suite in this repo carries the same createRoot shim.
+// The installed testing-library still calls the removed ReactDOM.render; every component suite carries this createRoot shim.
 jest.mock('react-dom', () => {
   const actual = jest.requireActual('react-dom');
   const client = jest.requireActual('react-dom/client');
@@ -128,9 +119,7 @@ describe('AccountsMobileCard', () => {
   });
 
   it('badges the card from the same sources as the desktop row', () => {
-    // The card path was only ever rendered without the two sources, so the
-    // "no badges" branch was the only one any test reached. Everything else
-    // about badges on this path was covered by Cypress alone.
+    // The card path was only ever rendered without the two sources, so the "no badges" branch was the only one any unit test reached.
     renderCard(
       { timestamp: GENESIS_MS },
       {
@@ -174,9 +163,7 @@ describe('AccountsMobileCard', () => {
     renderCard();
     const card = screen.getByTestId('table-row-3');
 
-    // The i18n mock throws on a key the bundle does not carry, so reaching
-    // this assertion already proves the key resolved; the text check pins the
-    // label to its value so the two cannot drift apart.
+    // Reaching this assertion proves the key resolved (the mock throws on a missing one); the text check pins the label to its value.
     expect(card.textContent).toContain('Nonce 42');
   });
 
@@ -187,8 +174,7 @@ describe('AccountsMobileCard', () => {
     expect(within(card).getByLabelText('Copy address')).toBeTruthy();
     const open = within(card).getByLabelText('Open account in a new tab');
     expect(open.getAttribute('href')).toBe(`/account/${ADDRESS}`);
-    // Set by the shared control, and the reason a reviewer does not have to
-    // check for it at every call site.
+    // Set by the shared control, so a reviewer does not have to check every call site.
     expect(open.getAttribute('rel')).toBe('noopener noreferrer');
   });
 });

@@ -44,12 +44,8 @@ jest.mock('react-dom', () => {
   };
 });
 
-/**
- * Thin on purpose. The wrapper is only ever rendered by the accounts page,
- * which Jest cannot import, so nothing else evaluates its breakpoint
- * interpolation: a theme token renamed out from under it would surface in a
- * browser rather than here.
- */
+/** Thin on purpose: the wrapper is only rendered by the accounts page, which Jest cannot import,
+ *  so nothing else evaluates its breakpoint interpolation; a renamed theme token would otherwise surface only in a browser. */
 describe('AccountsTableWrapper', () => {
   it('resolves its theme interpolation without throwing', () => {
     const { container } = render(

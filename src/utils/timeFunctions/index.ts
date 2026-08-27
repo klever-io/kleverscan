@@ -4,12 +4,9 @@ import { TFunction } from 'next-i18next';
  *  lands near this in either unit. */
 const MILLISECOND_FLOOR = 1e12;
 
-/**
- * A chain timestamp in milliseconds, whichever unit it arrived in. `address/
- * list` returns both in one field: a genesis validator carries 1656680400
- * where a foundation account carries 1656680400000, same instant. `getAge`
- * below fixes the same thing for display.
- */
+/** A chain timestamp in milliseconds, whichever unit it arrived in: `address/
+ *  list` mixes both in one field, 1656680400 next to 1656680400000 for the
+ *  same instant. `getAge` below fixes the same thing for display. */
 export const toMilliseconds = (timestamp: number): number =>
   timestamp < MILLISECOND_FLOOR ? timestamp * 1000 : timestamp;
 
@@ -44,9 +41,8 @@ export const normalizeTimestamp = (timestamp: number): number => {
 };
 
 export const getAge = (dateInput: Date, t?: TFunction): string => {
-  // Through the same normalisation the formatters use. This loop used to sit
-  // here unguarded in a second copy, where a zero multiplied to zero forever
-  // and hung the render, and an out-of-range date fell through into NaN.
+  // The formatters' normalisation: the unguarded copy that sat here hung the
+  // render on a zero and fell through to NaN on an out-of-range date.
   const date = new Date(normalizeTimestamp(dateInput?.getTime?.() ?? NaN));
 
   const diff = Math.abs(new Date().getTime() - date.getTime());

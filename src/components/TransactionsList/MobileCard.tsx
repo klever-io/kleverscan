@@ -200,9 +200,8 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
       </CardRow>
       {customLabels.map((label, fieldIndex) =>
         customFields[fieldIndex] ? (
-          // Index in the key too: no label set repeats a name today, but
-          // several already name their first field "Type", and a repeat would
-          // silently collapse two rows into one.
+          // Index in the key too: several sets already name a field "Type",
+          // and a repeated label would silently collapse two rows into one.
           <CardRow key={`${fieldIndex}-${label}`}>
             <CardLabel>
               {label === 'Type'

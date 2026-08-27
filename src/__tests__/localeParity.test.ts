@@ -18,15 +18,8 @@ const read = (locale: string, file: string): Record<string, unknown> => {
   return JSON.parse(fs.readFileSync(full, 'utf8'));
 };
 
-/**
- * Keys pt-BR is still short of, per namespace, measured 2026-08-27.
- *
- * A ceiling rather than an exact count: a namespace may only improve. Adding an
- * English key without its counterpart pushes a namespace over its number and
- * fails here, which is the drift this guards. Only `en` is wired into the i18n
- * config today, so nothing here is user-visible yet; it is the record that
- * stops the gap growing while that stays true.
- */
+// Keys pt-BR is still short of, per namespace, measured 2026-08-27. A ceiling, not an exact
+// count: a namespace may only improve, and an English key added without its counterpart fails here.
 const KNOWN_GAPS: Record<string, number> = {
   'contractValidator.json': 34,
   'common.json': 6,
@@ -35,15 +28,9 @@ const KNOWN_GAPS: Record<string, number> = {
   'table.json': 1,
 };
 
-/**
- * Keys whose pt-BR text expects a variable the English one does not pass,
- * measured 2026-08-27. All three predate this and sit in namespaces nothing
- * here touches: `Cards.ViewAll` carries two `{{type}}` against an English
- * string with none, and the other two add a `{{type}}` and a `{{vogal}}` for
- * Portuguese agreement that no call site supplies. Listed rather than rewritten
- * because guessing at the intended wording is not a translation, and only `en`
- * is wired into the config today. Fixing one means deleting its line here.
- */
+// Keys whose pt-BR text expects a variable the English one does not pass, measured 2026-08-27; all three predate this.
+// `Cards.ViewAll` carries two `{{type}}` against an English string with none; the other two add a `{{type}}` and a `{{vogal}}` no call site supplies.
+// Listed rather than rewritten because only `en` is wired into the config today; fixing one means deleting its line here.
 const PLACEHOLDER_GAPS = new Set([
   'common.json::Cards.ViewAll',
   'encodingConverter.json::PlaceHolderValues',
@@ -56,8 +43,7 @@ const namespaces = fs
 
 describe('locale parity between en and pt-BR', () => {
   it('finds the namespaces to compare', () => {
-    // Guards the walk itself: an empty list would make every case below pass
-    // by never running.
+    // Guards the walk itself: an empty list would make every case below pass by never running.
     expect(namespaces.length).toBeGreaterThan(10);
   });
 

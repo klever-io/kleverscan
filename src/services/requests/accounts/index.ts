@@ -55,11 +55,10 @@ export const accountsCall = async (
   });
 
   // Written after the allowlist, so a `page` or `limit` sitting in the URL
-  // cannot reach the API through it. Worth being precise about what that does
-  // and does not buy: the caller is the shared Table, which derives these two
-  // from `router.query` itself and coerces them with `Number(...) || default`.
-  // So the values still originate in the URL; what cannot travel is anything
-  // that is not a number, and no extra parameter can ride along beside them.
+  // cannot reach the API through it. The caller is the shared Table, which
+  // derives both from `router.query` through `normalizePageParam` (finite,
+  // floored, at least 1, size capped at 100) and passes them in as arguments,
+  // so a URL value arrives clamped, and no extra parameter rides along.
   query.page = page;
   query.limit = limit;
 

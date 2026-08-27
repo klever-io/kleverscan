@@ -207,9 +207,9 @@ describe('useDeferred', () => {
   });
 
   it('releases at the hard ceiling even while a request is still in flight', () => {
-    // The narrowed ceiling above is right, but `api.get` sets no fetch timeout,
-    // so a stalled connection would otherwise hold the deferred request for the
-    // life of the page. Late is better than never.
+    // The narrowed ceiling above is right, but a queryFn that pages
+    // sequentially can hold in-flight state far past any single request's
+    // timeout. Late is better than never.
     fetching.count = 1;
     renderProbe();
 

@@ -13,6 +13,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
+import { summaryFigures } from './summaryFigures';
 import {
   AccountsSummaryCard,
   AccountsSummaryLoading,
@@ -88,34 +89,17 @@ const AccountsSummary: React.FC = () => {
   if (!data) return null;
 
   const { totalRecords, series } = data;
-  // Read by position, because that is what makes them today and yesterday. A
-  // hole is undefined here, which is not the same as a day on which nothing
-  // happened, and the tiles below leave it out rather than printing a zero.
-  const today = series[0];
-  const yesterday = series[1];
-  // Summed over the days that carried a figure, and the span below counts
-  // those same days, so the total and its label describe one set of days.
-  const counted = series.filter(
-    (count): count is number => count !== undefined,
-  );
-  const weekTotal = counted.length
-    ? counted.reduce((sum, count) => sum + count, 0)
-    : undefined;
-
-  const change =
-    today !== undefined && yesterday !== undefined
-      ? today - yesterday
-      : undefined;
+  const { today, change, windowTotal, countedDays } = summaryFigures(series);
 
   // Nothing to show is better than a card of blanks. All three figures have to
-  // be missing before that is true, and `weekTotal` is genuinely a third one:
-  // since the series keeps holes, today can be absent while the rest of the
-  // window still carries figures, and testing only the first two would hide a
-  // tile that has something to say.
+  // be missing before that is true, and `windowTotal` is genuinely a third
+  // one: since the series keeps holes, today can be absent while the rest of
+  // the window still carries figures, and testing only the first two would
+  // hide a tile that has something to say.
   if (
     totalRecords === undefined &&
     today === undefined &&
-    weekTotal === undefined
+    windowTotal === undefined
   ) {
     return null;
   }
@@ -169,7 +153,7 @@ const AccountsSummary: React.FC = () => {
           </Tile>
         )}
 
-        {weekTotal !== undefined && (
+        {windowTotal !== undefined && (
           <Tile>
             <TileLabel>
               {t('accounts:List.NewWindow', {
@@ -178,7 +162,7 @@ const AccountsSummary: React.FC = () => {
               })}
             </TileLabel>
             <TileValueRow>
-              <TileValue>{weekTotal.toLocaleString(NUMBER_LOCALE)}</TileValue>
+              <TileValue>{windowTotal.toLocaleString(NUMBER_LOCALE)}</TileValue>
             </TileValueRow>
             <TileSub>
               {/* The days actually summed, not the days asked for: a short
@@ -186,7 +170,7 @@ const AccountsSummary: React.FC = () => {
                   through i18next's `count`, so the one-day case the API can
                   return does not read "across 1 days". */}
               {t('accounts:List.AcrossDays', {
-                count: counted.length,
+                count: countedDays,
                 defaultValue_one: 'across {{count}} day',
                 defaultValue_other: 'across {{count}} days',
               })}

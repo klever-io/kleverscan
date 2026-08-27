@@ -120,10 +120,12 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         };
         return responseFormatted;
       }
-      // setPage(1);
-      return [];
+      return { items: [], totalPages: 0 };
     } catch (error) {
+      // React Query rejects an undefined queryFn result outright and files
+      // the query as an error; an empty page shows the empty state instead.
       console.error(error);
+      return { items: [], totalPages: 0 };
     }
   };
 

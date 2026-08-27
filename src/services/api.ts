@@ -239,7 +239,7 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
         if (!response.ok) {
           return {
             data: null,
-            error: 'Could not parse response',
+            error: `request failed with status ${response.status}`,
             code: 'internal_error',
             pagination,
           };
@@ -253,9 +253,15 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
       }
 
       if (!response.ok) {
+        // Same rule as `withoutBody` and `withText`: a body without a string
+        // `error` yielded `error: undefined`, which `asyncDoIf` and every
+        // `if (response?.error)` guard read as success on a failed POST.
         return {
           data: null,
-          error: resJson.error,
+          error:
+            typeof resJson?.error === 'string' && resJson.error.length > 0
+              ? resJson.error
+              : `request failed with status ${response.status}`,
           code: 'internal_error',
           pagination,
         };

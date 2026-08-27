@@ -40,12 +40,12 @@ const emptyPage = (error: string): IAccountsResponse => ({
 const DEFAULT_LIMIT = 10;
 
 const paginate = (accounts: IAccount[], page: number, limit: number) => {
-  // The shared Table derives these as `Number(query.page) || 1` and
-  // `Number(query.limit) || 10`, so a hand-edited URL arrives intact,
-  // `Infinity` included. Three ways it goes wrong unguarded: a negative start
-  // makes slice count from the end, a negative size drops rows off a page that
-  // claims to hold them, and `0 * Infinity` is NaN, which slices to nothing
-  // while the pager still reports the full set.
+  // Defense in depth behind the Table's `normalizePageParam` clamp: a URL
+  // value no longer arrives here raw, but this function is also callable
+  // directly. Unguarded, a negative start makes slice count from the end, a
+  // negative size drops rows off a page that claims to hold them, and
+  // `0 * Infinity` is NaN, which slices to nothing while the pager still
+  // reports the full set.
   const size = Number.isFinite(limit)
     ? Math.max(1, Math.floor(limit))
     : DEFAULT_LIMIT;

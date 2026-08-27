@@ -103,6 +103,12 @@ export interface ITable<TCard = Record<string, never>> {
    * suits tables stacking a value over a label.
    */
   singleLineSkeleton?: boolean;
+  /**
+   * Column indexes whose loading bar hugs the right edge, matching a skin
+   * that right-aligns those cells. Default none: an unskinned table lays its
+   * values out left, and a right-hugging bar there jumps on load.
+   */
+  rightAlignedSkeletonColumns?: number[];
 }
 
 const onErrorHandler = () => {
@@ -133,6 +139,7 @@ const Table = <TCard,>({
   MobileCard,
   mobileCardProps,
   singleLineSkeleton = false,
+  rightAlignedSkeletonColumns = [],
 }: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -382,25 +389,25 @@ const Table = <TCard,>({
                           <DoubleRow {...props}>
                             {/* Pushed to the same edge the loaded value sits
                                 on. The bar is a block inside a column flex,
-                                so the cell's text-align does not reach it and
-                                it would hug the left in right-aligned
-                                columns, then jump when the data lands. */}
+                                so the cell's text-align does not reach it,
+                                and the consumer's skin decides per column
+                                which edge that is. */}
                             {!singleLineSkeleton && (
                               <Skeleton
                                 width={index2 === 0 ? '40%' : '30%'}
                                 containerCustomStyles={
-                                  index2 === 0
-                                    ? undefined
-                                    : { marginLeft: 'auto' }
+                                  rightAlignedSkeletonColumns.includes(index2)
+                                    ? { marginLeft: 'auto' }
+                                    : undefined
                                 }
                               />
                             )}
                             <Skeleton
                               width={index2 === 0 ? '70%' : '40%'}
                               containerCustomStyles={
-                                index2 === 0
-                                  ? undefined
-                                  : { marginLeft: 'auto' }
+                                rightAlignedSkeletonColumns.includes(index2)
+                                  ? { marginLeft: 'auto' }
+                                  : undefined
                               }
                             />
                           </DoubleRow>

@@ -1,7 +1,9 @@
 import {
   accountsCall,
   genesisAccountsCall,
+  genesisTimestampCall,
 } from '@/services/requests/accounts';
+import { QueryClient } from '@tanstack/react-query';
 import { accountBadges } from '../badges';
 import { genesisTimestampQuery, validatorOwnersQuery } from '../badgeQueries';
 import { accountsFilteredCall } from '../filteredList';
@@ -232,11 +234,11 @@ describe('accountsFilteredCall', () => {
   });
 
   it('rounds a fractional limit down, so the pager matches the rows', async () => {
-    // The page size gets the same treatment as the page number: `?limit=3.5`
-    // arrives intact through `Number(...) || 10`. `slice` truncates its own
-    // arguments, so the rows survive either way and the damage lands in the
-    // count: 40 rows at 3.5 reports 12 pages while serving them 3 at a time,
-    // which is a pager pointing at pages that do not exist.
+    // Defense in depth: the Table clamp already floors a URL value, but this
+    // function is callable directly. `slice` truncates its own arguments, so
+    // the rows survive either way and the damage lands in the count: 40 rows
+    // at 3.5 reports 12 pages while serving them 3 at a time, which is a
+    // pager pointing at pages that do not exist.
     const fractional = await call({
       filter: 'foundation',
       limit: 3.5,
@@ -268,9 +270,9 @@ describe('accountsFilteredCall', () => {
   });
 
   it('falls back to a usable page size for a non-finite limit', async () => {
-    // `?limit=Infinity` passes the shared Table's `Number(...) || 10` intact,
-    // and `(1 - 1) * Infinity` is NaN, which sliced to nothing while the pager
-    // still reported the full 40 records.
+    // Unguarded, `(1 - 1) * Infinity` is NaN, which sliced to nothing while
+    // the pager still reported the full 40 records. The Table clamp keeps a
+    // URL value out; this guard covers direct callers.
     const response = await call({ filter: 'foundation', limit: Infinity });
 
     expect(response.data.accounts).toHaveLength(10);
@@ -286,10 +288,10 @@ describe('accountsFilteredCall', () => {
   });
 
   it('does not serve rows from the end for a negative page', async () => {
-    // The shared Table derives `page` as `Number(router.query.page) || 1`, so a
-    // hand-edited `?page=-1` arrives intact. An unclamped `start` makes `slice`
-    // count from the end, which served four real rows under an impossible page
-    // number while the pager said there were two pages.
+    // An unclamped `start` makes `slice` count from the end, which served
+    // four real rows under an impossible page number while the pager said
+    // there were two pages. Clamped here as well as at the Table, because
+    // this function does not know its caller.
     const response = await call({ filter: 'genesisValidator', page: -1 });
 
     expect(response.data.accounts.map(a => a.address)).toEqual(
@@ -353,8 +355,9 @@ describe('accountsFilteredCall', () => {
 
   it('marks a failed window as an error, not as an empty result', async () => {
     // Scoped to this layer. The shared Table collapses the two into the same
-    // empty state (`Table/index.tsx:151-159`), so this is not a claim about
-    // what the page shows, only that surfacing it needs no change here.
+    // empty state (`tableRequest` in `Table/index.tsx`), so this is not a
+    // claim about what the page shows, only that surfacing it needs no
+    // change here.
     mockedGenesis.mockResolvedValue(undefined);
 
     const response = await call({ filter: 'foundation' });
@@ -381,5 +384,35 @@ describe('accountsFilteredCall', () => {
         GENESIS_MS,
       ]);
     });
+  });
+
+  it('retries the genesis window after a failure, and pins a real answer', async () => {
+    // Through a real cache, because the inline staleTime arrow is the policy
+    // under test: a null result must go stale immediately so the next call
+    // asks again, and a populated set is pinned for the session.
+    (genesisTimestampCall as jest.Mock).mockResolvedValue(GENESIS_MS);
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    const realCall = () =>
+      accountsFilteredCall({
+        page: 1,
+        limit: 10,
+        filter: 'foundation',
+        routerQuery: {},
+        queryClient: client,
+      });
+
+    mockedGenesis.mockResolvedValueOnce(undefined);
+    const first = await realCall();
+    expect(first.error).toBe('genesis accounts unavailable');
+    expect(mockedGenesis).toHaveBeenCalledTimes(1);
+
+    const second = await realCall();
+    expect(second.error).toBeFalsy();
+    expect(mockedGenesis).toHaveBeenCalledTimes(2);
+
+    await realCall();
+    expect(mockedGenesis).toHaveBeenCalledTimes(2);
   });
 });

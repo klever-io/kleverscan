@@ -50,14 +50,8 @@ const Accounts: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'accounts', 'table']);
 
-  /**
-   * Built inside the component so the row actions can be translated, the way
-   * the assets list does it. Note the shared Table also calls this with a
-   * header *string* to read each column's width, so nothing here may touch the
-   * argument outside an `element` closure: those are not invoked for that
-   * probe, the destructure below simply yields undefined, and the page keeps
-   * rendering its header.
-   */
+  // Built inside the component so the row actions can be translated, the way
+  // the assets list does it.
   const rowSections = (account: IAccount | string): IRowSection[] => {
     // The shared Table calls this with a header string to read column widths.
     // Handled explicitly rather than relying on a string destructuring to
@@ -66,8 +60,6 @@ const Accounts: React.FC<PropsWithChildren> = () => {
     if (typeof account !== 'object' || account === null) return COLUMN_LAYOUT;
 
     const { address, balance, frozenBalance, nonce, timestamp } = account;
-    // Survives the header-string probe: every field reads undefined, which
-    // answers "no badges".
     const badges = accountBadges(address, timestamp, genesisTimestamp, owners);
 
     return [
@@ -168,6 +160,7 @@ const Accounts: React.FC<PropsWithChildren> = () => {
     // subscriptions to the same two queries.
     mobileCardProps: { owners, genesisTimestamp },
     singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [1, 2, 3],
   };
 
   return (

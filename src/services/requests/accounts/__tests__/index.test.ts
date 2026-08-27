@@ -70,10 +70,9 @@ describe('accountsCall', () => {
 
   it('takes paging from the query object it was passed, not the URL copy', async () => {
     // Scoped to this function on purpose. It ignores `page`/`limit` sitting in
-    // the query object; it does not clamp them, and the shared Table derives
-    // both from `router.query` and passes them in as arguments, so a crafted
-    // `?limit=10000` does still reach the API as a number. What cannot travel
-    // is a non-number, or a parameter riding along beside them.
+    // the query object; it does not clamp them itself, because the shared
+    // Table already clamps both through `normalizePageParam` before passing
+    // them in as arguments.
     await accountsCall(2, 10, { page: '999', limit: '10000' });
 
     expect(queryOf()).toEqual({ page: 2, limit: 10 });

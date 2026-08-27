@@ -8,9 +8,9 @@ const CEILING_MS = 4000;
  * Hard stop, whatever the page is doing.
  *
  * The ceiling above only releases a page with no traffic, which is right, but
- * `api.get` sets no fetch timeout of its own: a stalled connection would keep
- * `useIsFetching` above zero and hold the deferred request for the life of the
- * page. That is worse than releasing late.
+ * a queryFn that pages sequentially (the validator set takes up to 50 calls,
+ * each with `api.get`'s own 10s timeout) can legitimately hold in-flight
+ * state far longer than any single request. Releasing late beats never.
  */
 const HARD_CEILING_MS = 15000;
 

@@ -138,3 +138,101 @@ describe('api.get failure shape', () => {
     expect(result.error).toBe('invalid address');
   });
 });
+
+describe('api.post failure shape', () => {
+  const withFetch = async (
+    response: Partial<Response> & { json: () => Promise<unknown> },
+  ) => {
+    const original = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue(response) as never;
+    try {
+      return await api.post({ route: 'transaction/send', body: {} });
+    } finally {
+      global.fetch = original;
+    }
+  };
+
+  it('always carries an error when the request failed', async () => {
+    // Same defect class as api.get: `error: undefined` here read as success
+    // to `asyncDoIf`, so a failed broadcast passed its guard on the first try.
+    const result = await withFetch({
+      ok: false,
+      status: 500,
+      json: async () => ({ message: 'something else' }),
+    });
+
+    expect(result.error).toBeTruthy();
+    expect(result.error).toContain('500');
+    expect(result.data).toBeNull();
+  });
+
+  it('survives an error body that is not JSON at all', async () => {
+    const result = await withFetch({
+      ok: false,
+      status: 502,
+      json: async () => {
+        throw new Error('Unexpected token <');
+      },
+    });
+
+    expect(result.error).toContain('502');
+  });
+
+  it('prefers the error the body carries', async () => {
+    const result = await withFetch({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: 'invalid transaction' }),
+    });
+
+    expect(result.error).toBe('invalid transaction');
+  });
+});
+
+describe('api.text failure shape', () => {
+  const withFetch = async (
+    response: Partial<Response> & { json: () => Promise<unknown> },
+  ) => {
+    const original = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue(response) as never;
+    try {
+      return await api.text({ route: 'address/list' });
+    } finally {
+      global.fetch = original;
+    }
+  };
+
+  it('always carries an error when the request failed', async () => {
+    const result = await withFetch({
+      ok: false,
+      status: 500,
+      json: async () => ({ message: 'something else' }),
+    });
+
+    expect(result.error).toBeTruthy();
+    expect(result.error).toContain('500');
+    expect(result.data).toBeNull();
+  });
+
+  it('survives an error body that is not JSON at all', async () => {
+    const result = await withFetch({
+      ok: false,
+      status: 502,
+      json: async () => {
+        throw new Error('Unexpected token <');
+      },
+    });
+
+    expect(result.error).toContain('502');
+  });
+
+  it('prefers the error the body carries', async () => {
+    const result = await withFetch({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: 'invalid address' }),
+    });
+
+    expect(result.error).toBe('invalid address');
+  });
+});

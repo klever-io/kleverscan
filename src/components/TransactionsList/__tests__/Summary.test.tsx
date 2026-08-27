@@ -1,6 +1,6 @@
 import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
@@ -78,13 +78,18 @@ jest.mock('react-dom', () => {
 });
 
 const summaryCall = jest.fn();
+const breakdownCall = jest.fn();
 
-// Only the request is replaced. The arithmetic beside it stays real, so a
+// Only the requests are replaced. The arithmetic beside them stays real, so a
 // change to what "grew by" means is caught here as well as in its own spec.
 jest.mock('@/services/requests/transactions/summary', () => ({
   ...jest.requireActual('@/services/requests/transactions/summary'),
   transactionsSummaryCall: () => summaryCall(),
+  transactionsBreakdownCall: () => breakdownCall(),
 }));
+
+let deferralPassed = false;
+jest.mock('../useDeferred', () => ({ useDeferred: () => deferralPassed }));
 
 import TransactionsSummary from '../Summary';
 
@@ -93,12 +98,10 @@ const FULL = {
   previous24h: 8000,
   totalTransactions: 58558891,
   mostTransactedAsset: { assetId: 'KLV', count: 4000 },
-  breakdown: [
-    { name: 'Transfer', count: 5000 },
-    { name: 'Smart Contract', count: 2000 },
-    { name: 'Other', count: 1247 },
-  ],
 };
+
+/** Raw counts per named type, in the order the bar draws them. */
+const COUNTS = [5000, 2000, 600, 400];
 
 const renderSummary = () =>
   render(
@@ -123,6 +126,9 @@ const digitsOf = (text: string): string => text.replace(/\D/g, '');
 
 beforeEach(() => {
   summaryCall.mockReset();
+  breakdownCall.mockReset();
+  breakdownCall.mockResolvedValue(COUNTS);
+  deferralPassed = true;
 });
 
 describe('TransactionsSummary', () => {
@@ -186,8 +192,52 @@ describe('TransactionsSummary', () => {
     expect(screen.queryByText('Transactions (24h)')).toBeNull();
   });
 
+  it('asks for nothing while the page still has work in flight', async () => {
+    deferralPassed = false;
+    summaryCall.mockResolvedValue(FULL);
+
+    renderSummary();
+
+    // The card reserves its space and spends nothing. Both of its tile
+    // requests are transaction-list queries, which this API answers in about
+    // two seconds and will not serve alongside the rows.
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    expect(summaryCall).not.toHaveBeenCalled();
+    expect(breakdownCall).not.toHaveBeenCalled();
+    expect(screen.getByLabelText('Transaction statistics')).toBeTruthy();
+  });
+
+  it('holds the space for the bar while only the tiles have answered', async () => {
+    // The two halves answer on separate requests. Drawing the tiles alone
+    // dropped the bar and its legend, so the card lost 48px between its
+    // skeleton and its finished self and then grew back.
+    summaryCall.mockResolvedValue(FULL);
+    breakdownCall.mockReturnValue(new Promise(() => undefined));
+
+    renderSummary();
+
+    expect(await screen.findByText('Total transactions')).toBeTruthy();
+    const kaart = screen.getByLabelText('Transaction statistics');
+    expect(kaart.querySelectorAll('[data-testid="skeleton"]').length).toBe(2);
+    expect(screen.queryByLabelText(/Contract types/)).toBeNull();
+  });
+
+  it('asks once the page falls quiet', async () => {
+    summaryCall.mockResolvedValue(FULL);
+
+    renderSummary();
+
+    expect(
+      await screen.findByLabelText('Contract types in the last 24 hours'),
+    ).toBeTruthy();
+    expect(summaryCall).toHaveBeenCalled();
+    expect(breakdownCall).toHaveBeenCalled();
+  });
+
   it('draws no card at all when every figure is missing', async () => {
-    summaryCall.mockResolvedValue({ breakdown: [] });
+    summaryCall.mockResolvedValue({});
 
     renderSummary();
 

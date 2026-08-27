@@ -15,10 +15,13 @@ import {
 // The same percent policy the holders and assets legends use, so the two
 // visually identical legends cannot format the same quantity differently.
 import { formatShare } from '@/components/DataList/format';
+import { SummaryBarPlaceholder } from '@/components/DataList/SummaryLoading';
 import {
   ITransactionTypeShare,
+  buildBreakdown,
   summaryVariation,
   totalGrowth,
+  transactionsBreakdownCall,
   transactionsSummaryCall,
 } from '@/services/requests/transactions/summary';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -26,12 +29,21 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useTheme } from 'styled-components';
+import { useDeferred } from './useDeferred';
 import {
   PageSummaryCard,
   PageSummaryLoading,
   SummaryAssetLink,
   TrendValue,
 } from './styles';
+
+/**
+ * A quarter of an hour. These are 24 hour figures, so a fresh reading moves
+ * them by fractions of a percent, and every refetch costs two of the slow
+ * transaction-list queries. Kept past the last observer too, so paging away
+ * and back does not pay for them again.
+ */
+const FIGURE_CACHE = { staleTime: 15 * 60_000, gcTime: 15 * 60_000 };
 
 /**
  * Percentage with its sign, e.g. "+18.6%". A rate, not a share, so it has no
@@ -55,15 +67,30 @@ const TransactionsSummary: React.FC = () => {
   const label = t('transactions:Summary.Label', {
     defaultValue: 'Transaction statistics',
   });
-  const { data: summary, isLoading } = useQuery({
+
+  const deferred = useDeferred();
+
+  const { data: summary } = useQuery({
     queryKey: ['transactionsSummary'],
     queryFn: transactionsSummaryCall,
-    // The figures move by the second; refetching on every mount would make
-    // the card flicker without telling the reader anything new.
-    staleTime: 60_000,
+    // Behind the list, not beside it. Two of these three are transaction-list
+    // queries costing about two seconds each, and racing them against the
+    // rows is what a reader actually feels.
+    enabled: deferred,
+    ...FIGURE_CACHE,
   });
 
-  if (isLoading) {
+  const { data: typeCounts, isPending: breakdownPending } = useQuery({
+    queryKey: ['transactionsBreakdown'],
+    queryFn: transactionsBreakdownCall,
+    // Four requests for a bar nobody waits on, so they stay out of the
+    // opening burst. Not gated on the tiles: waiting for the total first put
+    // the bar six seconds out when the API answered slowly.
+    enabled: deferred,
+    ...FIGURE_CACHE,
+  });
+
+  if (!summary) {
     return <PageSummaryLoading label={label} tiles={3} bar />;
   }
 
@@ -73,24 +100,23 @@ const TransactionsSummary: React.FC = () => {
       ? theme.blueGray500
       : [theme.violet, theme.purple, theme.lightPurple, theme.green][index % 4];
 
-  const variation = summary ? summaryVariation(summary) : undefined;
-  const growth = summary ? totalGrowth(summary) : undefined;
+  const variation = summaryVariation(summary);
+  const growth = totalGrowth(summary);
   // Each figure is shown only when its own request answered; a failed part
   // leaves its tile out instead of printing a zero the chain never had.
   const hasFigures =
-    summary &&
-    (summary.last24h !== undefined ||
-      summary.totalTransactions !== undefined ||
-      summary.mostTransactedAsset !== undefined);
+    summary.last24h !== undefined ||
+    summary.totalTransactions !== undefined ||
+    summary.mostTransactedAsset !== undefined;
 
-  if (!summary || !hasFigures) return null;
+  if (!hasFigures) return null;
 
   // The shares sum to the window's own total; using that sum rather than
   // last24h keeps the bar full even if the parts answered moments apart.
-  const breakdownTotal = summary.breakdown.reduce(
-    (sum, share) => sum + share.count,
-    0,
-  );
+  const breakdown = typeCounts
+    ? buildBreakdown(summary.last24h, typeCounts)
+    : [];
+  const breakdownTotal = breakdown.reduce((sum, share) => sum + share.count, 0);
 
   return (
     <PageSummaryCard aria-label={label}>
@@ -209,8 +235,14 @@ const TransactionsSummary: React.FC = () => {
 
       {/* Same shape as the assets registry strip, deliberately: tiles, then
           the bar, then its legend, with no heading in between, so both
-          summary cards stand the same height on their pages. */}
-      {summary.breakdown.length > 1 && breakdownTotal > 0 && (
+          summary cards stand the same height on their pages.
+
+          The tiles and the bar answer on separate requests, so the card is
+          drawn once with only the first of them. Holding the bar's space
+          until its own request settles keeps that middle state the same
+          height as the two around it. */}
+      {breakdownPending && <SummaryBarPlaceholder />}
+      {!breakdownPending && breakdown.length > 1 && breakdownTotal > 0 && (
         <>
           <DistBar
             role="img"
@@ -218,7 +250,7 @@ const TransactionsSummary: React.FC = () => {
               defaultValue: 'Contract types in the last 24 hours',
             })}
           >
-            {summary.breakdown.map((share, index) => (
+            {breakdown.map((share, index) => (
               <DistSegment
                 key={share.name}
                 $color={segmentColor(share, index)}
@@ -232,7 +264,7 @@ const TransactionsSummary: React.FC = () => {
             ))}
           </DistBar>
           <LegendRow>
-            {summary.breakdown.map((share, index) => (
+            {breakdown.map((share, index) => (
               <LegendItem key={share.name}>
                 <LegendDot $color={segmentColor(share, index)} />
                 {share.name === 'Other'

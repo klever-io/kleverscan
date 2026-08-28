@@ -11,8 +11,12 @@ export const SectionContainer = styled.div<{
 
   @media (min-width: 768px) {
     display: grid;
+    /* minmax(0, 1fr), not bare 1fr: a bare fr floors at min-content, so the
+       ~500px table stretched its column and the grid past the page edge. */
     grid-template-columns: ${props =>
-      isKVMAvailable(props.network) ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'};
+      isKVMAvailable(props.network)
+        ? 'repeat(2, minmax(0, 1fr))'
+        : 'repeat(3, minmax(0, 1fr))'};
     /* gap: 16px; */
   }
 `;
@@ -32,6 +36,16 @@ export const Title = styled.h2`
   font-size: 1.5rem;
   font-weight: 500;
   color: ${({ theme }) => theme.black};
+`;
+
+/**
+ * A table cannot shrink below its content, and the owner addresses hold these
+ * at ~500px. Without this wrapper that width became the document's: the whole
+ * page scrolled sideways below 1000px (197px of it at 320), taking the search
+ * bar with it. Scrolls here instead, per the convention for wide content.
+ */
+export const TableScroll = styled.div`
+  overflow-x: auto;
 `;
 
 export const Table = styled.table`

@@ -562,6 +562,10 @@ export const EnchangeLinks = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  /* The row holds a label and a button that together outgrow a 320px screen;
+     without this the button ran 24px past the page edge and made the whole
+     home scroll sideways. */
+  flex-wrap: wrap;
   gap: 8px;
   color: ${props => props.theme.black};
   font-size: 1rem;

@@ -166,6 +166,13 @@ export const AutoUpdateContainer = styled.div`
     padding-left: 17px;
   }
 
+  /* The same bottom margin LimitContainer carries below that width. The row
+     aligns its children on their bottom edge, so without it this control sat
+     10px under the page-size buttons it shares the row with. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-bottom: 10px;
+  }
+
   cursor: pointer;
   user-select: none;
 

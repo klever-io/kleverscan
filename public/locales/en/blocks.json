@@ -15,7 +15,9 @@
     "FeesBurned": "Fees burned",
     "ToValidators": "To validators",
     "KAppFees": "kApp fees",
-    "AutoUpdate": "Auto update"
+    "AutoUpdate": "Auto update",
+    "TxCount_one": "{{formatted}} tx",
+    "TxCount_other": "{{formatted}} txs"
   },
   "Table": {
     "Block": "Block",
@@ -26,6 +28,7 @@
     "KAppFees": "kApp Fees",
     "BurnedFees": "Burned Fees",
     "FeeRewards": "Fee Rewards",
-    "BlockRewards": "Block Rewards"
+    "BlockRewards": "Block Rewards",
+    "Epoch": "Epoch"
   }
 }

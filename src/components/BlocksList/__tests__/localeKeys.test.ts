@@ -35,6 +35,7 @@ const sources = [
   ['src/components/BlocksList/Summary.tsx', 'blocks'],
   ['src/components/BlocksList/AutoUpdate.tsx', 'blocks'],
   ['src/components/BlocksList/columns.ts', 'blocks'],
+  ['src/components/BlocksList/MobileCard.tsx', 'blocks'],
   ['src/components/BlocksList/UpdatedAgo.tsx', 'common'],
 ] as const;
 
@@ -60,10 +61,15 @@ describe('blocks list locale keys', () => {
         ),
       );
 
-      const missing = keys.filter(
-        key => typeof lookup(bundle, key) !== 'string',
-      );
-      expect(missing).toEqual([]);
+      // A pluralised key exists as `_one`/`_other` rather than on its own,
+      // which is how i18next stores it and how `AcrossDays` sits in the
+      // accounts bundle.
+      const present = (key: string): boolean =>
+        typeof lookup(bundle, key) === 'string' ||
+        (typeof lookup(bundle, `${key}_one`) === 'string' &&
+          typeof lookup(bundle, `${key}_other`) === 'string');
+
+      expect(keys.filter(key => !present(key))).toEqual([]);
     },
   );
 });

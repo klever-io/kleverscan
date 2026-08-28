@@ -15,7 +15,9 @@
     "FeesBurned": "Taxas queimadas",
     "ToValidators": "Para validadores",
     "KAppFees": "Taxas de kApp",
-    "AutoUpdate": "Atualização automática"
+    "AutoUpdate": "Atualização automática",
+    "TxCount_one": "{{formatted}} tx",
+    "TxCount_other": "{{formatted}} txs"
   },
   "Table": {
     "Block": "Bloco",
@@ -26,6 +28,7 @@
     "KAppFees": "Taxas de kApp",
     "BurnedFees": "Taxas queimadas",
     "FeeRewards": "Recompensas de taxa",
-    "BlockRewards": "Recompensas de bloco"
+    "BlockRewards": "Recompensas de bloco",
+    "Epoch": "Época"
   }
 }

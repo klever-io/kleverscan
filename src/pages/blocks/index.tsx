@@ -1,6 +1,7 @@
 import { Blocks as Icon } from '@/assets/title-icons';
 import AutoUpdate from '@/components/BlocksList/AutoUpdate';
 import { RIGHT_ALIGNED_COLUMNS } from '@/components/BlocksList/columns';
+import BlocksMobileCard from '@/components/BlocksList/MobileCard';
 import { blockRowSections } from '@/components/BlocksList/rows';
 import { BlocksTableWrapper } from '@/components/BlocksList/styles';
 import BlocksSummary from '@/components/BlocksList/Summary';
@@ -51,6 +52,7 @@ const Blocks: React.FC<PropsWithChildren> = () => {
     intervalController: setBlocksInterval,
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
+    MobileCard: BlocksMobileCard,
     Filters,
   };
 

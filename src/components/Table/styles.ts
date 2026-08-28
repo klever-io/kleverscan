@@ -540,6 +540,22 @@ export const ItemContainer = styled.div<{
   }
 `;
 
+/**
+ * Items per page and the refresh control as one unit.
+ *
+ * They used to be two siblings of the filters, so the two-column grid below
+ * the tablet width had three children to place and dropped the refresh button
+ * onto a row of its own, floating under the filters. One child instead of two
+ * keeps them together at every width.
+ */
+export const TableControls = styled.div`
+  display: flex;
+  align-items: end;
+  gap: 16px;
+
+  margin-left: auto;
+`;
+
 export const ExportContainer = styled.div`
   width: fit-content;
 

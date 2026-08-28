@@ -27,6 +27,7 @@ import {
   IoReloadSharpWrapper,
   ItemContainer,
   LimitContainer,
+  TableControls,
   LimitItems,
   MobileCardItem,
   MobileHeader,
@@ -253,7 +254,7 @@ const Table = <TCard,>({
         <FloatContainer>
           {Filters && <Filters />}
           {showLimit ? (
-            <>
+            <TableControls>
               <LimitContainer>
                 <span>Items per page</span>
                 <LimitItems>
@@ -302,7 +303,7 @@ const Table = <TCard,>({
                   />
                 )}
               </ExportContainer>
-            </>
+            </TableControls>
           ) : null}
         </FloatContainer>
       )}

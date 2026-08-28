@@ -157,10 +157,14 @@ export const AutoUpdateContainer = styled.div`
   align-items: center;
   gap: 0.5rem;
 
-  /* Lines the label up with the table's first heading and the card's first
-     tile: the float container it sits in starts at the table's outer edge,
-     while a heading starts a 1px border and 16px of cell padding further in. */
-  padding-left: 17px;
+  /* Lines the label up with the table's first heading: the float container it
+     sits in starts at the table's outer edge, while a heading starts a 1px
+     border and 16px of cell padding further in. Only where those headings
+     exist; below the tablet width the table is cards, and the indent there
+     costs the label the room it needs to stay on one line. */
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    padding-left: 17px;
+  }
 
   cursor: pointer;
   user-select: none;

@@ -36,6 +36,7 @@ const sources = [
   ['src/components/BlocksList/AutoUpdate.tsx', 'blocks'],
   ['src/components/BlocksList/columns.ts', 'blocks'],
   ['src/components/BlocksList/MobileCard.tsx', 'blocks'],
+  ['src/components/BlocksList/LoadingCard.tsx', 'blocks'],
   ['src/components/BlocksList/UpdatedAgo.tsx', 'common'],
 ] as const;
 

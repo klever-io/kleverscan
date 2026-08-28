@@ -21,11 +21,8 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import {
-  BlocksSummaryCard,
-  BlocksSummaryLoading,
-  feeSegmentColor,
-} from './styles';
+import { BlocksSummaryCard, feeSegmentColor } from './styles';
+import BlocksSummaryLoadingCard from './LoadingCard';
 import UpdatedAgo from './UpdatedAgo';
 import { feeSplit } from './summaryFigures';
 
@@ -71,7 +68,7 @@ const BlocksSummary: React.FC = () => {
   });
 
   if (isLoading) {
-    return <BlocksSummaryLoading label={label} tiles={3} bar />;
+    return <BlocksSummaryLoadingCard label={label} />;
   }
   if (!data) return null;
 
@@ -162,6 +159,8 @@ const BlocksSummary: React.FC = () => {
             )}
           </Tile>
         )}
+
+        <UpdatedAgo at={dataUpdatedAt} />
       </TilesGrid>
 
       {fees && (
@@ -188,8 +187,6 @@ const BlocksSummary: React.FC = () => {
           </LegendRow>
         </>
       )}
-
-      <UpdatedAgo at={dataUpdatedAt} />
     </BlocksSummaryCard>
   );
 };

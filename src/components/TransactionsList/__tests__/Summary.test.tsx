@@ -222,7 +222,10 @@ describe('TransactionsSummary', () => {
 
     expect(await screen.findByText('Total transactions')).toBeTruthy();
     const kaart = screen.getByLabelText('Transaction statistics');
-    expect(kaart.querySelectorAll('[data-testid="skeleton"]').length).toBe(2);
+    // The bar plus a legend line per entry: the placeholder wraps like the
+    // real legend since the one-line version held the card 33px short at
+    // 390px, measured on /blocks.
+    expect(kaart.querySelectorAll('[data-testid="skeleton"]').length).toBe(4);
     expect(screen.queryByLabelText(/Contract types/)).toBeNull();
   });
 

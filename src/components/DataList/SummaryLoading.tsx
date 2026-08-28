@@ -1,5 +1,6 @@
 import Skeleton from '@/components/Skeleton';
 import React from 'react';
+import styled from 'styled-components';
 import { SummaryCard, Tile, TilesGrid } from './styles';
 
 interface ISummaryLoadingProps {
@@ -29,20 +30,35 @@ const SUB_W = '24%';
 const BAR = 8;
 const LEGEND = 16.5;
 
+/** Near the median of a real legend entry (dot, label, figure). */
+const LEGEND_ITEM_W = 150;
+
+// The same wrap metrics as LegendRow, so the placeholder breaks onto a second
+// line at the widths the real legend does: one 70%-wide line here held the
+// card 33px short of its loaded height at 390px, measured on /blocks.
+const LegendPlaceholderRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 8px;
+`;
+
 // Exported because tiles-arrived-bar-pending is a state of its own: without
 // this it drew the tiles alone and lost 48px.
-export const SummaryBarPlaceholder: React.FC = () => (
+export const SummaryBarPlaceholder: React.FC<{ legendItems?: number }> = ({
+  legendItems = 3,
+}) => (
   <>
     <Skeleton
       width="100%"
       height={BAR}
       containerCustomStyles={{ marginTop: 16 }}
     />
-    <Skeleton
-      width="70%"
-      height={LEGEND}
-      containerCustomStyles={{ marginTop: 8 }}
-    />
+    <LegendPlaceholderRow>
+      {Array.from({ length: legendItems }, (_, index) => (
+        <Skeleton key={index} width={LEGEND_ITEM_W} height={LEGEND} />
+      ))}
+    </LegendPlaceholderRow>
   </>
 );
 

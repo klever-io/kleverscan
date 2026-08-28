@@ -5,7 +5,6 @@ import {
   Tile,
   TilesGrid,
 } from '@/components/DataList/styles';
-import SummaryLoading from '@/components/DataList/SummaryLoading';
 import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
 import styled, { css, DefaultTheme } from 'styled-components';
 import { RIGHT_ALIGNED_COLUMNS } from './columns';
@@ -41,27 +40,23 @@ const tileHeight = css`
   }
 `;
 
-const cornerNoteRoom = css`
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    ${TilesGrid} {
-      padding-top: 20px;
-    }
-  }
-`;
-
 export const BlocksSummaryCard = styled(SummaryCard)`
   ${pageSummarySpacing}
-  ${cornerNoteRoom}
   ${tileHeight}
 
   /* Anchors the age line in the top-right corner. */
   position: relative;
-`;
 
-export const BlocksSummaryLoading = styled(SummaryLoading)`
-  ${pageSummarySpacing}
-  ${cornerNoteRoom}
-  ${tileHeight}
+  /* Narrow screens park the age line in the grid cell the wrapped tiles leave
+     empty. Aligned on the last text baseline, not the cell edge: the tiles hold
+     a 66,5px minimum while their "in total" line ends above it, by an amount
+     that scales with the root font (9px at 390, 2px at 1000), so an edge or a
+     fixed margin misses the line at one width or the other. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    ${TilesGrid} {
+      align-items: last baseline;
+    }
+  }
 `;
 
 // Same red the holders bar uses for its burned segment, so one colour means
@@ -86,13 +81,22 @@ export const feeSegmentColor = (
  * arrived. `top`/`right` match the card's own 20px padding.
  */
 export const UpdatedNote = styled.p`
-  position: absolute;
-  top: 20px;
-  right: 20px;
-
   color: ${props => props.theme.darkText};
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  /* Wide screens: the corner, above the single tile row. Narrow ones wrap the
+     tiles, which leaves the grid cell beside the last tile empty; the line
+     fills it there instead, on the baseline of that tile's "in total" sub. */
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    justify-self: end;
+  }
 `;
 
 /* -------------------------------- cells ---------------------------------- */

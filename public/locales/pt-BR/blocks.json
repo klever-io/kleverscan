@@ -3,5 +3,17 @@
   "Miner": "Minerador",
   "Burned": "Queimado",
   "Reward": "Recompensa",
-  "Recent Blocks": "Blocos Recentes"
+  "Recent Blocks": "Blocos Recentes",
+  "List": {
+    "SummaryAria": "Estatísticas de blocos",
+    "BlocksYesterday": "Blocos (ontem)",
+    "CumulativeBlocks": "{{blocks}} no total",
+    "TransactionFees": "Taxas de transação (ontem)",
+    "ShareBurned": "{{share}} disso queimado",
+    "TotalBurned": "Total queimado (ontem)",
+    "CumulativeBurned": "{{amount}} no total",
+    "FeesBurned": "Taxas queimadas",
+    "ToValidators": "Para validadores",
+    "KAppFees": "Taxas de kApp"
+  }
 }

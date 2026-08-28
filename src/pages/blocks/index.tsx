@@ -1,40 +1,27 @@
 import { PropsWithChildren } from 'react';
 import { Blocks as Icon } from '@/assets/title-icons';
+import BlocksSummary from '@/components/BlocksList/Summary';
 import ToggleButton from '@/components/Button/Toggle';
 import Title from '@/components/Layout/Title';
-import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
-import {
-  blockListCall,
-  blockTotalStatsCall,
-  blockYesterdayStatsCall,
-} from '@/services/requests/block';
-import {
-  Card,
-  CardContainer,
-  Container,
-  DoubleRow,
-  Header,
-} from '@/styles/common';
-import { IBlock, ICard } from '@/types/blocks';
+import { blockListCall } from '@/services/requests/block';
+import { Container, DoubleRow, Header } from '@/styles/common';
+import { IBlock } from '@/types/blocks';
 import { IRowSection } from '@/types/index';
-import {
-  formatAmount,
-  formatDate,
-  toLocaleFixed,
-} from '@/utils/formatFunctions';
+import { formatAmount, formatDate } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import {
   getStorageUpdateConfig,
   storageUpdateBlocks,
 } from '@/utils/localStorage/localStorageData';
 import { parseAddress } from '@/utils/parseValues';
-import { getAge } from '@/utils/timeFunctions';
 import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
 import ExplorerLink from '@/components/ExplorerLink';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const blocksHeader = [
   'Block/ Epoch',
@@ -127,29 +114,6 @@ const Blocks: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
-  const {
-    data: blocksStatsToday,
-    isLoading: isLoadingBlocksStatsToday,
-    refetch: refetchTotal,
-    dataUpdatedAt: totalUpdatedAt,
-  } = useQuery({
-    queryKey: ['blockTotalStats'],
-    queryFn: blockTotalStatsCall,
-  });
-  const {
-    data: blocksStatsYesterday,
-    refetch: refetchYesterday,
-    isLoading: isLoadingBlocksStatsYesterday,
-    dataUpdatedAt: yesterdayUpdatedAt,
-  } = useQuery({
-    queryKey: ['blockYesterdayStats'],
-    queryFn: blockYesterdayStatsCall,
-  });
-
-  const dataUpdatedAt =
-    totalUpdatedAt && yesterdayUpdatedAt
-      ? Math.min(totalUpdatedAt, yesterdayUpdatedAt)
-      : totalUpdatedAt || yesterdayUpdatedAt || 0;
 
   const updateBlocks = useCallback(async () => {
     const newState = storageUpdateBlocks(!!blocksInterval);
@@ -161,16 +125,6 @@ const Blocks: React.FC<PropsWithChildren> = () => {
   }, [blocksInterval]);
 
   useEffect(() => {
-    if (blocksInterval) {
-      const intervalId = setInterval(() => {
-        refetchYesterday();
-        refetchTotal();
-      }, blocksWatcherInterval);
-      return () => clearInterval(intervalId);
-    }
-  }, [blocksInterval]);
-
-  useEffect(() => {
     const updateBlocksConfig = getStorageUpdateConfig();
     if (updateBlocksConfig) {
       setBlocksInterval(blocksWatcherInterval);
@@ -178,114 +132,6 @@ const Blocks: React.FC<PropsWithChildren> = () => {
       setBlocksInterval(0);
     }
   }, []);
-
-  const cards: ICard[] = [
-    {
-      title: 'Number of Blocks',
-      headers: ['Blocks 24h', 'Cumulative Number'],
-      values: [
-        !isLoadingBlocksStatsYesterday ? (
-          toLocaleFixed(blocksStatsYesterday?.totalBlocks || 0, 0)
-        ) : (
-          <Skeleton />
-        ),
-        !isLoadingBlocksStatsToday ? (
-          toLocaleFixed(blocksStatsToday?.totalBlocks || 0, 0)
-        ) : (
-          <Skeleton />
-        ),
-      ],
-    },
-    {
-      title: 'Block Reward',
-      headers: ['Rewards 24h', 'Cumulative Revenue'],
-      values: [
-        !isLoadingBlocksStatsYesterday ? (
-          `${formatAmount(
-            (blocksStatsYesterday?.totalBlockRewards || 0) /
-              10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-        !isLoadingBlocksStatsToday ? (
-          `${formatAmount(
-            (blocksStatsToday?.totalBlockRewards || 0) / 10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-      ],
-    },
-    {
-      title: 'Stats on Burned KLV',
-      headers: ['Burned 24h', 'Burned in Total'],
-      values: [
-        !isLoadingBlocksStatsYesterday ? (
-          `${formatAmount(
-            (blocksStatsYesterday?.totalBurned || 0) / 10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-        !isLoadingBlocksStatsToday ? (
-          `${formatAmount(
-            (blocksStatsToday?.totalBurned || 0) / 10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-      ],
-    },
-  ];
-
-  interface CardContentProps extends ICard {
-    dataUpdatedAt: number;
-  }
-
-  const CardContent: React.FC<PropsWithChildren<CardContentProps>> = ({
-    title,
-    headers,
-    values,
-    dataUpdatedAt,
-  }) => {
-    const [age, setAge] = useState(
-      dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '',
-    );
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setAge(dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '');
-      }, 1 * 1000); // 1 sec
-
-      return () => {
-        clearInterval(interval);
-      };
-    }, [dataUpdatedAt]);
-
-    return (
-      <Card>
-        <div>
-          <span>
-            <strong>{title}</strong>
-          </span>
-          <p>{age ? `${age} ago` : ''}</p>
-        </div>
-        <div>
-          <span>
-            <small>{headers[0]}</small>
-          </span>
-          <span>
-            <small>{headers[1]}</small>
-          </span>
-        </div>
-        <div>
-          <span>{values[0]}</span>
-          <span>{values[1]}</span>
-        </div>
-      </Card>
-    );
-  };
 
   const tableProps: ITable = {
     type: 'blocks',
@@ -304,15 +150,10 @@ const Blocks: React.FC<PropsWithChildren> = () => {
         <Title title="Blocks" Icon={Icon} />
       </Header>
 
-      <CardContainer>
-        {cards.map((card, index) => (
-          <CardContent key={index} {...card} dataUpdatedAt={dataUpdatedAt} />
-        ))}
-      </CardContainer>
+      <BlocksSummary />
 
       <TableContainer autoUpdate={!!blocksInterval}>
         <TableHeader>
-          <h3>List of blocks</h3>
           <UpdateContainer onClick={() => updateBlocks()}>
             <span>Auto update</span>
             <ToggleButton active={!!blocksInterval} />
@@ -323,6 +164,19 @@ const Blocks: React.FC<PropsWithChildren> = () => {
       </TableContainer>
     </Container>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'blocks', 'table'],
+    nextI18nextConfig,
+    ['en'],
+  );
+
+  return { props };
 };
 
 export default Blocks;

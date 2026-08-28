@@ -1,5 +1,5 @@
 import { Blocks as Icon } from '@/assets/title-icons';
-import AutoUpdate from '@/components/BlocksList/AutoUpdate';
+import BlocksFilters from '@/components/BlocksList/Filters';
 import { RIGHT_ALIGNED_COLUMNS } from '@/components/BlocksList/columns';
 import BlocksMobileCard from '@/components/BlocksList/MobileCard';
 import { blockRowSections } from '@/components/BlocksList/rows';
@@ -25,8 +25,13 @@ const AUTO_UPDATE_INTERVAL = 4 * 1000;
  * on each one, and cut the toggle's 0.4s transition short.
  */
 const makeFilters = (onChange: (interval: number) => void): React.FC =>
-  function BlocksFilters() {
-    return <AutoUpdate interval={AUTO_UPDATE_INTERVAL} onChange={onChange} />;
+  function Filters() {
+    return (
+      <BlocksFilters
+        interval={AUTO_UPDATE_INTERVAL}
+        onIntervalChange={onChange}
+      />
+    );
   };
 
 const Blocks: React.FC<PropsWithChildren> = () => {

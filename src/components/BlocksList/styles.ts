@@ -157,20 +157,13 @@ export const AutoUpdateContainer = styled.div`
   align-items: center;
   gap: 0.5rem;
 
-  /* Lines the label up with the table's first heading: the float container it
-     sits in starts at the table's outer edge, while a heading starts a 1px
-     border and 16px of cell padding further in. Only where those headings
-     exist; below the tablet width the table is cards, and the indent there
-     costs the label the room it needs to stay on one line. */
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    padding-left: 17px;
-  }
-
-  /* The same bottom margin LimitContainer carries below that width. The row
-     aligns its children on their bottom edge, so without it this control sat
-     10px under the page-size buttons it shares the row with. */
+  /* Only where the filter row stacks. It centres its children, and this one is
+     narrower than the date control, so it floated to the middle of the column
+     while everything around it started at the left edge. Above that width the
+     row runs horizontally and the same rule would lift it off the date
+     control's centre line. */
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    margin-bottom: 10px;
+    align-self: flex-start;
   }
 
   cursor: pointer;

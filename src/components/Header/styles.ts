@@ -240,12 +240,23 @@ export const SpotlightTrigger = styled.button`
         : 'rgba(125, 63, 241, 0.06)'};
   }
 
+  /* A round icon button beside the menu icon: the label and the shortcut
+     badge are desktop affordances, and the 0.9rem glyph sat lost in the pill
+     once they were gone. */
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     height: 2.25rem;
-    padding: 0 0.6rem;
+    width: 2.25rem;
+    padding: 0;
+    justify-content: center;
 
-    span {
+    span,
+    kbd {
       display: none;
+    }
+
+    svg {
+      width: 1.15rem;
+      height: 1.15rem;
     }
   }
 `;

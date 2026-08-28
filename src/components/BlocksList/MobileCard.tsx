@@ -12,6 +12,7 @@ import {
   formatDate,
   formatDateWithSeconds,
 } from '@/utils/formatFunctions';
+import { bandwidthFeeReward } from '@/utils/fees';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
@@ -105,7 +106,7 @@ const BlocksMobileCard: React.FC<IBlocksMobileCardProps> = ({
           {label('burnedFees')} {klv(txBurnedFees)}
         </MobileMetaItem>
         <MobileMetaItem>
-          {label('feeRewards')} {klv((txFees || 0) / 2)}
+          {label('feeRewards')} {klv(bandwidthFeeReward(txFees))}
         </MobileMetaItem>
       </MobileMetaRow>
     </MobileListCard>

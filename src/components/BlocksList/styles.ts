@@ -19,15 +19,6 @@ const pageSummarySpacing = css`
 `;
 
 /**
- * Room for the age line in the corner. Above this width the third tile's label
- * ends 118px before the line starts; at 1000px that gap is down to 14px, and a
- * line reading "Updated 59 mins ago" is wider than the one measured. Below it
- * the tiles start a line lower instead of running under it.
- *
- * On the loading shape as well, which carries no line: without it the card
- * would be 20px shorter while loading and grow when the figures land.
- */
-/**
  * Holds the tile to the height a tile reaches on /transactions, so the two
  * cards line up. Theirs carries a `TrendValue` at 0.8125rem where a plain
  * `TileSub` is 0.75rem, which is 18px of line box against 16,5px: without this

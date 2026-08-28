@@ -11,36 +11,42 @@ import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { blockListCall } from '@/services/requests/block';
 import { Container, Header } from '@/styles/common';
+import {
+  getStorageUpdateConfig,
+  storageUpdateBlocks,
+} from '@/utils/localStorage/localStorageData';
+import { normalizePageParam } from '@/utils/table';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, { PropsWithChildren, useMemo, useRef, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
 /** How often the list refetches while auto update is on. */
 const AUTO_UPDATE_INTERVAL = 4 * 1000;
 
-/**
- * The table renders `TableControl` as a component, so it needs one identity
- * for the life of the page: built inline it would be a new type every render,
- * remount on each one, and cut the toggle's 0.4s transition short.
- */
-const makeAutoUpdate = (onChange: (interval: number) => void): React.FC =>
-  function BlocksAutoUpdate() {
-    return <AutoUpdate interval={AUTO_UPDATE_INTERVAL} onChange={onChange} />;
-  };
-
 const Blocks: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const header = useBlockHeaders();
   const [blocksInterval, setBlocksInterval] = useState(0);
+  const page = normalizePageParam(router.query?.page, 1);
 
-  // The setter through a ref, so the memo below never has to be rebuilt.
-  const onIntervalChange = useRef(setBlocksInterval);
-  const TableControl = useMemo(
-    () => makeAutoUpdate(interval => onIntervalChange.current(interval)),
-    [],
-  );
+  // The switch renders `blocksInterval`, which the shared Table zeroes on a
+  // page change away from 1 (rolling blocks mean nothing on page 7). Stored
+  // intent survives that pause, so landing back on page 1 resumes; in between
+  // the switch shows the pause honestly rather than holding its own copy of
+  // the state, which is how the first version kept saying "on" while nothing
+  // refreshed any more.
+  useEffect(() => {
+    if (page === 1 && getStorageUpdateConfig()) {
+      setBlocksInterval(AUTO_UPDATE_INTERVAL);
+    }
+  }, [page]);
+
+  const toggleAutoUpdate = (): void => {
+    const next = storageUpdateBlocks(blocksInterval > 0);
+    setBlocksInterval(next ? AUTO_UPDATE_INTERVAL : 0);
+  };
 
   const tableProps: ITable = {
     type: 'blocks',
@@ -55,7 +61,9 @@ const Blocks: React.FC<PropsWithChildren> = () => {
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
     MobileCard: BlocksMobileCard,
     Filters: BlocksFilters,
-    TableControl,
+    TableControl: (
+      <AutoUpdate active={blocksInterval > 0} onToggle={toggleAutoUpdate} />
+    ),
   };
 
   return (

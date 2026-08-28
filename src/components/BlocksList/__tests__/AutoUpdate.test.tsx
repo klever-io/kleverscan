@@ -68,15 +68,13 @@ jest.mock('react-dom', () => {
 import { act } from 'react';
 import AutoUpdate from '../AutoUpdate';
 
-const INTERVAL = 4000;
-
-const renderToggle = (onChange = jest.fn()) => {
-  render(
+const renderSwitch = (active: boolean, onToggle = jest.fn()) => {
+  const view = render(
     <ThemeProvider theme={theme}>
-      <AutoUpdate interval={INTERVAL} onChange={onChange} />
+      <AutoUpdate active={active} onToggle={onToggle} />
     </ThemeProvider>,
   );
-  return onChange;
+  return { view, onToggle };
 };
 
 const control = () => screen.getByTestId('blocks-auto-update');
@@ -84,56 +82,48 @@ const switchButton = () =>
   control().querySelector('button') as HTMLButtonElement;
 
 describe('AutoUpdate', () => {
-  beforeEach(() => {
-    localStorage.clear();
-    jest.clearAllMocks();
-  });
-
-  it('starts off and reports no interval when storage has never been written', () => {
-    const onChange = renderToggle();
-
-    expect(switchButton().getAttribute('aria-pressed')).toBe('false');
-    expect(onChange).toHaveBeenCalledWith(0);
-  });
-
-  it('starts on and reports the interval when storage says so', () => {
-    localStorage.setItem('updateBlocks', 'true');
-
-    const onChange = renderToggle();
+  it('shows what the page says, on', () => {
+    renderSwitch(true);
 
     expect(switchButton().getAttribute('aria-pressed')).toBe('true');
-    expect(onChange).toHaveBeenCalledWith(INTERVAL);
   });
 
-  it('turns on, reporting the interval and writing it back', () => {
-    const onChange = renderToggle();
-    onChange.mockClear();
+  it('shows what the page says, off', () => {
+    renderSwitch(false);
+
+    expect(switchButton().getAttribute('aria-pressed')).toBe('false');
+  });
+
+  // The regression that made this component controlled: the shared Table
+  // zeroes the interval on a page change, and a switch holding its own state
+  // kept showing "on" while nothing refreshed any more.
+  it('follows the page when the interval is zeroed from outside', () => {
+    const { view } = renderSwitch(true);
+    expect(switchButton().getAttribute('aria-pressed')).toBe('true');
+
+    act(() => {
+      view.rerender(
+        <ThemeProvider theme={theme}>
+          <AutoUpdate active={false} onToggle={jest.fn()} />
+        </ThemeProvider>,
+      );
+    });
+
+    expect(switchButton().getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('reports a click and decides nothing itself', () => {
+    const { onToggle } = renderSwitch(false);
 
     act(() => control().click());
 
-    expect(switchButton().getAttribute('aria-pressed')).toBe('true');
-    expect(onChange).toHaveBeenCalledWith(INTERVAL);
-    expect(localStorage.getItem('updateBlocks')).toBe('true');
-  });
-
-  // The opposite of the switch's purpose: reporting the interval on the way
-  // off would leave the table refetching every four seconds with the control
-  // showing that it is not.
-  it('turns off, reporting zero rather than the interval', () => {
-    localStorage.setItem('updateBlocks', 'true');
-    const onChange = renderToggle();
-    onChange.mockClear();
-
-    act(() => control().click());
-
+    expect(onToggle).toHaveBeenCalledTimes(1);
+    // Still off: flipping is the page's decision, not this component's.
     expect(switchButton().getAttribute('aria-pressed')).toBe('false');
-    expect(onChange).toHaveBeenCalledWith(0);
-    expect(onChange).not.toHaveBeenCalledWith(INTERVAL);
-    expect(localStorage.getItem('updateBlocks')).toBe('false');
   });
 
   it('names the switch, which is otherwise an unlabelled button', () => {
-    renderToggle();
+    renderSwitch(false);
 
     expect(switchButton().getAttribute('aria-label')).toBe('Auto update');
   });
@@ -141,7 +131,7 @@ describe('AutoUpdate', () => {
   // Invalid HTML that React reports as a hydration failure, which is what the
   // first version of this control did.
   it('puts no button inside another button', () => {
-    renderToggle();
+    renderSwitch(false);
 
     expect(control().tagName).toBe('DIV');
     expect(control().querySelectorAll('button')).toHaveLength(1);

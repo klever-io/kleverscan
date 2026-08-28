@@ -50,7 +50,7 @@ const BlocksSummary: React.FC = () => {
     queryKey: ['blocksSummary'],
     queryFn: async () => {
       // api.get resolves failures as undefined instead of rejecting, so a
-      // degraded endpoint costs its own tile and leaves the others standing.
+      // half-failed pair still lands here as data rather than an error.
       const [yesterday, total] = await Promise.all([
         blockYesterdayStatsCall(),
         blockTotalStatsCall(),
@@ -58,12 +58,14 @@ const BlocksSummary: React.FC = () => {
       return { yesterday, total };
     },
     // A function, not a constant: a failure caches as a successful undefined,
-    // and a constant would hold that for five minutes.
+    // and a constant would hold that for five minutes. Both halves, not
+    // either: with `||` a half-failed answer counted as fresh and the card it
+    // degrades survived remounts for the full five minutes.
     staleTime: query => {
       const cached = query.state.data as
         | { yesterday?: unknown; total?: unknown }
         | undefined;
-      return cached?.yesterday || cached?.total ? 5 * 60 * 1000 : 0;
+      return cached?.yesterday && cached?.total ? 5 * 60 * 1000 : 0;
     },
   });
 
@@ -74,7 +76,10 @@ const BlocksSummary: React.FC = () => {
 
   const { yesterday, total } = data;
   const fees = feeSplit(yesterday);
-  if (!yesterday && !total && !fees) return null;
+  // Every tile hangs off `yesterday` (`total` only feeds the sub-lines), so
+  // without it the card would render as an empty rectangle holding nothing
+  // but the age line in its corner.
+  if (!yesterday) return null;
 
   const segments = [
     {

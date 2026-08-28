@@ -9,6 +9,7 @@ import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
 import { IBlock } from '@/types/blocks';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { formatAmount } from '@/utils/formatFunctions';
+import { bandwidthFeeReward } from '@/utils/fees';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import {
@@ -116,7 +117,7 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
       element: props => (
         <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
           <span>
-            {formatAmount(((txFees || 0) * 0.5) / 10 ** KLV_PRECISION)} KLV
+            {formatAmount(bandwidthFeeReward(txFees) / 10 ** KLV_PRECISION)} KLV
           </span>
           <span>
             {formatAmount((blockRewards || 0) / 10 ** KLV_PRECISION)} KLV
@@ -202,7 +203,7 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
       element: props => (
         <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
           <span>
-            {formatAmount(((txFees || 0) * 0.5) / 10 ** KLV_PRECISION)} KLV
+            {formatAmount(bandwidthFeeReward(txFees) / 10 ** KLV_PRECISION)} KLV
           </span>
           <span>
             {formatAmount((blockRewards || 0) / 10 ** KLV_PRECISION)} KLV

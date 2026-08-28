@@ -75,8 +75,9 @@ export interface ITable<TCard = Record<string, never>> {
   showLimit?: boolean;
   Filters?: React.FC;
   /** Rendered beside Items per page rather than with the filters, for a
-   *  control that acts on the table itself. */
-  TableControl?: React.FC;
+   *  control that acts on the table itself. An element, not a component:
+   *  a component built per render is a new type each time and remounts. */
+  TableControl?: React.ReactNode;
   smaller?: boolean;
   showPagination?: boolean;
   refreshKey?: number;
@@ -259,7 +260,7 @@ const Table = <TCard,>({
           {Filters && <Filters />}
           {showLimit ? (
             <TableControls>
-              {TableControl && <TableControl />}
+              {TableControl}
               <LimitContainer>
                 <span>Items per page</span>
                 <LimitItems>

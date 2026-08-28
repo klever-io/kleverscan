@@ -9,6 +9,7 @@ import {
   formatDate,
   formatDateWithSeconds,
 } from '@/utils/formatFunctions';
+import { bandwidthFeeReward } from '@/utils/fees';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import React from 'react';
@@ -91,10 +92,9 @@ export const blockRowSections = (block: IBlock | string): IRowSection[] => {
     ),
     kAppFees: () => <AmountMuted>{klv(kAppFees)}</AmountMuted>,
     burnedFees: () => <AmountMuted>{klv(txBurnedFees)}</AmountMuted>,
-    // Half the bandwidth fee, which is what the chain pays the producer out of
-    // it: `txBurnedFees` is the other half, exactly, on every block carrying
-    // transactions. The API has no per-block field for this side of the split.
-    feeRewards: () => <AmountMuted>{klv((txFees || 0) / 2)}</AmountMuted>,
+    feeRewards: () => (
+      <AmountMuted>{klv(bandwidthFeeReward(txFees))}</AmountMuted>
+    ),
     blockRewards: () => <AmountPrimary>{klv(blockRewards)}</AmountPrimary>,
   };
 

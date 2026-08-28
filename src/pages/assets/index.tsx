@@ -364,6 +364,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
     Filters: AssetsFilters,
     MobileCard: AssetsMobileCard,
     singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [1, 2, 4, 5],
   };
 
   const tableHeaders = [

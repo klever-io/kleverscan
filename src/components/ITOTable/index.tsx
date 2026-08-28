@@ -3,7 +3,7 @@ import { useMobile } from '@/contexts/mobile';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { processRowSectionsLayout } from '@/utils/table';
+import { normalizePageParam, processRowSectionsLayout } from '@/utils/table';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
@@ -99,8 +99,12 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
   const [scrollTop, setScrollTop] = useState<boolean>(false);
   const tableRef = useRef<HTMLDivElement>(null);
 
-  const page = Number(router.query?.page) || 1;
-  const limit = Number(router.query?.limit) || 10;
+  // Clamped where it enters and used everywhere below, request included:
+  // `Array(limit)` in the loading render throws RangeError on a non-integer,
+  // and with `getInitialProps` everywhere that throw answers as a server 500.
+  // 100 is the largest size the control offers.
+  const limit = normalizePageParam(router.query?.limit, 10, 100);
+  const page = normalizePageParam(router.query?.page, 1);
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -113,10 +117,12 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         };
         return responseFormatted;
       }
-      // setPage(1);
-      return [];
+      return { items: [], totalPages: 0 };
     } catch (error) {
+      // React Query rejects an undefined queryFn result outright and files
+      // the query as an error; an empty page shows the empty state instead.
       console.error(error);
+      return { items: [], totalPages: 0 };
     }
   };
 
@@ -132,11 +138,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
       router.pathname,
     ],
 
-    queryFn: () =>
-      tableRequest(
-        Number(router.query?.page) || 1,
-        Number(router.query?.limit) || 10,
-      ),
+    queryFn: () => tableRequest(page, limit),
 
     ...onErrorHandler(),
   });
@@ -221,7 +223,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                       );
                       refetch();
                     }}
-                    active={value === (Number(router.query?.limit) || limit)}
+                    active={value === limit}
                   >
                     {value}
                   </ItemContainer>
@@ -337,7 +339,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
           <PaginationContainer>
             <Pagination
               count={response?.totalPages}
-              page={Number(router.query?.page) || page}
+              page={page}
               onPaginate={page => {
                 setQueryAndRouter(
                   { ...router.query, page: page.toString() },

@@ -3,5 +3,32 @@
   "Miner": "Miner",
   "Burned": "Burned",
   "Reward": "Reward",
-  "Recent Blocks": "Recent Blocks"
+  "Recent Blocks": "Recent Blocks",
+  "List": {
+    "SummaryAria": "Block statistics",
+    "BlocksYesterday": "Blocks (yesterday)",
+    "CumulativeBlocks": "{{blocks}} in total",
+    "TransactionFees": "Transaction fees (yesterday)",
+    "ShareBurned": "{{share}} of it burned",
+    "TotalBurned": "Total burned (yesterday)",
+    "CumulativeBurned": "{{amount}} in total",
+    "FeesBurned": "Fees burned",
+    "ToValidators": "To validators",
+    "KAppFees": "kApp fees",
+    "AutoUpdate": "Auto update",
+    "TxCount_one": "{{formatted}} tx",
+    "TxCount_other": "{{formatted}} txs"
+  },
+  "Table": {
+    "Block": "Block",
+    "Age": "Age",
+    "Txs": "Txs",
+    "Size": "Size",
+    "ProducedBy": "Produced by",
+    "KAppFees": "kApp Fees",
+    "BurnedFees": "Burned Fees",
+    "FeeRewards": "Fee Rewards",
+    "BlockRewards": "Block Rewards",
+    "Epoch": "Epoch"
+  }
 }

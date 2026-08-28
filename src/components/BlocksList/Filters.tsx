@@ -1,0 +1,16 @@
+import DateFilter from '@/components/DateFilter';
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
+import React from 'react';
+
+/**
+ * The date range above the list. `DateFilter` writes `startdate` and `enddate`
+ * as epoch milliseconds and resets the page, which is exactly what
+ * `block/list` documents and what `blockListCall` forwards.
+ */
+const BlocksFilters: React.FC = () => (
+  <FilterContainer>
+    <DateFilter />
+  </FilterContainer>
+);
+
+export default BlocksFilters;

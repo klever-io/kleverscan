@@ -17,10 +17,14 @@ export const Container = styled.div`
   right: 0;
   z-index: 6;
   transition: top 0.1s linear;
-  background-color: ${props =>
-    props.theme.dark ? props.theme.background : props.theme.true.white};
+  /* The raised surface, the same one the cards and tables sit on: #fff in the
+     light theme, #151515 in the dark one. Reading the background token for
+     dark gave the bar the page's own colour, so it had no edge of its own and
+     only its hairline told a reader where the chrome ended. Identical in
+     light, where both tokens are #fff. */
+  background-color: ${props => props.theme.white};
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
+    ${props => (props.theme.dark ? props.theme.black20 : props.theme.black10)};
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
     justify-content: space-between;
@@ -236,9 +240,29 @@ export const SpotlightTrigger = styled.button`
         : 'rgba(125, 63, 241, 0.06)'};
   }
 
+  /* Touch widths keep the desktop pill, label included, for as long as the
+     row holds it: the logo ends near x=222 and the icons claim the last
+     ~77px, which leaves the ~118px the labelled pill needs from about 430px
+     up (measured); 480 keeps a margin. The shortcut badge never shows here,
+     a key hint means nothing to a screen answering to touch. */
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     height: 2.25rem;
-    padding: 0 0.6rem;
+
+    kbd {
+      display: none;
+    }
+
+    svg {
+      width: 1.15rem;
+      height: 1.15rem;
+    }
+  }
+
+  /* Below that there is no room beside the logo: a round icon button. */
+  @media (max-width: 480px) {
+    width: 2.25rem;
+    padding: 0;
+    justify-content: center;
 
     span {
       display: none;
@@ -478,7 +502,7 @@ export const ConnectionWrapper = styled.div`
   z-index: 3;
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
+    ${props => (props.theme.dark ? props.theme.black20 : props.theme.black10)};
   display: flex;
   justify-content: space-between;
   align-items: center;

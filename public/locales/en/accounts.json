@@ -54,9 +54,43 @@
       "PermissionsName": "Permissions Name"
     }
   },
-  "AccountsPage": {
-    "Number of Accounts": "Number of Accounts",
-    "Accounts created in the last 24h": "Accounts created in the last 24h",
-    "List Of Accounts": "List of Accounts"
+  "List": {
+    "SummaryAria": "Account statistics",
+    "OnChain": "on chain",
+    "New24h": "New (24h)",
+    "VersusYesterday": "{{change}} vs yesterday",
+    "NewWindow": "New ({{days}}d)",
+    "AcrossDays_one": "across {{count}} day",
+    "AcrossDays_other": "across {{count}} days",
+    "Nonce": "Nonce"
+  },
+  "Common": {
+    "CopyAddress": "Copy address",
+    "AddressCopied": "Address copied to clipboard",
+    "OpenAccount": "Open account in a new tab",
+    "OpenInNewTab": "Open in a new tab"
+  },
+  "Badges": {
+    "Foundation": "Foundation",
+    "FoundationTooltip": "Created in the chain's first block",
+    "Validator": "Validator",
+    "ValidatorTooltip": "Owns a registered validator node",
+    "GenesisValidator": "Genesis validator",
+    "GenesisValidatorTooltip": "Owns a validator registered in the genesis block",
+    "ListState": {
+      "elected": "Elected",
+      "eligible": "Eligible",
+      "waiting": "Waiting",
+      "jailed": "Jailed",
+      "inactive": "Inactive",
+      "leaving": "Leaving",
+      "observer": "Observer"
+    }
+  },
+  "Filters": {
+    "Type": "Account type",
+    "All": "All",
+    "foundation": "Foundation",
+    "genesisValidator": "Genesis validator"
   }
 }

@@ -1,20 +1,49 @@
 import { TFunction } from 'next-i18next';
 
+/** 1e12 ms is 2001 and 1e12 seconds is the year 33658, so no chain timestamp
+ *  lands near this in either unit. */
+const MILLISECOND_FLOOR = 1e12;
+
+/** A chain timestamp in milliseconds, whichever unit it arrived in: `address/
+ *  list` mixes both in one field, 1656680400 next to 1656680400000 for the
+ *  same instant. `getAge` below fixes the same thing for display. */
+export const toMilliseconds = (timestamp: number): number =>
+  timestamp < MILLISECOND_FLOOR ? timestamp * 1000 : timestamp;
+
 /**
  * Receives a Date instance and calculate how many time has passed between now and this Date. Will return a string indicating how many time passed. Second arg is for translation option (optional).
  * @param date
  * @param t
  * @returns string
  */
-export const getAge = (dateInput: Date, t?: TFunction): string => {
-  let date = dateInput;
-  while (new Date(date).getFullYear() < 2000) {
-    date = new Date(date.getTime() * 10 ** 3);
-  }
+/**
+ * A chain timestamp scaled until the year looks sane, in milliseconds.
+ *
+ * Both formatters below need this because timestamps arrive in seconds or in
+ * milliseconds depending on the endpoint. Two inputs break the scaling on
+ * their own and are handled here rather than in each caller: 0 multiplies to 0
+ * forever, which hangs the render, and anything past the Date range makes
+ * every getter answer NaN, which both loops fall straight through because NaN
+ * compares false either way, printing "NaN/NaN/aN".
+ */
+export const normalizeTimestamp = (timestamp: number): number => {
+  if (!Number.isFinite(timestamp) || timestamp <= 0) return 0;
+  if (Number.isNaN(new Date(timestamp).getTime())) return 0;
 
-  while (new Date(date).getFullYear() > 3000) {
-    date = new Date(date.getTime() / 10 ** 3);
+  let value = timestamp;
+  while (new Date(value).getFullYear() < 2000) {
+    value = value * 10 ** 3;
   }
+  while (new Date(value).getFullYear() > 3000) {
+    value = value / 10 ** 3;
+  }
+  return value;
+};
+
+export const getAge = (dateInput: Date, t?: TFunction): string => {
+  // The formatters' normalisation: the unguarded copy that sat here hung the
+  // render on a zero and fell through to NaN on an out-of-range date.
+  const date = new Date(normalizeTimestamp(dateInput?.getTime?.() ?? NaN));
 
   const diff = Math.abs(new Date().getTime() - date.getTime());
   const sec = Math.floor(diff / 1000);

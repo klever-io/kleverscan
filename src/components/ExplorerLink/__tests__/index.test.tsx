@@ -105,4 +105,44 @@ describe('ExplorerLink compact mode', () => {
     expect(screen.getByText('QR Code')).toBeInTheDocument();
     expect(screen.getByText('Transfer')).toBeInTheDocument();
   });
+
+  describe('the monospace an address type gets', () => {
+    /** The link's own text node, whichever wrapper it ended up in. */
+    const renderedInside = (text: string): string =>
+      screen.getByText(text).tagName;
+
+    it('wraps a hash-shaped type in its own element', () => {
+      render(
+        <ThemeProvider theme={theme}>
+          <ExplorerLink type="smart-contract" value="klv1abc" compact />
+        </ThemeProvider>,
+      );
+
+      // The address goes through Mono, which renders a span of its own inside
+      // the anchor rather than putting the text straight in the link.
+      const anchor = screen.getByText('klv1abc').closest('a') as HTMLElement;
+      expect(anchor.firstElementChild).not.toBeNull();
+      expect(renderedInside('klv1abc')).toBe('SPAN');
+    });
+
+    it('gives way when the label brings its own typography', () => {
+      // A resolved contract name is words, not a hash, so the caller turns the
+      // monospace off and the label renders exactly as it was handed over.
+      render(
+        <ThemeProvider theme={theme}>
+          <ExplorerLink
+            type="smart-contract"
+            value="klv1abc"
+            label={<b>Bitcoin.me</b>}
+            mono={false}
+            compact
+          />
+        </ThemeProvider>,
+      );
+
+      expect(renderedInside('Bitcoin.me')).toBe('B');
+      const anchor = screen.getByText('Bitcoin.me').closest('a') as HTMLElement;
+      expect(anchor.firstElementChild?.tagName).toBe('B');
+    });
+  });
 });

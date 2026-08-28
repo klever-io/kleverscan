@@ -1,235 +1,150 @@
-import { PropsWithChildren } from 'react';
 import { Accounts as Icon } from '@/assets/title-icons';
-import ExplorerLink from '@/components/ExplorerLink';
+import AccountBadges from '@/components/AccountsList/AccountBadges';
+import AccountsMobileCard, {
+  type IAccountsMobileCardExtras,
+} from '@/components/AccountsList/MobileCard';
+import AccountsFilters from '@/components/AccountsList/Filters';
+import AccountsSummary from '@/components/AccountsList/Summary';
+import { accountBadges } from '@/components/AccountsList/badges';
+import { accountsFilteredCall } from '@/components/AccountsList/filteredList';
+import { klvAmount } from '@/components/AccountsList/format';
+import { AccountsTableWrapper } from '@/components/AccountsList/styles';
+import { useAccountBadgeSources } from '@/components/AccountsList/useAccountBadgeSources';
+import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/DataList/ExplorerLink';
+import {
+  AddressLink,
+  AmountMuted,
+  AmountPrimary,
+  IdentityCell,
+  RowActions,
+} from '@/components/DataList/styles';
 import Title from '@/components/Layout/Title';
-import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
-import { useMobile } from '@/contexts/mobile';
-import api from '@/services/api';
-import { Card, CardContainer, Container, Header } from '@/styles/common';
-import { IAccount, IPagination, IResponse, IRowSection } from '@/types/index';
-import { formatAmount } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
-import { parseAddress } from '@/utils/parseValues';
-import { getAge } from '@/utils/timeFunctions';
-import { TableContainer } from '@/views/accounts';
+import { isAccountFilter } from '@/services/requests/accounts';
+import { Container, Header } from '@/styles/common';
+import { IAccount, IRowSection } from '@/types/index';
+import { useQueryClient } from '@tanstack/react-query';
+import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import React, { PropsWithChildren } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { GetServerSideProps } from 'next';
 
-interface IAccounts {
-  accounts: IAccount[];
-  pagination: IPagination;
-  createdYesterday: number;
-}
+/** Widths and spans with no cell content: the shared Table calls `rowSections`
+ *  with a header string to read them, twice per header cell on every render,
+ *  and answering from here keeps the real builder off that path. */
+const COLUMN_LAYOUT: IRowSection[] = [
+  { element: () => null, span: 2 },
+  { element: () => null, span: 1, width: 100 },
+  { element: () => null, span: 1, width: 190 },
+  { element: () => null, span: 1, width: 190 },
+];
 
-interface IAccountResponse extends IResponse {
-  data: {
-    accounts: IAccount[];
-  };
-  pagination: IPagination;
-}
-
-interface IAccountRangeOfLastDays extends IResponse {
-  data: {
-    number_by_day: [
-      {
-        doc_count: number;
-      },
-    ];
-  };
-}
-
-interface ICard {
-  title: string;
-  headers: string[];
-  values: Array<string | React.ReactElement>;
-}
-
-const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
-  const [pagination, setPagination] = useState<null | IPagination>(null);
-  const [createdYesterday, setCreatedYesterday] = useState<null | number>(null);
+const Accounts: React.FC<PropsWithChildren> = () => {
+  const router = useRouter();
   const { t } = useTranslation(['common', 'accounts', 'table']);
-  const requestAccounts = async (page: number, limit: number) =>
-    await api.get({
-      route: 'address/list',
-      query: { page, limit },
-    });
 
-  const loadInitialData = async () => {
-    const accountsCall = new Promise<IAccountResponse>(
-      async (resolve, reject) => {
-        const res = await api.get({
-          route: 'address/list',
-        });
+  // Inside the component so the row actions can be translated.
+  const rowSections = (account: IAccount | string): IRowSection[] => {
+    // The shared Table calls this with a header string to read column widths;
+    // handled explicitly so a future dereference of the argument cannot crash.
+    if (typeof account !== 'object' || account === null) return COLUMN_LAYOUT;
 
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
+    const { address, balance, frozenBalance, nonce, timestamp } = account;
+    const badges = accountBadges(address, timestamp, genesisTimestamp, owners);
 
-        reject(res.error);
-      },
-    );
-
-    const yesterdayAccountsCall = new Promise<IAccountRangeOfLastDays>(
-      async (resolve, reject) => {
-        const res = await api.get({
-          route: 'address/list/count/1',
-        });
-
-        if (!res.error || res.error === '') {
-          resolve(res);
-        }
-
-        reject(res.error);
-      },
-    );
-
-    await Promise.allSettled([accountsCall, yesterdayAccountsCall]).then(
-      responses => {
-        responses.map((res, index) => {
-          if (res.status !== 'rejected') {
-            const { value }: any = res;
-            switch (index) {
-              case 0:
-                setPagination(value.pagination);
-                break;
-
-              case 1:
-                setCreatedYesterday(value.data.number_by_day[0]?.doc_count);
-                break;
-
-              default:
-                break;
-            }
-          }
-        });
-      },
-    );
-  };
-
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const cards: ICard[] = [
-    {
-      title: t('accounts:AccountsPage.Number of Accounts'),
-      headers: [
-        t('accounts:AccountsPage.Accounts created in the last 24h'),
-        t('common:Cards.Total Accounts'),
-      ],
-      values: [
-        createdYesterday === pagination?.totalRecords
-          ? '--'
-          : (createdYesterday?.toLocaleString() ?? <Skeleton />),
-        pagination?.totalRecords?.toLocaleString() ?? <Skeleton />,
-      ],
-    },
-  ];
-
-  const CardContent: React.FC<PropsWithChildren<ICard>> = ({
-    title,
-    headers,
-    values,
-  }) => {
-    const [uptime] = useState(new Date().getTime());
-    const [age, setAge] = useState(getAge(new Date(), t));
-
-    useEffect(() => {
-      const interval = setInterval(() => {
-        const newAge = getAge(new Date(uptime / 1000), t);
-
-        setAge(newAge);
-      }, 1 * 1000); // 1 sec
-
-      return () => {
-        clearInterval(interval);
-      };
-    }, []);
-
-    return (
-      <Card>
-        <div>
-          <span>
-            <strong>{title}</strong>
-          </span>
-          <p>
-            {age} {t('common:Date.Elapsed_Time')}
-          </p>
-        </div>
-        <div>
-          <span>
-            <small>{headers[0]}</small>
-          </span>
-          <span>
-            <small>{headers[1]}</small>
-          </span>
-        </div>
-        <div>
-          <span>{values[0]}</span>
-          <span>{values[1]}</span>
-        </div>
-      </Card>
-    );
-  };
-
-  const header = [
-    `${t('table:Address')}`,
-    'Nonce',
-    `KLV ${t('table:Balance')}`,
-    `KLV ${t('table:Staked')}`,
-  ];
-
-  const { isMobile } = useMobile();
-
-  const rowSections = (account: IAccount): IRowSection[] => {
-    const { address, balance, frozenBalance, nonce } = account;
-    const sections: IRowSection[] = [
+    return [
       {
-        element: props => (
-          <ExplorerLink
-            type="account"
-            value={address}
-            label={isMobile ? parseAddress(address, 24) : address}
-            compact
-          />
+        element: () => (
+          <IdentityCell>
+            {/* The whole address and no `title`: a tooltip repeating visible
+                text is announced twice by some screen readers, and the tail of
+                a bech32 address is its checksum, the part a look-alike grind
+                hides. Below tablet width the mobile card takes over. */}
+            <AddressLink
+              href={`/account/${address}`}
+              data-testid="account-link"
+            >
+              {address}
+            </AddressLink>
+            <AccountBadges badges={badges} />
+            <RowActions>
+              <CopyAction
+                value={address}
+                label={t('accounts:Common.CopyAddress')}
+                announcement={t('accounts:Common.AddressCopied')}
+              />
+              <ExplorerLink
+                href={`/account/${address}`}
+                label={t('accounts:Common.OpenAccount')}
+                title={t('accounts:Common.OpenInNewTab')}
+              />
+            </RowActions>
+          </IdentityCell>
         ),
         span: 2,
       },
       {
-        element: props => <span key={nonce}>{nonce}</span>,
+        element: () => <AmountMuted>{nonce}</AmountMuted>,
         span: 1,
         width: 100,
       },
       {
-        element: props => (
-          <span key={balance}>
-            {formatAmount(balance / 10 ** KLV_PRECISION)} KLV
-          </span>
-        ),
+        element: () => <AmountPrimary>{klvAmount(balance)} KLV</AmountPrimary>,
         span: 1,
+        width: 190,
       },
       {
-        element: props => (
-          <span key={frozenBalance}>
-            {formatAmount(frozenBalance / 10 ** KLV_PRECISION)} KLV
-          </span>
+        element: () => (
+          <AmountMuted>{klvAmount(frozenBalance)} KLV</AmountMuted>
         ),
         span: 1,
+        width: 190,
       },
     ];
-    return sections;
   };
 
-  const tableProps: ITable = {
+  const queryClient = useQueryClient();
+  const filter = isAccountFilter(router.query.type)
+    ? router.query.type
+    : undefined;
+  // Eager only for the filter that decides which rows exist from this set:
+  // under `foundation` it would put three validator pages before the rows.
+  const { owners, genesisTimestamp } = useAccountBadgeSources(
+    filter === 'genesisValidator',
+  );
+
+  const header = [
+    `${t('table:Address')}`,
+    `${t('accounts:List.Nonce')}`,
+    `KLV ${t('table:Balance')}`,
+    `KLV ${t('table:Staked')}`,
+  ];
+
+  const tableProps: ITable<IAccountsMobileCardExtras> = {
     type: 'accounts',
     header,
     rowSections,
-    request: (page, limit) => requestAccounts(page, limit),
+    request: (page, limit) =>
+      accountsFilteredCall({
+        page,
+        limit,
+        filter,
+        routerQuery: router.query,
+        queryClient,
+      }),
     dataName: 'accounts',
+    // No refreshKey: the request awaits its own sources and the badges
+    // recompute on a plain re-render, leaving a changing key nothing to do.
+    Filters: AccountsFilters,
+    MobileCard: AccountsMobileCard,
+    // Once here, not per card: ten cards calling the hook would open ten
+    // subscriptions to the same two queries.
+    mobileCardProps: { owners, genesisTimestamp },
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [1, 2, 3],
   };
 
   return (
@@ -238,16 +153,11 @@ const Accounts: React.FC<PropsWithChildren<IAccounts>> = () => {
         <Title title={t('common:Titles.Accounts')} Icon={Icon} />
       </Header>
 
-      <CardContainer>
-        {cards.map((card, index) => (
-          <CardContent key={String(index)} {...card} />
-        ))}
-      </CardContainer>
+      <AccountsSummary />
 
-      <TableContainer>
-        <h3>{t('accounts:AccountsPage.List Of Accounts')}</h3>
+      <AccountsTableWrapper>
         <Table {...tableProps} />
-      </TableContainer>
+      </AccountsTableWrapper>
     </Container>
   );
 };

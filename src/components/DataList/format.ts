@@ -1,3 +1,24 @@
+import { formatAmount } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
+
+// Pinned: a bare toLocaleString() follows the reader's browser locale, and a
+// Dutch browser would print 21.597 beside English labels.
+export const NUMBER_LOCALE = 'en-US';
+
+/**
+ * A compact KLV amount for list surfaces. One definition: three files in
+ * BlocksList each carried a copy and they had already drifted (one took
+ * `number`, one added a non-breaking space). `nbsp` binds amount and unit
+ * into one token for surfaces that wrap, such as the mobile card rows.
+ */
+export const klvAmount = (
+  amount: number | undefined,
+  options?: { nbsp?: boolean },
+): string =>
+  `${formatAmount((amount || 0) / 10 ** KLV_PRECISION)}${
+    options?.nbsp ? '\u00A0' : ' '
+  }KLV`;
+
 /**
  * Percent formatting policy shared by the data-list pages (holders, assets):
  * one decimal from 10% up, two below that, and a "<0.01%" floor so dust

@@ -1,22 +1,23 @@
 import api from '@/services/api';
 import {
   HotContracts,
-  SmartContractsList,
   SmartContractTransactionData,
 } from '@/types/smart-contract';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 const smartContractsListCall = async (): Promise<
-  { smartContracts: SmartContractsList[]; totalContracts: number } | undefined
+  { totalContracts: number } | undefined
 > => {
   try {
     const smartContractsRes = await api.get({
       route: 'sc/list',
+      // Only the record count is used downstream; the rows were fetched and
+      // thrown away on every one of these calls.
+      query: { limit: 1 },
     });
 
     if (!smartContractsRes.error || smartContractsRes.error === '') {
       return {
-        smartContracts: smartContractsRes.data.sc,
         totalContracts: smartContractsRes.pagination?.totalRecords || 0,
       };
     }
@@ -25,21 +26,42 @@ const smartContractsListCall = async (): Promise<
   }
 };
 
+/**
+ * What narrows this list, named rather than inherited. An allowlist so the
+ * request carries filters only: the page keeps other state in the URL, and
+ * forwarding that would hand the API this table's view state as if it were a
+ * filter. A repeated param (?sortBy=a&sortBy=b) arrives as an array, which the
+ * filter bar never writes, so it is skipped rather than joined.
+ *
+ * The server coerces two of these anyway (baseSmartContractGroup.go): anything
+ * but `totalTransactions` sorts by timestamp, anything but `asc` orders
+ * descending, and neither returns an error. Sending only what the bar writes
+ * keeps that silent fallback from being reached in the first place.
+ */
+const FILTER_PARAMS = ['deployer', 'sortBy', 'orderBy'];
+
 const smartContractsTableRequest = async (
   page: number,
   limit: number,
   query: NextParsedUrlQuery,
 ) => {
   try {
-    const parsedQuery = {
-      deployer: query?.deployer || undefined,
-      sortBy: query?.sortBy || 'totalTransactions',
-      orderBy: query?.orderBy || 'desc',
-      page,
-      limit,
+    const parsedQuery: Record<string, unknown> = {
+      sortBy: 'totalTransactions',
+      orderBy: 'desc',
     };
 
-    !query?.deployer && delete parsedQuery.deployer;
+    FILTER_PARAMS.forEach(key => {
+      const value = query?.[key];
+      if (typeof value === 'string' && value !== '') {
+        parsedQuery[key] = value;
+      }
+    });
+
+    // Last, so a spoofed page or limit in the URL cannot reach the API through
+    // the allowlist above; they come from the caller's arguments instead.
+    parsedQuery.page = page;
+    parsedQuery.limit = limit;
 
     const smartContractsListRes = await api.get({
       route: 'sc/list',
@@ -72,41 +94,16 @@ const smartContractsStatisticCall = async (): Promise<
   }
 };
 
-const smartContractsTotalContractsCall = async () => {
-  try {
-    const res = await api.get({
-      route: 'sc/list',
-    });
-
-    if (!res.error || res.error === '') {
-      return res.pagination.totalRecords;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 const smartContractTotalTransactionsListCall = async () => {
   try {
     const res = await api.get({
       route: 'transaction/list',
       query: {
         type: 63, // Smart Contract Transactions
+        // Only `totalRecords` is read. Measured: the unlimited call ships
+        // 30.801 bytes for that one number, `limit=1` ships 3.572.
+        limit: 1,
       },
-    });
-
-    if (!res.error || res.error === '') {
-      return res.pagination.totalRecords;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const scInvokesTotalRecordsCall = async (address: string) => {
-  try {
-    const res = await api.get({
-      route: `sc/invokes/${address}`,
     });
 
     if (!res.error || res.error === '') {
@@ -189,13 +186,11 @@ const smartContractTransactionDetailsCall = async (
 };
 
 export {
-  scInvokesTotalRecordsCall,
   smartContractBeforeYesterdayTransactionsCall,
   smartContractsBeforeYesterdayTransactionsCall,
   smartContractsListCall,
   smartContractsStatisticCall,
   smartContractsTableRequest,
-  smartContractsTotalContractsCall,
   smartContractTotalTransactionsListCall,
   smartContractTransactionDetailsCall,
 };

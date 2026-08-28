@@ -38,7 +38,6 @@ import {
   TableRowProps,
   TableEmptyData,
 } from './styles';
-import SmartContractCard from '../SmartContracts/SmartContractCard';
 
 export interface ITable<TCard = Record<string, never>> {
   type:
@@ -424,20 +423,6 @@ const Table = <TCard,>({
                     {...(mobileCardProps as TCard)}
                     item={item}
                     index={index}
-                  />
-                );
-              }
-
-              if (type === 'smartContracts' && (isMobile || isTablet)) {
-                return (
-                  <SmartContractCard
-                    key={index}
-                    name={item?.name}
-                    timestamp={item?.timestamp}
-                    contractAddress={item?.contractAddress}
-                    deployer={item?.deployer}
-                    deployTxHash={item?.deployTxHash}
-                    totalTransactions={item?.totalTransactions}
                   />
                 );
               }

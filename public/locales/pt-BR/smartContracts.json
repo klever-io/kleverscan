@@ -1,13 +1,6 @@
 {
   "Titles": {
-    "Most Used Applications": "Aplicações Mais Utilizadas",
-    "Daily": "Diariamente",
-    "Transactions": "Transações"
-  },
-  "Cards": {
-    "Deployer": "Implantador",
-    "Deployer Hash": "Hash do Implantador",
-    "Total Transactions": "Total de Transações"
+    "MostUsed": "Most used applications"
   },
   "ContractInteraction": {
     "noReadable": "Nenhuma função de leitura disponível para este contrato.",
@@ -37,5 +30,43 @@
       "failed": "Transação falhou",
       "notSuccessful": "A transação não foi bem-sucedida."
     }
+  },
+  "Table": {
+    "Contract": "Contract",
+    "Deployed": "Deployed",
+    "Deployer": "Deployer",
+    "DeployTx": "Deploy Tx",
+    "Upgrades": "Upgrades",
+    "Transactions": "Transactions"
+  },
+  "List": {
+    "SummaryAria": "Smart contract statistics",
+    "ContractsDeployed": "Contracts deployed",
+    "ContractTransactions": "Contract transactions",
+    "Today": "{{formatted}} today",
+    "MostUsed": "Most used contract",
+    "LeaderTransactions": "{{amount}} transactions, all time",
+    "BarCaption": "Share among the five busiest contracts",
+    "MostUsedNote": "By successful contract transactions, all time.",
+    "NoStatistics": "No contract activity has been recorded yet.",
+    "ScrollBack": "Scroll back",
+    "ScrollForward": "Scroll forward",
+    "DeployerCountTitle": "Show the {{count}} contracts from this deployer",
+    "FilteredByDeployer": "Contracts deployed by",
+    "ClearFilter": "Clear filter"
+  },
+  "Filters": {
+    "SortBy": "Sort by",
+    "Order": "Order",
+    "SortTransactions": "Transactions",
+    "SortDeployed": "Deployed",
+    "OrderDesc": "Descending",
+    "OrderAsc": "Ascending"
+  },
+  "Common": {
+    "CopyAddress": "Copy contract address",
+    "AddressCopied": "Contract address copied to clipboard",
+    "OpenContract": "Open contract",
+    "OpenInNewTab": "Open in a new tab"
   }
 }

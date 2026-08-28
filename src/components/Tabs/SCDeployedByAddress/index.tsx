@@ -1,105 +1,54 @@
-import { Copy } from '@/assets/icons';
-import ExplorerLink from '@/components/ExplorerLink';
-import Filters from '@/components/SmartContracts/SmartContractFilters';
+import { useDeferred } from '@/components/DataList/useDeferred';
+import { RIGHT_ALIGNED_COLUMNS } from '@/components/SmartContractsList/columns';
+import ContractsFilters from '@/components/SmartContractsList/Filters';
+import ContractsMobileCard, {
+  type IContractsMobileCardExtras,
+} from '@/components/SmartContractsList/MobileCard';
+import { contractRowSections } from '@/components/SmartContractsList/rows';
+import { ContractsTableWrapper } from '@/components/SmartContractsList/styles';
+import { useContractHeaders } from '@/components/SmartContractsList/useContractHeaders';
 import Table, { ITable } from '@/components/Table';
-import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
-import { IInnerTableProps, IRowSection } from '@/types';
+import { IInnerTableProps } from '@/types';
 import { SmartContractsList } from '@/types/smart-contract';
-import { smartContractsTableHeaders } from '@/utils/contracts';
-import { formatDate } from '@/utils/formatFunctions';
-import { parseAddress } from '@/utils/parseValues';
 import React, { PropsWithChildren } from 'react';
 
 interface ISCDeployedByAddress {
   smartContractsTableProps: IInnerTableProps;
 }
 
+/**
+ * The contracts one account deployed, as a tab on its page.
+ *
+ * Shares the list page's columns, rows and skin rather than carrying a second
+ * copy of them: it is the same endpoint with the deployer already fixed, and
+ * the copy it used to hold had already drifted into a fifth two-line table.
+ */
 const SCDeployedByAddress: React.FC<
   PropsWithChildren<ISCDeployedByAddress>
 > = ({ smartContractsTableProps }) => {
-  const scDeployerListRowSections = (
-    props: SmartContractsList,
-  ): IRowSection[] => {
-    const {
-      name,
-      deployTxHash,
-      deployer,
-      timestamp,
-      totalTransactions,
-      contractAddress,
-    } = props;
+  const header = useContractHeaders();
+  const deferred = useDeferred();
 
-    return [
-      {
-        element: props => (
-          <DoubleRow key={contractAddress}>
-            <CenteredRow>
-              <span>{name || '- -'}</span>
-            </CenteredRow>
-            <CenteredRow>
-              <ExplorerLink
-                type="smart-contract"
-                value={contractAddress}
-                label={parseAddress(contractAddress, 25)}
-                compact
-              />
-            </CenteredRow>
-          </DoubleRow>
-        ),
-        span: 2,
-      },
-
-      {
-        element: props => (
-          <CenteredRow key={contractAddress}>
-            <span>{totalTransactions}</span>
-          </CenteredRow>
-        ),
-        span: 1,
-      },
-
-      {
-        element: props => (
-          <CenteredRow key={contractAddress}>
-            <ExplorerLink
-              type="account"
-              value={deployer}
-              label={parseAddress(deployer, 25)}
-              compact
-            />
-          </CenteredRow>
-        ),
-        span: 1,
-      },
-
-      {
-        element: props => (
-          <DoubleRow key={contractAddress}>
-            <CenteredRow>
-              <Mono>{parseAddress(deployTxHash, 25)}</Mono>
-              <Copy data={deployTxHash} info="deployTxHash" />
-            </CenteredRow>
-            <CenteredRow>
-              <span>{formatDate(timestamp)}</span>
-            </CenteredRow>
-          </DoubleRow>
-        ),
-        span: 1,
-      },
-    ];
-  };
-
-  const tableProps: ITable = {
+  const tableProps: ITable<IContractsMobileCardExtras> = {
     ...smartContractsTableProps,
     type: 'smartContracts',
-    header: smartContractsTableHeaders,
-    rowSections: scDeployerListRowSections,
+    header,
+    rowSections: (contract: SmartContractsList | string) =>
+      contractRowSections(contract, { deferred }),
     dataName: 'sc',
     showLimit: true,
-    Filters,
+    Filters: ContractsFilters,
+    MobileCard: ContractsMobileCard,
+    mobileCardProps: { deferred },
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <ContractsTableWrapper>
+      <Table {...tableProps} />
+    </ContractsTableWrapper>
+  );
 };
 
 export default SCDeployedByAddress;

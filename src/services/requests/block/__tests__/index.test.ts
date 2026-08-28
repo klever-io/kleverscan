@@ -1,7 +1,12 @@
 import api from '@/services/api';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
 import { toast } from 'react-toastify';
-import { blockTransactionsCall } from '../index';
+import {
+  blockListCall,
+  blockTotalStatsCall,
+  blockTransactionsCall,
+  blockYesterdayStatsCall,
+} from '../index';
 
 jest.mock('react-toastify', () => ({
   toast: { error: jest.fn() },
@@ -178,5 +183,197 @@ describe('blockTransactionsCall', () => {
 
     expect(result.error).toBe('boom');
     expect(result.data.transactions).toEqual([]);
+  });
+});
+
+const argOf = (call = 0) => mockedGet.mock.calls[call][0];
+
+describe('blockListCall', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockedGet.mockResolvedValue({
+      data: { blocks: [] },
+      pagination: {},
+      error: '',
+    });
+  });
+
+  it('sends page and limit, and asks for the full payload', async () => {
+    await blockListCall(2, 25);
+
+    // No `minify`: it zeroes `size`, which the Size column reads.
+    expect(argOf()).toEqual({
+      route: 'block/list',
+      query: { page: 2, limit: 25 },
+    });
+  });
+
+  it('forwards a date range the filter bar wrote', async () => {
+    await blockListCall(1, 10, {
+      startdate: '1787788800000',
+      enddate: '1787875200000',
+    });
+
+    expect(argOf().query).toEqual({
+      startdate: '1787788800000',
+      enddate: '1787875200000',
+      page: 1,
+      limit: 10,
+    });
+  });
+
+  // Each of these answers 500 with an Elasticsearch stack trace when it reaches
+  // the endpoint, verified against mainnet; `Number()` alone accepts the first
+  // four of them.
+  it.each([
+    ['exponent notation', '1e12'],
+    ['a value past int64', '10000000000000000000'],
+    ['padding whitespace', ' 1787788800000 '],
+    ['hex', '0x1A'],
+    ['NaN', 'NaN'],
+    ['Infinity', 'Infinity'],
+    ['a negative', '-1787788800000'],
+    ['a fraction', '1787788800000.7'],
+    ['a bare word', 'notadate'],
+    ['an ISO date', '2026-08-20T00:00:00Z'],
+    ['the empty string', ''],
+    ['one past MAX_SAFE_INTEGER', '9007199254740992'],
+  ])('drops %s rather than forwarding it', async (_label, value) => {
+    await blockListCall(1, 10, { startdate: value });
+
+    expect(argOf().query).not.toHaveProperty('startdate');
+  });
+
+  it('keeps MAX_SAFE_INTEGER itself, the last value it can compare', async () => {
+    await blockListCall(1, 10, { startdate: '9007199254740991' });
+
+    expect(argOf().query.startdate).toBe('9007199254740991');
+  });
+
+  it('drops a repeated param, which arrives as an array the filter bar never writes', async () => {
+    await blockListCall(1, 10, {
+      startdate: ['1787788800000', '1787875200000'] as unknown as string,
+    });
+
+    expect(argOf().query).not.toHaveProperty('startdate');
+  });
+
+  it('ignores a page or limit in the URL in favour of the clamped arguments', async () => {
+    await blockListCall(3, 10, { page: '999', limit: '5000' });
+
+    expect(argOf().query.page).toBe(3);
+    expect(argOf().query.limit).toBe(10);
+  });
+});
+
+describe('blockYesterdayStatsCall', () => {
+  const day = (totalBlocks: number) => ({
+    date: 1,
+    totalBlocks,
+    totalBurned: 145531094085,
+  });
+
+  beforeEach(() => jest.clearAllMocks());
+
+  it('returns the closed day, not the one still running', async () => {
+    mockedGet.mockResolvedValue({
+      data: { block_stats_by_day: [day(20661), day(21599)] },
+      error: '',
+    });
+
+    // 20661 is the running day at the moment of the call; reading entry 0
+    // would report a part-day under a label that says a whole one.
+    await expect(blockYesterdayStatsCall()).resolves.toEqual(day(21599));
+  });
+
+  it('returns undefined when only the running day came back', async () => {
+    mockedGet.mockResolvedValue({
+      data: { block_stats_by_day: [day(20661)] },
+      error: '',
+    });
+
+    await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
+  });
+
+  it('returns undefined on a failure, which api.get resolves rather than throws', async () => {
+    mockedGet.mockResolvedValue({ data: null, error: 'boom' });
+
+    await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
+  });
+
+  it('returns undefined when the series is not an array', async () => {
+    mockedGet.mockResolvedValue({
+      data: { block_stats_by_day: { totalBlocks: 1 } },
+      error: '',
+    });
+
+    await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
+  });
+
+  // The tiles dereference these fields bare; an answer missing one used to
+  // crash the page render instead of costing the card.
+  it('rejects a closed day missing a field the tiles render', async () => {
+    mockedGet.mockResolvedValue({
+      data: {
+        block_stats_by_day: [day(20661), { date: 2, totalBlocks: 21599 }],
+      },
+      error: '',
+    });
+
+    await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
+  });
+
+  it('rejects a closed day whose figure is not a number', async () => {
+    mockedGet.mockResolvedValue({
+      data: {
+        block_stats_by_day: [
+          day(20661),
+          { date: 2, totalBlocks: '21599', totalBurned: 1 },
+        ],
+      },
+      error: '',
+    });
+
+    await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
+  });
+});
+
+describe('blockTotalStatsCall', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('reads the cumulative figures', async () => {
+    const total = {
+      totalBlocks: 32728348,
+      totalBurned: 1,
+      totalBlockRewards: 2,
+    };
+    mockedGet.mockResolvedValue({
+      data: { block_stats_total: total },
+      error: '',
+    });
+
+    await expect(blockTotalStatsCall()).resolves.toEqual(total);
+    expect(argOf()).toEqual({ route: 'block/statistics-total/0' });
+  });
+
+  it('returns undefined on a failure', async () => {
+    mockedGet.mockResolvedValue({ data: null, error: 'boom' });
+
+    await expect(blockTotalStatsCall()).resolves.toBeUndefined();
+  });
+
+  it('returns undefined when a clean answer carries no totals', async () => {
+    mockedGet.mockResolvedValue({ data: {}, error: '' });
+
+    await expect(blockTotalStatsCall()).resolves.toBeUndefined();
+  });
+
+  it('rejects totals missing a field the tiles render', async () => {
+    mockedGet.mockResolvedValue({
+      data: { block_stats_total: { totalBlocks: 32728348 } },
+      error: '',
+    });
+
+    await expect(blockTotalStatsCall()).resolves.toBeUndefined();
   });
 });

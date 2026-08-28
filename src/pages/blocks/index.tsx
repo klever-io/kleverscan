@@ -1,315 +1,80 @@
-import { PropsWithChildren } from 'react';
 import { Blocks as Icon } from '@/assets/title-icons';
-import ToggleButton from '@/components/Button/Toggle';
+import AutoUpdate from '@/components/BlocksList/AutoUpdate';
+import BlocksFilters from '@/components/BlocksList/Filters';
+import { RIGHT_ALIGNED_COLUMNS } from '@/components/BlocksList/columns';
+import BlocksMobileCard from '@/components/BlocksList/MobileCard';
+import { blockRowSections } from '@/components/BlocksList/rows';
+import { BlocksTableWrapper } from '@/components/BlocksList/styles';
+import BlocksSummary from '@/components/BlocksList/Summary';
+import { useBlockHeaders } from '@/components/BlocksList/useBlockHeaders';
 import Title from '@/components/Layout/Title';
-import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
-import {
-  blockCall,
-  totalStatisticsCall,
-  yesterdayStatisticsCall,
-} from '@/services/apiCalls';
-import {
-  Card,
-  CardContainer,
-  Container,
-  DoubleRow,
-  Header,
-} from '@/styles/common';
-import { IBlock, IBlocks, ICard } from '@/types/blocks';
-import { IRowSection } from '@/types/index';
-import {
-  formatAmount,
-  formatDate,
-  toLocaleFixed,
-} from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
+import { blockListCall } from '@/services/requests/block';
+import { Container, Header } from '@/styles/common';
 import {
   getStorageUpdateConfig,
   storageUpdateBlocks,
 } from '@/utils/localStorage/localStorageData';
-import { parseAddress } from '@/utils/parseValues';
-import { getAge } from '@/utils/timeFunctions';
-import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
-import ExplorerLink from '@/components/ExplorerLink';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { normalizePageParam } from '@/utils/table';
+import { GetServerSideProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/router';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
-interface IBlocksStatsToday {
-  totalBlocks: number;
-  totalBurned: number;
-  totalBlockRewards: number;
-}
+/** How often the list refetches while auto update is on. */
+const AUTO_UPDATE_INTERVAL = 4 * 1000;
 
-interface IBlocksStatsYesterday {
-  date: number;
-  totalBlocks: number;
-  totalMinted: number;
-  totalBurned: number;
-  totalBlockRewards: number;
-  totalStakingRewards: number;
-  totalTxFees: number;
-  totalKappsFees: number;
-  totalTxRewards: number;
-}
-export const blocksHeader = [
-  'Block/ Epoch',
-  'Size/Transactions',
-  'Produced by/ Created At',
-  'kApp Fees/Burned Fees',
-  'Fee Rewards/Block Rewards',
-];
-
-export const blocksRowSections = (block: IBlock): IRowSection[] => {
-  const {
-    nonce,
-    size,
-    epoch,
-    producerName,
-    producerOwnerAddress,
-    timestamp,
-    txCount,
-    txFees,
-    kAppFees,
-    txBurnedFees,
-    blockRewards,
-  } = block;
-
-  const sections: IRowSection[] = [
-    {
-      element: props => (
-        <DoubleRow {...props} key={nonce + epoch}>
-          <ExplorerLink type="block" value={String(nonce)} compact />
-          <span>{epoch}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={txCount + size}>
-          <span>{size} Bytes</span>
-          <span>
-            {txCount} TX{txCount > 1 ? 's' : ''}
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={producerOwnerAddress + timestamp}>
-          <ExplorerLink
-            type="validator"
-            value={producerOwnerAddress}
-            label={parseAddress(producerName, 16)}
-            compact
-          />
-          <span key={timestamp}>{formatDate(timestamp)}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(kAppFees) + String(txBurnedFees)}>
-          <span>{formatAmount((kAppFees || 0) / 10 ** KLV_PRECISION)} KLV</span>
-          <span>{`${formatAmount(
-            (txBurnedFees || 0) / 10 ** KLV_PRECISION,
-          )} KLV`}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
-          <span>
-            {formatAmount(((txFees || 0) * 0.5) / 10 ** KLV_PRECISION)} KLV
-          </span>
-          <span>
-            {formatAmount((blockRewards || 0) / 10 ** KLV_PRECISION)} KLV
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-  ];
-
-  return sections;
-};
-
-const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
-  const blocksWatcherInterval = 4 * 1000; // 4 secs
+const Blocks: React.FC<PropsWithChildren> = () => {
+  const router = useRouter();
+  const header = useBlockHeaders();
+  const { t } = useTranslation(['blocks']);
+  // Translated here and handed down: the row builder is no component, so
+  // t() is out of its reach, and the mobile card already translates this key.
+  const epochLabel = t('blocks:Table.Epoch', { defaultValue: 'Epoch' });
+  // Two pieces of state on purpose: the switch and storage carry the user's
+  // INTENT, the interval is derived from it. Conflating them made the toggle
+  // unable to turn the setting off from a paused page: with the interval at
+  // zero there, a click stored "on" again.
+  const [autoUpdateIntent, setAutoUpdateIntent] = useState(false);
   const [blocksInterval, setBlocksInterval] = useState(0);
-  const {
-    data: blocksStatsToday,
-    isLoading: isLoadingBlocksStatsToday,
-    refetch: refetchTotal,
-    dataUpdatedAt: totalUpdatedAt,
-  } = useQuery({
-    queryKey: ['statisticsCall'],
-    queryFn: totalStatisticsCall,
-  });
-  const {
-    data: blocksStatsYesterday,
-    refetch: refetchYesterday,
-    isLoading: isLoadingBlocksStatsYesterday,
-    dataUpdatedAt: yesterdayUpdatedAt,
-  } = useQuery({
-    queryKey: ['yesterdayStatisticsCall'],
-    queryFn: yesterdayStatisticsCall,
-  });
-
-  const dataUpdatedAt =
-    totalUpdatedAt && yesterdayUpdatedAt
-      ? Math.min(totalUpdatedAt, yesterdayUpdatedAt)
-      : totalUpdatedAt || yesterdayUpdatedAt || 0;
-
-  const updateBlocks = useCallback(async () => {
-    const newState = storageUpdateBlocks(!!blocksInterval);
-    if (newState) {
-      setBlocksInterval(blocksWatcherInterval);
-    } else {
-      setBlocksInterval(0);
-    }
-  }, [blocksInterval]);
+  const page = normalizePageParam(router.query?.page, 1);
 
   useEffect(() => {
-    if (blocksInterval) {
-      const intervalId = setInterval(() => {
-        refetchYesterday();
-        refetchTotal();
-      }, blocksWatcherInterval);
-      return () => clearInterval(intervalId);
-    }
-  }, [blocksInterval]);
-
-  useEffect(() => {
-    const updateBlocksConfig = getStorageUpdateConfig();
-    if (updateBlocksConfig) {
-      setBlocksInterval(blocksWatcherInterval);
-    } else {
-      setBlocksInterval(0);
-    }
+    setAutoUpdateIntent(getStorageUpdateConfig());
   }, []);
 
-  const cards: ICard[] = [
-    {
-      title: 'Number of Blocks',
-      headers: ['Blocks 24h', 'Cumulative Number'],
-      values: [
-        !isLoadingBlocksStatsYesterday ? (
-          toLocaleFixed(blocksStatsYesterday?.totalBlocks || 0, 0)
-        ) : (
-          <Skeleton />
-        ),
-        !isLoadingBlocksStatsToday ? (
-          toLocaleFixed(blocksStatsToday?.totalBlocks || 0, 0)
-        ) : (
-          <Skeleton />
-        ),
-      ],
-    },
-    {
-      title: 'Block Reward',
-      headers: ['Rewards 24h', 'Cumulative Revenue'],
-      values: [
-        !isLoadingBlocksStatsYesterday ? (
-          `${formatAmount(
-            (blocksStatsYesterday?.totalBlockRewards || 0) /
-              10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-        !isLoadingBlocksStatsToday ? (
-          `${formatAmount(
-            (blocksStatsToday?.totalBlockRewards || 0) / 10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-      ],
-    },
-    {
-      title: 'Stats on Burned KLV',
-      headers: ['Burned 24h', 'Burned in Total'],
-      values: [
-        !isLoadingBlocksStatsYesterday ? (
-          `${formatAmount(
-            (blocksStatsYesterday?.totalBurned || 0) / 10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-        !isLoadingBlocksStatsToday ? (
-          `${formatAmount(
-            (blocksStatsToday?.totalBurned || 0) / 10 ** KLV_PRECISION,
-          )} KLV`
-        ) : (
-          <Skeleton />
-        ),
-      ],
-    },
-  ];
-
-  interface CardContentProps extends ICard {
-    dataUpdatedAt: number;
-  }
-
-  const CardContent: React.FC<PropsWithChildren<CardContentProps>> = ({
-    title,
-    headers,
-    values,
-    dataUpdatedAt,
-  }) => {
-    const [age, setAge] = useState(
-      dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '',
+  // The loop itself only runs on page 1: rolling blocks mean nothing on page
+  // 7, and the shared Table zeroes its interval on a page change for the same
+  // reason. Deriving it here re-arms it on returning to page 1.
+  useEffect(() => {
+    setBlocksInterval(
+      autoUpdateIntent && page === 1 ? AUTO_UPDATE_INTERVAL : 0,
     );
+  }, [autoUpdateIntent, page]);
 
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setAge(dataUpdatedAt ? getAge(new Date(dataUpdatedAt)) : '');
-      }, 1 * 1000); // 1 sec
-
-      return () => {
-        clearInterval(interval);
-      };
-    }, [dataUpdatedAt]);
-
-    return (
-      <Card>
-        <div>
-          <span>
-            <strong>{title}</strong>
-          </span>
-          <p>{age ? `${age} ago` : ''}</p>
-        </div>
-        <div>
-          <span>
-            <small>{headers[0]}</small>
-          </span>
-          <span>
-            <small>{headers[1]}</small>
-          </span>
-        </div>
-        <div>
-          <span>{values[0]}</span>
-          <span>{values[1]}</span>
-        </div>
-      </Card>
-    );
+  const toggleAutoUpdate = (): void => {
+    setAutoUpdateIntent(storageUpdateBlocks(autoUpdateIntent));
   };
 
   const tableProps: ITable = {
     type: 'blocks',
-    header: blocksHeader,
-    rowSections: blocksRowSections,
+    header,
+    rowSections: (block: Parameters<typeof blockRowSections>[0]) =>
+      blockRowSections(block, epochLabel),
     dataName: 'blocks',
-    request: (page: number, limit: number) => blockCall(page, limit),
+    request: (page: number, limit: number) =>
+      blockListCall(page, limit, router.query),
     interval: blocksInterval,
     intervalController: setBlocksInterval,
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
+    MobileCard: BlocksMobileCard,
+    Filters: BlocksFilters,
+    TableControl: (
+      <AutoUpdate active={autoUpdateIntent} onToggle={toggleAutoUpdate} />
+    ),
   };
 
   return (
@@ -318,25 +83,26 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
         <Title title="Blocks" Icon={Icon} />
       </Header>
 
-      <CardContainer>
-        {cards.map((card, index) => (
-          <CardContent key={index} {...card} dataUpdatedAt={dataUpdatedAt} />
-        ))}
-      </CardContainer>
+      <BlocksSummary />
 
-      <TableContainer autoUpdate={!!blocksInterval}>
-        <TableHeader>
-          <h3>List of blocks</h3>
-          <UpdateContainer onClick={() => updateBlocks()}>
-            <span>Auto update</span>
-            <ToggleButton active={!!blocksInterval} />
-          </UpdateContainer>
-        </TableHeader>
-
+      <BlocksTableWrapper>
         <Table {...tableProps} />
-      </TableContainer>
+      </BlocksTableWrapper>
     </Container>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'blocks', 'table'],
+    nextI18nextConfig,
+    ['en'],
+  );
+
+  return { props };
 };
 
 export default Blocks;

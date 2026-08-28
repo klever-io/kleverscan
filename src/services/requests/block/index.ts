@@ -1,5 +1,10 @@
 import api from '@/services/api';
-import { ITransaction, ITransactionsResponse } from '@/types';
+import {
+  IPaginatedResponse,
+  ITransaction,
+  ITransactionsResponse,
+} from '@/types';
+import { IBlock } from '@/types/blocks';
 import {
   PRECISION_TOAST_ID,
   getParsedTransactionPrecision,
@@ -95,4 +100,123 @@ export const blockTransactionsCall = async (
         parsedTransactions ?? transactionsResponse.data?.transactions ?? [],
     },
   };
+};
+
+/* ------------------------------ blocks list ------------------------------ */
+
+export interface IBlocksListResponse extends IPaginatedResponse {
+  data: {
+    blocks: IBlock[];
+  };
+}
+
+export interface IBlockDayStats {
+  date: number;
+  totalBlocks: number;
+  totalMinted: number;
+  totalBurned: number;
+  totalBlockRewards: number;
+  totalStakingRewards: number;
+  totalTxFees: number;
+  totalKappsFees: number;
+  totalTxRewards: number;
+}
+
+export interface IBlockTotalStats {
+  totalBlocks: number;
+  totalBurned: number;
+  totalBlockRewards: number;
+}
+
+/** Of the five params `block/list` documents, the date range is the only one
+ *  the URL may contribute; the rest arrive as arguments or are fixed below. */
+const LIST_FILTER_PARAMS = ['startdate', 'enddate'];
+
+/**
+ * A bad date is dropped, not forwarded: the endpoint answers 500 with an
+ * Elasticsearch stack trace rather than an empty list. Digits only, because
+ * `Number()` accepts shapes the endpoint crashes on: `1e12` and `" 123 "` both
+ * parse here and both 500 there. The ceiling is one the endpoint accepts (it
+ * parses to int64) and the last this side compares without losing digits.
+ */
+const isEpochMillis = (value: string): boolean =>
+  /^\d+$/.test(value) && Number(value) <= Number.MAX_SAFE_INTEGER;
+
+/** The tiles dereference these without their own guards, so a well-formed
+ *  answer missing one would crash the page render or print "NaN KLV". */
+const hasFiniteFields = (value: unknown, fields: string[]): boolean =>
+  typeof value === 'object' &&
+  value !== null &&
+  fields.every(field =>
+    Number.isFinite((value as Record<string, unknown>)[field]),
+  );
+
+/**
+ * One page of the block list.
+ *
+ * No `minify=true` here, though it would cut the response from 57 859 bytes to
+ * 7 034. It does not only drop fields: it zeroes `size`, `sizeTxs`,
+ * `virtualBlockSize` and `slot`, and `size` is one of the eleven fields a row
+ * reads. Checked field by field across 40 blocks; `size` is the only one of the
+ * eleven affected.
+ */
+export const blockListCall = async (
+  page: number,
+  limit: number,
+  routerQuery: RouterQuery = {},
+): Promise<IBlocksListResponse> => {
+  const query: Record<string, unknown> = {};
+
+  LIST_FILTER_PARAMS.forEach(key => {
+    const value = routerQuery[key];
+    if (typeof value === 'string' && isEpochMillis(value)) {
+      query[key] = value;
+    }
+  });
+
+  // After the allowlist, so a page or limit in the URL cannot override the
+  // arguments, which `normalizePageParam` has already clamped.
+  query.page = page;
+  query.limit = limit;
+
+  return api.get({ route: 'block/list', query });
+};
+
+/**
+ * Yesterday as a closed calendar day, or undefined on failure.
+ *
+ * Entry `[1]`, not `[0]`: `[0]` counts from midnight UTC, so at 01:00 it holds
+ * one hour of blocks under a label saying 24. Measured on mainnet, it grew by
+ * the same 23 blocks as the cumulative counter over 93 seconds.
+ */
+export const blockYesterdayStatsCall = async (): Promise<
+  IBlockDayStats | undefined
+> => {
+  const response = await api.get({ route: 'block/statistics-by-day/1' });
+  if (response?.error) return undefined;
+
+  const days = response?.data?.block_stats_by_day;
+  if (!Array.isArray(days)) return undefined;
+
+  const yesterday = days[1];
+  // Only the fields the tiles render bare; feeSplit hardens the fee fields
+  // itself, one by one.
+  if (!hasFiniteFields(yesterday, ['totalBlocks', 'totalBurned'])) {
+    return undefined;
+  }
+  return yesterday;
+};
+
+/** Cumulative since genesis, or undefined on failure. */
+export const blockTotalStatsCall = async (): Promise<
+  IBlockTotalStats | undefined
+> => {
+  const response = await api.get({ route: 'block/statistics-total/0' });
+  if (response?.error) return undefined;
+
+  const total = response?.data?.block_stats_total;
+  if (!hasFiniteFields(total, ['totalBlocks', 'totalBurned'])) {
+    return undefined;
+  }
+  return total;
 };

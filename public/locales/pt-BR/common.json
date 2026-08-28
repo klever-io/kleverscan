@@ -24,7 +24,8 @@
     "Total Staked": "Total Congelado",
     "Estimated APR": "APR Estimado",
     "KLV per KFI": "KLV por KFI",
-    "ViewAll": "Ver Tod{{type}} {{type}}"
+    "ViewAll": "Ver Tod{{type}} {{type}}",
+    "UpdatedAgo": "Atualizado há {{age}}"
   },
   "Titles": {
     "Assets": "Ativos",

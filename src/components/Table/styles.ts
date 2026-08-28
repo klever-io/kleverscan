@@ -551,9 +551,20 @@ export const ItemContainer = styled.div<{
 export const TableControls = styled.div`
   display: flex;
   align-items: end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 16px;
 
   margin-left: auto;
+
+  /* The float container is a two-column grid below this width, and one 171px
+     column cannot hold these controls: they wrapped into three rows with the
+     refresh button alone again. The full row can. */
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
 `;
 
 export const ExportContainer = styled.div`

@@ -74,6 +74,9 @@ export interface ITable<TCard = Record<string, never>> {
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
   Filters?: React.FC;
+  /** Rendered beside Items per page rather than with the filters, for a
+   *  control that acts on the table itself. */
+  TableControl?: React.FC;
   smaller?: boolean;
   showPagination?: boolean;
   refreshKey?: number;
@@ -131,6 +134,7 @@ const Table = <TCard,>({
   interval,
   intervalController,
   Filters,
+  TableControl,
   smaller = false,
   showLimit = true,
   showPagination = true,
@@ -255,6 +259,7 @@ const Table = <TCard,>({
           {Filters && <Filters />}
           {showLimit ? (
             <TableControls>
+              {TableControl && <TableControl />}
               <LimitContainer>
                 <span>Items per page</span>
                 <LimitItems>

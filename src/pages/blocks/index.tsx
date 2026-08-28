@@ -1,4 +1,5 @@
 import { Blocks as Icon } from '@/assets/title-icons';
+import AutoUpdate from '@/components/BlocksList/AutoUpdate';
 import BlocksFilters from '@/components/BlocksList/Filters';
 import { RIGHT_ALIGNED_COLUMNS } from '@/components/BlocksList/columns';
 import BlocksMobileCard from '@/components/BlocksList/MobileCard';
@@ -20,18 +21,13 @@ import nextI18nextConfig from '../../../next-i18next.config';
 const AUTO_UPDATE_INTERVAL = 4 * 1000;
 
 /**
- * The table renders `Filters` as a component, so it needs one identity for the
- * life of the page: built inline it would be a new type every render, remount
- * on each one, and cut the toggle's 0.4s transition short.
+ * The table renders `TableControl` as a component, so it needs one identity
+ * for the life of the page: built inline it would be a new type every render,
+ * remount on each one, and cut the toggle's 0.4s transition short.
  */
-const makeFilters = (onChange: (interval: number) => void): React.FC =>
-  function Filters() {
-    return (
-      <BlocksFilters
-        interval={AUTO_UPDATE_INTERVAL}
-        onIntervalChange={onChange}
-      />
-    );
+const makeAutoUpdate = (onChange: (interval: number) => void): React.FC =>
+  function BlocksAutoUpdate() {
+    return <AutoUpdate interval={AUTO_UPDATE_INTERVAL} onChange={onChange} />;
   };
 
 const Blocks: React.FC<PropsWithChildren> = () => {
@@ -41,8 +37,8 @@ const Blocks: React.FC<PropsWithChildren> = () => {
 
   // The setter through a ref, so the memo below never has to be rebuilt.
   const onIntervalChange = useRef(setBlocksInterval);
-  const Filters = useMemo(
-    () => makeFilters(interval => onIntervalChange.current(interval)),
+  const TableControl = useMemo(
+    () => makeAutoUpdate(interval => onIntervalChange.current(interval)),
     [],
   );
 
@@ -58,7 +54,8 @@ const Blocks: React.FC<PropsWithChildren> = () => {
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
     MobileCard: BlocksMobileCard,
-    Filters,
+    Filters: BlocksFilters,
+    TableControl,
   };
 
   return (

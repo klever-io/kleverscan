@@ -149,26 +149,26 @@ export const BlocksTableWrapper = styled.div`
 /* ------------------------------ auto update ------------------------------ */
 
 /**
- * Sits in the table's Filters slot, so it shares a row with Items per page.
- * A button, not a div: it toggles state, and a div swallows keyboard use.
+ * Sits in the table's control slot, directly beside Items per page. The click
+ * lives on the wrapper as a convenience; the switch inside is the real button.
  */
 export const AutoUpdateContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
 
-  /* Only where the filter row stacks. It centres its children, and this one is
-     narrower than the date control, so it floated to the middle of the column
-     while everything around it started at the left edge. Above that width the
-     row runs horizontally and the same rule would lift it off the date
-     control's centre line. */
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    align-self: flex-start;
-  }
-
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
 
   color: ${props => props.theme.black};
   font-size: 0.9rem;
+
+  /* The bottom margin LimitContainer carries below this width; the block
+     aligns its children on their bottom edge, so without it the switch sits
+     10px under the page-size buttons. Ends at the buttons' baseline, which is
+     also why the label needs no extra offset above that width. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    margin-bottom: 10px;
+  }
 `;

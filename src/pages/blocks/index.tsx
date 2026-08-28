@@ -28,28 +28,29 @@ const AUTO_UPDATE_INTERVAL = 4 * 1000;
 const Blocks: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const header = useBlockHeaders();
+  // Two pieces of state on purpose: the switch and storage carry the user's
+  // INTENT, the interval is derived from it. Conflating them made the toggle
+  // unable to turn the setting off from a paused page: with the interval at
+  // zero there, a click stored "on" again.
+  const [autoUpdateIntent, setAutoUpdateIntent] = useState(false);
   const [blocksInterval, setBlocksInterval] = useState(0);
   const page = normalizePageParam(router.query?.page, 1);
 
-  // The switch renders `blocksInterval`, which the shared Table zeroes on a
-  // page change away from 1 (rolling blocks mean nothing on page 7). Stored
-  // intent survives that pause, so landing back on page 1 resumes; in between
-  // the switch shows the pause honestly rather than holding its own copy of
-  // the state, which is how the first version kept saying "on" while nothing
-  // refreshed any more.
   useEffect(() => {
-    if (page === 1 && getStorageUpdateConfig()) {
-      setBlocksInterval(AUTO_UPDATE_INTERVAL);
-    }
-  }, [page]);
+    setAutoUpdateIntent(getStorageUpdateConfig());
+  }, []);
+
+  // The loop itself only runs on page 1: rolling blocks mean nothing on page
+  // 7, and the shared Table zeroes its interval on a page change for the same
+  // reason. Deriving it here re-arms it on returning to page 1.
+  useEffect(() => {
+    setBlocksInterval(
+      autoUpdateIntent && page === 1 ? AUTO_UPDATE_INTERVAL : 0,
+    );
+  }, [autoUpdateIntent, page]);
 
   const toggleAutoUpdate = (): void => {
-    const next = storageUpdateBlocks(blocksInterval > 0);
-    // Intent is stored regardless; the loop itself only runs on page 1, the
-    // same policy every other path enforces. Without the page check a click
-    // on page 5 started the four-second refetch there, drifting the rows
-    // under the reader one block at a time.
-    setBlocksInterval(next && page === 1 ? AUTO_UPDATE_INTERVAL : 0);
+    setAutoUpdateIntent(storageUpdateBlocks(autoUpdateIntent));
   };
 
   const tableProps: ITable = {
@@ -66,7 +67,7 @@ const Blocks: React.FC<PropsWithChildren> = () => {
     MobileCard: BlocksMobileCard,
     Filters: BlocksFilters,
     TableControl: (
-      <AutoUpdate active={blocksInterval > 0} onToggle={toggleAutoUpdate} />
+      <AutoUpdate active={autoUpdateIntent} onToggle={toggleAutoUpdate} />
     ),
   };
 

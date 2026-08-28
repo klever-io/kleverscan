@@ -10,4 +10,6 @@
  * the desktop row, the mobile card and the home page from drifting apart.
  */
 export const bandwidthFeeReward = (txFees: number | undefined): number =>
-  (txFees || 0) / 2;
+  Number.isFinite(txFees) && (txFees as number) > 0
+    ? (txFees as number) / 2
+    : 0;

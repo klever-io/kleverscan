@@ -1,5 +1,5 @@
 import { IBlockDayStats } from '@/services/requests/block';
-import { feeSplit } from '../summaryFigures';
+import { feeSplit, summaryRefetchInterval } from '../summaryFigures';
 
 // 2026-08-27 on mainnet, read from block/statistics-by-day.
 const day = (overrides: Partial<IBlockDayStats> = {}): IBlockDayStats => ({
@@ -40,10 +40,15 @@ describe('feeSplit', () => {
     ]);
   });
 
-  it('never draws a segment backwards when rewards exceed the fee they come from', () => {
+  it('caps the validator share at the fee it comes from', () => {
     const split = feeSplit(day({ totalTxFees: 100, totalTxRewards: 900 }));
 
+    // Uncapped, the validator segment exceeded the displayed total and the
+    // bar drew wider than itself; burned stays zero rather than negative.
     expect(split?.segments[0]).toEqual({ key: 'burned', amount: 0 });
+    expect(split?.segments[1]).toEqual({ key: 'validators', amount: 100 });
+    const summed = split!.segments.reduce((acc, s) => acc + s.amount, 0);
+    expect(summed).toBe(split!.total);
   });
 
   it('returns undefined for a missing day', () => {
@@ -87,4 +92,26 @@ describe('feeSplit', () => {
       expect(split?.segments[0]).toEqual({ key: 'burned', amount: 0 });
     },
   );
+});
+
+describe('summaryRefetchInterval', () => {
+  const day = { totalBlocks: 1 };
+  const totals = { totalBlocks: 2 };
+
+  it('stops polling once both halves are in', () => {
+    expect(summaryRefetchInterval({ yesterday: day, total: totals })).toBe(
+      false,
+    );
+  });
+
+  // The other direction of the same guard: a hole anywhere keeps the retry
+  // alive, since the query "succeeded" and nothing else would refetch it.
+  it.each([
+    ['no answer at all', undefined],
+    ['both halves missing', {}],
+    ['the day figures missing', { total: totals }],
+    ['the totals missing', { yesterday: day }],
+  ])('keeps retrying with %s', (_label, data) => {
+    expect(summaryRefetchInterval(data)).toBe(30_000);
+  });
 });

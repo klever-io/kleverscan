@@ -36,11 +36,11 @@ export const feeSplit = (
   const bandwidth = finite(day.totalTxFees);
   const kapp = finite(day.totalKappsFees);
   // From the field rather than halving `bandwidth`, so a chain that changes the
-  // split reports its own number instead of one this file assumes.
-  const validators = finite(day.totalTxRewards);
-  // The remainder, never negative: `totalTxRewards` above the fee it comes from
-  // would otherwise draw a segment running backwards.
-  const burned = Math.max(0, bandwidth - validators);
+  // split reports its own number instead of one this file assumes. Capped at
+  // the fee it comes from: above it the segment sum would exceed the displayed
+  // total and the bar would draw wider than itself.
+  const validators = Math.min(finite(day.totalTxRewards), bandwidth);
+  const burned = bandwidth - validators;
 
   const total = bandwidth + kapp;
   if (total === 0) return undefined;
@@ -54,3 +54,13 @@ export const feeSplit = (
     ],
   };
 };
+
+/**
+ * How often the summary retries while its answer is incomplete. The stat
+ * calls map failures to undefined, so the query "succeeds" with a hole and
+ * staleTime alone never refetches a mounted query; without this the card
+ * stayed absent until a remount or window focus.
+ */
+export const summaryRefetchInterval = (
+  data: { yesterday?: unknown; total?: unknown } | undefined,
+): number | false => (data?.yesterday && data?.total ? false : 30_000);

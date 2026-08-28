@@ -24,7 +24,7 @@ import React from 'react';
 import { BlocksSummaryCard, feeSegmentColor } from './styles';
 import BlocksSummaryLoadingCard from './LoadingCard';
 import UpdatedAgo from './UpdatedAgo';
-import { feeSplit } from './summaryFigures';
+import { feeSplit, summaryRefetchInterval } from './summaryFigures';
 
 // Pinned: a bare toLocaleString() follows the reader's browser locale, so a
 // Dutch browser would print 21.597 beside English labels.
@@ -68,6 +68,12 @@ const BlocksSummary: React.FC = () => {
         | undefined;
       return cached?.yesterday && cached?.total ? 5 * 60 * 1000 : 0;
     },
+    refetchInterval: query =>
+      summaryRefetchInterval(
+        query.state.data as
+          | { yesterday?: unknown; total?: unknown }
+          | undefined,
+      ),
   });
 
   if (isLoading) {

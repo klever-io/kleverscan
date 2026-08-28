@@ -256,8 +256,10 @@ const Navbar: React.FC<PropsWithChildren> = () => {
                   title="Open spotlight"
                 >
                   {/* No shortcut badge here: this variant renders on screens
-                      that answer to touch, where a key hint is noise. */}
+                      that answer to touch, where a key hint is noise. The
+                      label stays as long as the row can hold it. */}
                   <Search />
+                  <span>Spotlight</span>
                 </SpotlightTrigger>
               )}
               {!isMobile && (

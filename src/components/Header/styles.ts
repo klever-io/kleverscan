@@ -240,16 +240,14 @@ export const SpotlightTrigger = styled.button`
         : 'rgba(125, 63, 241, 0.06)'};
   }
 
-  /* A round icon button beside the menu icon: the label and the shortcut
-     badge are desktop affordances, and the 0.9rem glyph sat lost in the pill
-     once they were gone. */
+  /* Touch widths keep the desktop pill, label included, for as long as the
+     row holds it: the logo ends near x=222 and the icons claim the last
+     ~77px, which leaves the ~118px the labelled pill needs from about 430px
+     up (measured); 480 keeps a margin. The shortcut badge never shows here,
+     a key hint means nothing to a screen answering to touch. */
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
     height: 2.25rem;
-    width: 2.25rem;
-    padding: 0;
-    justify-content: center;
 
-    span,
     kbd {
       display: none;
     }
@@ -257,6 +255,17 @@ export const SpotlightTrigger = styled.button`
     svg {
       width: 1.15rem;
       height: 1.15rem;
+    }
+  }
+
+  /* Below that there is no room beside the logo: a round icon button. */
+  @media (max-width: 480px) {
+    width: 2.25rem;
+    padding: 0;
+    justify-content: center;
+
+    span {
+      display: none;
     }
   }
 `;

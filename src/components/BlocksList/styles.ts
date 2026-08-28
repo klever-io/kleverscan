@@ -38,6 +38,16 @@ export const BlocksSummaryCard = styled(SummaryCard)`
   /* Anchors the age line in the top-right corner. */
   position: relative;
 
+  /* Room for that corner line, in rem so browser text zoom scales it along:
+     with a px reservation the note painted through the third tile's label at
+     125 percent text size and beyond (measured, 47px of overlap at 1026px).
+     Applies to the loading card too, which shares this component. */
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    ${TilesGrid} {
+      padding-right: 9rem;
+    }
+  }
+
   /* Narrow screens park the age line in the grid cell the wrapped tiles leave
      empty. Aligned on the last text baseline, not the cell edge: the tiles hold
      a 66,5px minimum while their "in total" line ends above it, by an amount

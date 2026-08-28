@@ -13,7 +13,7 @@ import { bandwidthFeeReward } from '@/utils/fees';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import React from 'react';
-import { BLOCK_COLUMNS } from './columns';
+import { BLOCK_COLUMNS, BlockColumnKey } from './columns';
 import { NumericCell } from './styles';
 
 const NUMBER_LOCALE = 'en-US';
@@ -53,12 +53,18 @@ export const blockRowSections = (block: IBlock | string): IRowSection[] => {
 
   // Computed per row, not inside the tooltip: the body mounts on hover, and a
   // fresh formatDate there makes the visible elapsed time jump on pointer entry.
-  const fullDate = formatDateWithSeconds(timestamp);
+  // The epoch rides along on the focusable age tooltip: the block cell's own
+  // tooltip is hover-only, so without this a keyboard user on desktop had no
+  // way to reach the epoch at all.
+  const fullDate = `${formatDateWithSeconds(timestamp)} · Epoch ${epoch}`;
   const elapsed = formatDate(timestamp, { showElapsedTime: true }).split(
     ' (',
   )[0];
 
-  const cells: Record<string, IRowSection['element']> = {
+  // The key set pinned, not erased: a column added or renamed without a cell
+  // is a compile error here, where an unchecked index made it a whole-page
+  // render crash at runtime.
+  const cells: Record<BlockColumnKey, IRowSection['element']> = {
     block: () => (
       <Tooltip
         msg={`Epoch ${epoch}`}

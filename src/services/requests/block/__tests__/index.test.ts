@@ -267,7 +267,11 @@ describe('blockListCall', () => {
 });
 
 describe('blockYesterdayStatsCall', () => {
-  const day = (totalBlocks: number) => ({ date: 1, totalBlocks });
+  const day = (totalBlocks: number) => ({
+    date: 1,
+    totalBlocks,
+    totalBurned: 145531094085,
+  });
 
   beforeEach(() => jest.clearAllMocks());
 
@@ -305,6 +309,33 @@ describe('blockYesterdayStatsCall', () => {
 
     await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
   });
+
+  // The tiles dereference these fields bare; an answer missing one used to
+  // crash the page render instead of costing the card.
+  it('rejects a closed day missing a field the tiles render', async () => {
+    mockedGet.mockResolvedValue({
+      data: {
+        block_stats_by_day: [day(20661), { date: 2, totalBlocks: 21599 }],
+      },
+      error: '',
+    });
+
+    await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
+  });
+
+  it('rejects a closed day whose figure is not a number', async () => {
+    mockedGet.mockResolvedValue({
+      data: {
+        block_stats_by_day: [
+          day(20661),
+          { date: 2, totalBlocks: '21599', totalBurned: 1 },
+        ],
+      },
+      error: '',
+    });
+
+    await expect(blockYesterdayStatsCall()).resolves.toBeUndefined();
+  });
 });
 
 describe('blockTotalStatsCall', () => {
@@ -333,6 +364,15 @@ describe('blockTotalStatsCall', () => {
 
   it('returns undefined when a clean answer carries no totals', async () => {
     mockedGet.mockResolvedValue({ data: {}, error: '' });
+
+    await expect(blockTotalStatsCall()).resolves.toBeUndefined();
+  });
+
+  it('rejects totals missing a field the tiles render', async () => {
+    mockedGet.mockResolvedValue({
+      data: { block_stats_total: { totalBlocks: 32728348 } },
+      error: '',
+    });
 
     await expect(blockTotalStatsCall()).resolves.toBeUndefined();
   });

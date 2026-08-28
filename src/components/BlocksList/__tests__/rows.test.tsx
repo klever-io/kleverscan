@@ -177,10 +177,14 @@ describe('blockRowSections', () => {
     expect(screen.getByTitle('Epoch 6076')).toBeTruthy();
   });
 
-  it('hands the age tooltip the full date its visible text drops', () => {
+  it('hands the age tooltip the full date and the epoch, keyboard-reachably', () => {
     renderCell('age');
 
-    // timestamp 1787871964 (seconds) is 2026-08-27 23:06:04 UTC.
-    expect(screen.getByTitle('08/27/26 23:06:04 UTC')).toBeTruthy();
+    // timestamp 1787871964 (seconds) is 2026-08-27 23:06:04 UTC. The epoch
+    // rides along because this tooltip is the focusable one; the block cell's
+    // own is hover-only, which left keyboard users without the epoch.
+    expect(
+      screen.getByTitle('08/27/26 23:06:04 UTC · Epoch 6076'),
+    ).toBeTruthy();
   });
 });

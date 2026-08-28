@@ -142,6 +142,15 @@ const LIST_FILTER_PARAMS = ['startdate', 'enddate'];
 const isEpochMillis = (value: string): boolean =>
   /^\d+$/.test(value) && Number(value) <= Number.MAX_SAFE_INTEGER;
 
+/** The tiles dereference these without their own guards, so a well-formed
+ *  answer missing one would crash the page render or print "NaN KLV". */
+const hasFiniteFields = (value: unknown, fields: string[]): boolean =>
+  typeof value === 'object' &&
+  value !== null &&
+  fields.every(field =>
+    Number.isFinite((value as Record<string, unknown>)[field]),
+  );
+
 /**
  * One page of the block list.
  *
@@ -188,7 +197,14 @@ export const blockYesterdayStatsCall = async (): Promise<
 
   const days = response?.data?.block_stats_by_day;
   if (!Array.isArray(days)) return undefined;
-  return days[1] ?? undefined;
+
+  const yesterday = days[1];
+  // Only the fields the tiles render bare; feeSplit hardens the fee fields
+  // itself, one by one.
+  if (!hasFiniteFields(yesterday, ['totalBlocks', 'totalBurned'])) {
+    return undefined;
+  }
+  return yesterday;
 };
 
 /** Cumulative since genesis, or undefined on failure. */
@@ -197,5 +213,10 @@ export const blockTotalStatsCall = async (): Promise<
 > => {
   const response = await api.get({ route: 'block/statistics-total/0' });
   if (response?.error) return undefined;
-  return response?.data?.block_stats_total ?? undefined;
+
+  const total = response?.data?.block_stats_total;
+  if (!hasFiniteFields(total, ['totalBlocks', 'totalBurned'])) {
+    return undefined;
+  }
+  return total;
 };

@@ -45,7 +45,11 @@ const Blocks: React.FC<PropsWithChildren> = () => {
 
   const toggleAutoUpdate = (): void => {
     const next = storageUpdateBlocks(blocksInterval > 0);
-    setBlocksInterval(next ? AUTO_UPDATE_INTERVAL : 0);
+    // Intent is stored regardless; the loop itself only runs on page 1, the
+    // same policy every other path enforces. Without the page check a click
+    // on page 5 started the four-second refetch there, drifting the rows
+    // under the reader one block at a time.
+    setBlocksInterval(next && page === 1 ? AUTO_UPDATE_INTERVAL : 0);
   };
 
   const tableProps: ITable = {

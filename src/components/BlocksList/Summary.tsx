@@ -49,8 +49,9 @@ const BlocksSummary: React.FC = () => {
   const { data, isLoading, dataUpdatedAt } = useQuery({
     queryKey: ['blocksSummary'],
     queryFn: async () => {
-      // api.get resolves failures as undefined instead of rejecting, so a
-      // half-failed pair still lands here as data rather than an error.
+      // The two stat calls map every failure to undefined (api.get itself
+      // resolves an error object), so a half-failed pair still lands here as
+      // data rather than an error.
       const [yesterday, total] = await Promise.all([
         blockYesterdayStatsCall(),
         blockTotalStatsCall(),
@@ -106,28 +107,26 @@ const BlocksSummary: React.FC = () => {
   return (
     <BlocksSummaryCard aria-label={label} data-testid="blocks-summary">
       <TilesGrid>
-        {yesterday && (
-          <Tile>
-            <TileLabel>
-              {t('blocks:List.BlocksYesterday', {
-                defaultValue: 'Blocks (yesterday)',
+        <Tile>
+          <TileLabel>
+            {t('blocks:List.BlocksYesterday', {
+              defaultValue: 'Blocks (yesterday)',
+            })}
+          </TileLabel>
+          <TileValue>
+            {yesterday.totalBlocks.toLocaleString(NUMBER_LOCALE)}
+          </TileValue>
+          {total && (
+            <TileSub>
+              {/* Not `count`: i18next reserves that for plural selection
+                  and interpolates the raw number, unformatted. */}
+              {t('blocks:List.CumulativeBlocks', {
+                defaultValue: '{{blocks}} in total',
+                blocks: total.totalBlocks.toLocaleString(NUMBER_LOCALE),
               })}
-            </TileLabel>
-            <TileValue>
-              {yesterday.totalBlocks.toLocaleString(NUMBER_LOCALE)}
-            </TileValue>
-            {total && (
-              <TileSub>
-                {/* Not `count`: i18next reserves that for plural selection
-                    and interpolates the raw number, unformatted. */}
-                {t('blocks:List.CumulativeBlocks', {
-                  defaultValue: '{{blocks}} in total',
-                  blocks: total.totalBlocks.toLocaleString(NUMBER_LOCALE),
-                })}
-              </TileSub>
-            )}
-          </Tile>
-        )}
+            </TileSub>
+          )}
+        </Tile>
 
         {fees && (
           <Tile>
@@ -146,24 +145,22 @@ const BlocksSummary: React.FC = () => {
           </Tile>
         )}
 
-        {yesterday && (
-          <Tile>
-            <TileLabel>
-              {t('blocks:List.TotalBurned', {
-                defaultValue: 'Total burned (yesterday)',
+        <Tile>
+          <TileLabel>
+            {t('blocks:List.TotalBurned', {
+              defaultValue: 'Total burned (yesterday)',
+            })}
+          </TileLabel>
+          <TileValue>{klv(yesterday.totalBurned)}</TileValue>
+          {total && (
+            <TileSub>
+              {t('blocks:List.CumulativeBurned', {
+                defaultValue: '{{amount}} in total',
+                amount: klv(total.totalBurned),
               })}
-            </TileLabel>
-            <TileValue>{klv(yesterday.totalBurned)}</TileValue>
-            {total && (
-              <TileSub>
-                {t('blocks:List.CumulativeBurned', {
-                  defaultValue: '{{amount}} in total',
-                  amount: klv(total.totalBurned),
-                })}
-              </TileSub>
-            )}
-          </Tile>
-        )}
+            </TileSub>
+          )}
+        </Tile>
 
         <UpdatedAgo at={dataUpdatedAt} />
       </TilesGrid>

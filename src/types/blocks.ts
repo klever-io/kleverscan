@@ -53,11 +53,6 @@ export interface IBlockCardFetcher {
   ) => void;
 }
 
-export interface IBlockStats {
-  totalBlocks: number;
-  totalBurned: number;
-  totalBlockRewards: number;
-}
 export interface IBlocksResponse extends IResponse {
   data: {
     blocks: IBlock[];
@@ -73,10 +68,4 @@ export interface IBlockResponse extends IResponse {
 
 export interface IBlockPage {
   block: IBlock;
-}
-
-export interface ICard {
-  title: string;
-  headers: string[];
-  values: (string | React.ReactElement)[];
 }

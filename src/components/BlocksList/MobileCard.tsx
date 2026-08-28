@@ -17,12 +17,14 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import { BLOCK_COLUMNS } from './columns';
+import { BLOCK_COLUMNS, BlockColumnKey } from './columns';
 
 const NUMBER_LOCALE = 'en-US';
 
+// Non-breaking: at 320px the fee row wraps, and a plain space put "KLV" alone
+// on the next line, mid-value.
 const klv = (amount: number | undefined): string =>
-  `${formatAmount((amount || 0) / 10 ** KLV_PRECISION)} KLV`;
+  `${formatAmount((amount || 0) / 10 ** KLV_PRECISION)}\u00A0KLV`;
 
 export interface IBlocksMobileCardProps {
   item: IBlock;
@@ -39,7 +41,7 @@ const BlocksMobileCard: React.FC<IBlocksMobileCardProps> = ({
   index,
 }) => {
   const { t } = useTranslation(['blocks']);
-  const label = (key: string): string => {
+  const label = (key: BlockColumnKey): string => {
     const column = BLOCK_COLUMNS.find(c => c.key === key);
     return column ? t(column.i18nKey, { defaultValue: column.header }) : key;
   };

@@ -37,6 +37,9 @@ const sources = [
   ['src/components/BlocksList/columns.ts', 'blocks'],
   ['src/components/BlocksList/MobileCard.tsx', 'blocks'],
   ['src/components/BlocksList/LoadingCard.tsx', 'blocks'],
+  // The page, not rows.tsx: the epoch label is translated there and handed
+  // into the row builder, where t() cannot reach.
+  ['src/pages/blocks/index.tsx', 'blocks'],
   ['src/components/BlocksList/UpdatedAgo.tsx', 'common'],
 ] as const;
 

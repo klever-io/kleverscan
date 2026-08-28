@@ -20,9 +20,7 @@ import {
   TrendNote,
 } from './styles';
 
-// Pinned: bare toLocaleString() follows the reader's browser locale, and a
-// Dutch browser would print 176.197 beside English labels.
-const NUMBER_LOCALE = 'en-US';
+import { NUMBER_LOCALE } from '@/components/DataList/format';
 
 /** Days of history fetched. The first entry is the running 24 hours. */
 const WINDOW_DAYS = 7;

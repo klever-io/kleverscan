@@ -10,13 +10,17 @@ import {
   TileValue,
   TilesGrid,
 } from '@/components/DataList/styles';
-import { formatShare } from '@/components/DataList/format';
+import {
+  exactAmount,
+  formatShare,
+  klvAmount,
+  NUMBER_LOCALE,
+} from '@/components/DataList/format';
 import { useTheme } from '@/contexts/theme';
 import {
   blockTotalStatsCall,
   blockYesterdayStatsCall,
 } from '@/services/requests/block';
-import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
@@ -24,14 +28,11 @@ import React from 'react';
 import { BlocksSummaryCard, feeSegmentColor } from './styles';
 import BlocksSummaryLoadingCard from './LoadingCard';
 import UpdatedAgo from './UpdatedAgo';
-import { feeSplit, summaryRefetchInterval } from './summaryFigures';
-
-// Pinned: a bare toLocaleString() follows the reader's browser locale, so a
-// Dutch browser would print 21.597 beside English labels.
-const NUMBER_LOCALE = 'en-US';
-
-const klv = (amount: number): string =>
-  `${formatAmount(amount / 10 ** KLV_PRECISION)} KLV`;
+import {
+  feeSplit,
+  summaryComplete,
+  summaryRefetchInterval,
+} from './summaryFigures';
 
 /**
  * What yesterday cost and where it went. Yesterday rather than a rolling 24
@@ -62,12 +63,14 @@ const BlocksSummary: React.FC = () => {
     // and a constant would hold that for five minutes. Both halves, not
     // either: with `||` a half-failed answer counted as fresh and the card it
     // degrades survived remounts for the full five minutes.
-    staleTime: query => {
-      const cached = query.state.data as
-        | { yesterday?: unknown; total?: unknown }
-        | undefined;
-      return cached?.yesterday && cached?.total ? 5 * 60 * 1000 : 0;
-    },
+    staleTime: query =>
+      summaryComplete(
+        query.state.data as
+          | { yesterday?: unknown; total?: unknown }
+          | undefined,
+      )
+        ? 5 * 60 * 1000
+        : 0,
     refetchInterval: query =>
       summaryRefetchInterval(
         query.state.data as
@@ -141,7 +144,11 @@ const BlocksSummary: React.FC = () => {
                 defaultValue: 'Transaction fees (yesterday)',
               })}
             </TileLabel>
-            <TileValue>{klv(fees.total)}</TileValue>
+            {/* Compact headline, exact figure on hover: two segments already
+                render identically compacted on real data. */}
+            <TileValue title={`${exactAmount(fees.total, KLV_PRECISION)} KLV`}>
+              {klvAmount(fees.total)}
+            </TileValue>
             <TileSub>
               {t('blocks:List.ShareBurned', {
                 defaultValue: '{{share}} of it burned',
@@ -157,12 +164,12 @@ const BlocksSummary: React.FC = () => {
               defaultValue: 'Total burned (yesterday)',
             })}
           </TileLabel>
-          <TileValue>{klv(yesterday.totalBurned)}</TileValue>
+          <TileValue>{klvAmount(yesterday.totalBurned)}</TileValue>
           {total && (
             <TileSub>
               {t('blocks:List.CumulativeBurned', {
                 defaultValue: '{{amount}} in total',
-                amount: klv(total.totalBurned),
+                amount: klvAmount(total.totalBurned),
               })}
             </TileSub>
           )}
@@ -180,7 +187,7 @@ const BlocksSummary: React.FC = () => {
                 $color={feeSegmentColor(segment.key, theme)}
                 $delay={index * 60}
                 style={{ width: `${(segment.amount / fees.total) * 100}%` }}
-                title={`${segment.label} · ${klv(segment.amount)}`}
+                title={`${segment.label} · ${exactAmount(segment.amount, KLV_PRECISION)} KLV`}
                 aria-hidden="true"
               />
             ))}
@@ -189,7 +196,7 @@ const BlocksSummary: React.FC = () => {
             {segments.map(segment => (
               <LegendItem key={segment.key}>
                 <LegendDot $color={feeSegmentColor(segment.key, theme)} />
-                {segment.label} <strong>{klv(segment.amount)}</strong>
+                {segment.label} <strong>{klvAmount(segment.amount)}</strong>
               </LegendItem>
             ))}
           </LegendRow>

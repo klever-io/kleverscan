@@ -18,6 +18,7 @@ import {
 import { normalizePageParam } from '@/utils/table';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
@@ -28,6 +29,10 @@ const AUTO_UPDATE_INTERVAL = 4 * 1000;
 const Blocks: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const header = useBlockHeaders();
+  const { t } = useTranslation(['blocks']);
+  // Translated here and handed down: the row builder is no component, so
+  // t() is out of its reach, and the mobile card already translates this key.
+  const epochLabel = t('blocks:Table.Epoch', { defaultValue: 'Epoch' });
   // Two pieces of state on purpose: the switch and storage carry the user's
   // INTENT, the interval is derived from it. Conflating them made the toggle
   // unable to turn the setting off from a paused page: with the interval at
@@ -56,7 +61,8 @@ const Blocks: React.FC<PropsWithChildren> = () => {
   const tableProps: ITable = {
     type: 'blocks',
     header,
-    rowSections: blockRowSections,
+    rowSections: (block: Parameters<typeof blockRowSections>[0]) =>
+      blockRowSections(block, epochLabel),
     dataName: 'blocks',
     request: (page: number, limit: number) =>
       blockListCall(page, limit, router.query),

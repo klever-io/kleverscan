@@ -55,6 +55,12 @@ export const feeSplit = (
   };
 };
 
+/** Both halves in: the one definition staleTime and the retry share, so the
+ *  two cannot drift apart with only one of them under test. */
+export const summaryComplete = (
+  data: { yesterday?: unknown; total?: unknown } | undefined,
+): boolean => Boolean(data?.yesterday && data?.total);
+
 /**
  * How often the summary retries while its answer is incomplete. The stat
  * calls map failures to undefined, so the query "succeeds" with a hole and
@@ -63,4 +69,4 @@ export const feeSplit = (
  */
 export const summaryRefetchInterval = (
   data: { yesterday?: unknown; total?: unknown } | undefined,
-): number | false => (data?.yesterday && data?.total ? false : 30_000);
+): number | false => (summaryComplete(data) ? false : 30_000);

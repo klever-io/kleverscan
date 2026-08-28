@@ -6,25 +6,14 @@ import {
   MobileTopRow,
   MobileTotalRow,
 } from '@/components/DataList/styles';
+import { klvAmount, NUMBER_LOCALE } from '@/components/DataList/format';
 import { IBlock } from '@/types/blocks';
-import {
-  formatAmount,
-  formatDate,
-  formatDateWithSeconds,
-} from '@/utils/formatFunctions';
+import { formatDate, formatDateWithSeconds } from '@/utils/formatFunctions';
 import { bandwidthFeeReward } from '@/utils/fees';
-import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { BLOCK_COLUMNS, BlockColumnKey } from './columns';
-
-const NUMBER_LOCALE = 'en-US';
-
-// Non-breaking: at 320px the fee row wraps, and a plain space put "KLV" alone
-// on the next line, mid-value.
-const klv = (amount: number | undefined): string =>
-  `${formatAmount((amount || 0) / 10 ** KLV_PRECISION)}\u00A0KLV`;
 
 export interface IBlocksMobileCardProps {
   item: IBlock;
@@ -77,7 +66,7 @@ const BlocksMobileCard: React.FC<IBlocksMobileCardProps> = ({
 
       <MobileTotalRow>
         <MobileMetaItem>{label('blockRewards')}</MobileMetaItem>
-        <strong>{klv(blockRewards)}</strong>
+        <strong>{klvAmount(blockRewards, { nbsp: true })}</strong>
       </MobileTotalRow>
 
       <MobileMetaRow>
@@ -102,13 +91,14 @@ const BlocksMobileCard: React.FC<IBlocksMobileCardProps> = ({
 
       <MobileMetaRow>
         <MobileMetaItem>
-          {label('kAppFees')} {klv(kAppFees)}
+          {label('kAppFees')} {klvAmount(kAppFees, { nbsp: true })}
         </MobileMetaItem>
         <MobileMetaItem>
-          {label('burnedFees')} {klv(txBurnedFees)}
+          {label('burnedFees')} {klvAmount(txBurnedFees, { nbsp: true })}
         </MobileMetaItem>
         <MobileMetaItem>
-          {label('feeRewards')} {klv(bandwidthFeeReward(txFees))}
+          {label('feeRewards')}{' '}
+          {klvAmount(bandwidthFeeReward(txFees), { nbsp: true })}
         </MobileMetaItem>
       </MobileMetaRow>
     </MobileListCard>

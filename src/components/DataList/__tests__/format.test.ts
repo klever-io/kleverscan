@@ -67,3 +67,21 @@ describe('exactAmount', () => {
     expect(exactAmount(-1, 6)).toBe('--');
   });
 });
+
+describe('klvAmount', () => {
+  it('compacts units at KLV precision with a breaking space by default', () => {
+    expect(require('../format').klvAmount(6143952)).toBe('6.14 KLV');
+  });
+
+  it('binds amount and unit with a non-breaking space on request', () => {
+    // One token, so a wrapping card row cannot leave "KLV" alone on the
+    // next line, mid-value.
+    expect(require('../format').klvAmount(6143952, { nbsp: true })).toBe(
+      '6.14\u00A0KLV',
+    );
+  });
+
+  it('reads an absent amount as zero, the empty-block shape', () => {
+    expect(require('../format').klvAmount(undefined)).toBe('0 KLV');
+  });
+});

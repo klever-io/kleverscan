@@ -95,6 +95,13 @@ export const UpdatedNote = styled.p`
   font-variant-numeric: tabular-nums;
 `;
 
+/* -------------------------------- cells ---------------------------------- */
+
+/** Digits of one width, so a column of them reads as a column. */
+export const NumericCell = styled.span`
+  font-variant-numeric: tabular-nums;
+`;
+
 /* --------------------------- scoped table skin --------------------------- */
 
 /** `nth-child` is 1-based; the column indexes are not. */
@@ -149,6 +156,11 @@ export const AutoUpdateContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
+  /* Lines the label up with the table's first heading and the card's first
+     tile: the float container it sits in starts at the table's outer edge,
+     while a heading starts a 1px border and 16px of cell padding further in. */
+  padding-left: 17px;
 
   cursor: pointer;
   user-select: none;

@@ -13,6 +13,7 @@ import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import React from 'react';
 import { BLOCK_COLUMNS } from './columns';
+import { NumericCell } from './styles';
 
 const NUMBER_LOCALE = 'en-US';
 
@@ -72,10 +73,14 @@ export const blockRowSections = (block: IBlock | string): IRowSection[] => {
         Component={() => <CustomFieldWrapper>{elapsed}</CustomFieldWrapper>}
       />
     ),
-    txs: () => <span>{(txCount ?? 0).toLocaleString(NUMBER_LOCALE)}</span>,
+    txs: () => (
+      <NumericCell>{(txCount ?? 0).toLocaleString(NUMBER_LOCALE)}</NumericCell>
+    ),
     // Bytes carry their unit here rather than in the heading, which would
     // stop being true the day a block is measured in anything else.
-    size: () => <span>{`${(size ?? 0).toLocaleString(NUMBER_LOCALE)} B`}</span>,
+    size: () => (
+      <NumericCell>{`${(size ?? 0).toLocaleString(NUMBER_LOCALE)} B`}</NumericCell>
+    ),
     producer: () => (
       <ExplorerLink
         type="validator"

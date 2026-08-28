@@ -36,20 +36,10 @@ export interface IBlockColumn {
 export const BLOCK_COLUMNS: IBlockColumn[] = [
   { key: 'block', header: 'Block', i18nKey: 'blocks:Table.Block', width: 110 },
   { key: 'age', header: 'Age', i18nKey: 'blocks:Table.Age', width: 120 },
-  {
-    key: 'txs',
-    header: 'Txs',
-    i18nKey: 'blocks:Table.Txs',
-    width: 80,
-    rightAligned: true,
-  },
-  {
-    key: 'size',
-    header: 'Size',
-    i18nKey: 'blocks:Table.Size',
-    width: 100,
-    rightAligned: true,
-  },
+  // Left, like Block and Age: both are short values in wide-enough columns,
+  // and the amounts on the right are what the right edge is reserved for.
+  { key: 'txs', header: 'Txs', i18nKey: 'blocks:Table.Txs', width: 80 },
+  { key: 'size', header: 'Size', i18nKey: 'blocks:Table.Size', width: 100 },
   {
     key: 'producer',
     header: 'Produced by',

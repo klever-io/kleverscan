@@ -1,5 +1,6 @@
 import {
   accentText,
+  AddressLink,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   focusRing,
@@ -240,4 +241,14 @@ export const ContractsTableWrapper = styled.div`
       )
       .join('')}
   }
+`;
+
+/**
+ * The contract's identity on the mobile card. A name is words and gets the
+ * page font; an address is a hash and keeps the monospace that makes its
+ * middle ellipsis line up. Same rule the transactions list follows.
+ */
+export const MobileContractLink = styled(AddressLink)<{ $isName: boolean }>`
+  font-family: ${props =>
+    props.$isName ? "'Manrope', sans-serif" : "'Fira Mono', monospace"};
 `;

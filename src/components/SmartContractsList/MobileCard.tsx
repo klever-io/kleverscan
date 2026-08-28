@@ -15,6 +15,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { CONTRACT_COLUMNS, ContractColumnKey } from './columns';
+import { MobileContractLink } from './styles';
 
 export interface IContractsMobileCardExtras {
   deferred: boolean;
@@ -62,13 +63,14 @@ const ContractsMobileCard: React.FC<IContractsMobileCardProps> = ({
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
       <MobileTopRow>
-        <AddressLink
+        <MobileContractLink
           href={`/smart-contract/${contractAddress}`}
           data-testid="smart-contract-link"
           title={shown ? `${shown} · ${contractAddress}` : contractAddress}
+          $isName={Boolean(shown)}
         >
           {shown || parseAddress(contractAddress, 14)}
-        </AddressLink>
+        </MobileContractLink>
         <MobileMetaItem title={formatDateWithSeconds(timestamp)}>
           {elapsed}
         </MobileMetaItem>

@@ -1,4 +1,4 @@
-import { klvAmount } from '@/components/DataList/format';
+import { klvAmount, NUMBER_LOCALE } from '@/components/DataList/format';
 import { AmountMuted, AmountPrimary } from '@/components/DataList/styles';
 import ExplorerLink from '@/components/ExplorerLink';
 import { CustomFieldWrapper } from '@/components/Table/styles';
@@ -81,12 +81,12 @@ export const blockRowSections = (
       />
     ),
     txs: () => (
-      <NumericCell>{(txCount ?? 0).toLocaleString('en-US')}</NumericCell>
+      <NumericCell>{(txCount ?? 0).toLocaleString(NUMBER_LOCALE)}</NumericCell>
     ),
     // Bytes carry their unit here rather than in the heading, which would
     // stop being true the day a block is measured in anything else.
     size: () => (
-      <NumericCell>{`${(size ?? 0).toLocaleString('en-US')} B`}</NumericCell>
+      <NumericCell>{`${(size ?? 0).toLocaleString(NUMBER_LOCALE)} B`}</NumericCell>
     ),
     producer: () => (
       <ExplorerLink

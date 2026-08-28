@@ -14,6 +14,18 @@
     "CumulativeBurned": "{{amount}} no total",
     "FeesBurned": "Taxas queimadas",
     "ToValidators": "Para validadores",
-    "KAppFees": "Taxas de kApp"
+    "KAppFees": "Taxas de kApp",
+    "AutoUpdate": "Atualização automática"
+  },
+  "Table": {
+    "Block": "Bloco",
+    "Age": "Idade",
+    "Txs": "Txs",
+    "Size": "Tamanho",
+    "ProducedBy": "Produzido por",
+    "KAppFees": "Taxas de kApp",
+    "BurnedFees": "Taxas queimadas",
+    "FeeRewards": "Recompensas de taxa",
+    "BlockRewards": "Recompensas de bloco"
   }
 }

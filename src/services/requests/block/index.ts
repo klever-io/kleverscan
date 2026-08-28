@@ -143,9 +143,13 @@ const isEpochMillis = (value: string): boolean =>
   /^\d+$/.test(value) && Number(value) <= Number.MAX_SAFE_INTEGER;
 
 /**
- * One page of the block list. `minify=true` drops the fields no row reads,
- * including the embedded transactions: 8.408 bytes over the wire against 1.487.
- * It must be that literal string, `minify=1` and `minify=yes` return the lot.
+ * One page of the block list.
+ *
+ * No `minify=true` here, though it would cut the response from 57 859 bytes to
+ * 7 034. It does not only drop fields: it zeroes `size`, `sizeTxs`,
+ * `virtualBlockSize` and `slot`, and `size` is one of the eleven fields a row
+ * reads. Checked field by field across 40 blocks; `size` is the only one of the
+ * eleven affected.
  */
 export const blockListCall = async (
   page: number,
@@ -165,7 +169,6 @@ export const blockListCall = async (
   // arguments, which `normalizePageParam` has already clamped.
   query.page = page;
   query.limit = limit;
-  query.minify = 'true';
 
   return api.get({ route: 'block/list', query });
 };

@@ -1,6 +1,14 @@
-import { SummaryCard, Tile, TilesGrid } from '@/components/DataList/styles';
+import {
+  DATA_LIST_ROW_HEIGHT,
+  dataListTableSkin,
+  SummaryCard,
+  Tile,
+  TilesGrid,
+} from '@/components/DataList/styles';
 import SummaryLoading from '@/components/DataList/SummaryLoading';
+import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
 import styled, { css, DefaultTheme } from 'styled-components';
+import { RIGHT_ALIGNED_COLUMNS } from './columns';
 
 /* ------------------------------- summary --------------------------------- */
 
@@ -85,4 +93,66 @@ export const UpdatedNote = styled.p`
   color: ${props => props.theme.darkText};
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
+`;
+
+/* --------------------------- scoped table skin --------------------------- */
+
+/** `nth-child` is 1-based; the column indexes are not. */
+const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
+
+export const BlocksTableWrapper = styled.div`
+  ${dataListTableSkin}
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    /* One row height across every data-list table on the site. */
+    ${MobileCardItem} {
+      height: ${DATA_LIST_ROW_HEIGHT};
+      /* The amounts are the anonymous text of their cells, which the shared
+         a/span rule cannot reach; under width pressure they wrapped mid-value. */
+      white-space: nowrap;
+    }
+
+    /* One 20px content line, centered by the cell's vertical-align inside the
+       60px row; the shared rule would pin these to 24px. */
+    ${MobileCardItem} a,
+    ${MobileCardItem} span {
+      height: 20px;
+    }
+
+    /* The skin drops the permanent underline, so a link needs hover and focus
+       affordances to stay distinguishable from the static text beside it. */
+    ${MobileCardItem} a:hover,
+    ${MobileCardItem} a:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 0.2rem;
+    }
+
+    ${rightAligned
+      .map(
+        position => `
+    ${MobileCardItem}:nth-child(${position}),
+    ${HeaderItem}:nth-child(${position}) {
+      text-align: right;
+    }`,
+      )
+      .join('')}
+  }
+`;
+
+/* ------------------------------ auto update ------------------------------ */
+
+/**
+ * Sits in the table's Filters slot, so it shares a row with Items per page.
+ * A button, not a div: it toggles state, and a div swallows keyboard use.
+ */
+export const AutoUpdateContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  cursor: pointer;
+  user-select: none;
+
+  color: ${props => props.theme.black};
+  font-size: 0.9rem;
 `;

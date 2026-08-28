@@ -9,8 +9,15 @@ import path from 'path';
  */
 const readKeys = (file: string, namespace: string): string[] => {
   const source = fs.readFileSync(path.join(process.cwd(), file), 'utf8');
-  const pattern = new RegExp(`t\\(\\s*'${namespace}:([\\w.]+)'`, 'g');
-  return [...source.matchAll(pattern)].map(match => match[1]);
+  // Both shapes in use: `t('ns:Key')` at the call site, and `i18nKey:
+  // 'ns:Key'` in the column table, which the heading hook feeds to `t`.
+  const patterns = [
+    new RegExp(`t\\(\\s*'${namespace}:([\\w.]+)'`, 'g'),
+    new RegExp(`i18nKey:\\s*'${namespace}:([\\w.]+)'`, 'g'),
+  ];
+  return patterns.flatMap(pattern =>
+    [...source.matchAll(pattern)].map(match => match[1]),
+  );
 };
 
 const lookup = (bundle: unknown, key: string): unknown =>
@@ -26,6 +33,8 @@ const lookup = (bundle: unknown, key: string): unknown =>
 
 const sources = [
   ['src/components/BlocksList/Summary.tsx', 'blocks'],
+  ['src/components/BlocksList/AutoUpdate.tsx', 'blocks'],
+  ['src/components/BlocksList/columns.ts', 'blocks'],
   ['src/components/BlocksList/UpdatedAgo.tsx', 'common'],
 ] as const;
 

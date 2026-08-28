@@ -198,12 +198,13 @@ describe('blockListCall', () => {
     });
   });
 
-  it('asks for the minified payload, as the literal string the API needs', async () => {
+  it('sends page and limit, and asks for the full payload', async () => {
     await blockListCall(2, 25);
 
+    // No `minify`: it zeroes `size`, which the Size column reads.
     expect(argOf()).toEqual({
       route: 'block/list',
-      query: { page: 2, limit: 25, minify: 'true' },
+      query: { page: 2, limit: 25 },
     });
   });
 
@@ -218,7 +219,6 @@ describe('blockListCall', () => {
       enddate: '1787875200000',
       page: 1,
       limit: 10,
-      minify: 'true',
     });
   });
 

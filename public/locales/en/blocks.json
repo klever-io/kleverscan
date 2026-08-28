@@ -14,6 +14,18 @@
     "CumulativeBurned": "{{amount}} in total",
     "FeesBurned": "Fees burned",
     "ToValidators": "To validators",
-    "KAppFees": "kApp fees"
+    "KAppFees": "kApp fees",
+    "AutoUpdate": "Auto update"
+  },
+  "Table": {
+    "Block": "Block",
+    "Age": "Age",
+    "Txs": "Txs",
+    "Size": "Size",
+    "ProducedBy": "Produced by",
+    "KAppFees": "kApp Fees",
+    "BurnedFees": "Burned Fees",
+    "FeeRewards": "Fee Rewards",
+    "BlockRewards": "Block Rewards"
   }
 }

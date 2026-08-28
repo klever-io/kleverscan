@@ -1,147 +1,57 @@
-import { PropsWithChildren } from 'react';
 import { Blocks as Icon } from '@/assets/title-icons';
+import AutoUpdate from '@/components/BlocksList/AutoUpdate';
+import { RIGHT_ALIGNED_COLUMNS } from '@/components/BlocksList/columns';
+import { blockRowSections } from '@/components/BlocksList/rows';
+import { BlocksTableWrapper } from '@/components/BlocksList/styles';
 import BlocksSummary from '@/components/BlocksList/Summary';
-import ToggleButton from '@/components/Button/Toggle';
+import { useBlockHeaders } from '@/components/BlocksList/useBlockHeaders';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { blockListCall } from '@/services/requests/block';
-import { Container, DoubleRow, Header } from '@/styles/common';
-import { IBlock } from '@/types/blocks';
-import { IRowSection } from '@/types/index';
-import { formatAmount, formatDate } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
-import {
-  getStorageUpdateConfig,
-  storageUpdateBlocks,
-} from '@/utils/localStorage/localStorageData';
-import { parseAddress } from '@/utils/parseValues';
-import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
-import ExplorerLink from '@/components/ExplorerLink';
+import { Container, Header } from '@/styles/common';
 import { GetServerSideProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useMemo, useRef, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
-const blocksHeader = [
-  'Block/ Epoch',
-  'Size/Transactions',
-  'Produced by/ Created At',
-  'kApp Fees/Burned Fees',
-  'Fee Rewards/Block Rewards',
-];
+/** How often the list refetches while auto update is on. */
+const AUTO_UPDATE_INTERVAL = 4 * 1000;
 
-const blocksRowSections = (block: IBlock): IRowSection[] => {
-  const {
-    nonce,
-    size,
-    epoch,
-    producerName,
-    producerOwnerAddress,
-    timestamp,
-    txCount,
-    txFees,
-    kAppFees,
-    txBurnedFees,
-    blockRewards,
-  } = block;
-
-  const sections: IRowSection[] = [
-    {
-      element: props => (
-        <DoubleRow {...props} key={nonce + epoch}>
-          <ExplorerLink type="block" value={String(nonce)} compact />
-          <span>{epoch}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={txCount + size}>
-          <span>{size} Bytes</span>
-          <span>
-            {txCount} TX{txCount > 1 ? 's' : ''}
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={producerOwnerAddress + timestamp}>
-          <ExplorerLink
-            type="validator"
-            value={producerOwnerAddress}
-            label={parseAddress(producerName, 16)}
-            compact
-          />
-          <span key={timestamp}>{formatDate(timestamp)}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(kAppFees) + String(txBurnedFees)}>
-          <span>{formatAmount((kAppFees || 0) / 10 ** KLV_PRECISION)} KLV</span>
-          <span>{`${formatAmount(
-            (txBurnedFees || 0) / 10 ** KLV_PRECISION,
-          )} KLV`}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
-          <span>
-            {formatAmount(((txFees || 0) * 0.5) / 10 ** KLV_PRECISION)} KLV
-          </span>
-          <span>
-            {formatAmount((blockRewards || 0) / 10 ** KLV_PRECISION)} KLV
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-  ];
-
-  return sections;
-};
+/**
+ * The table renders `Filters` as a component, so it needs one identity for the
+ * life of the page: built inline it would be a new type every render, remount
+ * on each one, and cut the toggle's 0.4s transition short.
+ */
+const makeFilters = (onChange: (interval: number) => void): React.FC =>
+  function BlocksFilters() {
+    return <AutoUpdate interval={AUTO_UPDATE_INTERVAL} onChange={onChange} />;
+  };
 
 const Blocks: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const blocksWatcherInterval = 4 * 1000; // 4 secs
+  const header = useBlockHeaders();
   const [blocksInterval, setBlocksInterval] = useState(0);
 
-  const updateBlocks = useCallback(async () => {
-    const newState = storageUpdateBlocks(!!blocksInterval);
-    if (newState) {
-      setBlocksInterval(blocksWatcherInterval);
-    } else {
-      setBlocksInterval(0);
-    }
-  }, [blocksInterval]);
-
-  useEffect(() => {
-    const updateBlocksConfig = getStorageUpdateConfig();
-    if (updateBlocksConfig) {
-      setBlocksInterval(blocksWatcherInterval);
-    } else {
-      setBlocksInterval(0);
-    }
-  }, []);
+  // The setter through a ref, so the memo below never has to be rebuilt.
+  const onIntervalChange = useRef(setBlocksInterval);
+  const Filters = useMemo(
+    () => makeFilters(interval => onIntervalChange.current(interval)),
+    [],
+  );
 
   const tableProps: ITable = {
     type: 'blocks',
-    header: blocksHeader,
-    rowSections: blocksRowSections,
+    header,
+    rowSections: blockRowSections,
     dataName: 'blocks',
     request: (page: number, limit: number) =>
       blockListCall(page, limit, router.query),
     interval: blocksInterval,
     intervalController: setBlocksInterval,
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
+    Filters,
   };
 
   return (
@@ -152,16 +62,9 @@ const Blocks: React.FC<PropsWithChildren> = () => {
 
       <BlocksSummary />
 
-      <TableContainer autoUpdate={!!blocksInterval}>
-        <TableHeader>
-          <UpdateContainer onClick={() => updateBlocks()}>
-            <span>Auto update</span>
-            <ToggleButton active={!!blocksInterval} />
-          </UpdateContainer>
-        </TableHeader>
-
+      <BlocksTableWrapper>
         <Table {...tableProps} />
-      </TableContainer>
+      </BlocksTableWrapper>
     </Container>
   );
 };

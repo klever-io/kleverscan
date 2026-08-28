@@ -110,6 +110,8 @@ describe('blockRowSections', () => {
     layout.forEach((section, index) => {
       expect(section.width).toBe(BLOCK_COLUMNS[index].width);
       expect(section.span).toBe(BLOCK_COLUMNS[index].span ?? 1);
+      // The probe's cells render nothing; the Table only reads the widths.
+      expect(section.element({})).toBeNull();
     });
   });
 
@@ -147,6 +149,19 @@ describe('blockRowSections', () => {
     renderCell('feeRewards', empty);
 
     expect(screen.getByText('0 KLV')).toBeTruthy();
+  });
+
+  it('turns an absent count and size into zeros, the malformed-answer shape', () => {
+    const malformed = {
+      ...BLOCK,
+      txCount: undefined,
+      size: undefined,
+    } as unknown as IBlock;
+
+    renderCell('txs', malformed);
+    expect(screen.getByText('0')).toBeTruthy();
+    renderCell('size', malformed);
+    expect(screen.getByText('0 B')).toBeTruthy();
   });
 
   it('carries the byte unit in the cell, not the heading', () => {

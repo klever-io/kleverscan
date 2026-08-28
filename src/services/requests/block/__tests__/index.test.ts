@@ -330,4 +330,10 @@ describe('blockTotalStatsCall', () => {
 
     await expect(blockTotalStatsCall()).resolves.toBeUndefined();
   });
+
+  it('returns undefined when a clean answer carries no totals', async () => {
+    mockedGet.mockResolvedValue({ data: {}, error: '' });
+
+    await expect(blockTotalStatsCall()).resolves.toBeUndefined();
+  });
 });

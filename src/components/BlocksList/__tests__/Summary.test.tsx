@@ -198,6 +198,36 @@ describe('BlocksSummary', () => {
     expect(screen.queryByText(/in total/)).toBeNull();
   });
 
+  it('renders nothing when the query itself rejected', async () => {
+    yesterdayCall.mockRejectedValue(new Error('network down'));
+    totalCall.mockRejectedValue(new Error('network down'));
+
+    const { container } = renderSummary();
+
+    await waitFor(() => expect(yesterdayCall).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.queryByLabelText('Block statistics')).toBeNull(),
+    );
+    expect(container.textContent).toBe('');
+  });
+
+  it('drops the fee tile and the bar on a day that carried no fees', async () => {
+    yesterdayCall.mockResolvedValue({
+      ...YESTERDAY,
+      totalTxFees: 0,
+      totalKappsFees: 0,
+      totalTxRewards: 0,
+    });
+    totalCall.mockResolvedValue(TOTAL);
+
+    renderSummary();
+
+    expect(await screen.findByTestId('blocks-summary')).toBeTruthy();
+    expect(screen.getByText('21,597')).toBeTruthy();
+    expect(screen.queryByText(/of it burned/)).toBeNull();
+    expect(screen.queryByText('Fees burned')).toBeNull();
+  });
+
   it('renders nothing when both halves failed', async () => {
     yesterdayCall.mockResolvedValue(undefined);
     totalCall.mockResolvedValue(undefined);

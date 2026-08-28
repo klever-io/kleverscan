@@ -159,14 +159,17 @@ describe('BlocksMobileCard', () => {
   });
 
   it('renders a block without transactions as zero fees, not a crash', () => {
+    // count and size undefined rather than 0: the shape a malformed API
+    // answer would have, which the ?? fallbacks turn into zeros.
     renderCard({
-      txCount: 0,
+      txCount: undefined,
+      size: undefined,
       txFees: undefined,
       kAppFees: undefined,
       txBurnedFees: undefined,
-    });
+    } as Partial<IBlock>);
 
     expect(screen.getByText(/Fee Rewards 0 KLV/)).toBeTruthy();
-    expect(screen.getByText(/0 txs ·/)).toBeTruthy();
+    expect(screen.getByText(/0 txs · 0 B/)).toBeTruthy();
   });
 });

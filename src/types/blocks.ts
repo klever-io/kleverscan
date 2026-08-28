@@ -58,15 +58,6 @@ export interface IBlockStats {
   totalBurned: number;
   totalBlockRewards: number;
 }
-export interface IBlockData {
-  yesterday: IBlockStats;
-  total: IBlockStats;
-}
-export interface IBlocks {
-  blocks: IBlock[];
-  statistics: IBlockData;
-}
-
 export interface IBlocksResponse extends IResponse {
   data: {
     blocks: IBlock[];
@@ -82,13 +73,6 @@ export interface IBlockResponse extends IResponse {
 
 export interface IBlockPage {
   block: IBlock;
-}
-
-export interface IStatisticsResponse extends IResponse {
-  data: {
-    block_stats_by_day: IBlockStats;
-    block_stats_total: IBlockStats;
-  };
 }
 
 export interface ICard {

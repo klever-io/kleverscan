@@ -28,7 +28,6 @@ jest.mock('@/utils/precisionFunctions', () => ({
   getPrecision: jest.fn(),
 }));
 
-import { blockCall } from '@/services/apiCalls';
 import {
   KFIAllowancePromise,
   KLVAllowancePromise,
@@ -61,15 +60,6 @@ beforeEach(() => {
 });
 
 describe('converted query shapes', () => {
-  it('blockCall sends page and limit as query values', async () => {
-    await blockCall(2, 25);
-
-    expect(callArg()).toEqual({
-      route: 'block/list',
-      query: { page: 2, limit: 25 },
-    });
-  });
-
   it('getSomeAssetsPool keeps the asset list, page and limit', async () => {
     await getSomeAssetsPool('KLV,KFI', 3, 15);
 

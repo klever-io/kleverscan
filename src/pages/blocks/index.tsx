@@ -5,10 +5,10 @@ import Title from '@/components/Layout/Title';
 import Skeleton from '@/components/Skeleton';
 import Table, { ITable } from '@/components/Table';
 import {
-  blockCall,
-  totalStatisticsCall,
-  yesterdayStatisticsCall,
-} from '@/services/apiCalls';
+  blockListCall,
+  blockTotalStatsCall,
+  blockYesterdayStatsCall,
+} from '@/services/requests/block';
 import {
   Card,
   CardContainer,
@@ -16,7 +16,7 @@ import {
   DoubleRow,
   Header,
 } from '@/styles/common';
-import { IBlock, IBlocks, ICard } from '@/types/blocks';
+import { IBlock, ICard } from '@/types/blocks';
 import { IRowSection } from '@/types/index';
 import {
   formatAmount,
@@ -32,27 +32,11 @@ import { parseAddress } from '@/utils/parseValues';
 import { getAge } from '@/utils/timeFunctions';
 import { TableContainer, TableHeader, UpdateContainer } from '@/views/blocks';
 import ExplorerLink from '@/components/ExplorerLink';
+import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
-interface IBlocksStatsToday {
-  totalBlocks: number;
-  totalBurned: number;
-  totalBlockRewards: number;
-}
-
-interface IBlocksStatsYesterday {
-  date: number;
-  totalBlocks: number;
-  totalMinted: number;
-  totalBurned: number;
-  totalBlockRewards: number;
-  totalStakingRewards: number;
-  totalTxFees: number;
-  totalKappsFees: number;
-  totalTxRewards: number;
-}
-export const blocksHeader = [
+const blocksHeader = [
   'Block/ Epoch',
   'Size/Transactions',
   'Produced by/ Created At',
@@ -60,7 +44,7 @@ export const blocksHeader = [
   'Fee Rewards/Block Rewards',
 ];
 
-export const blocksRowSections = (block: IBlock): IRowSection[] => {
+const blocksRowSections = (block: IBlock): IRowSection[] => {
   const {
     nonce,
     size,
@@ -139,7 +123,8 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
   return sections;
 };
 
-const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
+const Blocks: React.FC<PropsWithChildren> = () => {
+  const router = useRouter();
   const blocksWatcherInterval = 4 * 1000; // 4 secs
   const [blocksInterval, setBlocksInterval] = useState(0);
   const {
@@ -148,8 +133,8 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     refetch: refetchTotal,
     dataUpdatedAt: totalUpdatedAt,
   } = useQuery({
-    queryKey: ['statisticsCall'],
-    queryFn: totalStatisticsCall,
+    queryKey: ['blockTotalStats'],
+    queryFn: blockTotalStatsCall,
   });
   const {
     data: blocksStatsYesterday,
@@ -157,8 +142,8 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     isLoading: isLoadingBlocksStatsYesterday,
     dataUpdatedAt: yesterdayUpdatedAt,
   } = useQuery({
-    queryKey: ['yesterdayStatisticsCall'],
-    queryFn: yesterdayStatisticsCall,
+    queryKey: ['blockYesterdayStats'],
+    queryFn: blockYesterdayStatsCall,
   });
 
   const dataUpdatedAt =
@@ -307,7 +292,8 @@ const Blocks: React.FC<PropsWithChildren<IBlocks>> = () => {
     header: blocksHeader,
     rowSections: blocksRowSections,
     dataName: 'blocks',
-    request: (page: number, limit: number) => blockCall(page, limit),
+    request: (page: number, limit: number) =>
+      blockListCall(page, limit, router.query),
     interval: blocksInterval,
     intervalController: setBlocksInterval,
   };

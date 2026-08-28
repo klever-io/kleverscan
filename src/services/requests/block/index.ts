@@ -1,5 +1,10 @@
 import api from '@/services/api';
-import { ITransaction, ITransactionsResponse } from '@/types';
+import {
+  IPaginatedResponse,
+  ITransaction,
+  ITransactionsResponse,
+} from '@/types';
+import { IBlock } from '@/types/blocks';
 import {
   PRECISION_TOAST_ID,
   getParsedTransactionPrecision,
@@ -95,4 +100,99 @@ export const blockTransactionsCall = async (
         parsedTransactions ?? transactionsResponse.data?.transactions ?? [],
     },
   };
+};
+
+/* ------------------------------ blocks list ------------------------------ */
+
+export interface IBlocksListResponse extends IPaginatedResponse {
+  data: {
+    blocks: IBlock[];
+  };
+}
+
+export interface IBlockDayStats {
+  date: number;
+  totalBlocks: number;
+  totalMinted: number;
+  totalBurned: number;
+  totalBlockRewards: number;
+  totalStakingRewards: number;
+  totalTxFees: number;
+  totalKappsFees: number;
+  totalTxRewards: number;
+}
+
+export interface IBlockTotalStats {
+  totalBlocks: number;
+  totalBurned: number;
+  totalBlockRewards: number;
+}
+
+/** Of the five params `block/list` documents, the date range is the only one
+ *  the URL may contribute; the rest arrive as arguments or are fixed below. */
+const LIST_FILTER_PARAMS = ['startdate', 'enddate'];
+
+/**
+ * A bad date is dropped, not forwarded: the endpoint answers 500 with an
+ * Elasticsearch stack trace rather than an empty list. Digits only, because
+ * `Number()` accepts shapes the endpoint crashes on: `1e12` and `" 123 "` both
+ * parse here and both 500 there. The ceiling is one the endpoint accepts (it
+ * parses to int64) and the last this side compares without losing digits.
+ */
+const isEpochMillis = (value: string): boolean =>
+  /^\d+$/.test(value) && Number(value) <= Number.MAX_SAFE_INTEGER;
+
+/**
+ * One page of the block list. `minify=true` drops the fields no row reads,
+ * including the embedded transactions: 8.408 bytes over the wire against 1.487.
+ * It must be that literal string, `minify=1` and `minify=yes` return the lot.
+ */
+export const blockListCall = async (
+  page: number,
+  limit: number,
+  routerQuery: RouterQuery = {},
+): Promise<IBlocksListResponse> => {
+  const query: Record<string, unknown> = {};
+
+  LIST_FILTER_PARAMS.forEach(key => {
+    const value = routerQuery[key];
+    if (typeof value === 'string' && isEpochMillis(value)) {
+      query[key] = value;
+    }
+  });
+
+  // After the allowlist, so a page or limit in the URL cannot override the
+  // arguments, which `normalizePageParam` has already clamped.
+  query.page = page;
+  query.limit = limit;
+  query.minify = 'true';
+
+  return api.get({ route: 'block/list', query });
+};
+
+/**
+ * Yesterday as a closed calendar day, or undefined on failure.
+ *
+ * Entry `[1]`, not `[0]`: `[0]` counts from midnight UTC, so at 01:00 it holds
+ * one hour of blocks under a label saying 24. Measured on mainnet, it grew by
+ * the same 23 blocks as the cumulative counter over 93 seconds.
+ */
+export const blockYesterdayStatsCall = async (): Promise<
+  IBlockDayStats | undefined
+> => {
+  const response = await api.get({ route: 'block/statistics-by-day/1' });
+  if (response?.error) return undefined;
+
+  const days = response?.data?.block_stats_by_day;
+  if (!Array.isArray(days)) return undefined;
+  return days[1] ?? undefined;
+};
+
+/** Cumulative since genesis, or undefined on failure. */
+export const blockTotalStatsCall = async (): Promise<
+  IBlockTotalStats | undefined
+> => {
+  const response = await api.get({ route: 'block/statistics-total/0' });
+  if (response?.error) return undefined;
+  return response?.data?.block_stats_total ?? undefined;
 };

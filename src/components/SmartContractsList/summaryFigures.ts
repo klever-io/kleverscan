@@ -1,27 +1,28 @@
 import { HotContracts } from '@/types/smart-contract';
 
-export interface IContractsDaily {
-  /** Contract transactions in the current day bucket. */
-  today: number;
-  /** The bucket before it, which the change is measured against. */
+export interface IWindowPair {
+  /** The last 24 hours: a complete rolling window ending at the request. */
+  current: number;
+  /** The 24 hours before that, which the change is measured against. */
   previous: number;
 }
 
 /**
- * Day-on-day change as a rate, e.g. 0.186 for "+18.6%".
+ * Window-on-window change as a rate, e.g. 0.186 for "+18.6%". Fair at any time
+ * of day because both windows are complete; see contractTransactions24hCall.
  *
- * Undefined rather than zero when it cannot be computed: with no previous day
- * there is no rate, and printing "+0%" would state a fact the data does not
- * carry. Growth from nothing is likewise undefined rather than infinite.
+ * Undefined rather than zero when it cannot be computed: with no previous
+ * window there is no rate, and printing "+0%" would state a fact the data does
+ * not carry. Growth from nothing is likewise undefined rather than infinite.
  */
-export const dailyVariation = (
-  daily: IContractsDaily | undefined,
+export const windowVariation = (
+  pair: IWindowPair | undefined,
 ): number | undefined => {
-  if (!daily) return undefined;
-  const { today, previous } = daily;
-  if (!Number.isFinite(today) || !Number.isFinite(previous)) return undefined;
+  if (!pair) return undefined;
+  const { current, previous } = pair;
+  if (!Number.isFinite(current) || !Number.isFinite(previous)) return undefined;
   if (previous <= 0) return undefined;
-  return (today - previous) / previous;
+  return (current - previous) / previous;
 };
 
 export interface IContractShare {

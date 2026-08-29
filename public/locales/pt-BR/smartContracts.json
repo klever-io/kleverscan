@@ -43,17 +43,15 @@
     "SummaryAria": "Smart contract statistics",
     "ContractsDeployed": "Contracts deployed",
     "ContractTransactions": "Contract transactions",
-    "Today": "{{formatted}} today",
     "MostUsed": "Most used contract",
     "LeaderTransactions": "{{amount}} transactions, all time",
     "BarCaption": "Share among the five busiest contracts",
     "MostUsedNote": "By successful contract transactions, all time.",
     "NoStatistics": "No contract activity has been recorded yet.",
-    "ScrollBack": "Scroll back",
-    "ScrollForward": "Scroll forward",
     "DeployerCountTitle": "Show the {{count}} contracts from this deployer",
     "FilteredByDeployer": "Contracts deployed by",
-    "ClearFilter": "Clear filter"
+    "ClearFilter": "Clear filter",
+    "Last24h": "{{formatted}} in the last 24 hours"
   },
   "Filters": {
     "SortBy": "Sort by",

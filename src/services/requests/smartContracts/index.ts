@@ -114,8 +114,17 @@ const smartContractTotalTransactionsListCall = async () => {
   }
 };
 
-const smartContractsBeforeYesterdayTransactionsCall = async (): Promise<
-  { newTransactions: number; beforeYesterdayTxs: number } | undefined
+/**
+ * Contract transactions in the last 24 hours and the 24 hours before that.
+ *
+ * The endpoint's buckets are rolling windows anchored at the request, not
+ * calendar days: `countDaysQuery` in the proxy builds ranges of `now-1d..now`
+ * and `now-2d..now-1d`. Both windows are therefore complete, which is what
+ * makes comparing them fair at any time of day. The old name of this call
+ * said "before yesterday", which the endpoint never measured.
+ */
+const contractTransactions24hCall = async (): Promise<
+  { last24h: number; previous24h: number } | undefined
 > => {
   try {
     const res = await api.get({
@@ -126,14 +135,10 @@ const smartContractsBeforeYesterdayTransactionsCall = async (): Promise<
     });
 
     if (!res.error || res.error === '') {
-      const data = {
-        newTransactions: 0,
-        beforeYesterdayTxs: res.data?.number_by_day[1]?.doc_count || 0,
+      return {
+        last24h: res.data?.number_by_day?.[0]?.doc_count || 0,
+        previous24h: res.data?.number_by_day?.[1]?.doc_count || 0,
       };
-      if (res.data?.number_by_day?.length > 0) {
-        data.newTransactions = res.data?.number_by_day[0]?.doc_count || 0;
-      }
-      return data;
     }
   } catch (error) {
     console.error(error);
@@ -187,7 +192,7 @@ const smartContractTransactionDetailsCall = async (
 
 export {
   smartContractBeforeYesterdayTransactionsCall,
-  smartContractsBeforeYesterdayTransactionsCall,
+  contractTransactions24hCall,
   smartContractsListCall,
   smartContractsStatisticCall,
   smartContractsTableRequest,

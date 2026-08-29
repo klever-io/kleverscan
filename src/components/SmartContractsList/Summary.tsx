@@ -15,7 +15,7 @@ import {
 import { useDeferred } from '@/components/DataList/useDeferred';
 import { TrendValue } from '@/components/TransactionsList/styles';
 import {
-  smartContractsBeforeYesterdayTransactionsCall,
+  contractTransactions24hCall,
   smartContractsListCall,
   smartContractsStatisticCall,
   smartContractTotalTransactionsListCall,
@@ -31,7 +31,7 @@ import {
   ContractsSummaryLoading,
   SummaryContractLink,
 } from './styles';
-import { dailyVariation, topContracts } from './summaryFigures';
+import { topContracts, windowVariation } from './summaryFigures';
 
 /**
  * A quarter of an hour. These are chain-wide totals that move by fractions of
@@ -64,12 +64,12 @@ const ContractsSummary: React.FC = () => {
       // Every one of these maps its own failure to undefined, so a half-failed
       // set still lands here as data rather than as an error, and each tile
       // decides on its own whether it has something to say.
-      const [contracts, transactions, daily] = await Promise.all([
+      const [contracts, transactions, windows] = await Promise.all([
         smartContractsListCall(),
         smartContractTotalTransactionsListCall(),
-        smartContractsBeforeYesterdayTransactionsCall(),
+        contractTransactions24hCall(),
       ]);
-      return { contracts, transactions, daily };
+      return { contracts, transactions, windows };
     },
     ...FIGURE_CACHE,
   });
@@ -88,12 +88,12 @@ const ContractsSummary: React.FC = () => {
   }
   if (!data) return null;
 
-  const { contracts, transactions, daily } = data;
+  const { contracts, transactions, windows } = data;
   const busiest = topContracts(statistics?.statistics);
-  const variation = dailyVariation(
-    daily && {
-      today: daily.newTransactions,
-      previous: daily.beforeYesterdayTxs,
+  const variation = windowVariation(
+    windows && {
+      current: windows.last24h,
+      previous: windows.previous24h,
     },
   );
 
@@ -155,15 +155,11 @@ const ContractsSummary: React.FC = () => {
                 </TrendValue>
               )}
             </TileValueRow>
-            {daily && (
+            {windows && (
               <TileSub>
-                {t('smartContracts:List.Today', {
-                  defaultValue: '{{count}} today',
-                  count: daily.newTransactions,
-                  formatted:
-                    daily.newTransactions.toLocaleString(NUMBER_LOCALE),
-                  defaultValue_one: '{{formatted}} today',
-                  defaultValue_other: '{{formatted}} today',
+                {t('smartContracts:List.Last24h', {
+                  defaultValue: '{{formatted}} in the last 24 hours',
+                  formatted: windows.last24h.toLocaleString(NUMBER_LOCALE),
                 })}
               </TileSub>
             )}

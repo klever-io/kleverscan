@@ -35,59 +35,6 @@ export const EmptyNote = styled.p`
   color: ${props => props.theme.darkText};
 `;
 
-/* ------------------------------- carousel -------------------------------- */
-
-export const CarouselRow = styled.div`
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-`;
-
-export const CarouselTrack = styled.div`
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
-  /* The track is scrollable, so it is a focus target for keyboard users; the
-     ring would otherwise only ever land on the cards inside it. */
-  ${focusRing}
-
-  @media (prefers-reduced-motion: reduce) {
-    scroll-behavior: auto;
-  }
-`;
-
-/**
- * Enabled state driven by the real scroll position rather than hardcoded.
- * Both arrows used to be `active={true}` unconditionally, so the left one
- * looked and behaved like a live control at `scrollLeft: 0`.
- */
-export const CarouselArrow = styled.button<{ $enabled: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 32px;
-  border: none;
-  border-radius: 8px;
-  background: none;
-  color: ${props => props.theme.darkText};
-  cursor: ${props => (props.$enabled ? 'pointer' : 'not-allowed')};
-  opacity: ${props => (props.$enabled ? 1 : 0.3)};
-  transition: opacity 150ms ease-out;
-
-  ${focusRing}
-
-  &:hover {
-    color: ${props => (props.$enabled ? accentText(props) : undefined)};
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-  }
-`;
-
 /* --------------------------------- cards --------------------------------- */
 
 /**
@@ -106,7 +53,6 @@ export const ContractCard = styled(Link)`
     max-width: 216px;
   }
 
-  scroll-snap-align: start;
   gap: 8px;
   padding: 14px;
   border-radius: 12px;

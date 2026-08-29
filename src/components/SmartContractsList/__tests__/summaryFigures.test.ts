@@ -1,38 +1,38 @@
-import { dailyVariation, topContracts } from '../summaryFigures';
+import { topContracts, windowVariation } from '../summaryFigures';
 
-describe('dailyVariation', () => {
+describe('windowVariation', () => {
   it('reports growth as a rate', () => {
-    expect(dailyVariation({ today: 120, previous: 100 })).toBeCloseTo(0.2);
+    expect(windowVariation({ current: 120, previous: 100 })).toBeCloseTo(0.2);
   });
 
   it('reports a fall as a negative rate', () => {
-    expect(dailyVariation({ today: 80, previous: 100 })).toBeCloseTo(-0.2);
+    expect(windowVariation({ current: 80, previous: 100 })).toBeCloseTo(-0.2);
   });
 
   // The inverse of the guard's purpose: it exists to avoid printing a change
   // the data cannot support, so each of these must come back undefined rather
   // than as a number the tile would happily render.
-  it('has no rate without a previous day', () => {
-    expect(dailyVariation({ today: 120, previous: 0 })).toBeUndefined();
+  it('has no rate without a previous window', () => {
+    expect(windowVariation({ current: 120, previous: 0 })).toBeUndefined();
   });
 
-  it('has no rate for a negative previous day', () => {
-    expect(dailyVariation({ today: 120, previous: -5 })).toBeUndefined();
+  it('has no rate for a negative previous window', () => {
+    expect(windowVariation({ current: 120, previous: -5 })).toBeUndefined();
   });
 
   it('has no rate for a non-finite figure', () => {
-    expect(dailyVariation({ today: Infinity, previous: 100 })).toBeUndefined();
-    expect(dailyVariation({ today: NaN, previous: 100 })).toBeUndefined();
-    expect(dailyVariation({ today: 10, previous: NaN })).toBeUndefined();
+    expect(windowVariation({ current: Infinity, previous: 100 })).toBeUndefined();
+    expect(windowVariation({ current: NaN, previous: 100 })).toBeUndefined();
+    expect(windowVariation({ current: 10, previous: NaN })).toBeUndefined();
   });
 
-  it('has no rate at all without a day', () => {
-    expect(dailyVariation(undefined)).toBeUndefined();
+  it('has no rate at all without a pair', () => {
+    expect(windowVariation(undefined)).toBeUndefined();
   });
 
   it('reports zero change as zero, not as absent', () => {
-    // The one case that must NOT be undefined: an unchanged day is a fact.
-    expect(dailyVariation({ today: 100, previous: 100 })).toBe(0);
+    // The one case that must NOT be undefined: an unchanged window is a fact.
+    expect(windowVariation({ current: 100, previous: 100 })).toBe(0);
   });
 });
 

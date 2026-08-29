@@ -1,52 +1,49 @@
-import { ArrowLeft, ArrowRight } from '@/assets/pagination';
+import { NUMBER_LOCALE, formatShare } from '@/components/DataList/format';
+import { ShareTrack } from '@/components/DataList/styles';
 import { useDeferred } from '@/components/DataList/useDeferred';
 import { smartContractsStatisticCall } from '@/services/requests/smartContracts';
+import { parseAddress } from '@/utils/parseValues';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { topContracts } from '../summaryFigures';
+import { contractLabel } from './label';
 import {
-  CarouselArrow,
-  CarouselRow,
-  CarouselTrack,
+  CardAddress,
+  CardCount,
+  CardCountLabel,
+  CardName,
+  CardRank,
+  CardTopRow,
+  ContractCard,
   EmptyNote,
+  PodiumRow,
+  RankedList,
+  RankedRow,
+  RowBar,
+  RowCount,
+  RowName,
+  RowRank,
   SectionNote,
   SectionTitle,
 } from './styles';
-import {
-  BarsVariant,
-  CardsVariant,
-  FeaturedVariant,
-  isVariant,
-  MostUsedVariant,
-  RankedVariant,
-} from './variants';
-
-/** Which variants scroll sideways and so need the arrows around them. */
-const SCROLLING: MostUsedVariant[] = ['cards', 'bars'];
 
 /**
- * The busiest contracts on chain.
+ * The busiest contracts on chain: the podium as cards, the rest as rows, all
+ * ten on screen at once.
  *
- * The counts are all-time, verified against the proxy's own query: it filters
- * successful type-63 transactions and adds a time range only when an `epoch`
- * parameter is passed, which this page does not send. The section used to be
- * labelled "today", which the numbers never supported.
+ * Replaces a horizontal carousel that showed 5,19 of its 10 cards at 1440px
+ * and 1,50 at 390px (measured), behind arrows that were hardcoded enabled at
+ * both ends.
+ *
+ * The counts are all-time, verified against the proxy's own aggregation: it
+ * filters successful type-63 transactions and adds a time range only when an
+ * `epoch` parameter is passed, which this page does not send. The section used
+ * to be labelled "today", which the numbers never supported.
  */
 const MostUsed: React.FC = () => {
   const { t } = useTranslation(['smartContracts']);
-  const router = useRouter();
   const deferred = useDeferred();
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
-
-  // TEMPORARY: the variant switch for choosing between the four candidates.
-  // Removed with `variants.tsx` once one is picked.
-  const variant: MostUsedVariant = isVariant(router.query.carousel)
-    ? router.query.carousel
-    : 'cards';
 
   const { data, isLoading } = useQuery({
     queryKey: ['smartContractsStatistic'],
@@ -58,48 +55,8 @@ const MostUsed: React.FC = () => {
     gcTime: 15 * 60_000,
   });
 
-  const readEdges = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    setAtStart(track.scrollLeft <= 1);
-    // A pixel of slack: fractional layout widths mean scrollLeft never reaches
-    // the exact difference, so an exact comparison never disables the arrow.
-    setAtEnd(track.scrollLeft >= track.scrollWidth - track.clientWidth - 1);
-  }, []);
-
-  useEffect(() => {
-    readEdges();
-  }, [readEdges, data, variant]);
-
-  const scrollBy = (direction: 1 | -1): void => {
-    const track = trackRef.current;
-    if (!track) return;
-    track.scrollLeft += direction * track.offsetWidth;
-  };
-
   const busiest = topContracts(data?.statistics, 10);
-  const countLabel = t('smartContracts:Table.Transactions', {
-    defaultValue: 'Transactions',
-  });
-
-  const body = (): React.ReactElement | null => {
-    if (!busiest) return null;
-    const props = {
-      segments: busiest.segments,
-      total: busiest.total,
-      countLabel,
-    };
-    switch (variant) {
-      case 'bars':
-        return <BarsVariant {...props} />;
-      case 'ranked':
-        return <RankedVariant {...props} />;
-      case 'featured':
-        return <FeaturedVariant {...props} />;
-      default:
-        return <CardsVariant {...props} />;
-    }
-  };
+  const leaderCount = busiest?.segments[0]?.count ?? 0;
 
   return (
     <section aria-labelledby="most-used-heading">
@@ -122,37 +79,64 @@ const MostUsed: React.FC = () => {
         </EmptyNote>
       )}
 
-      {busiest && SCROLLING.includes(variant) && (
-        <CarouselRow>
-          <CarouselArrow
-            type="button"
-            onClick={() => scrollBy(-1)}
-            disabled={atStart}
-            $enabled={!atStart}
-            aria-label={t('smartContracts:List.ScrollBack', {
-              defaultValue: 'Scroll back',
-            })}
-          >
-            <ArrowLeft />
-          </CarouselArrow>
-          <CarouselTrack ref={trackRef} onScroll={readEdges} tabIndex={0}>
-            {body()}
-          </CarouselTrack>
-          <CarouselArrow
-            type="button"
-            onClick={() => scrollBy(1)}
-            disabled={atEnd}
-            $enabled={!atEnd}
-            aria-label={t('smartContracts:List.ScrollForward', {
-              defaultValue: 'Scroll forward',
-            })}
-          >
-            <ArrowRight />
-          </CarouselArrow>
-        </CarouselRow>
-      )}
+      {busiest && (
+        <>
+          <PodiumRow>
+            {busiest.segments.slice(0, 3).map((segment, index) => (
+              <ContractCard
+                key={segment.address}
+                href={`/smart-contract/${segment.address}`}
+                title={`${contractLabel(segment, 60)} · ${segment.address}`}
+              >
+                <CardTopRow>
+                  <CardRank>{index + 1}</CardRank>
+                  <CardCountLabel>
+                    {formatShare(segment.count, busiest.total)}
+                  </CardCountLabel>
+                </CardTopRow>
+                <div>
+                  <CardName>{contractLabel(segment)}</CardName>
+                  <CardAddress>{parseAddress(segment.address, 10)}</CardAddress>
+                </div>
+                <CardCount>
+                  {segment.count.toLocaleString(NUMBER_LOCALE)}
+                </CardCount>
+              </ContractCard>
+            ))}
+          </PodiumRow>
 
-      {busiest && !SCROLLING.includes(variant) && body()}
+          <RankedList>
+            {busiest.segments.slice(3).map((segment, index) => (
+              <li key={segment.address}>
+                <RankedRow
+                  href={`/smart-contract/${segment.address}`}
+                  title={`${contractLabel(segment, 60)} · ${segment.address}`}
+                >
+                  <RowRank>{index + 4}</RowRank>
+                  <RowName>{contractLabel(segment, 20)}</RowName>
+                  {/* Scaled against the leader, not the sum: against the sum
+                      the tenth bar is a two-pixel stub that says nothing. */}
+                  <ShareTrack $fluid>
+                    <RowBar
+                      $delay={index * 40}
+                      style={{
+                        width:
+                          leaderCount > 0
+                            ? `${(segment.count / leaderCount) * 100}%`
+                            : '0%',
+                      }}
+                    />
+                  </ShareTrack>
+                  <RowCount>
+                    {segment.count.toLocaleString(NUMBER_LOCALE)}
+                    {` · ${formatShare(segment.count, busiest.total)}`}
+                  </RowCount>
+                </RankedRow>
+              </li>
+            ))}
+          </RankedList>
+        </>
+      )}
     </section>
   );
 };

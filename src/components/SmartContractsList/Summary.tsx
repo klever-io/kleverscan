@@ -14,7 +14,6 @@ import {
 import { useDeferred } from '@/components/DataList/useDeferred';
 import Skeleton from '@/components/Skeleton';
 import {
-  contractActivitySharesCall,
   contractTransactions24hCall,
   smartContractsListCall,
   smartContractTotalTransactionsListCall,
@@ -25,6 +24,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useTheme } from 'styled-components';
+import { contractLabel } from './MostUsed/label';
 import ContractsSummaryLoadingCard, {
   FiguresBarPlaceholder,
 } from './LoadingCard';
@@ -34,6 +34,7 @@ import {
   SummaryContractLink,
 } from './styles';
 import { shareModel, topContracts } from './summaryFigures';
+import { CONTRACT_SHARES_QUERY } from './sharesQuery';
 
 /**
  * A quarter of an hour. These are chain-wide totals that move by fractions of
@@ -72,14 +73,10 @@ const ContractsSummary: React.FC = () => {
   });
 
   const { data: shares, isPending: sharesPending } = useQuery({
-    // One key with the podium below: both draw shares from this bundle, so
-    // the two surfaces cannot compute a share against different bases.
-    queryKey: ['contractActivityShares'],
-    queryFn: contractActivitySharesCall,
+    ...CONTRACT_SHARES_QUERY,
     // Behind the list, not beside it: the bar is decoration nobody waits on,
     // and the statistics call is the slowest of the page (0,55s measured).
     enabled: deferred,
-    ...FIGURE_CACHE,
   });
 
   if (isLoading) {
@@ -239,10 +236,7 @@ const ContractsSummary: React.FC = () => {
             {model.segments.map((segment, index) => (
               <LegendItem key={segment.address}>
                 <LegendDot $color={segmentColor(index)} />
-                {segment.name
-                  ? safeContractName(segment.name) ||
-                    parseAddress(segment.address, 10)
-                  : parseAddress(segment.address, 10)}{' '}
+                {contractLabel(segment, 10)}{' '}
                 <strong>{formatShare(segment.count, model.total)}</strong>
               </LegendItem>
             ))}

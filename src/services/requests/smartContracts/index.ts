@@ -100,7 +100,10 @@ const successfulContractTransactionsCall = async (): Promise<
     });
 
     if (!res.error || res.error === '') {
-      return res.pagination.totalRecords;
+      const total = res.pagination?.totalRecords;
+      // Same null-on-200 payload as the sibling call below; undefined lets
+      // shareModel refuse the denominator instead of it failing silently.
+      return Number.isFinite(total) ? total : undefined;
     }
   } catch (error) {
     console.error(error);

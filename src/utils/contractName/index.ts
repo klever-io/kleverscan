@@ -51,6 +51,10 @@ const LOOKS_LIKE_AN_ADDRESS = /^klv1[0-9a-z]{6,}/i;
  * is the one an attacker gets to pick.
  */
 export const safeContractName = (name: string): string => {
+  // The type is a promise the network does not keep: a truthy non-string here
+  // reaches .replace mid-render and would take the whole surface down.
+  if (typeof name !== 'string') return '';
+
   const cleaned = name.replace(DECEPTIVE, '').replace(/\s+/g, ' ').trim();
   const shown =
     cleaned.length > NAME_LIMIT

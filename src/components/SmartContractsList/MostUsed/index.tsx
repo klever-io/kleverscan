@@ -1,12 +1,12 @@
 import { NUMBER_LOCALE, formatShare } from '@/components/DataList/format';
 import { useDeferred } from '@/components/DataList/useDeferred';
 import Skeleton from '@/components/Skeleton';
-import { contractActivitySharesCall } from '@/services/requests/smartContracts';
 import { parseAddress } from '@/utils/parseValues';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { shareModel, topContracts } from '../summaryFigures';
+import { CONTRACT_SHARES_QUERY } from '../sharesQuery';
 import { contractLabel } from './label';
 import {
   CardAddress,
@@ -105,15 +105,10 @@ const MostUsed: React.FC = () => {
   const deferred = useDeferred();
 
   const { data, isPending, isError } = useQuery({
-    // The summary bar reads this same bundle under this same key, so a card
-    // and the bar can never divide one contract by two different bases.
-    queryKey: ['contractActivityShares'],
-    queryFn: contractActivitySharesCall,
+    ...CONTRACT_SHARES_QUERY,
     // Behind the list: this is the slowest of the page's calls (measured
     // 0,55s against 0,12s for the others) and nobody waits on it.
     enabled: deferred,
-    staleTime: 15 * 60_000,
-    gcTime: 15 * 60_000,
   });
 
   const busiest = topContracts(data?.statistics, 5);

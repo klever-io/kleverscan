@@ -32,41 +32,41 @@
     }
   },
   "Table": {
-    "Contract": "Contract",
-    "Deployed": "Deployed",
-    "Deployer": "Deployer",
-    "DeployTx": "Deploy Tx",
-    "Upgrades": "Upgrades",
-    "Transactions": "Transactions"
+    "Contract": "Contrato",
+    "Deployed": "Implantado",
+    "Deployer": "Implantador",
+    "DeployTx": "Tx de implantação",
+    "Upgrades": "Atualizações",
+    "Transactions": "Transações"
   },
   "List": {
-    "SummaryAria": "Smart contract statistics",
-    "ContractsDeployed": "Contracts deployed",
-    "ContractTransactions": "Contract transactions",
-    "MostUsed": "Most used contract",
-    "LeaderTransactions": "{{amount}} transactions, all time",
-    "MostUsedNote": "By successful contract transactions, all time.",
-    "NoStatistics": "No contract activity has been recorded yet.",
-    "DeployerCountTitle": "Show the {{count}} contracts from this deployer",
-    "ClearFilter": "Clear filter",
-    "Last24h": "{{formatted}} in the last 24 hours",
-    "MostUsedLoading": "Loading the most used applications",
-    "OtherContracts": "Other contracts",
-    "DeployedByShort": "Deployed by",
+    "SummaryAria": "Estatísticas de contratos inteligentes",
+    "ContractsDeployed": "Contratos implantados",
+    "ContractTransactions": "Transações de contratos",
+    "MostUsed": "Contrato mais utilizado",
+    "LeaderTransactions": "{{amount}} transações, desde o início",
+    "MostUsedNote": "Por transações de contrato bem-sucedidas, desde o início.",
+    "NoStatistics": "Nenhuma atividade de contrato foi registrada até agora.",
+    "DeployerCountTitle": "Mostrar os {{count}} contratos deste implantador",
+    "ClearFilter": "Limpar filtro",
+    "Last24h": "{{formatted}} nas últimas 24 horas",
+    "MostUsedLoading": "Carregando as aplicações mais utilizadas",
+    "OtherContracts": "Outros contratos",
+    "DeployedByShort": "Implantado por",
     "TransactionsShort": "Tx"
   },
   "Filters": {
-    "SortBy": "Sort by",
-    "Order": "Order",
-    "SortTransactions": "Transactions",
-    "SortDeployed": "Deployed",
-    "OrderDesc": "Descending",
-    "OrderAsc": "Ascending"
+    "SortBy": "Ordenar por",
+    "Order": "Ordem",
+    "SortTransactions": "Transações",
+    "SortDeployed": "Implantado",
+    "OrderDesc": "Decrescente",
+    "OrderAsc": "Crescente"
   },
   "Common": {
-    "CopyAddress": "Copy contract address",
-    "AddressCopied": "Contract address copied to clipboard",
-    "OpenContract": "Open contract",
-    "OpenInNewTab": "Open in a new tab"
+    "CopyAddress": "Copiar endereço do contrato",
+    "AddressCopied": "Endereço do contrato copiado para a área de transferência",
+    "OpenContract": "Abrir contrato",
+    "OpenInNewTab": "Abrir em uma nova aba"
   }
 }

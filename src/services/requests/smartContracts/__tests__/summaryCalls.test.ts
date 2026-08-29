@@ -43,6 +43,19 @@ describe('contractActivitySharesCall', () => {
       allSuccessful: undefined,
     });
   });
+
+  it('drops a null denominator instead of passing it along', async () => {
+    // The same null-on-200 payload the total call guards against; shareModel
+    // must see undefined, not null wearing a number type.
+    respond({
+      'sc/statistics': { error: '', data: [] },
+      'transaction/list': { error: '', pagination: { totalRecords: null } },
+    });
+    await expect(contractActivitySharesCall()).resolves.toEqual({
+      statistics: [],
+      allSuccessful: undefined,
+    });
+  });
 });
 
 describe('finite guards on totals', () => {

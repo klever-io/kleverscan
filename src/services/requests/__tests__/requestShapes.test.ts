@@ -34,10 +34,12 @@ import {
   assetsRequest,
 } from '@/services/requests/account';
 import {
+  getAsset,
   getAssetByPartialSymbol,
   transactionCall,
 } from '@/services/requests/asset';
-import { requestAssets } from '@/services/requests/assets';
+import { requestAssets, requestAssetsQuery } from '@/services/requests/assets';
+import { requestAssetsPoolsQuery } from '@/services/requests/assetsPools';
 import { collectionListCall } from '@/services/requests/collection';
 import { requestAssetsList } from '@/services/requests/ito';
 import { getMarketplace } from '@/services/requests/marketplace';
@@ -225,5 +227,29 @@ describe('shapes that must not drift', () => {
       route: 'assets/list',
       query: { asset: 'KLV,KFI' },
     });
+  });
+});
+
+describe('preserved big amounts stay opt-in per request', () => {
+  it('the exact-display requests ask for the digit twins', async () => {
+    mockGet.mockResolvedValue({
+      error: '',
+      data: { assets: [], pools: [] },
+      pagination: { totalPages: 1 },
+    });
+
+    await requestAssetsQuery(1, 10, routerWith({}));
+    await getAsset('KLV');
+    await requestAssetsPoolsQuery(1, 10, routerWith({}));
+
+    expect(callArg(0)).toMatchObject({ preserveBigAmounts: true });
+    expect(callArg(1)).toMatchObject({ preserveBigAmounts: true });
+    expect(callArg(2)).toMatchObject({ preserveBigAmounts: true });
+  });
+
+  it('a transaction request does not, so the raw view stays verbatim', async () => {
+    await transactionCall(routerWith({ asset: 'KLV' }));
+
+    expect(callArg()).not.toHaveProperty('preserveBigAmounts');
   });
 });

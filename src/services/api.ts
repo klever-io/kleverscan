@@ -25,6 +25,13 @@ export interface IProps {
   service?: Service;
   requestMode?: RequestMode;
   tries?: number;
+  /**
+   * Opt-in for `preserveBigDigits` on this response. Off by default on
+   * purpose: the field names also occur inside transaction payloads, and the
+   * raw-JSON surfaces (the Raw Tx card, the JSON export) must show the wire
+   * verbatim. A consumer that reads `<field>String` twins asks for them here.
+   */
+  preserveBigAmounts?: boolean;
 }
 
 export interface IAssetInfoRequestProps {
@@ -199,7 +206,8 @@ export const withoutBody = async (
 ): Promise<any> => {
   const request = async () => {
     try {
-      const { route, query, service, apiVersion } = getProps(props);
+      const { route, query, service, apiVersion, preserveBigAmounts } =
+        getProps(props);
       const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
       // No Content-Type here on purpose: this path carries no body, so the
@@ -238,7 +246,8 @@ export const withoutBody = async (
 
       // Through text so the exact digits survive the parse boundary (#679);
       // a body that is not JSON still lands in the catch below, as before.
-      return JSON.parse(preserveBigDigits(await response.text()));
+      const text = await response.text();
+      return JSON.parse(preserveBigAmounts ? preserveBigDigits(text) : text);
     } catch (error) {
       return {
         data: null,

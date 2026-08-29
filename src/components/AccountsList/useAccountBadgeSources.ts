@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { genesisTimestampQuery, validatorOwnersQuery } from './badgeQueries';
 
 export interface IAccountBadgeSources {
-  owners: ValidatorOwners | undefined;
+  /** undefined while loading or held back; null when the fetch failed. */
+  owners: ValidatorOwners | null | undefined;
   genesisTimestamp: number | undefined;
 }
 
@@ -25,7 +26,10 @@ export const useAccountBadgeSources = (
   });
 
   return {
-    owners: owners ?? undefined,
+    // Passed through as-is: the query resolves null on failure
+    // (failure-as-data), and erasing that to undefined here made the
+    // announcement's failed-fetch silence contract unreachable.
+    owners,
     genesisTimestamp: genesisTimestamp ?? undefined,
   };
 };

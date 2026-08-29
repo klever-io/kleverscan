@@ -27,32 +27,36 @@ const AccountBadges: React.FC<IAccountBadgesProps> = ({ badges }) => {
       })
     : '';
 
+  const foundationMsg = t('accounts:Badges.FoundationTooltip');
+  const roleMsg = listState ? `${roleTooltip} (${listState})` : roleTooltip;
+
   // Focusable tooltips instead of `title`: a title never opens from the
   // keyboard or on touch, and readers expose it inconsistently (#699). The
-  // list state also rides inside the pill as hidden text, so it reads with
-  // the badge; visible it is not, because it changes per epoch and this row
-  // is not where someone comes to read it.
+  // full message also rides inside each pill as hidden text, per the
+  // multi-contract badge precedent: the tooltip mounts only on focus, so a
+  // reader in browse mode would otherwise never meet the text at all.
   return (
     <>
       {foundation && (
         <Tooltip
-          msg={t('accounts:Badges.FoundationTooltip')}
+          msg={foundationMsg}
           focusable
           Component={() => (
             <BadgePill $variant="accent">
               {t('accounts:Badges.Foundation')}
+              <VisuallyHidden>{`, ${foundationMsg}`}</VisuallyHidden>
             </BadgePill>
           )}
         />
       )}
       {validator && (
         <Tooltip
-          msg={listState ? `${roleTooltip} (${listState})` : roleTooltip}
+          msg={roleMsg}
           focusable
           Component={() => (
             <BadgePill $variant={genesisValidator ? 'success' : 'neutral'}>
               {t(`accounts:Badges.${roleKey}`)}
-              {listState && <VisuallyHidden>{`, ${listState}`}</VisuallyHidden>}
+              <VisuallyHidden>{`, ${roleMsg}`}</VisuallyHidden>
             </BadgePill>
           )}
         />

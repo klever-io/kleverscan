@@ -262,6 +262,9 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     if (onClick) {
       onClick(allItem);
     }
+    // Clearing empties the button under the keyboard user's focus (the
+    // `empty` style is display:none); land it on the opener, not on <body>.
+    openerRef.current?.focus({ preventScroll: true });
   };
 
   const handleChange = ({
@@ -336,7 +339,12 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     }
   };
 
-  const handleInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+  // On Content rather than on the input: React's onBlur is the bubbling
+  // focusout, so this sees EVERY hop out of the widget. On the input alone,
+  // Tab parked on the opener first ("inside", no close) and the next Tab
+  // left from the opener with no handler, orphaning the panel open.
+  const handleContentBlur = (event: React.FocusEvent<HTMLElement>) => {
+    if (closed) return;
     if (dontBlur) return;
     // Focus moving to the clear button or an option is not "leaving".
     const next = event.relatedTarget as Node | null;
@@ -374,12 +382,12 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       <Content
         onMouseEnter={() => setDontBlur(true)}
         onMouseLeave={() => setDontBlur(false)}
+        onBlur={handleContentBlur}
         data-testid="selector"
         {...contentProps}
       >
         {!closed && (
           <HiddenInput
-            onBlur={handleInputBlur}
             onKeyDown={handleInputKeyDown}
             value={inputValue}
             type={inputType}
@@ -405,6 +413,10 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
         <OpenerButton
           ref={openerRef}
           type="button"
+          // Out of the Tab order while open: focus lives on the search input
+          // then, and this button is a dead stop with a collapsed name. The
+          // Escape/select focus return uses .focus(), which -1 still allows.
+          tabIndex={closed ? undefined : -1}
           aria-haspopup="listbox"
           aria-expanded={!closed}
           aria-controls={!closed ? listboxId : undefined}
@@ -452,6 +464,9 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
             role="listbox"
             id={listboxId}
             aria-labelledby={labelId}
+            // Chromium makes a scrollable box without focusable children a
+            // Tab stop; in an activedescendant pattern the list must not be.
+            tabIndex={-1}
           >
             {!filteredArray.length && !loading ? (
               <span>{notFoundLabel ?? `${title} not found!`}</span>

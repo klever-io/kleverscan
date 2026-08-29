@@ -124,23 +124,30 @@ describe('AccountBadges', () => {
     expect(container.textContent).toBe('');
   });
 
-  it('renders the foundation badge on its own, with its own tooltip', () => {
+  it('renders the foundation badge on its own, with its message readable in place', () => {
     renderBadges({ foundation: true });
 
-    const trigger = triggerOf(screen.getByText('Foundation'));
+    const trigger = screen.getByTestId('tooltip-trigger');
     expect(screen.queryByText('Validator')).toBeNull();
     // The validator pill's tooltip was checked twice and this one never: swapping the two keys passed the whole suite.
-    expect(trigger?.getAttribute('title')).toBe(
+    expect(trigger.getAttribute('title')).toBe(
       "Created in the chain's first block",
+    );
+    // The tooltip only mounts on focus; the hidden copy is what browse-mode
+    // readers get, per the multi-contract badge precedent.
+    expect(trigger.textContent).toBe(
+      "Foundation, Created in the chain's first block",
     );
   });
 
-  it('renders the plain validator badge with its role tooltip, and no state text', () => {
+  it('renders the plain validator badge with its role message, no state', () => {
     renderBadges({ validator: true });
 
-    const pill = screen.getByText('Validator');
-    expect(pill.textContent).toBe('Validator');
-    expect(triggerOf(pill)?.getAttribute('title')).toBe(
+    const trigger = screen.getByTestId('tooltip-trigger');
+    expect(trigger.textContent).toBe(
+      'Validator, Owns a registered validator node',
+    );
+    expect(trigger.getAttribute('title')).toBe(
       'Owns a registered validator node',
     );
   });
@@ -148,10 +155,10 @@ describe('AccountBadges', () => {
   it('reads the list state with the badge and appends it to the tooltip', () => {
     renderBadges({ validator: true, validatorList: 'jailed' });
 
-    // The hidden span makes a reader say "Validator, Jailed" in the row
-    // itself, instead of hiding the state behind a hover-only title.
     const trigger = screen.getByTestId('tooltip-trigger');
-    expect(trigger.textContent).toBe('Validator, Jailed');
+    expect(trigger.textContent).toBe(
+      'Validator, Owns a registered validator node (Jailed)',
+    );
     expect(trigger.getAttribute('title')).toBe(
       'Owns a registered validator node (Jailed)',
     );
@@ -173,7 +180,9 @@ describe('AccountBadges', () => {
     renderBadges({ validator: true, validatorList: 'somethingNew' });
 
     const trigger = screen.getByTestId('tooltip-trigger');
-    expect(trigger.textContent).toBe('Validator, somethingNew');
+    expect(trigger.textContent).toBe(
+      'Validator, Owns a registered validator node (somethingNew)',
+    );
     expect(trigger.getAttribute('title')).toBe(
       'Owns a registered validator node (somethingNew)',
     );
@@ -187,7 +196,9 @@ describe('AccountBadges', () => {
     });
 
     const trigger = screen.getByTestId('tooltip-trigger');
-    expect(trigger.textContent).toBe('Genesis validator, Elected');
+    expect(trigger.textContent).toBe(
+      'Genesis validator, Owns a validator registered in the genesis block (Elected)',
+    );
     expect(trigger.getAttribute('title')).toBe(
       'Owns a validator registered in the genesis block (Elected)',
     );
@@ -199,7 +210,9 @@ describe('AccountBadges', () => {
     // Suppression happens upstream in accountBadges; this component renders what it is handed.
     renderBadges({ foundation: true, validator: true });
 
-    expect(screen.getByText('Foundation')).toBeTruthy();
-    expect(screen.getByText('Validator')).toBeTruthy();
+    const triggers = screen.getAllByTestId('tooltip-trigger');
+    expect(triggers).toHaveLength(2);
+    expect(triggers[0].textContent?.startsWith('Foundation')).toBe(true);
+    expect(triggers[1].textContent?.startsWith('Validator')).toBe(true);
   });
 });

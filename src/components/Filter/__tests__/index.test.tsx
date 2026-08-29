@@ -550,6 +550,69 @@ describe('Filter keyboard operation', () => {
     expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
   });
 
+  it('closes when the second Tab hop leaves via the opener, not just via the input', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    const openerElement = opener();
+    fireEvent.click(openerElement);
+    const input = await screen.findByLabelText('Search Status');
+
+    // Hop one: input to opener stays inside, must not close.
+    fireEvent.blur(input, { relatedTarget: openerElement });
+    expect(screen.getByLabelText('Search Status')).toBeInTheDocument();
+
+    // Hop two: opener to the rest of the page. Handled on Content, so the
+    // panel cannot be orphaned open the way an input-only handler allowed.
+    fireEvent.blur(openerElement, { relatedTarget: document.body });
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+  });
+
+  it('takes the opener out of the tab order while open, and the listbox always', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    const openerElement = opener();
+    expect(openerElement).not.toHaveAttribute('tabindex');
+
+    fireEvent.click(openerElement);
+    await screen.findByLabelText('Search Status');
+
+    expect(openerElement).toHaveAttribute('tabindex', '-1');
+    expect(screen.getByRole('listbox')).toHaveAttribute('tabindex', '-1');
+  });
+
+  it('returns focus to the opener after clearing, instead of dropping it on body', () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current="Fail"
+        onClick={jest.fn()}
+      />,
+    );
+
+    const openerElement = screen.getByRole('button', { name: 'Status Fail' });
+    const clear = screen.getByRole('button', { name: 'Clear Status filter' });
+    clear.focus();
+
+    // Clearing flips the focused button to display:none via `empty`.
+    fireEvent.click(clear);
+    expect(openerElement).toHaveFocus();
+  });
+
   it('does not close on blur while the pointer rests on the control', async () => {
     renderWithTheme(
       <Filter

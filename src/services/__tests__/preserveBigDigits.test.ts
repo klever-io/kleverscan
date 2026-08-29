@@ -68,24 +68,46 @@ describe('preserveBigDigits', () => {
 });
 
 describe('api.get carries the exact digits through the parse boundary', () => {
-  it('returns both the rounded number and the exact twin', async () => {
+  const withFetchText = async (
+    body: string,
+    props: Parameters<typeof api.get>[0],
+  ) => {
     const original = global.fetch;
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
-      text: async () =>
-        '{"data":{"asset":{"assetId":"EMT-NO9T","circulatingSupply":100000000000000001}},"error":"","code":"successful"}',
+      text: async () => body,
     }) as never;
-
     try {
-      const result = await api.get({ route: 'assets/EMT-NO9T' });
-
-      expect(result.data.asset.circulatingSupply).toBe(100000000000000000);
-      expect(result.data.asset.circulatingSupplyString).toBe(
-        '100000000000000001',
-      );
+      return await api.get(props);
     } finally {
       global.fetch = original;
     }
+  };
+
+  it('returns both the rounded number and the exact twin when asked', async () => {
+    const result = await withFetchText(
+      '{"data":{"asset":{"assetId":"EMT-NO9T","circulatingSupply":100000000000000001}},"error":"","code":"successful"}',
+      { route: 'assets/EMT-NO9T', preserveBigAmounts: true },
+    );
+
+    expect(result.data.asset.circulatingSupply).toBe(100000000000000000);
+    expect(result.data.asset.circulatingSupplyString).toBe(
+      '100000000000000001',
+    );
+  });
+
+  it('leaves a response verbatim without the opt-in, so raw views stay honest', async () => {
+    // A CreateAsset transaction carries the same field names inside its
+    // contract parameter; the Raw Tx card renders this object as-is.
+    const result = await withFetchText(
+      '{"data":{"transaction":{"contract":[{"parameter":{"initialSupply":2100000000000000000,"maxSupply":2100000000000000000}}]}},"error":"","code":"successful"}',
+      { route: 'transaction/abc' },
+    );
+
+    const parameter = result.data.transaction.contract[0].parameter;
+    expect(parameter.initialSupplyString).toBeUndefined();
+    expect(parameter.maxSupplyString).toBeUndefined();
+    expect(Object.keys(parameter)).toEqual(['initialSupply', 'maxSupply']);
   });
 });

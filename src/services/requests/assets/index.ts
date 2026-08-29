@@ -26,5 +26,7 @@ export const requestAssetsQuery = async (
   return api.get({
     route: `assets/list`,
     query: localQuery,
+    // The assets list shows exact supplies in its tooltips (#679).
+    preserveBigAmounts: true,
   });
 };

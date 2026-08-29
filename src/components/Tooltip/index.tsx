@@ -34,6 +34,15 @@ const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
       className="button-tooltip"
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
+      // WCAG 1.4.13: content shown on hover or focus must be dismissible
+      // without moving either. Stops propagation only while actually open,
+      // so a surrounding dialog's Escape keeps working when no tip shows.
+      onKeyDown={event => {
+        if (event.key === 'Escape' && displayMessage) {
+          event.stopPropagation();
+          setDisplayMessage(false);
+        }
+      }}
       {...(focusable && {
         tabIndex: 0,
         onFocus: () => setDisplayMessage(true),

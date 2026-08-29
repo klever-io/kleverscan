@@ -222,6 +222,9 @@ export const Item = styled.div<{ selected: boolean; $active?: boolean }>`
     props.$active &&
     css`
       background-color: ${props => transparentize(0.75, props.theme.lightGray)};
+      /* The tint alone measured ~1.12:1 against unhighlighted rows; the
+         cursor is where Enter lands, so it gets the app's focus color. */
+      border-color: ${props => props.theme.violet};
     `}
 
   &:hover {

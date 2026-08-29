@@ -30,9 +30,8 @@ import {
   SectionTitle,
 } from './styles';
 
-/** Cards on the podium. The share texts divide by the five busiest, the same
- *  denominator the summary bar above uses. */
-const PODIUM = 3;
+/** Cards on the podium. */
+const PODIUM = 4;
 
 /**
  * The same line boxes as the loaded card, so the section holds its height
@@ -87,8 +86,8 @@ const PodiumLoading: React.FC<{ label: string }> = ({ label }) => (
 );
 
 /**
- * The busiest contracts on chain, top three, each with its share of the ten
- * busiest.
+ * The busiest contracts on chain, top four, each with its share of all
+ * contract activity.
  *
  * Replaces a horizontal carousel that showed 5,19 of its 10 cards at 1440px
  * and 1,50 at 390px (measured), behind arrows that were hardcoded enabled at

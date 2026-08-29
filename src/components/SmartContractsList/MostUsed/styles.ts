@@ -59,7 +59,7 @@ export const EmptyNote = styled.p`
  */
 export const PodiumRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
 
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {

@@ -1,4 +1,4 @@
-import { topContracts, windowVariation } from '../summaryFigures';
+import { shareModel, topContracts, windowVariation } from '../summaryFigures';
 
 describe('windowVariation', () => {
   it('reports growth as a rate', () => {
@@ -110,5 +110,46 @@ describe('topContracts', () => {
     // still reporting a total, and the bar would draw nothing inside itself.
     const result = topContracts([entry('a', 10)], 0);
     expect(result?.segments).toHaveLength(1);
+  });
+});
+
+describe('shareModel', () => {
+  const top = {
+    total: 300,
+    segments: [
+      { address: 'a', name: 'A', count: 200 },
+      { address: 'b', name: undefined, count: 100 },
+    ],
+  };
+
+  it('divides by the chain-wide total and names the remainder', () => {
+    const model = shareModel(top, 1000);
+    expect(model).toEqual({ total: 1000, segments: top.segments, other: 700 });
+  });
+
+  it('clamps a denominator that lags below its own parts', () => {
+    // The two figures come from different endpoints read moments apart; a
+    // lagging total would draw a bar wider than itself and shares over 100%.
+    const model = shareModel(top, 250);
+    expect(model?.total).toBe(300);
+    expect(model?.other).toBe(0);
+  });
+
+  // The inverse of the guard: every unusable denominator must yield nothing,
+  // because a share silently recomputed against the segment sum is exactly
+  // the inconsistency this model exists to prevent.
+  it.each([
+    ['no denominator', undefined],
+    ['a zero denominator', 0],
+    ['a negative denominator', -5],
+    ['a non-finite denominator', Infinity],
+    ['a NaN denominator', NaN],
+    ['a string denominator', '1000' as unknown as number],
+  ])('yields no shares for %s', (_label, all) => {
+    expect(shareModel(top, all as number | undefined)).toBeUndefined();
+  });
+
+  it('yields nothing without segments to share', () => {
+    expect(shareModel(undefined, 1000)).toBeUndefined();
   });
 });

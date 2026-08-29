@@ -1,12 +1,12 @@
 import { NUMBER_LOCALE, formatShare } from '@/components/DataList/format';
 import { useDeferred } from '@/components/DataList/useDeferred';
 import Skeleton from '@/components/Skeleton';
-import { smartContractsStatisticCall } from '@/services/requests/smartContracts';
+import { contractActivitySharesCall } from '@/services/requests/smartContracts';
 import { parseAddress } from '@/utils/parseValues';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
-import { topContracts } from '../summaryFigures';
+import { shareModel, topContracts } from '../summaryFigures';
 import { contractLabel } from './label';
 import {
   CardAddress,
@@ -104,8 +104,10 @@ const MostUsed: React.FC = () => {
   const deferred = useDeferred();
 
   const { data, isPending } = useQuery({
-    queryKey: ['smartContractsStatistic'],
-    queryFn: smartContractsStatisticCall,
+    // The summary bar reads this same bundle under this same key, so a card
+    // and the bar can never divide one contract by two different bases.
+    queryKey: ['contractActivityShares'],
+    queryFn: contractActivitySharesCall,
     // Behind the list: this is the slowest of the page's calls (measured
     // 0,55s against 0,12s for the others) and nobody waits on it.
     enabled: deferred,
@@ -113,10 +115,11 @@ const MostUsed: React.FC = () => {
     gcTime: 15 * 60_000,
   });
 
-  // Five, the same denominator as the summary bar above: one contract showing
-  // two different percentages on one page reads as a bug, whatever the
-  // captions say. Measured complaint: 39,1% in the bar against 32,6% here.
   const busiest = topContracts(data?.statistics, 5);
+  // Shares divide by ALL successful contract transactions, the same model the
+  // summary bar draws from. Dividing by the segments' own sum read as a
+  // market share it never was, and disagreed with the bar above.
+  const model = shareModel(busiest, data?.allSuccessful);
   const leaderCount = busiest?.segments[0]?.count ?? 0;
   const loadingLabel = t('smartContracts:List.MostUsedLoading', {
     defaultValue: 'Loading the most used applications',
@@ -131,8 +134,7 @@ const MostUsed: React.FC = () => {
       </SectionTitle>
       <SectionNote>
         {t('smartContracts:List.MostUsedNote', {
-          defaultValue:
-            'By successful contract transactions, all time. Shares are of the five busiest.',
+          defaultValue: 'By successful contract transactions, all time.',
         })}
       </SectionNote>
 
@@ -190,9 +192,13 @@ const MostUsed: React.FC = () => {
                     }}
                   />
                 </CardTrack>
-                <CardShare>
-                  {formatShare(segment.count, busiest.total)}
-                </CardShare>
+                {/* Left out rather than recomputed against the segment sum
+                    when the denominator failed to arrive. */}
+                {model && (
+                  <CardShare>
+                    {formatShare(segment.count, model.total)}
+                  </CardShare>
+                )}
               </CardBarRow>
             </ContractCard>
           ))}

@@ -16,9 +16,9 @@ import { useDeferred } from '@/components/DataList/useDeferred';
 import Skeleton from '@/components/Skeleton';
 import { TrendValue } from '@/components/TransactionsList/styles';
 import {
+  contractActivitySharesCall,
   contractTransactions24hCall,
   smartContractsListCall,
-  smartContractsStatisticCall,
   smartContractTotalTransactionsListCall,
 } from '@/services/requests/smartContracts';
 import { safeContractName } from '@/utils/contractName';
@@ -31,7 +31,7 @@ import ContractsSummaryLoadingCard, {
   FiguresBarPlaceholder,
 } from './LoadingCard';
 import { ContractsSummaryCard, SummaryContractLink } from './styles';
-import { topContracts, windowVariation } from './summaryFigures';
+import { shareModel, topContracts, windowVariation } from './summaryFigures';
 
 /**
  * A quarter of an hour. These are chain-wide totals that move by fractions of
@@ -74,11 +74,13 @@ const ContractsSummary: React.FC = () => {
     ...FIGURE_CACHE,
   });
 
-  const { data: statistics, isPending: statisticsPending } = useQuery({
-    queryKey: ['smartContractsStatistic'],
-    queryFn: smartContractsStatisticCall,
+  const { data: shares, isPending: sharesPending } = useQuery({
+    // One key with the podium below: both draw shares from this bundle, so
+    // the two surfaces cannot compute a share against different bases.
+    queryKey: ['contractActivityShares'],
+    queryFn: contractActivitySharesCall,
     // Behind the list, not beside it: the bar is decoration nobody waits on,
-    // and this is the slowest of the four calls (measured 0,55s against 0,12s).
+    // and the statistics call is the slowest of the page (0,55s measured).
     enabled: deferred,
     ...FIGURE_CACHE,
   });
@@ -89,7 +91,8 @@ const ContractsSummary: React.FC = () => {
   if (!data) return null;
 
   const { contracts, transactions, windows } = data;
-  const busiest = topContracts(statistics?.statistics);
+  const busiest = topContracts(shares?.statistics);
+  const model = shareModel(busiest, shares?.allSuccessful);
   const variation = windowVariation(
     windows && {
       current: windows.last24h,
@@ -106,21 +109,26 @@ const ContractsSummary: React.FC = () => {
   const leader = busiest?.segments[0];
   const leaderName = leader?.name ? safeContractName(leader.name) : '';
 
+  // blueGray500 is reserved for the Other remainder, the way the transactions
+  // breakdown mutes its own computed rest; rose is the fifth distinct hue.
   const segmentColor = (index: number): string =>
-    [
-      theme.violet,
-      theme.purple,
-      theme.lightPurple,
-      theme.green,
-      theme.blueGray500,
-    ][index % 5];
+    [theme.violet, theme.purple, theme.lightPurple, theme.green, theme.rose][
+      index % 5
+    ];
 
-  const barLabel = (busiest?.segments ?? [])
-    .map(
-      segment =>
-        `${segment.name ? safeContractName(segment.name) || segment.address : segment.address} ${formatShare(segment.count, busiest?.total ?? 0)}`,
-    )
-    .join(', ');
+  const otherLabel = t('smartContracts:List.OtherContracts', {
+    defaultValue: 'Other contracts',
+  });
+
+  const barLabel = model
+    ? [
+        ...model.segments.map(
+          segment =>
+            `${segment.name ? safeContractName(segment.name) || segment.address : segment.address} ${formatShare(segment.count, model.total)}`,
+        ),
+        `${otherLabel} ${formatShare(model.other, model.total)}`,
+      ].join(', ')
+    : '';
 
   return (
     <ContractsSummaryCard aria-label={label} data-testid="contracts-summary">
@@ -190,7 +198,7 @@ const ContractsSummary: React.FC = () => {
             </TileSub>
           </Tile>
         ) : (
-          statisticsPending && (
+          sharesPending && (
             <Tile aria-busy="true">
               <TileLabel>
                 {t('smartContracts:List.MostUsed', {
@@ -215,42 +223,57 @@ const ContractsSummary: React.FC = () => {
         )}
       </TilesGrid>
 
-      {!busiest && statisticsPending && <FiguresBarPlaceholder />}
+      {!model && sharesPending && <FiguresBarPlaceholder />}
 
-      {busiest && (
+      {model && (
         <>
           <DistBar role="img" aria-label={barLabel}>
-            {busiest.segments.map((segment, index) => (
+            {model.segments.map((segment, index) => (
               <DistSegment
                 key={segment.address}
                 $color={segmentColor(index)}
                 $delay={index * 60}
                 style={{
-                  width: `${(segment.count / busiest.total) * 100}%`,
+                  width: `${(segment.count / model.total) * 100}%`,
                 }}
                 title={`${segment.name ? safeContractName(segment.name) || segment.address : segment.address} · ${segment.count.toLocaleString(NUMBER_LOCALE)}`}
                 aria-hidden="true"
               />
             ))}
+            {model.other > 0 && (
+              <DistSegment
+                $color={theme.blueGray500}
+                $delay={model.segments.length * 60}
+                $dimmed
+                style={{ width: `${(model.other / model.total) * 100}%` }}
+                title={`${otherLabel} · ${model.other.toLocaleString(NUMBER_LOCALE)}`}
+                aria-hidden="true"
+              />
+            )}
           </DistBar>
           <LegendRow>
-            {/* "Among the busiest five" and not "of all activity": the endpoint
-                returns a top ten, so the denominator is those, not the chain. */}
             <LegendItem>
               {t('smartContracts:List.BarCaption', {
-                defaultValue: 'Share among the five busiest contracts',
+                defaultValue: 'Share of all contract transactions',
               })}
             </LegendItem>
-            {busiest.segments.map((segment, index) => (
+            {model.segments.map((segment, index) => (
               <LegendItem key={segment.address}>
                 <LegendDot $color={segmentColor(index)} />
                 {segment.name
                   ? safeContractName(segment.name) ||
                     parseAddress(segment.address, 10)
                   : parseAddress(segment.address, 10)}{' '}
-                <strong>{formatShare(segment.count, busiest.total)}</strong>
+                <strong>{formatShare(segment.count, model.total)}</strong>
               </LegendItem>
             ))}
+            {model.other > 0 && (
+              <LegendItem $dimmed>
+                <LegendDot $color={theme.blueGray500} />
+                {otherLabel}{' '}
+                <strong>{formatShare(model.other, model.total)}</strong>
+              </LegendItem>
+            )}
           </LegendRow>
         </>
       )}

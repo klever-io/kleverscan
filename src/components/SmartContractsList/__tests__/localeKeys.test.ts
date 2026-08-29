@@ -26,6 +26,7 @@ const USED_KEYS = [
   'List.MostUsed',
   'List.LeaderTransactions',
   'List.BarCaption',
+  'List.OtherContracts',
   'List.MostUsedNote',
   'List.MostUsedLoading',
   'List.NoStatistics',

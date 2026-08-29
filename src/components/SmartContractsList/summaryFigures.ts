@@ -86,3 +86,40 @@ export const topContracts = (
 
   return { total, segments };
 };
+
+export interface IShareModel {
+  /** The denominator: every successful contract transaction, chain-wide. */
+  total: number;
+  segments: IContractShare[];
+  /** What the drawn segments leave of the total: every other contract. */
+  other: number;
+}
+
+/**
+ * The share figures, divided by ALL contract activity rather than by the
+ * segments' own sum. A share against the sum of the five busiest read as a
+ * market share it never was.
+ *
+ * The denominator is clamped up to the segment sum: the two figures come from
+ * different endpoints read moments apart, and a denominator that lags below
+ * its own parts would draw a bar wider than itself and shares above 100%.
+ *
+ * Undefined when the denominator did not arrive, so the shares are left out
+ * rather than silently recomputed against the wrong base.
+ */
+export const shareModel = (
+  top: ITopContracts | undefined,
+  allSuccessful: number | undefined,
+): IShareModel | undefined => {
+  if (!top) return undefined;
+  if (
+    typeof allSuccessful !== 'number' ||
+    !Number.isFinite(allSuccessful) ||
+    allSuccessful <= 0
+  ) {
+    return undefined;
+  }
+
+  const total = Math.max(allSuccessful, top.total);
+  return { total, segments: top.segments, other: total - top.total };
+};

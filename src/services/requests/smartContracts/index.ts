@@ -78,6 +78,51 @@ const smartContractsTableRequest = async (
   }
 };
 
+/**
+ * Every successful contract transaction ever, which is the denominator the
+ * share figures divide by. The same basis as the numerators: `sc/statistics`
+ * counts successful type-63 transactions only, and the two bases partition
+ * cleanly on mainnet (466.863 success + 3.311 fail = 470.174 total, measured).
+ */
+const successfulContractTransactionsCall = async (): Promise<
+  number | undefined
+> => {
+  try {
+    const res = await api.get({
+      route: 'transaction/list',
+      query: {
+        type: 63, // Smart Contract Transactions
+        status: 'success',
+        // Only `totalRecords` is read.
+        limit: 1,
+      },
+    });
+
+    if (!res.error || res.error === '') {
+      return res.pagination.totalRecords;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+/**
+ * The most-used figures as one bundle: the top-ten aggregation and the
+ * all-time denominator its shares divide by. One call because the summary bar
+ * and the podium cards both need both, under one query key, so the two
+ * surfaces can never show a share computed against different bases.
+ */
+const contractActivitySharesCall = async (): Promise<{
+  statistics?: HotContracts[];
+  allSuccessful?: number;
+}> => {
+  const [statistics, allSuccessful] = await Promise.all([
+    smartContractsStatisticCall(),
+    successfulContractTransactionsCall(),
+  ]);
+  return { statistics: statistics?.statistics, allSuccessful };
+};
+
 const smartContractsStatisticCall = async (): Promise<
   { statistics: HotContracts[] } | undefined
 > => {
@@ -191,6 +236,7 @@ const smartContractTransactionDetailsCall = async (
 };
 
 export {
+  contractActivitySharesCall,
   smartContractBeforeYesterdayTransactionsCall,
   contractTransactions24hCall,
   smartContractsListCall,

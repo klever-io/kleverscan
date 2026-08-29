@@ -32,6 +32,7 @@ const USED_KEYS = [
   'List.NoStatistics',
   'List.DeployerCountTitle',
   'List.FilteredByDeployer',
+  'List.DeployedByShort',
   'List.ClearFilter',
   'Filters.SortBy',
   'Filters.Order',

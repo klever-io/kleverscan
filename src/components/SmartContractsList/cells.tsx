@@ -9,6 +9,7 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { deployerFilterHref } from './queryState';
+import { shallowNavigate } from './shallowNavigate';
 import {
   ContractIdentity,
   DeployerCellRow,
@@ -112,6 +113,10 @@ export const DeployerCell: React.FC<IDeployerCellProps> = ({
       {count !== undefined && count > 1 && (
         <DeployerCountLink
           href={deployerFilterHref(router.query, deployer)}
+          onClick={shallowNavigate(
+            router,
+            deployerFilterHref(router.query, deployer),
+          )}
           title={t('smartContracts:List.DeployerCountTitle', {
             defaultValue: 'Show the {{count}} contracts from this deployer',
             count,

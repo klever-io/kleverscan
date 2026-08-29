@@ -1,5 +1,6 @@
 import Filter, { IFilter } from '@/components/Filter';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
+import ActiveFilter from './ActiveFilter';
 import { setQueryAndRouter } from '@/utils';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
@@ -80,10 +81,14 @@ const ContractsFilters: React.FC = () => {
 
   return (
     <FilterContainer>
-      {router.isReady &&
-        filters.map(filter => (
-          <Filter key={`${filter.testId}-${filter.current}`} {...filter} />
-        ))}
+      {router.isReady && (
+        <>
+          {filters.map(filter => (
+            <Filter key={`${filter.testId}-${filter.current}`} {...filter} />
+          ))}
+          <ActiveFilter placement="filters" />
+        </>
+      )}
     </FilterContainer>
   );
 };

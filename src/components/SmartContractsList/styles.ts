@@ -1,6 +1,7 @@
 import {
   accentText,
   AddressLink,
+  badgeTint,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   focusRing,
@@ -213,26 +214,70 @@ export const DeployerCountLink = styled(Link)`
  * What the list is narrowed to, and the way out of it. Without this the
  * deployer link is a one-way door: nothing else on the page writes
  * `?deployer=`, so nothing else knows how to clear it.
+ *
+ * A tinted chip rather than a bare text line: as a line above the table it
+ * read as body copy and was missed. It renders in two places, one visible per
+ * breakpoint: beside the sort dropdowns on wide screens, and left of "Items
+ * per page" below tablet width, where it may wrap onto a second line.
  */
-export const FilterNote = styled.div`
-  display: flex;
+export const FilterNote = styled.div<{ $placement: 'filters' | 'controls' }>`
+  display: inline-flex;
   align-items: center;
-  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
+  /* One line at the height of the page-size pills, so the chip sits level
+     with the controls beside it instead of growing taller than them. */
+  height: 40px;
+  padding: 0 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid ${props => accentText(props)};
+  background-color: ${props => badgeTint(props, 'accent')};
   font-size: 0.8125rem;
-  color: ${props => props.theme.darkText};
+  color: ${props => props.theme.black};
 
   strong {
     font-family: 'Fira Mono', monospace;
     font-weight: 400;
     color: ${props => props.theme.black};
   }
+
+  ${props =>
+    props.$placement === 'filters'
+      ? css`
+          /* Bottom edge level with the dropdown boxes, whose labels stand
+             above them. */
+          align-self: flex-end;
+
+          @media screen and (max-width: ${props.theme.breakpoints.tablet}) {
+            display: none;
+          }
+        `
+      : css`
+          /* Its own width and nothing more: a grow basis stretched it across
+             the leftover row, and a zero basis squeezed it in and pushed the
+             refresh button under the page-size pills. Content-sized, it sits
+             left of them when it fits and takes its own line when not, and
+             the pills and the refresh button always stay together. */
+          flex: 0 1 auto;
+          min-width: 0;
+          /* The page-size block carries a 10px bottom margin below tablet
+             width (the same one the blocks auto-update switch compensates
+             for); without matching it the chip's bottom lands 10px under the
+             pills, measured. */
+          margin-bottom: 10px;
+
+          @media screen and (min-width: ${props.theme.breakpoints.tablet}) {
+            display: none;
+          }
+        `}
 `;
 
 export const FilterClear = styled(Link)`
-  color: ${props => props.theme.violet};
+  font-weight: 600;
+  color: ${props => accentText(props)};
   text-decoration: none;
+  white-space: nowrap;
 
   &:hover {
     text-decoration: underline;

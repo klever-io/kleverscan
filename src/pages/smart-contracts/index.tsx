@@ -48,6 +48,9 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
     mobileCardProps: { deferred },
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
+    // The narrow-screen spot of the active-filter chip, left of Items per
+    // page; the wide-screen twin renders inside the filter bar.
+    TableControl: <ActiveFilter placement="controls" />,
   };
 
   return (
@@ -59,8 +62,6 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
       <ContractsSummary />
 
       <MostUsed />
-
-      <ActiveFilter />
 
       <ContractsTableWrapper>
         <Table {...tableProps} />

@@ -3,7 +3,14 @@ import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { clearDeployerHref, readDeployerFilter } from './queryState';
+import { shallowNavigate } from './shallowNavigate';
 import { FilterClear, FilterNote } from './styles';
+
+export interface IActiveFilterProps {
+  /** Which of the two spots this instance fills; each hides at the other's
+   *  breakpoint, so exactly one is visible. */
+  placement: 'filters' | 'controls';
+}
 
 /**
  * What the list is narrowed to, and the way out.
@@ -13,22 +20,36 @@ import { FilterClear, FilterNote } from './styles';
  * reason and no control that clears it. Renders nothing when the list is not
  * narrowed, so the unfiltered page is unchanged.
  */
-const ActiveFilter: React.FC = () => {
+const ActiveFilter: React.FC<IActiveFilterProps> = ({ placement }) => {
   const router = useRouter();
   const { t } = useTranslation(['smartContracts']);
   const deployer = readDeployerFilter(router.query);
 
   if (!deployer) return null;
 
+  // The narrow spot beside Items per page holds about 130px, so it gets the
+  // short label and a shorter address; the full sentence stays on wide
+  // screens, where the chip shares the filter row.
+  const compact = placement === 'controls';
+
   return (
-    <FilterNote data-testid="deployer-filter-note">
+    <FilterNote $placement={placement} data-testid="deployer-filter-note">
       <span>
-        {t('smartContracts:List.FilteredByDeployer', {
-          defaultValue: 'Contracts deployed by',
-        })}
+        {compact
+          ? t('smartContracts:List.DeployedByShort', {
+              defaultValue: 'Deployed by',
+            })
+          : t('smartContracts:List.FilteredByDeployer', {
+              defaultValue: 'Contracts deployed by',
+            })}
       </span>
-      <strong title={deployer}>{parseAddress(deployer, 16)}</strong>
-      <FilterClear href={clearDeployerHref(router.query)}>
+      <strong title={deployer}>
+        {parseAddress(deployer, compact ? 10 : 16)}
+      </strong>
+      <FilterClear
+        href={clearDeployerHref(router.query)}
+        onClick={shallowNavigate(router, clearDeployerHref(router.query))}
+      >
         {t('smartContracts:List.ClearFilter', { defaultValue: 'Clear filter' })}
       </FilterClear>
     </FilterNote>

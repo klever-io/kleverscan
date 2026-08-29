@@ -17,9 +17,10 @@ const smartContractsListCall = async (): Promise<
     });
 
     if (!smartContractsRes.error || smartContractsRes.error === '') {
-      return {
-        totalContracts: smartContractsRes.pagination?.totalRecords || 0,
-      };
+      const total = smartContractsRes.pagination?.totalRecords;
+      // A null or absent count on a 200 must not render as "0 contracts
+      // deployed"; undefined leaves the tile out instead.
+      return Number.isFinite(total) ? { totalContracts: total } : undefined;
     }
   } catch (error) {
     console.error(error);
@@ -113,14 +114,23 @@ const successfulContractTransactionsCall = async (): Promise<
  * surfaces can never show a share computed against different bases.
  */
 const contractActivitySharesCall = async (): Promise<{
-  statistics?: HotContracts[];
+  statistics: HotContracts[];
   allSuccessful?: number;
 }> => {
   const [statistics, allSuccessful] = await Promise.all([
     smartContractsStatisticCall(),
     successfulContractTransactionsCall(),
   ]);
-  return { statistics: statistics?.statistics, allSuccessful };
+  // Reject rather than resolve undefined: a resolved bundle is a success to
+  // react-query, which then caches "no statistics" for the full staleTime and
+  // never retries, and the podium renders that failure as the fact "no
+  // contract activity has been recorded yet". A rejection keeps retry and
+  // isError available. The denominator may still be absent; the share labels
+  // are simply left out then.
+  if (statistics === undefined) {
+    throw new Error('sc/statistics gave no statistics');
+  }
+  return { statistics: statistics.statistics, allSuccessful };
 };
 
 const smartContractsStatisticCall = async (): Promise<
@@ -139,7 +149,9 @@ const smartContractsStatisticCall = async (): Promise<
   }
 };
 
-const smartContractTotalTransactionsListCall = async () => {
+const smartContractTotalTransactionsListCall = async (): Promise<
+  number | undefined
+> => {
   try {
     const res = await api.get({
       route: 'transaction/list',
@@ -152,7 +164,11 @@ const smartContractTotalTransactionsListCall = async () => {
     });
 
     if (!res.error || res.error === '') {
-      return res.pagination.totalRecords;
+      const total = res.pagination?.totalRecords;
+      // A null here survives the `!== undefined` gate upstream and would then
+      // throw on toLocaleString in the middle of a render (the same payload
+      // is documented on this route in transactions/summary.ts).
+      return Number.isFinite(total) ? total : undefined;
     }
   } catch (error) {
     console.error(error);
@@ -160,30 +176,28 @@ const smartContractTotalTransactionsListCall = async () => {
 };
 
 /**
- * Contract transactions in the last 24 hours and the 24 hours before that.
+ * Contract transactions in the last 24 hours.
  *
- * The endpoint's buckets are rolling windows anchored at the request, not
- * calendar days: `countDaysQuery` in the proxy builds ranges of `now-1d..now`
- * and `now-2d..now-1d`. Both windows are therefore complete, which is what
- * makes comparing them fair at any time of day. The old name of this call
- * said "before yesterday", which the endpoint never measured.
+ * The bucket is a rolling window anchored at the request (`countDaysQuery` in
+ * the proxy builds `now-1d..now`), not a calendar day, so the "in the last
+ * 24 hours" line means exactly that at any time of day.
  */
 const contractTransactions24hCall = async (): Promise<
-  { last24h: number; previous24h: number } | undefined
+  { last24h: number } | undefined
 > => {
   try {
     const res = await api.get({
-      route: 'transaction/list/count/2',
+      route: 'transaction/list/count/1',
       query: {
         type: 63, // Smart Contract Transactions
       },
     });
 
     if (!res.error || res.error === '') {
-      return {
-        last24h: res.data?.number_by_day?.[0]?.doc_count || 0,
-        previous24h: res.data?.number_by_day?.[1]?.doc_count || 0,
-      };
+      const count = res.data?.number_by_day?.[0]?.doc_count;
+      // An empty window still arrives as a bucket with doc_count 0; a missing
+      // bucket on a 200 is a malformed success, not a zero the chain reported.
+      return Number.isFinite(count) ? { last24h: count } : undefined;
     }
   } catch (error) {
     console.error(error);

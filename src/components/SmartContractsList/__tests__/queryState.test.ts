@@ -124,6 +124,19 @@ describe('deployerFilterHref', () => {
     expect(href).toContain('deployer=klv1new');
     expect(href).not.toContain('klv1old');
   });
+
+  it('keeps the page size the reader chose', () => {
+    // The badge used to reset limit=50 back to 10; limit is view state like
+    // the sort, only `page` is meaningless under the narrowed list.
+    const href = deployerFilterHref({ limit: '50', page: '3' }, 'klv1abc');
+    expect(href).toContain('limit=50');
+    expect(href).not.toContain('page=');
+  });
+
+  it('drops a repeated limit like every other repeated parameter', () => {
+    const href = deployerFilterHref({ limit: ['50', '100'] }, 'klv1abc');
+    expect(href).not.toContain('limit');
+  });
 });
 
 describe('clearDeployerHref', () => {
@@ -131,6 +144,12 @@ describe('clearDeployerHref', () => {
     expect(
       clearDeployerHref({ deployer: 'klv1abc', sortBy: 'timestamp' }),
     ).toBe('/smart-contracts?sortBy=timestamp&orderBy=desc');
+  });
+
+  it('keeps the page size when clearing', () => {
+    expect(clearDeployerHref({ deployer: 'klv1abc', limit: '100' })).toContain(
+      'limit=100',
+    );
   });
 
   it('is a no-op shape on an already unfiltered list', () => {

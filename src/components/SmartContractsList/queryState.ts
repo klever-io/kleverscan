@@ -53,9 +53,10 @@ export const readDeployerFilter = (
 ): string | undefined => singleParam(query?.deployer);
 
 /**
- * Rebuilds this page's URL. Carries the sort over and drops everything else,
- * `page` included: page 12 of the unfiltered list does not exist in the two
- * pages one deployer has.
+ * Rebuilds this page's URL. Carries the sort and the page size over (both are
+ * view state the reader chose) and drops everything else, `page` included:
+ * page 12 of the unfiltered list does not exist in the two pages one deployer
+ * has.
  */
 const build = (
   query: ParsedUrlQuery | undefined,
@@ -72,6 +73,9 @@ const build = (
   // would carry that nonsense forward while the bar beside it says timestamp.
   params.set('sortBy', overrides.sortBy ?? activeSort(query));
   params.set('orderBy', overrides.orderBy ?? activeOrder(query));
+
+  const limit = singleParam(query?.limit);
+  if (limit) params.set('limit', limit);
 
   return `/smart-contracts?${params.toString()}`;
 };

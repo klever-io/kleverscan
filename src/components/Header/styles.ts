@@ -1,5 +1,6 @@
 import { transparentize } from 'polished';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
+import { kbdAccent } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 import { DefaultCardStyleWithBorder } from '@/styles/common';
 
@@ -213,13 +214,7 @@ export const SpotlightTrigger = styled.button`
     font-size: 0.68rem;
     font-weight: 700;
     font-family: inherit;
-    color: ${props =>
-      props.theme.dark ? 'rgba(198, 199, 235, 0.85)' : props.theme.gray800};
-    background: ${props =>
-      props.theme.dark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)'};
-    border: 1px solid
-      ${props =>
-        props.theme.dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'};
+    ${kbdAccent}
   }
 
   svg {

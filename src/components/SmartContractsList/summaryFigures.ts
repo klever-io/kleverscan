@@ -1,30 +1,5 @@
 import { HotContracts } from '@/types/smart-contract';
 
-export interface IWindowPair {
-  /** The last 24 hours: a complete rolling window ending at the request. */
-  current: number;
-  /** The 24 hours before that, which the change is measured against. */
-  previous: number;
-}
-
-/**
- * Window-on-window change as a rate, e.g. 0.186 for "+18.6%". Fair at any time
- * of day because both windows are complete; see contractTransactions24hCall.
- *
- * Undefined rather than zero when it cannot be computed: with no previous
- * window there is no rate, and printing "+0%" would state a fact the data does
- * not carry. Growth from nothing is likewise undefined rather than infinite.
- */
-export const windowVariation = (
-  pair: IWindowPair | undefined,
-): number | undefined => {
-  if (!pair) return undefined;
-  const { current, previous } = pair;
-  if (!Number.isFinite(current) || !Number.isFinite(previous)) return undefined;
-  if (previous <= 0) return undefined;
-  return (current - previous) / previous;
-};
-
 export interface IContractShare {
   address: string;
   name?: string;
@@ -32,7 +7,8 @@ export interface IContractShare {
 }
 
 export interface ITopContracts {
-  /** The sum over the returned contracts, which is the bar's denominator. */
+  /** The sum over the returned contracts, the floor the share denominator
+   *  is clamped to in shareModel. */
   total: number;
   segments: IContractShare[];
 }

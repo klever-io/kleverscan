@@ -16,6 +16,8 @@ import {
   CardCount,
   CardCountLabel,
   CardCountRow,
+  CountLabelFull,
+  CountLabelShort,
   CardIdentity,
   CardName,
   CardRank,
@@ -102,7 +104,7 @@ const MostUsed: React.FC = () => {
   const { t } = useTranslation(['smartContracts']);
   const deferred = useDeferred();
 
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError } = useQuery({
     // The summary bar reads this same bundle under this same key, so a card
     // and the bar can never divide one contract by two different bases.
     queryKey: ['contractActivityShares'],
@@ -119,7 +121,10 @@ const MostUsed: React.FC = () => {
   // summary bar draws from. Dividing by the segments' own sum read as a
   // market share it never was, and disagreed with the bar above.
   const model = shareModel(busiest, data?.allSuccessful);
-  const leaderCount = busiest?.segments[0]?.count ?? 0;
+  // Bars divide by what the printed share divides by; only when that
+  // denominator failed to arrive do they fall back to leader scale, where no
+  // label renders to disagree with.
+  const barDenominator = model?.total ?? busiest?.segments[0]?.count ?? 0;
   const loadingLabel = t('smartContracts:List.MostUsedLoading', {
     defaultValue: 'Loading the most used applications',
   });
@@ -142,7 +147,9 @@ const MostUsed: React.FC = () => {
           on it flashed "no activity" over a chain that has plenty. */}
       {isPending && <PodiumLoading label={loadingLabel} />}
 
-      {!isPending && !busiest && (
+      {/* Not on isError: a failed fetch says nothing about the chain, and
+          this note states a fact. */}
+      {!isPending && !isError && !busiest && (
         <EmptyNote>
           {t('smartContracts:List.NoStatistics', {
             defaultValue: 'No contract activity has been recorded yet.',
@@ -171,22 +178,29 @@ const MostUsed: React.FC = () => {
                   {segment.count.toLocaleString(NUMBER_LOCALE)}
                 </CardCount>
                 <CardCountLabel>
-                  {t('smartContracts:Table.Transactions', {
-                    defaultValue: 'Transactions',
-                  })}
+                  <CountLabelFull>
+                    {t('smartContracts:Table.Transactions', {
+                      defaultValue: 'Transactions',
+                    })}
+                  </CountLabelFull>
+                  <CountLabelShort>
+                    {t('smartContracts:List.TransactionsShort', {
+                      defaultValue: 'Tx',
+                    })}
+                  </CountLabelShort>
                 </CardCountLabel>
               </CardCountRow>
 
               <CardBarRow>
-                {/* Scaled against the leader so the second and third bar stay
-                    readable; the text beside it carries the true share. */}
+                {/* Scaled to the leader this bar sat full beside a label
+                    saying 30%, reading as broken. */}
                 <CardTrack $fluid>
                   <CardBar
                     $delay={index * 60}
                     style={{
                       width:
-                        leaderCount > 0
-                          ? `${(segment.count / leaderCount) * 100}%`
+                        barDenominator > 0
+                          ? `${(segment.count / barDenominator) * 100}%`
                           : '0%',
                     }}
                   />

@@ -9,12 +9,10 @@ import {
   TileLabel,
   TileSub,
   TileValue,
-  TileValueRow,
   TilesGrid,
 } from '@/components/DataList/styles';
 import { useDeferred } from '@/components/DataList/useDeferred';
 import Skeleton from '@/components/Skeleton';
-import { TrendValue } from '@/components/TransactionsList/styles';
 import {
   contractActivitySharesCall,
   contractTransactions24hCall,
@@ -30,8 +28,12 @@ import { useTheme } from 'styled-components';
 import ContractsSummaryLoadingCard, {
   FiguresBarPlaceholder,
 } from './LoadingCard';
-import { ContractsSummaryCard, SummaryContractLink } from './styles';
-import { shareModel, topContracts, windowVariation } from './summaryFigures';
+import {
+  ContractsSummaryCard,
+  MostUsedTile,
+  SummaryContractLink,
+} from './styles';
+import { shareModel, topContracts } from './summaryFigures';
 
 /**
  * A quarter of an hour. These are chain-wide totals that move by fractions of
@@ -39,11 +41,6 @@ import { shareModel, topContracts, windowVariation } from './summaryFigures';
  * queries every four seconds for the same numbers.
  */
 const FIGURE_CACHE = { staleTime: 15 * 60_000, gcTime: 15 * 60_000 };
-
-/** Percentage with its sign, e.g. "+18.6%". A rate, not a share, so it has no
- *  ceiling: a figure that more than doubled reads "+140%". */
-const formatVariation = (variation: number): string =>
-  `${variation > 0 ? '+' : ''}${(variation * 100).toFixed(1)}%`;
 
 /**
  * The figures above the deployed-contracts list: how many contracts exist, how
@@ -93,13 +90,6 @@ const ContractsSummary: React.FC = () => {
   const { contracts, transactions, windows } = data;
   const busiest = topContracts(shares?.statistics);
   const model = shareModel(busiest, shares?.allSuccessful);
-  const variation = windowVariation(
-    windows && {
-      current: windows.last24h,
-      previous: windows.previous24h,
-    },
-  );
-
   // Each tile appears only when its own request answered; a failed part is
   // left out rather than printing a zero the chain never reported.
   if (contracts === undefined && transactions === undefined && !busiest) {
@@ -153,16 +143,7 @@ const ContractsSummary: React.FC = () => {
                 defaultValue: 'Contract transactions',
               })}
             </TileLabel>
-            <TileValueRow>
-              <TileValue>
-                {transactions.toLocaleString(NUMBER_LOCALE)}
-              </TileValue>
-              {variation !== undefined && (
-                <TrendValue $positive={variation >= 0}>
-                  {formatVariation(variation)}
-                </TrendValue>
-              )}
-            </TileValueRow>
+            <TileValue>{transactions.toLocaleString(NUMBER_LOCALE)}</TileValue>
             {windows && (
               <TileSub>
                 {t('smartContracts:List.Last24h', {
@@ -177,9 +158,12 @@ const ContractsSummary: React.FC = () => {
         {/* The statistics arrive after the tiles on purpose (deferred), so
             this tile reserves its boxes rather than growing the card while
             the reader is already below it. Label and value line boxes are
-            27,5px and 16,5px, the same as the loaded lines. */}
+            27,5px and 16,5px, the same as the loaded lines. Third by
+            position: ContractsSummaryLoadingCard mirrors this order blindly
+            (its tileIndex 2 is the MostUsedTile), so reordering or inserting
+            tiles here means moving that file with it. */}
         {leader ? (
-          <Tile>
+          <MostUsedTile>
             <TileLabel>
               {t('smartContracts:List.MostUsed', {
                 defaultValue: 'Most used contract',
@@ -196,10 +180,10 @@ const ContractsSummary: React.FC = () => {
                 amount: leader.count.toLocaleString(NUMBER_LOCALE),
               })}
             </TileSub>
-          </Tile>
+          </MostUsedTile>
         ) : (
           sharesPending && (
-            <Tile aria-busy="true">
+            <MostUsedTile aria-busy="true">
               <TileLabel>
                 {t('smartContracts:List.MostUsed', {
                   defaultValue: 'Most used contract',
@@ -218,7 +202,7 @@ const ContractsSummary: React.FC = () => {
                   marginTop: 'calc(0.1875rem + 2px)',
                 }}
               />
-            </Tile>
+            </MostUsedTile>
           )
         )}
       </TilesGrid>
@@ -252,11 +236,6 @@ const ContractsSummary: React.FC = () => {
             )}
           </DistBar>
           <LegendRow>
-            <LegendItem>
-              {t('smartContracts:List.BarCaption', {
-                defaultValue: 'Share of all contract transactions',
-              })}
-            </LegendItem>
             {model.segments.map((segment, index) => (
               <LegendItem key={segment.address}>
                 <LegendDot $color={segmentColor(index)} />

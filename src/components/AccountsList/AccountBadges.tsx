@@ -1,4 +1,5 @@
-import { BadgePill } from '@/components/DataList/styles';
+import { BadgePill, VisuallyHidden } from '@/components/DataList/styles';
+import Tooltip from '@/components/Tooltip';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import type { IAccountBadges } from './badges';
@@ -26,25 +27,35 @@ const AccountBadges: React.FC<IAccountBadgesProps> = ({ badges }) => {
       })
     : '';
 
+  // Focusable tooltips instead of `title`: a title never opens from the
+  // keyboard or on touch, and readers expose it inconsistently (#699). The
+  // list state also rides inside the pill as hidden text, so it reads with
+  // the badge; visible it is not, because it changes per epoch and this row
+  // is not where someone comes to read it.
   return (
     <>
       {foundation && (
-        <BadgePill
-          $variant="accent"
-          title={t('accounts:Badges.FoundationTooltip')}
-        >
-          {t('accounts:Badges.Foundation')}
-        </BadgePill>
+        <Tooltip
+          msg={t('accounts:Badges.FoundationTooltip')}
+          focusable
+          Component={() => (
+            <BadgePill $variant="accent">
+              {t('accounts:Badges.Foundation')}
+            </BadgePill>
+          )}
+        />
       )}
       {validator && (
-        <BadgePill
-          $variant={genesisValidator ? 'success' : 'neutral'}
-          // List state rides in the tooltip, not its own badge: it changes per
-          // epoch and this row is not where someone comes to read it.
-          title={listState ? `${roleTooltip} (${listState})` : roleTooltip}
-        >
-          {t(`accounts:Badges.${roleKey}`)}
-        </BadgePill>
+        <Tooltip
+          msg={listState ? `${roleTooltip} (${listState})` : roleTooltip}
+          focusable
+          Component={() => (
+            <BadgePill $variant={genesisValidator ? 'success' : 'neutral'}>
+              {t(`accounts:Badges.${roleKey}`)}
+              {listState && <VisuallyHidden>{`, ${listState}`}</VisuallyHidden>}
+            </BadgePill>
+          )}
+        />
       )}
     </>
   );

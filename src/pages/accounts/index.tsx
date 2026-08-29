@@ -6,6 +6,7 @@ import AccountsMobileCard, {
 import AccountsFilters from '@/components/AccountsList/Filters';
 import AccountsSummary from '@/components/AccountsList/Summary';
 import { accountBadges } from '@/components/AccountsList/badges';
+import { BadgesAnnouncement } from '@/components/AccountsList/BadgesAnnouncement';
 import { accountsFilteredCall } from '@/components/AccountsList/filteredList';
 import { klvAmount } from '@/components/AccountsList/format';
 import { AccountsTableWrapper } from '@/components/AccountsList/styles';
@@ -155,6 +156,12 @@ const Accounts: React.FC<PropsWithChildren> = () => {
 
       <AccountsSummary />
 
+      <BadgesAnnouncement
+        owners={owners}
+        message={t('accounts:List.ValidatorBadgesLoaded', {
+          defaultValue: 'Validator badges loaded',
+        })}
+      />
       <AccountsTableWrapper>
         <Table {...tableProps} />
       </AccountsTableWrapper>

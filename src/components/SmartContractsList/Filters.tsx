@@ -84,7 +84,7 @@ const ContractsFilters: React.FC = () => {
       {router.isReady && (
         <>
           {filters.map(filter => (
-            <Filter key={`${filter.testId}-${filter.current}`} {...filter} />
+            <Filter key={filter.testId} {...filter} />
           ))}
           <ActiveFilter />
         </>

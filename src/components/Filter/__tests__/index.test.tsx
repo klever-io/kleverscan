@@ -349,3 +349,154 @@ describe('Filter', () => {
     expect(screen.queryByLabelText('Search Version')).not.toBeInTheDocument();
   });
 });
+
+describe('Filter keyboard operation', () => {
+  const opener = () => screen.getByRole('button', { name: 'Status All' });
+
+  it('opens from the opener button and reports the expanded state', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    expect(opener()).toHaveAttribute('aria-expanded', 'false');
+    expect(opener()).toHaveAttribute('aria-haspopup', 'listbox');
+
+    fireEvent.click(opener());
+
+    const input = await screen.findByLabelText('Search Status');
+    expect(input).toHaveAttribute('role', 'combobox');
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('listbox')).toBeInTheDocument();
+    expect(screen.getAllByRole('option')).toHaveLength(3);
+  });
+
+  it('walks options with the arrow keys and selects the active one on Enter', async () => {
+    const onClick = jest.fn();
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={onClick}
+      />,
+    );
+
+    fireEvent.click(opener());
+    const input = await screen.findByLabelText('Search Status');
+
+    // The cursor seeds on the current value ("All", index 0), like a select.
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    const activeId = input.getAttribute('aria-activedescendant');
+    expect(activeId).toBeTruthy();
+    expect(document.getElementById(activeId as string)).toHaveTextContent(
+      'Success',
+    );
+
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onClick).toHaveBeenCalledWith('Success');
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+  });
+
+  it('wraps the cursor from the first option up to the last', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(opener());
+    const input = await screen.findByLabelText('Search Status');
+
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+    const activeId = input.getAttribute('aria-activedescendant');
+    expect(document.getElementById(activeId as string)).toHaveTextContent(
+      'Fail',
+    );
+  });
+
+  it('closes on Escape and puts focus back on the opener', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(opener());
+    const input = await screen.findByLabelText('Search Status');
+
+    fireEvent.keyDown(input, { key: 'Escape' });
+
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+    expect(opener()).toHaveAttribute('aria-expanded', 'false');
+    expect(opener()).toHaveFocus();
+  });
+
+  it('keeps the opener inert when disabledInput is set', () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+        disabledInput
+      />,
+    );
+
+    expect(opener()).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(opener());
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+    expect(opener()).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('toggles rather than double-firing in non-typeahead mode', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+        inputType="button"
+        isHiddenInput={false}
+      />,
+    );
+
+    // Captured once: while open the value span empties, so the accessible
+    // name shrinks to the title and a name-based lookup would miss.
+    const openerElement = opener();
+
+    // Pins the toggle itself: open on the first activation, closed on the
+    // second, with the click also bubbling into Content's own handler.
+    fireEvent.click(openerElement);
+    expect(await screen.findByLabelText('Search Status')).toBeInTheDocument();
+
+    fireEvent.click(openerElement);
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+  });
+
+  it('names the clear control and clears back to All through it', () => {
+    const onClick = jest.fn();
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current="Fail"
+        onClick={onClick}
+      />,
+    );
+
+    const clear = screen.getByRole('button', { name: 'Clear Status filter' });
+    fireEvent.click(clear);
+    expect(onClick).toHaveBeenCalledWith('All');
+  });
+});

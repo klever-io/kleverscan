@@ -3,6 +3,7 @@ import { HiOutlineMenuAlt2 } from 'react-icons/hi';
 import { kbdAccent } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 import { DefaultCardStyleWithBorder } from '@/styles/common';
+import { ConnectButton } from './ConnectWallet/styles';
 
 interface IMobileMenu {
   opened: boolean;
@@ -491,6 +492,11 @@ export const SvgWrapper = styled.div`
   justify-content: center;
 `;
 
+/**
+ * The wallet button on its own row under the bar, for the widths where the bar
+ * itself has no room left for it. Its full width belongs to this spot rather
+ * than to a breakpoint: the pill keeps its 200px cap wherever the bar holds it.
+ */
 export const ConnectionWrapper = styled.div`
   width: 100%;
   position: relative;
@@ -501,4 +507,8 @@ export const ConnectionWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  ${ConnectButton} {
+    max-width: 100%;
+  }
 `;

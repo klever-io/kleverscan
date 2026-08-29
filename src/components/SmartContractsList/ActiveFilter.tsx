@@ -2,15 +2,10 @@ import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
+import { AiOutlineClose } from 'react-icons/ai';
 import { clearDeployerHref, readDeployerFilter } from './queryState';
 import { shallowNavigate } from './shallowNavigate';
-import { FilterClear, FilterNote } from './styles';
-
-export interface IActiveFilterProps {
-  /** Which of the two spots this instance fills; each hides at the other's
-   *  breakpoint, so exactly one is visible. */
-  placement: 'filters' | 'controls';
-}
+import { ClearIcon, ClearLabel, FilterClear, FilterNote } from './styles';
 
 /**
  * What the list is narrowed to, and the way out.
@@ -20,37 +15,38 @@ export interface IActiveFilterProps {
  * reason and no control that clears it. Renders nothing when the list is not
  * narrowed, so the unfiltered page is unchanged.
  */
-const ActiveFilter: React.FC<IActiveFilterProps> = ({ placement }) => {
+const ActiveFilter: React.FC = () => {
   const router = useRouter();
   const { t } = useTranslation(['smartContracts']);
   const deployer = readDeployerFilter(router.query);
 
   if (!deployer) return null;
 
-  // The narrow spot beside Items per page holds about 130px, so it gets the
-  // short label and a shorter address; the full sentence stays on wide
-  // screens, where the chip shares the filter row.
-  const compact = placement === 'controls';
+  const clearLabel = t('smartContracts:List.ClearFilter', {
+    defaultValue: 'Clear filter',
+  });
 
   return (
-    <FilterNote $placement={placement} data-testid="deployer-filter-note">
+    <FilterNote data-testid="deployer-filter-note">
       <span>
-        {compact
-          ? t('smartContracts:List.DeployedByShort', {
-              defaultValue: 'Deployed by',
-            })
-          : t('smartContracts:List.FilteredByDeployer', {
-              defaultValue: 'Contracts deployed by',
-            })}
+        {t('smartContracts:List.DeployedByShort', {
+          defaultValue: 'Deployed by',
+        })}
       </span>
-      <strong title={deployer}>
-        {parseAddress(deployer, compact ? 10 : 16)}
-      </strong>
+      {/* The short label and a 10 character address keep the chip at 283px,
+          which is what fits beside the two dropdowns at 1026px, the narrowest
+          width where the filter bar is still a row. Measured. */}
+      <strong title={deployer}>{parseAddress(deployer, 10)}</strong>
       <FilterClear
         href={clearDeployerHref(router.query)}
         onClick={shallowNavigate(router, clearDeployerHref(router.query))}
+        aria-label={clearLabel}
+        title={clearLabel}
       >
-        {t('smartContracts:List.ClearFilter', { defaultValue: 'Clear filter' })}
+        <ClearLabel>{clearLabel}</ClearLabel>
+        <ClearIcon>
+          <AiOutlineClose size={14} />
+        </ClearIcon>
       </FilterClear>
     </FilterNote>
   );

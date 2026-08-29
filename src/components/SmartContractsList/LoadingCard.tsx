@@ -1,7 +1,11 @@
 import { Tile, TilesGrid } from '@/components/DataList/styles';
 import Skeleton from '@/components/Skeleton';
 import React from 'react';
-import { ContractsSummaryCard, PlaceholderLegendRow } from './styles';
+import {
+  ContractsSummaryCard,
+  MostUsedTile,
+  PlaceholderLegendRow,
+} from './styles';
 
 /**
  * Skeleton heights in rem, not px. The root font is 93,75% below 1440px and
@@ -47,7 +51,7 @@ export const FiguresBarPlaceholder: React.FC = () => (
       {Array.from({ length: 4 }, (unused, index) => (
         <Skeleton
           key={index}
-          width={index === 0 ? '18%' : '12%'}
+          width="12%"
           height="0.75rem"
           containerCustomStyles={{ margin: '0.15625rem 0' }}
         />
@@ -66,18 +70,26 @@ const ContractsSummaryLoadingCard: React.FC<{ label: string }> = ({
 }) => (
   <ContractsSummaryCard aria-busy="true" aria-label={label}>
     <TilesGrid>
-      {Array.from({ length: 3 }, (unused, tileIndex) => (
-        <Tile key={tileIndex}>
-          {TILE_LINES.map((tileLine, lineIndex) => (
-            <Skeleton
-              key={lineIndex}
-              width={tileLine.width}
-              height={tileLine.bar}
-              containerCustomStyles={{ margin: tileLine.margin }}
-            />
-          ))}
-        </Tile>
-      ))}
+      {Array.from({ length: 3 }, (unused, tileIndex) => {
+        // The third is the most-used tile, which the card drops below 600px;
+        // the loading shape has to drop it at the same width or it reserves a
+        // row the figures never fill. By position: Summary renders
+        // [contracts, transactions, most-used], and nothing but these two
+        // comments holds the pairing.
+        const TileBox = tileIndex === 2 ? MostUsedTile : Tile;
+        return (
+          <TileBox key={tileIndex}>
+            {TILE_LINES.map((tileLine, lineIndex) => (
+              <Skeleton
+                key={lineIndex}
+                width={tileLine.width}
+                height={tileLine.bar}
+                containerCustomStyles={{ margin: tileLine.margin }}
+              />
+            ))}
+          </TileBox>
+        );
+      })}
     </TilesGrid>
     <FiguresBarPlaceholder />
   </ContractsSummaryCard>

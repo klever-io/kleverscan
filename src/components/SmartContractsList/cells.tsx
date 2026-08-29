@@ -8,7 +8,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import React from 'react';
-import { deployerFilterHref } from './queryState';
+import { deployerFilterHref, readDeployerFilter } from './queryState';
 import { shallowNavigate } from './shallowNavigate';
 import {
   ContractIdentity,
@@ -82,6 +82,50 @@ export const ContractCell: React.FC<IContractCellProps> = ({
   );
 };
 
+export interface IDeployerCountBadgeProps {
+  deployer: string;
+  /** Undefined while the lookup has not answered, which is not the same as
+   *  "one" and must not render as a dead control. */
+  count?: number;
+}
+
+/**
+ * How many contracts this deployer has, as the entry point to the filtered
+ * list. Shared by the table cell and the mobile card so the rule that hides it
+ * at 1 lives once: there, the filtered list would be the row already on screen.
+ */
+export const DeployerCountBadge: React.FC<IDeployerCountBadgeProps> = ({
+  deployer,
+  count,
+}) => {
+  const { t } = useTranslation(['smartContracts']);
+  const router = useRouter();
+
+  if (count === undefined || count <= 1) return null;
+  // Same dead end as the rule above: on the already-narrowed list the link
+  // would lead to the page the reader is on.
+  if (readDeployerFilter(router.query) === deployer) return null;
+
+  const href = deployerFilterHref(router.query, deployer);
+  const label = t('smartContracts:List.DeployerCountTitle', {
+    defaultValue: 'Show the {{count}} contracts from this deployer',
+    count,
+  });
+
+  return (
+    <DeployerCountLink
+      href={href}
+      onClick={shallowNavigate(router, href)}
+      title={label}
+      // The bare number is the visible text; without this the accessible name
+      // is just "14".
+      aria-label={label}
+    >
+      {count}
+    </DeployerCountLink>
+  );
+};
+
 export interface IDeployerCellProps {
   deployer: string;
   deferred: boolean;
@@ -98,8 +142,6 @@ export const DeployerCell: React.FC<IDeployerCellProps> = ({
   deployer,
   deferred,
 }) => {
-  const { t } = useTranslation(['smartContracts']);
-  const router = useRouter();
   const count = useDeployerCount(deployer, deferred);
 
   return (
@@ -107,24 +149,7 @@ export const DeployerCell: React.FC<IDeployerCellProps> = ({
       <DeployerLink href={`/account/${deployer}`} title={deployer}>
         <Mono>{parseAddress(deployer, 12)}</Mono>
       </DeployerLink>
-      {/* Suppressed at 1: the filtered list would be the row already on
-          screen. Undefined means the lookup has not answered, which is not
-          the same as "one" and must not render as a dead control. */}
-      {count !== undefined && count > 1 && (
-        <DeployerCountLink
-          href={deployerFilterHref(router.query, deployer)}
-          onClick={shallowNavigate(
-            router,
-            deployerFilterHref(router.query, deployer),
-          )}
-          title={t('smartContracts:List.DeployerCountTitle', {
-            defaultValue: 'Show the {{count}} contracts from this deployer',
-            count,
-          })}
-        >
-          {count}
-        </DeployerCountLink>
-      )}
+      <DeployerCountBadge deployer={deployer} count={count} />
     </DeployerCellRow>
   );
 };

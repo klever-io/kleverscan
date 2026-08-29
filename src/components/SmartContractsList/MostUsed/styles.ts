@@ -10,6 +10,13 @@ import Link from 'next/link';
 import styled, { css } from 'styled-components';
 
 /**
+ * Where the two-up card runs out of room for the word beside its count: it
+ * holds 172px of content at 448px of viewport, which is what the count and the
+ * full label ask for together.
+ */
+const NARROW_CARD = '480px';
+
+/**
  * The page's blocks sit 24px apart everywhere (measured on /blocks, /accounts
  * and /transactions: title to summary 24, summary to filter row 24). The
  * section itself carries the 24px below it; above it, the summary card's own
@@ -53,18 +60,22 @@ export const EmptyNote = styled.p`
 /* --------------------------------- podium -------------------------------- */
 
 /**
- * Three equal columns across the full container. The old carousel parked its
+ * Four equal columns across the full container. The old carousel parked its
  * fixed-width cards on the left and left the right half of a 1440px viewport
  * empty; a grid makes the section's width a decision instead of a leftover.
+ *
+ * Two columns below that, never one: stacked, each card drew its bar across
+ * the whole container (992px at 1024) and the four of them pushed the table
+ * 1300px down the page.
  */
 export const PodiumRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
   }
 `;
 
@@ -188,6 +199,13 @@ export const CardAddress = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  /* 100px instead of 110 on the narrow two-up cards, which leave the identity
+     column 107px at a 390px viewport; the line box stays 1rem so the card
+     keeps its height. */
+  @media screen and (max-width: ${NARROW_CARD}) {
+    font-size: 0.625rem;
+  }
 `;
 
 export const CardCountRow = styled.span`
@@ -217,6 +235,28 @@ export const CardCountLabel = styled.span`
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: ${props => props.theme.darkText};
+`;
+
+/**
+ * The unit beside the count, in two lengths.
+ *
+ * The word costs 80px next to a count that takes 84, and the two-up card holds
+ * 108px of content at a 320px viewport, so under 480 it becomes "Tx". Shortened
+ * rather than dropped to a second line: that would make the loaded card taller
+ * than its loading shape, which is the shift the placeholder exists to prevent.
+ */
+export const CountLabelFull = styled.span`
+  @media screen and (max-width: ${NARROW_CARD}) {
+    display: none;
+  }
+`;
+
+export const CountLabelShort = styled.span`
+  display: none;
+
+  @media screen and (max-width: ${NARROW_CARD}) {
+    display: inline;
+  }
 `;
 
 export const CardBarRow = styled.span`

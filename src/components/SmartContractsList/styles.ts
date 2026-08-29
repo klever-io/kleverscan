@@ -10,16 +10,33 @@ import {
   LegendRow,
   SummaryCard,
   Tile,
+  TilesGrid,
 } from '@/components/DataList/styles';
 import {
+  ExportContainer,
   HeaderItem,
+  LimitContainer,
   MobileCardItem,
   MobileHeader,
+  TableControls,
   TableRow,
 } from '@/components/Table/styles';
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
 import { RIGHT_ALIGNED_COLUMNS } from './columns';
+
+/**
+ * Two widths the shared theme has no name for, both measured on this page.
+ *
+ * Three summary tiles need 554px: the grid's own 150px minimum holds the
+ * widest label, "Contract transactions", at 137px, and three of those plus the
+ * 16px gaps, the card's padding and the container's come to that. The controls
+ * fit on one line from 479px: the chip is 214px there, the page-size block and
+ * the refresh button 217 together.
+ */
+const THREE_TILES = '600px';
+const CONTROLS_ONE_ROW = '480px';
 
 /* ------------------------------- summary --------------------------------- */
 
@@ -47,6 +64,14 @@ export const ContractsSummaryCard = styled(SummaryCard)`
   ${pageSummarySpacing}
   ${tileHeight}
 
+  /* Auto-fit at every width, rather than the two fixed columns the shared grid
+     drops to below 768. Those are 115px wide at a 320px viewport, where every
+     label wraps and a tile runs to 109px against the 67 its loading shape
+     reserves: the page jumped 60px when the figures landed. Measured. */
+  ${TilesGrid} {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
   /* One legend row on every width: below tablet it scrolls sideways instead
      of wrapping. Wrapping made its height depend on the length of contract
      names, which no loading shape can predict; measured, the card grew 17px
@@ -60,6 +85,19 @@ export const ContractsSummaryCard = styled(SummaryCard)`
     ${LegendItem} {
       flex-shrink: 0;
     }
+  }
+`;
+
+/**
+ * The most used contract, as a tile.
+ *
+ * Gone below 600px, where only two tiles fit on a row and a third would take
+ * one of its own. Nothing is lost there: the podium directly under the card
+ * opens with the same contract and the same figure.
+ */
+export const MostUsedTile = styled(Tile)`
+  @media screen and (max-width: ${THREE_TILES}) {
+    display: none;
   }
 `;
 
@@ -109,18 +147,24 @@ export const SummaryContractLink = styled(Link)`
  * `width: fit-content` (Table/styles.ts), and the name arrives on a second
  * request about a second after the row is readable; without a pinned box the
  * column grew when it landed and dragged the five columns beside it sideways.
- * 300px holds the 32 character ceiling `safeContractName` imposes.
+ *
+ * 230px, measured against all 50 rows mainnet returns at `limit=50`: the
+ * longest name there, "KleverBridgedTokensWrapper", asks 191px and a row
+ * without one asks 143. It was 300, which made the table 1056px wide against
+ * the 994 a 1026px viewport gives it, so the whole page scrolled sideways
+ * between 1026 and 1070. Nothing was holding the difference: 32 characters,
+ * the ceiling `safeContractName` imposes, need 380 to 420px depending on the
+ * letters, so a name that long has always ended in an ellipsis here.
  */
 export const ContractIdentity = styled(Link)`
-  ${inCard('inline-flex')}
+  ${inCard('block')}
 
   && {
-    min-width: 300px;
-    max-width: 300px;
+    min-width: 230px;
+    max-width: 230px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: block;
     line-height: 20px;
   }
 
@@ -137,9 +181,9 @@ export const ContractIdentity = styled(Link)`
 
 /**
  * The deployer's address. Its own component rather than `ContractIdentity`:
- * that one is pinned at 300px to stop the contract column jumping when a name
- * lands, and borrowing it here widened this column from its declared 210px to
- * 358px, measured.
+ * that one is pinned to a fixed width to stop the contract column jumping
+ * when a name lands, and borrowing it here widened this column from its
+ * declared 210px to 358px, measured when that pin stood at 300.
  */
 export const DeployerLink = styled(Link)`
   ${inCard('inline-flex')}
@@ -182,6 +226,8 @@ export const DeployerCountLink = styled(Link)`
 
   && {
     align-items: center;
+    /* Holds on the mobile card; in desktop cells the page skin's 20px
+       line rule outranks it. */
     height: 18px;
     padding: 0 6px;
     font-weight: 600;
@@ -216,11 +262,10 @@ export const DeployerCountLink = styled(Link)`
  * `?deployer=`, so nothing else knows how to clear it.
  *
  * A tinted chip rather than a bare text line: as a line above the table it
- * read as body copy and was missed. It renders in two places, one visible per
- * breakpoint: beside the sort dropdowns on wide screens, and left of "Items
- * per page" below tablet width, where it may wrap onto a second line.
+ * read as body copy and was missed. Which of its two spots it fills is decided
+ * in ContractsTableWrapper, from the direction the filter bar is running in.
  */
-export const FilterNote = styled.div<{ $placement: 'filters' | 'controls' }>`
+export const FilterNote = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -242,38 +287,19 @@ export const FilterNote = styled.div<{ $placement: 'filters' | 'controls' }>`
     color: ${props => props.theme.black};
   }
 
-  ${props =>
-    props.$placement === 'filters'
-      ? css`
-          /* Bottom edge level with the dropdown boxes, whose labels stand
-             above them. */
-          align-self: flex-end;
+  /* Bottom edge level with the dropdown boxes, whose labels stand above them. */
+  align-self: flex-end;
 
-          @media screen and (max-width: ${props.theme.breakpoints.tablet}) {
-            display: none;
-          }
-        `
-      : css`
-          /* Its own width and nothing more: a grow basis stretched it across
-             the leftover row, and a zero basis squeezed it in and pushed the
-             refresh button under the page-size pills. Content-sized, it sits
-             left of them when it fits and takes its own line when not, and
-             the pills and the refresh button always stay together. */
-          flex: 0 1 auto;
-          min-width: 0;
-          /* The page-size block carries a 10px bottom margin below tablet
-             width (the same one the blocks auto-update switch compensates
-             for); without matching it the chip's bottom lands 10px under the
-             pills, measured. */
-          margin-bottom: 10px;
-
-          @media screen and (min-width: ${props.theme.breakpoints.tablet}) {
-            display: none;
-          }
-        `}
+  /* Half the right padding on a phone: the cross that replaces the words
+     there carries its own 24px target, so the full 12px reads as a gap. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    padding-right: 6px;
+  }
 `;
 
 export const FilterClear = styled(Link)`
+  display: inline-flex;
+  align-items: center;
   font-weight: 600;
   color: ${props => accentText(props)};
   text-decoration: none;
@@ -287,6 +313,30 @@ export const FilterClear = styled(Link)`
   ${focusRing}
 `;
 
+/** The words, on the screens with room for them. */
+export const ClearLabel = styled.span`
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    display: none;
+  }
+`;
+
+/**
+ * The same action as a cross on a phone, which takes the chip from 253px to
+ * 214px there. 24px square rather than the glyph's own 14, so the target still
+ * clears the WCAG minimum.
+ */
+export const ClearIcon = styled.span`
+  display: none;
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+`;
+
 /* --------------------------- scoped table skin --------------------------- */
 
 /** `nth-child` is 1-based; the column indexes are not. */
@@ -294,6 +344,86 @@ const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
 
 export const ContractsTableWrapper = styled.div`
   ${dataListTableSkin}
+
+  /* The active-filter chip is rendered twice and exactly one is visible: in
+     the filter bar where that bar is a row, and beside the page-size controls
+     below that, where the bar is a column and a chip at the end of it would
+     take a line of its own. */
+  ${FilterContainer} > [data-testid='deployer-filter-note'] {
+    display: none;
+  }
+
+  /* The page-size pills and the refresh button, on one line at every width.
+     They share the top row with the filter bar, which is wide enough to shrink
+     them: between 1026 and 1090px that squeezed the refresh button onto a
+     second line under the pills, measured. Nothing here needs to give way,
+     the bar wraps its own chip instead. */
+  ${TableControls} {
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+  }
+
+  /* Fixed slots rather than the shared wrapping flex row, which broke per
+     item: there was always a width where the chip and the pills still fit and
+     the refresh button alone dropped under them. Chip left, the two controls
+     packed right, one row. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    ${TableControls} {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto auto;
+      align-items: end;
+      column-gap: 16px;
+      row-gap: 4px;
+    }
+
+    ${TableControls} > [data-testid='deployer-filter-note'] {
+      grid-column: 1;
+      justify-self: start;
+      /* The two controls beside it carry a 10px bottom margin at this width;
+         without the same one the chip hangs 10px below them. */
+      margin-bottom: 10px;
+    }
+
+    ${LimitContainer} {
+      grid-column: 3;
+    }
+
+    ${ExportContainer} {
+      grid-column: 4;
+    }
+  }
+
+  /* Under 480px the three no longer fit on one line, so the chip takes the
+     row above and the two controls stay together on the one below. */
+  @media screen and (max-width: ${CONTROLS_ONE_ROW}) {
+    ${TableControls} {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    ${TableControls} > [data-testid='deployer-filter-note'] {
+      grid-column: 1 / -1;
+      margin-bottom: 0;
+    }
+
+    ${LimitContainer} {
+      grid-column: 1;
+      justify-self: end;
+    }
+
+    ${ExportContainer} {
+      grid-column: 2;
+    }
+  }
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    ${FilterContainer} > [data-testid='deployer-filter-note'] {
+      display: inline-flex;
+    }
+
+    ${TableControls} > [data-testid='deployer-filter-note'] {
+      display: none;
+    }
+  }
 
   /* The shared Table's mobile loading rows stack a heading over a bar for
      every column: six pairs, 204px per card, against the 107 to 110px of the

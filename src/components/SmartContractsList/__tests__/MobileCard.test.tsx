@@ -20,6 +20,17 @@ jest.mock('@/components/TransactionsList/useContractName', () => ({
   useContractName: jest.fn(() => undefined),
 }));
 
+// So is the deployer's contract count; without this the hook wants a
+// QueryClientProvider the card does not carry.
+jest.mock('../useDeployerCount', () => ({
+  useDeployerCount: jest.fn(() => undefined),
+}));
+
+const mockRouter = { query: {} as Record<string, string>, push: jest.fn() };
+jest.mock('next/router', () => ({
+  useRouter: () => mockRouter,
+}));
+
 // Resolved against the shipped bundle, so a card asking for a key the locale
 // file does not carry fails here rather than rendering the raw key.
 jest.mock('next-i18next', () => {
@@ -86,8 +97,10 @@ jest.mock('react-dom', () => {
 
 import { useContractName } from '@/components/TransactionsList/useContractName';
 import ContractsMobileCard from '../MobileCard';
+import { useDeployerCount } from '../useDeployerCount';
 
 const mockedName = useContractName as jest.Mock;
+const mockedDeployerCount = useDeployerCount as jest.Mock;
 
 // Bitcoin.me on mainnet, trimmed to the fields the card reads.
 const CONTRACT: SmartContractsList = {
@@ -116,6 +129,9 @@ describe('ContractsMobileCard', () => {
   beforeEach(() => {
     mockedName.mockReset();
     mockedName.mockReturnValue(undefined);
+    mockedDeployerCount.mockReset();
+    mockedDeployerCount.mockReturnValue(undefined);
+    mockRouter.query = {};
   });
 
   it('names the contract the list already resolved', () => {
@@ -202,5 +218,51 @@ describe('ContractsMobileCard', () => {
       totalTransactions: undefined as unknown as number,
     });
     expect(screen.getByText('0')).toBeTruthy();
+  });
+
+  it('carries the deployer count beside the address, as the table does', () => {
+    mockedDeployerCount.mockReturnValue(14);
+    const { container } = renderCard();
+    const badge = container.querySelector(
+      `a[href="/smart-contracts?deployer=${CONTRACT.deployer}&sortBy=totalTransactions&orderBy=desc"]`,
+    );
+    expect(badge?.textContent).toBe('14');
+  });
+
+  it('leaves the count out at one, where the filter leads to this row', () => {
+    mockedDeployerCount.mockReturnValue(1);
+    const { container } = renderCard();
+    expect(container.querySelector('a[href*="?deployer="]')).toBeNull();
+  });
+
+  it('leaves it out while the lookup has not answered', () => {
+    // Undefined is not "one": rendering it would put a dead control on the
+    // card, and rendering a number would make one up.
+    mockedDeployerCount.mockReturnValue(undefined);
+    const { container } = renderCard();
+    expect(container.querySelector('a[href*="?deployer="]')).toBeNull();
+  });
+
+  it('holds the count back while the table is still fetching', () => {
+    renderCard(CONTRACT, false);
+    expect(mockedDeployerCount).toHaveBeenCalledWith(CONTRACT.deployer, false);
+  });
+
+  it('hides the count on the list already narrowed to this deployer', () => {
+    // There the link would lead to the page the reader is on, the same dead
+    // end the hide-at-one rule exists for.
+    mockedDeployerCount.mockReturnValue(14);
+    mockRouter.query = { deployer: CONTRACT.deployer };
+    const { container } = renderCard();
+    expect(container.querySelector('a[href*="?deployer="]')).toBeNull();
+  });
+
+  it('keeps the count when the list is narrowed to a different deployer', () => {
+    mockedDeployerCount.mockReturnValue(14);
+    mockRouter.query = { deployer: 'klv1someoneelse' };
+    const { container } = renderCard();
+    expect(container.querySelector('a[href*="?deployer="]')?.textContent).toBe(
+      '14',
+    );
   });
 });

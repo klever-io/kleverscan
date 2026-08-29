@@ -45,16 +45,15 @@
     "ContractTransactions": "Contract transactions",
     "MostUsed": "Most used contract",
     "LeaderTransactions": "{{amount}} transactions, all time",
-    "BarCaption": "Share of all contract transactions",
     "MostUsedNote": "By successful contract transactions, all time.",
     "NoStatistics": "No contract activity has been recorded yet.",
     "DeployerCountTitle": "Show the {{count}} contracts from this deployer",
-    "FilteredByDeployer": "Contracts deployed by",
     "ClearFilter": "Clear filter",
     "Last24h": "{{formatted}} in the last 24 hours",
     "MostUsedLoading": "Loading the most used applications",
     "OtherContracts": "Other contracts",
-    "DeployedByShort": "Deployed by"
+    "DeployedByShort": "Deployed by",
+    "TransactionsShort": "Tx"
   },
   "Filters": {
     "SortBy": "Sort by",

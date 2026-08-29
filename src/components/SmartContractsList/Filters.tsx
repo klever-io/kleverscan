@@ -86,7 +86,7 @@ const ContractsFilters: React.FC = () => {
           {filters.map(filter => (
             <Filter key={`${filter.testId}-${filter.current}`} {...filter} />
           ))}
-          <ActiveFilter placement="filters" />
+          <ActiveFilter />
         </>
       )}
     </FilterContainer>

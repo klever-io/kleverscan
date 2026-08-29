@@ -14,8 +14,10 @@ import { formatDate, formatDateWithSeconds } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
+import { DeployerCountBadge } from './cells';
 import { CONTRACT_COLUMNS, ContractColumnKey } from './columns';
-import { MobileContractLink } from './styles';
+import { DeployerCellRow, MobileContractLink } from './styles';
+import { useDeployerCount } from './useDeployerCount';
 
 export interface IContractsMobileCardExtras {
   deferred: boolean;
@@ -59,6 +61,7 @@ const ContractsMobileCard: React.FC<IContractsMobileCardProps> = ({
     ' (',
   )[0];
   const upgradeCount = Array.isArray(upgrades) ? upgrades.length : 0;
+  const deployerCount = useDeployerCount(deployer, deferred);
 
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
@@ -84,9 +87,12 @@ const ContractsMobileCard: React.FC<IContractsMobileCardProps> = ({
       </MobileTotalRow>
 
       <MobileMetaRow>
-        <AddressLink href={`/account/${deployer}`} title={deployer}>
-          {parseAddress(deployer, 12)}
-        </AddressLink>
+        <DeployerCellRow>
+          <AddressLink href={`/account/${deployer}`} title={deployer}>
+            {parseAddress(deployer, 12)}
+          </AddressLink>
+          <DeployerCountBadge deployer={deployer} count={deployerCount} />
+        </DeployerCellRow>
         <MobileMetaItem>
           {label('upgrades')}{' '}
           {upgradeCount > 0

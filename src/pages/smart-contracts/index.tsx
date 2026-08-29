@@ -48,9 +48,10 @@ const SmartContracts: React.FC<PropsWithChildren> = () => {
     mobileCardProps: { deferred },
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
-    // The narrow-screen spot of the active-filter chip, left of Items per
-    // page; the wide-screen twin renders inside the filter bar.
-    TableControl: <ActiveFilter placement="controls" />,
+    // The chip's second spot, beside the page-size controls; the filter bar
+    // holds the other. The page skin shows whichever the bar's direction
+    // leaves room for.
+    TableControl: <ActiveFilter />,
   };
 
   return (

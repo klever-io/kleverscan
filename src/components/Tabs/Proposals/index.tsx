@@ -152,7 +152,7 @@ const Proposals: React.FC<PropsWithChildren<IProposalsProps>> = ({
         return (
           <Tooltip
             Component={() => (
-              <DoubleRow {...props}>
+              <DoubleRow>
                 {renderProposalsNetworkParams(parsedParameters)}
               </DoubleRow>
             )}

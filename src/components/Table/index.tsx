@@ -435,7 +435,7 @@ const Table = <TCard,>({
                 >
                   {rowSections &&
                     rowSections(item)?.map(
-                      ({ element: Element, span, width, maxWidth }, index2) => {
+                      ({ element, span, width, maxWidth }, index2) => {
                         const [updatedSpanCount, isRightAligned] =
                           processRowSectionsLayout(spanCount, span);
                         spanCount = updatedSpanCount;
@@ -459,7 +459,11 @@ const Table = <TCard,>({
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
-                            <Element $smaller={smaller} />
+                            {/* Called, not mounted as a component type: the
+                                builder returns a fresh arrow per render, and
+                                as a type that remounted every cell, dropping
+                                focus and cell state (#697). */}
+                            {element({ $smaller: smaller })}
                           </MobileCardItem>
                         );
                       },

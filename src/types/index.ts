@@ -1,6 +1,6 @@
 import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
-import { Dispatch, PropsWithChildren, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { IBlock, IBlockResponse } from './blocks';
 import {
   Contract,
@@ -1100,7 +1100,14 @@ export interface TableRowElementProps {
   $smaller?: boolean;
 }
 export interface IRowSection {
-  element: React.FC<PropsWithChildren<TableRowElementProps>>;
+  /**
+   * A plain function the tables CALL, not a component type they mount: builders
+   * hand over a fresh arrow every render, and rendering that as `<Element />`
+   * gave every cell a new identity, so React remounted all of them on each
+   * re-render, dropping keyboard focus and cell state (#697). Consequence: no
+   * hooks inside; a cell needing hooks renders a real component instead.
+   */
+  element: (props: TableRowElementProps) => React.ReactNode;
   span: number;
   width?: number;
   maxWidth?: number;

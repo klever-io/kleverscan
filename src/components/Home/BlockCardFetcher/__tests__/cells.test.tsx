@@ -116,6 +116,17 @@ describe('home block cells', () => {
     expect(screen.getAllByText('0 KLV')).toHaveLength(2);
   });
 
+  it('renders zeroes in the rewards cell when its fields are missing', () => {
+    renderCell(
+      blockRewardsCell({
+        ...BLOCK,
+        txFees: undefined,
+        blockRewards: undefined,
+      } as unknown as IBlock),
+    );
+    expect(screen.getAllByText('0 KLV')).toHaveLength(2);
+  });
+
   // The drift guard #700 asks for: both home variants must keep rendering the
   // shared cells identically. Positions 2 to 4 in both builders.
   it('keeps the desktop and tablet builders on the same three cells', () => {

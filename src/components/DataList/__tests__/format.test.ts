@@ -97,6 +97,8 @@ describe('exactAmount', () => {
     expect(exactAmount('10000000000000000', 8, { trimFraction: false })).toBe(
       '100,000,000.00000000',
     );
+    // Precision 0: no fraction exists, trimmed or not.
+    expect(exactAmount('123', 0, { trimFraction: false })).toBe('123');
   });
 });
 

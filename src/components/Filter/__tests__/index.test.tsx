@@ -402,6 +402,28 @@ describe('Filter keyboard operation', () => {
     expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
   });
 
+  it('selects nothing on Enter while no option is active', async () => {
+    const onClick = jest.fn();
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={onClick}
+      />,
+    );
+
+    fireEvent.click(opener());
+    const input = await screen.findByLabelText('Search Status');
+
+    // Typing resets the cursor to none; Enter must not guess an option.
+    fireEvent.change(input, { target: { value: 'Suc' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(onClick).not.toHaveBeenCalled();
+    expect(screen.getByLabelText('Search Status')).toBeInTheDocument();
+  });
+
   it('wraps the cursor from the first option up to the last', async () => {
     renderWithTheme(
       <Filter
@@ -482,6 +504,68 @@ describe('Filter keyboard operation', () => {
 
     fireEvent.click(openerElement);
     expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+  });
+
+  it('toggles from the chevron with the mouse, as before', async () => {
+    const { container } = renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    const arrow = container.querySelector('[aria-hidden="true"]');
+    fireEvent.click(arrow as Element);
+    expect(await screen.findByLabelText('Search Status')).toBeInTheDocument();
+
+    fireEvent.click(arrow as Element);
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+  });
+
+  it('closes when focus leaves the control, but not when it moves inside', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current="Fail"
+        onClick={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Status Fail' }));
+    const input = await screen.findByLabelText('Search Status');
+
+    // To the clear button: still inside the control, must stay open.
+    fireEvent.blur(input, {
+      relatedTarget: screen.getByRole('button', {
+        name: 'Clear Status filter',
+      }),
+    });
+    expect(screen.getByLabelText('Search Status')).toBeInTheDocument();
+
+    // Out of the control entirely: closes.
+    fireEvent.blur(input, { relatedTarget: null });
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+  });
+
+  it('does not close on blur while the pointer rests on the control', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(opener());
+    const input = await screen.findByLabelText('Search Status');
+
+    fireEvent.mouseEnter(screen.getByTestId('selector'));
+    fireEvent.blur(input, { relatedTarget: null });
+    expect(screen.getByLabelText('Search Status')).toBeInTheDocument();
   });
 
   it('names the clear control and clears back to All through it', () => {

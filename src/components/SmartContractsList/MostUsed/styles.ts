@@ -10,14 +10,28 @@ import Link from 'next/link';
 import styled, { css } from 'styled-components';
 
 /**
- * Section heading above the podium.
- *
+ * The page's blocks sit 24px apart everywhere (measured on /blocks, /accounts
+ * and /transactions: title to summary 24, summary to filter row 24). The
+ * section itself carries the 24px below it; above it, the summary card's own
+ * 24px bottom margin is the whole gap, so the heading adds no top margin. It
+ * used to add 2rem, and in a flex container margins stack instead of
+ * collapsing: 56px above against 0px below, measured.
+ */
+export const Section = styled.section`
+  /* px like the summary card's own margin, not rem: the root font shrinks to
+     87,5% below tablet width, and 1.5rem left this gap 21px where the gap
+     above the section stays 24. Measured on /blocks: the house keeps 24px
+     fixed at every width. */
+  margin-bottom: 24px;
+`;
+
+/**
  * An explicit size, not an inherited one. The old wrapper set 24px on a div
  * and put an `h3` inside it, and the browser's default `h3` of 1.17em turned
  * that into 28,08px, a hair under the page's own 28,8px `h1`. Measured.
  */
 export const SectionTitle = styled.h2`
-  margin: 2rem 0 0.75rem;
+  margin: 0 0 0.25rem;
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.6rem;
@@ -25,7 +39,7 @@ export const SectionTitle = styled.h2`
 `;
 
 export const SectionNote = styled.p`
-  margin: -0.5rem 0 0.75rem;
+  margin: 0 0 0.75rem;
   font-size: 0.75rem;
   color: ${props => props.theme.darkText};
 `;

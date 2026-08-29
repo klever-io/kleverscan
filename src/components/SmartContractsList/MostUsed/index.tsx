@@ -10,6 +10,7 @@ import { topContracts } from '../summaryFigures';
 import { contractLabel } from './label';
 import {
   CardAddress,
+  Section,
   CardBar,
   CardBarRow,
   CardCount,
@@ -29,8 +30,8 @@ import {
   SectionTitle,
 } from './styles';
 
-/** Cards on the podium. The share texts still divide by the ten busiest, the
- *  denominator the section note names. */
+/** Cards on the podium. The share texts divide by the five busiest, the same
+ *  denominator the summary bar above uses. */
 const PODIUM = 3;
 
 /**
@@ -112,15 +113,17 @@ const MostUsed: React.FC = () => {
     gcTime: 15 * 60_000,
   });
 
-  // Ten, not three: the ten busiest are the denominator of every share shown.
-  const busiest = topContracts(data?.statistics, 10);
+  // Five, the same denominator as the summary bar above: one contract showing
+  // two different percentages on one page reads as a bug, whatever the
+  // captions say. Measured complaint: 39,1% in the bar against 32,6% here.
+  const busiest = topContracts(data?.statistics, 5);
   const leaderCount = busiest?.segments[0]?.count ?? 0;
   const loadingLabel = t('smartContracts:List.MostUsedLoading', {
     defaultValue: 'Loading the most used applications',
   });
 
   return (
-    <section aria-labelledby="most-used-heading">
+    <Section aria-labelledby="most-used-heading">
       <SectionTitle id="most-used-heading">
         {t('smartContracts:Titles.MostUsed', {
           defaultValue: 'Most used applications',
@@ -129,7 +132,7 @@ const MostUsed: React.FC = () => {
       <SectionNote>
         {t('smartContracts:List.MostUsedNote', {
           defaultValue:
-            'By successful contract transactions, all time. Shares are of the ten busiest.',
+            'By successful contract transactions, all time. Shares are of the five busiest.',
         })}
       </SectionNote>
 
@@ -195,7 +198,7 @@ const MostUsed: React.FC = () => {
           ))}
         </PodiumRow>
       )}
-    </section>
+    </Section>
   );
 };
 

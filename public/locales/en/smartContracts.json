@@ -46,7 +46,7 @@
     "MostUsed": "Most used contract",
     "LeaderTransactions": "{{amount}} transactions, all time",
     "BarCaption": "Share among the five busiest contracts",
-    "MostUsedNote": "By successful contract transactions, all time. Shares are of the ten busiest.",
+    "MostUsedNote": "By successful contract transactions, all time. Shares are of the five busiest.",
     "NoStatistics": "No contract activity has been recorded yet.",
     "DeployerCountTitle": "Show the {{count}} contracts from this deployer",
     "FilteredByDeployer": "Contracts deployed by",

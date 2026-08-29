@@ -37,24 +37,37 @@ export const formatShare = (part: number, total: number): string => {
 };
 
 /**
- * Human-readable amount for tooltips, where compact notation lies. Divides by
- * 10^precision through string math, because float division rounds the last
- * decimal on 16-digit raw supplies.
+ * Human-readable amount for tooltips and full-value figures, where compact
+ * notation lies. Divides by 10^precision through string math, because float
+ * division rounds the last decimal on 16-digit raw supplies.
  *
- * The exactness ceiling is the input rather than this function: a raw supply
- * above Number.MAX_SAFE_INTEGER already lost its value in JSON.parse, so what
- * comes out is an exact rendering of the stored double, not necessarily of the
- * chain figure. Closing that gap means carrying the supply as a string from
- * the API boundary, tracked in issue #679. Note that a string path cannot just
- * be passed in here: the guard below rejects it and BigInt(Math.trunc(raw))
- * coerces through Number anyway, so it would have to feed BigInt the raw
- * digits instead.
+ * A string input is the exact digit twin the parse boundary injects for
+ * values past 2^53 (#679): those digits feed the walk directly and the
+ * result is genuinely exact. A number input is exact only up to what a
+ * double can carry, which is why callers prefer the string when present.
+ *
+ * `trimFraction: false` keeps the fraction at full precision, matching the
+ * fixed-decimals presentation of `toLocaleFixed` for figures shown in body
+ * text rather than tooltips.
  */
-export const exactAmount = (raw: number, precision: number): string => {
-  if (!Number.isFinite(raw) || raw < 0) return '--';
+const exactDigitsOf = (raw: number | string): string | undefined => {
+  if (typeof raw === 'string') {
+    // Digits only: anything else did not come from the parse boundary.
+    return /^\d+$/.test(raw) ? raw : undefined;
+  }
+  if (!Number.isFinite(raw) || raw < 0) return undefined;
   // BigInt rather than toString(): a double at or above 1e21 stringifies to
   // exponent form, which the digit walk below cannot read.
-  const rawString = BigInt(Math.trunc(raw)).toString();
+  return BigInt(Math.trunc(raw)).toString();
+};
+
+export const exactAmount = (
+  raw: number | string,
+  precision: number,
+  { trimFraction = true }: { trimFraction?: boolean } = {},
+): string => {
+  const rawString = exactDigitsOf(raw);
+  if (rawString === undefined) return '--';
   const padded = rawString.padStart(precision + 1, '0');
   const whole = precision > 0 ? padded.slice(0, -precision) : padded;
   const fraction = precision > 0 ? padded.slice(-precision) : '';
@@ -64,6 +77,10 @@ export const exactAmount = (raw: number, precision: number): string => {
     grouped += whole[index];
     const remaining = whole.length - index - 1;
     if (remaining > 0 && remaining % 3 === 0) grouped += ',';
+  }
+
+  if (!trimFraction) {
+    return fraction ? `${grouped}.${fraction}` : grouped;
   }
 
   let fractionEnd = fraction.length;

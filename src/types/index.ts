@@ -424,6 +424,8 @@ export interface IStaking {
   interestType: string;
   minEpochsToWithdraw: number;
   totalStaked: number;
+  /** Exact digit twin from the parse boundary, values past 2^53 (#679). */
+  totalStakedString?: string;
   apr:
     | {
         timestamp: number;
@@ -464,6 +466,14 @@ export interface IAsset {
   voidedSupply?: number;
   netCirculatingSupply?: number;
   maxSupply: number;
+  // Exact digit twins, injected at the parse boundary for values past 2^53
+  // (#679); present only when the wire value was 16 digits or more.
+  initialSupplyString?: string;
+  circulatingSupplyString?: string;
+  voidedSupplyString?: string;
+  netCirculatingSupplyString?: string;
+  maxSupplyString?: string;
+  burnedValueString?: string;
   royalties: IRoyalties;
   mintedValue: number;
   issueDate: number;
@@ -537,6 +547,9 @@ export interface IAssetPool {
   active: boolean;
   klvBalance: number;
   kdaBalance: number;
+  /** Exact digit twins from the parse boundary, values past 2^53 (#679). */
+  klvBalanceString?: string;
+  kdaBalanceString?: string;
   convertedFees: number;
   adminAddress: string;
   fRatioKLV: number;

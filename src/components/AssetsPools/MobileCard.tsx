@@ -82,7 +82,7 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
       </MobileTotalRow>
       <MobileMetaRow>
         <MobileMetaItem
-          title={`${exactAmount(pool.klvBalance, KLV_PRECISION)} KLV`}
+          title={`${exactAmount(pool.klvBalanceString ?? pool.klvBalance, KLV_PRECISION)} KLV`}
         >
           KLV reserve {formatAmount(pool.klvBalance / 10 ** KLV_PRECISION)}
         </MobileMetaItem>
@@ -90,7 +90,7 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
           title={
             precision === undefined
               ? undefined
-              : `${exactAmount(pool.kdaBalance, precision)} ${displayTicker}`
+              : `${exactAmount(pool.kdaBalanceString ?? pool.kdaBalance, precision)} ${displayTicker}`
           }
         >
           {displayTicker} reserve{' '}

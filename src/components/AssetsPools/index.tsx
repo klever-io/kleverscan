@@ -128,6 +128,10 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
     const displayTicker = ticker || kda.split('-')[0] || 'KDA';
     const rate = getPoolRate(pool?.fRatioKLV, pool?.fRatioKDA, precision);
     const separateAdmin = !!pool && hasSeparateAdmin(pool);
+    // Exact digit twins from the parse boundary (#679) for the reserve
+    // tooltips; the numbers stay the fallback.
+    const klvBalanceExact = pool?.klvBalanceString ?? klvBalance;
+    const kdaBalanceExact = pool?.kdaBalanceString ?? kdaBalance;
 
     return [
       {
@@ -180,7 +184,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
       {
         element: () => (
           <AmountPrimary
-            title={`${exactAmount(klvBalance, KLV_PRECISION)} KLV · ${t(POOL_KLV_RESERVE_TOOLTIP)}`}
+            title={`${exactAmount(klvBalanceExact, KLV_PRECISION)} KLV · ${t(POOL_KLV_RESERVE_TOOLTIP)}`}
           >
             {formatAmount(klvBalance / 10 ** KLV_PRECISION)}
           </AmountPrimary>
@@ -194,7 +198,7 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
             title={
               precision === undefined
                 ? t('assets:Pools.PrecisionUnavailable')
-                : `${exactAmount(kdaBalance, precision)} ${displayTicker}`
+                : `${exactAmount(kdaBalanceExact, precision)} ${displayTicker}`
             }
           >
             <span>

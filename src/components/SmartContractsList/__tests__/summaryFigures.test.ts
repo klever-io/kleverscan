@@ -21,7 +21,9 @@ describe('windowVariation', () => {
   });
 
   it('has no rate for a non-finite figure', () => {
-    expect(windowVariation({ current: Infinity, previous: 100 })).toBeUndefined();
+    expect(
+      windowVariation({ current: Infinity, previous: 100 }),
+    ).toBeUndefined();
     expect(windowVariation({ current: NaN, previous: 100 })).toBeUndefined();
     expect(windowVariation({ current: 10, previous: NaN })).toBeUndefined();
   });

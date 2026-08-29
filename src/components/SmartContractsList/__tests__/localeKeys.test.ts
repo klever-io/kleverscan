@@ -27,6 +27,7 @@ const USED_KEYS = [
   'List.LeaderTransactions',
   'List.BarCaption',
   'List.MostUsedNote',
+  'List.MostUsedLoading',
   'List.NoStatistics',
   'List.DeployerCountTitle',
   'List.FilteredByDeployer',

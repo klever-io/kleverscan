@@ -5,10 +5,17 @@ import {
   dataListTableSkin,
   focusRing,
   inCard,
+  LegendItem,
+  LegendRow,
   SummaryCard,
+  Tile,
 } from '@/components/DataList/styles';
-import SummaryLoading from '@/components/DataList/SummaryLoading';
-import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
+import {
+  HeaderItem,
+  MobileCardItem,
+  MobileHeader,
+  TableRow,
+} from '@/components/Table/styles';
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
 import { RIGHT_ALIGNED_COLUMNS } from './columns';
@@ -22,12 +29,44 @@ const pageSummarySpacing = css`
   margin-top: 1.5rem;
 `;
 
-export const ContractsSummaryCard = styled(SummaryCard)`
-  ${pageSummarySpacing}
+/**
+ * Holds every tile to the height of the tallest one (a label, a value row and
+ * a sub line), the same 66,5px /blocks measured against /transactions. On the
+ * loading shape too, or the card changes height when the figures land: the
+ * shared loading tile stacks to 61px against the loaded 64,5, which moved the
+ * whole page below it by 6px, measured here with stalled requests.
+ */
+const tileHeight = css`
+  ${Tile} {
+    min-height: 66.5px;
+  }
 `;
 
-export const ContractsSummaryLoading = styled(SummaryLoading)`
+export const ContractsSummaryCard = styled(SummaryCard)`
   ${pageSummarySpacing}
+  ${tileHeight}
+
+  /* One legend row on every width: below tablet it scrolls sideways instead
+     of wrapping. Wrapping made its height depend on the length of contract
+     names, which no loading shape can predict; measured, the card grew 17px
+     under the reader when the legend landed three rows tall at 390px. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    ${LegendRow} {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    ${LegendItem} {
+      flex-shrink: 0;
+    }
+  }
+`;
+
+/** The one-line legend placeholder's row, sharing the legend's own metrics. */
+export const PlaceholderLegendRow = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
 `;
 
 /**
@@ -42,6 +81,10 @@ export const SummaryContractLink = styled(Link)`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    /* Off the baseline: an inline-block on it gets the parent's descender
+       space added under it, which made this tile 33px where its neighbours
+       hold 27,5 and grew the whole card by 4,5px. Measured. */
+    vertical-align: bottom;
   }
 
   color: ${accentText};
@@ -206,6 +249,27 @@ const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
 
 export const ContractsTableWrapper = styled.div`
   ${dataListTableSkin}
+
+  /* The shared Table's mobile loading rows stack a heading over a bar for
+     every column: six pairs, 204px per card, against the 107 to 110px of the
+     loaded mobile card. Loading rows are the only place ${'${TableRow}'} exists
+     below tablet width on this page (the loaded rows are MobileListCards and
+     the header row renders on desktop only), so this reshapes just them:
+     no headings, two bars per row, and a bar height that lands the card at
+     109px, the median of the loaded cards. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    ${TableRow} ${MobileHeader} {
+      display: none;
+    }
+
+    ${TableRow} ${MobileCardItem} {
+      grid-column: span 1;
+    }
+
+    ${TableRow} [data-testid='skeleton'] {
+      height: 23px !important;
+    }
+  }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     /* One row height across every data-list table on the site. */

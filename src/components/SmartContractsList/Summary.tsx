@@ -13,6 +13,7 @@ import {
   TilesGrid,
 } from '@/components/DataList/styles';
 import { useDeferred } from '@/components/DataList/useDeferred';
+import Skeleton from '@/components/Skeleton';
 import { TrendValue } from '@/components/TransactionsList/styles';
 import {
   contractTransactions24hCall,
@@ -26,11 +27,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useTheme } from 'styled-components';
-import {
-  ContractsSummaryCard,
-  ContractsSummaryLoading,
-  SummaryContractLink,
-} from './styles';
+import ContractsSummaryLoadingCard, {
+  FiguresBarPlaceholder,
+} from './LoadingCard';
+import { ContractsSummaryCard, SummaryContractLink } from './styles';
 import { topContracts, windowVariation } from './summaryFigures';
 
 /**
@@ -74,7 +74,7 @@ const ContractsSummary: React.FC = () => {
     ...FIGURE_CACHE,
   });
 
-  const { data: statistics } = useQuery({
+  const { data: statistics, isPending: statisticsPending } = useQuery({
     queryKey: ['smartContractsStatistic'],
     queryFn: smartContractsStatisticCall,
     // Behind the list, not beside it: the bar is decoration nobody waits on,
@@ -84,7 +84,7 @@ const ContractsSummary: React.FC = () => {
   });
 
   if (isLoading) {
-    return <ContractsSummaryLoading label={label} tiles={3} bar />;
+    return <ContractsSummaryLoadingCard label={label} />;
   }
   if (!data) return null;
 
@@ -166,7 +166,11 @@ const ContractsSummary: React.FC = () => {
           </Tile>
         )}
 
-        {leader && (
+        {/* The statistics arrive after the tiles on purpose (deferred), so
+            this tile reserves its boxes rather than growing the card while
+            the reader is already below it. Label and value line boxes are
+            27,5px and 16,5px, the same as the loaded lines. */}
+        {leader ? (
           <Tile>
             <TileLabel>
               {t('smartContracts:List.MostUsed', {
@@ -185,8 +189,33 @@ const ContractsSummary: React.FC = () => {
               })}
             </TileSub>
           </Tile>
+        ) : (
+          statisticsPending && (
+            <Tile aria-busy="true">
+              <TileLabel>
+                {t('smartContracts:List.MostUsed', {
+                  defaultValue: 'Most used contract',
+                })}
+              </TileLabel>
+              <Skeleton
+                width="55%"
+                height="1.09375rem"
+                containerCustomStyles={{ margin: '0.3125rem 0' }}
+              />
+              <Skeleton
+                width="70%"
+                height="0.65625rem"
+                containerCustomStyles={{
+                  margin: '0.1875rem 0',
+                  marginTop: 'calc(0.1875rem + 2px)',
+                }}
+              />
+            </Tile>
+          )
         )}
       </TilesGrid>
+
+      {!busiest && statisticsPending && <FiguresBarPlaceholder />}
 
       {busiest && (
         <>

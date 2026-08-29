@@ -1,15 +1,16 @@
 import {
   accentText,
+  badgeTint,
   focusRing,
   inCard,
   ShareFill,
   ShareTrack,
 } from '@/components/DataList/styles';
 import Link from 'next/link';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 /**
- * Section heading above the carousel.
+ * Section heading above the podium.
  *
  * An explicit size, not an inherited one. The old wrapper set 24px on a div
  * and put an `h3` inside it, and the browser's default `h3` of 1.17em turned
@@ -35,30 +36,53 @@ export const EmptyNote = styled.p`
   color: ${props => props.theme.darkText};
 `;
 
-/* --------------------------------- cards --------------------------------- */
+/* --------------------------------- podium -------------------------------- */
 
 /**
+ * Three equal columns across the full container. The old carousel parked its
+ * fixed-width cards on the left and left the right half of a 1440px viewport
+ * empty; a grid makes the section's width a decision instead of a leftover.
+ */
+export const PodiumRow = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+`;
+
+/**
+ * One frame for the real card and its loading shape, so the two cannot end up
+ * at different heights and shift the table when the figures land.
+ *
  * Border in both themes. The old card drew a violet border in light and
  * `0px none` in dark, where its surface sat at 1,03:1 against the page, so in
  * dark mode there was no card to see. Measured.
  */
-export const ContractCard = styled(Link)`
-  ${inCard('flex')}
-
-  && {
-    flex-direction: column;
-    align-items: stretch;
-    height: auto;
-    min-width: 216px;
-    max-width: 216px;
-  }
-
-  gap: 8px;
-  padding: 14px;
+const cardFrame = css`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
   border-radius: 12px;
   border: 1px solid
     ${props => (props.theme.dark ? props.theme.darkGray : props.theme.black10)};
   background-color: ${props => props.theme.white};
+`;
+
+export const ContractCard = styled(Link)`
+  ${inCard('flex')}
+
+  && {
+    align-items: stretch;
+    height: auto;
+    min-width: 0;
+  }
+
+  ${cardFrame}
   color: ${props => props.theme.black};
   text-decoration: none;
   transition: border-color 150ms ease-out;
@@ -75,28 +99,50 @@ export const ContractCard = styled(Link)`
   }
 `;
 
-export const CardRank = styled.span`
-  ${inCard('inline-flex', 700)}
-
-  && {
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-  }
-
-  border-radius: 6px;
-  font-size: 0.6875rem;
-  font-variant-numeric: tabular-nums;
-  color: ${accentText};
-  background-color: ${props => props.theme.black10};
+export const PlaceholderCard = styled.div`
+  ${cardFrame}
 `;
 
 export const CardTopRow = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
+  min-width: 0;
+`;
+
+/**
+ * The leader's chip is accent-tinted, the other two stay neutral: one podium
+ * signal, not three competing ones.
+ */
+export const CardRank = styled.span<{ $leader?: boolean }>`
+  ${inCard('inline-flex', 700)}
+
+  && {
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+  }
+
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: ${props => (props.$leader ? accentText(props) : props.theme.darkText)};
+  background-color: ${props =>
+    props.$leader ? badgeTint(props, 'accent') : badgeTint(props, 'neutral')};
+`;
+
+export const CardIdentity = styled.span`
+  ${inCard('flex')}
+
+  && {
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  gap: 2px;
 `;
 
 export const CardName = styled.span`
@@ -106,7 +152,8 @@ export const CardName = styled.span`
     max-width: 100%;
   }
 
-  font-size: 0.875rem;
+  font-size: 1rem;
+  line-height: 1.25rem;
   color: ${props => props.theme.black};
   white-space: nowrap;
   overflow: hidden;
@@ -116,118 +163,74 @@ export const CardName = styled.span`
 export const CardAddress = styled.span`
   ${inCard('block')}
 
+  && {
+    max-width: 100%;
+  }
+
   font-family: 'Fira Mono', monospace;
   font-size: 0.6875rem;
+  line-height: 1rem;
   color: ${props => props.theme.darkText};
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+`;
+
+export const CardCountRow = styled.span`
+  ${inCard('flex')}
+
+  && {
+    align-items: baseline;
+  }
+
+  gap: 8px;
+  margin-top: auto;
 `;
 
 export const CardCount = styled.span`
   ${inCard('block', 600)}
 
-  font-size: 1.125rem;
+  font-size: 1.5rem;
+  line-height: 1.875rem;
   font-variant-numeric: tabular-nums;
   color: ${props => props.theme.black};
 `;
 
 export const CardCountLabel = styled.span`
-  ${inCard('block')}
+  ${inCard('block', 600)}
 
   font-size: 0.6875rem;
-  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: ${props => props.theme.darkText};
 `;
 
-/* ------------------------------ ranked rows ------------------------------ */
-
-export const RankedList = styled.ol`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-`;
-
-export const RankedRow = styled(Link)`
-  ${inCard('grid')}
+export const CardBarRow = styled.span`
+  ${inCard('flex')}
 
   && {
     align-items: center;
-    height: auto;
   }
 
-  grid-template-columns: 28px minmax(0, 1fr) 150px 110px;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: ${props => props.theme.black};
-  text-decoration: none;
-  transition: background-color 150ms ease-out;
-
-  &:hover {
-    background-color: ${props => props.theme.black10};
-    text-decoration: none;
-  }
-
-  ${focusRing}
-
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    grid-template-columns: 24px minmax(0, 1fr) 90px;
-
-    /* The bar is the first thing to go when the row runs out of room: it is
-       the only element here that repeats what the number beside it says. */
-    ${ShareTrack} {
-      display: none;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-  }
+  gap: 8px;
 `;
 
-export const RowRank = styled.span`
+/** One solid segment on the shared track: independent contracts, not two
+ *  parts of one quantity. */
+export const CardBar = styled(ShareFill)`
+  background-color: ${accentText};
+`;
+
+export const CardShare = styled.span`
   ${inCard('block', 600)}
 
-  font-size: 0.75rem;
+  flex-shrink: 0;
+  font-size: 0.6875rem;
   font-variant-numeric: tabular-nums;
   color: ${props => props.theme.darkText};
 `;
 
-export const RowName = styled.span`
-  ${inCard('block', 600)}
-
-  font-size: 0.875rem;
-  color: ${props => props.theme.black};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-export const RowCount = styled.span`
-  ${inCard('block')}
-
-  font-size: 0.8125rem;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  color: ${props => props.theme.darkText};
-`;
-
-/** The share bar reuses the shared track, but one solid segment: these are
- *  independent contracts, not two parts of one quantity. */
-export const RowBar = styled(ShareFill)`
-  background-color: ${props => props.theme.violet};
-`;
-
-/** The three featured cards of the "featured" variant. */
-export const PodiumRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 12px;
+/** The track grows, the share text keeps its width. */
+export const CardTrack = styled(ShareTrack)`
+  flex: 1;
 `;

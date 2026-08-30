@@ -1,4 +1,6 @@
+import { formatShare } from '@/components/DataList/format';
 import { HotContracts } from '@/types/smart-contract';
+import { safeContractName } from '@/utils/contractName';
 
 export interface IContractShare {
   address: string;
@@ -16,10 +18,9 @@ export interface ITopContracts {
 /**
  * The busiest contracts and their share of each other.
  *
- * Deliberately not a share of all contract activity: `sc/statistics` returns
- * the top ten only (`size: 10` in the proxy's aggregation), so the denominator
- * is those ten and nothing wider. The label above the bar has to say so, or a
- * reader takes it for a market share that is not being measured.
+ * That sum is not the share denominator: `shareModel` divides by all
+ * successful contract activity chain-wide, and uses this total only as the
+ * floor it clamps that denominator up to.
  *
  * The counts are all-time. The endpoint accepts an `epoch` parameter that
  * narrows it to one six-hour window, but the frontend does not send one, so
@@ -99,3 +100,29 @@ export const shareModel = (
   const total = Math.max(allSuccessful, top.total);
   return { total, segments: top.segments, other: total - top.total };
 };
+
+/** Cycles the distinct hues; the caller keeps its muted colour for the Other
+ *  remainder outside this cycle. */
+export const segmentColor = (
+  index: number,
+  palette: readonly string[],
+): string => palette[index % palette.length];
+
+/**
+ * The share bar's accessible label: every drawn segment with its share, then
+ * the Other remainder, as one string. Names pass safeContractName with the
+ * full address as fallback, the same rule the legend draws by.
+ */
+export const shareBarLabel = (
+  model: IShareModel | undefined,
+  otherLabel: string,
+): string =>
+  model
+    ? [
+        ...model.segments.map(
+          segment =>
+            `${segment.name ? safeContractName(segment.name) || segment.address : segment.address} ${formatShare(segment.count, model.total)}`,
+        ),
+        `${otherLabel} ${formatShare(model.other, model.total)}`,
+      ].join(', ')
+    : '';

@@ -20,6 +20,10 @@ const ActiveFilter: React.FC = () => {
   const { t } = useTranslation(['smartContracts']);
   const deployer = readDeployerFilter(router.query);
 
+  // Only where the parameter is actually applied: the account tab reuses this
+  // filter bar but scopes by route segment, and a hand-added `?deployer=`
+  // there would put a claim above a table that ignores it.
+  if (router.pathname !== '/smart-contracts') return null;
   if (!deployer) return null;
 
   const clearLabel = t('smartContracts:List.ClearFilter', {

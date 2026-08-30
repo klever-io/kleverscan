@@ -87,6 +87,8 @@ export interface IDeployerCountBadgeProps {
   /** Undefined while the lookup has not answered, which is not the same as
    *  "one" and must not render as a dead control. */
   count?: number;
+  /** The deployer the caller already narrowed the whole list to. */
+  scopedTo?: string;
 }
 
 /**
@@ -97,14 +99,18 @@ export interface IDeployerCountBadgeProps {
 export const DeployerCountBadge: React.FC<IDeployerCountBadgeProps> = ({
   deployer,
   count,
+  scopedTo,
 }) => {
   const { t } = useTranslation(['smartContracts']);
   const router = useRouter();
 
   if (count === undefined || count <= 1) return null;
   // Same dead end as the rule above: on the already-narrowed list the link
-  // would lead to the page the reader is on.
+  // would lead to the page the reader is on. The account tab narrows by route
+  // segment rather than by `?deployer=`, so its caller says so explicitly
+  // where the URL cannot.
   if (readDeployerFilter(router.query) === deployer) return null;
+  if (scopedTo === deployer) return null;
 
   const href = deployerFilterHref(router.query, deployer);
   const label = t('smartContracts:List.DeployerCountTitle', {
@@ -129,6 +135,7 @@ export const DeployerCountBadge: React.FC<IDeployerCountBadgeProps> = ({
 export interface IDeployerCellProps {
   deployer: string;
   deferred: boolean;
+  scopedTo?: string;
 }
 
 /**
@@ -141,6 +148,7 @@ export interface IDeployerCellProps {
 export const DeployerCell: React.FC<IDeployerCellProps> = ({
   deployer,
   deferred,
+  scopedTo,
 }) => {
   const count = useDeployerCount(deployer, deferred);
 
@@ -149,7 +157,11 @@ export const DeployerCell: React.FC<IDeployerCellProps> = ({
       <DeployerLink href={`/account/${deployer}`} title={deployer}>
         <Mono>{parseAddress(deployer, 12)}</Mono>
       </DeployerLink>
-      <DeployerCountBadge deployer={deployer} count={count} />
+      <DeployerCountBadge
+        deployer={deployer}
+        count={count}
+        scopedTo={scopedTo}
+      />
     </DeployerCellRow>
   );
 };

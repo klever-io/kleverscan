@@ -1,4 +1,9 @@
-import { shareModel, topContracts } from '../summaryFigures';
+import {
+  segmentColor,
+  shareBarLabel,
+  shareModel,
+  topContracts,
+} from '../summaryFigures';
 
 describe('topContracts', () => {
   const entry = (address: string, count: number, name?: string) => ({
@@ -113,5 +118,43 @@ describe('shareModel', () => {
 
   it('yields nothing without segments to share', () => {
     expect(shareModel(undefined, 1000)).toBeUndefined();
+  });
+});
+
+describe('segmentColor', () => {
+  const palette = ['a', 'b', 'c'];
+
+  it('cycles the palette by index', () => {
+    expect(segmentColor(0, palette)).toBe('a');
+    expect(segmentColor(2, palette)).toBe('c');
+    expect(segmentColor(3, palette)).toBe('a');
+  });
+});
+
+describe('shareBarLabel', () => {
+  const model = {
+    total: 100,
+    other: 40,
+    segments: [
+      { address: 'klv1named', name: 'Bitcoin.me', count: 30 },
+      { address: 'klv1bare', count: 20 },
+      { address: 'klv1sneaky', name: '\u1160\u1160', count: 10 },
+    ],
+  };
+
+  it('is empty without a model, so the bar carries no label it cannot back', () => {
+    expect(shareBarLabel(undefined, 'Other contracts')).toBe('');
+  });
+
+  it('names what it can and falls back to the full address', () => {
+    const label = shareBarLabel(model, 'Other contracts');
+    expect(label).toContain('Bitcoin.me');
+    expect(label).toContain('klv1bare');
+    // The invisible-only name must lose to the address, and never leak its
+    // code points into an aria string.
+    expect(label).toContain('klv1sneaky');
+    expect(label).not.toContain('\u1160');
+    expect(label).toContain('Other contracts');
+    expect(label.split(', ')).toHaveLength(4);
   });
 });

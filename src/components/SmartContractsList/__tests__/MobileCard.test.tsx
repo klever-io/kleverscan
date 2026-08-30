@@ -118,10 +118,19 @@ const CONTRACT: SmartContractsList = {
   totalTransactions: 130759,
 };
 
-const renderCard = (item: SmartContractsList = CONTRACT, deferred = true) =>
+const renderCard = (
+  item: SmartContractsList = CONTRACT,
+  deferred = true,
+  scopedTo?: string,
+) =>
   render(
     <ThemeProvider theme={theme}>
-      <ContractsMobileCard item={item} index={0} deferred={deferred} />
+      <ContractsMobileCard
+        item={item}
+        index={0}
+        deferred={deferred}
+        scopedTo={scopedTo}
+      />
     </ThemeProvider>,
   );
 
@@ -255,6 +264,27 @@ describe('ContractsMobileCard', () => {
     mockRouter.query = { deployer: CONTRACT.deployer };
     const { container } = renderCard();
     expect(container.querySelector('a[href*="?deployer="]')).toBeNull();
+  });
+
+  it('hides the count when the caller scoped the list by route segment', () => {
+    // The account tab pins the deployer in the request, not in the URL, so
+    // the query-based guard never sees it; the caller says so instead.
+    mockedDeployerCount.mockReturnValue(14);
+    const { container } = renderCard(CONTRACT, true, CONTRACT.deployer);
+    expect(container.querySelector('a[href*="?deployer="]')).toBeNull();
+  });
+
+  it.each([
+    ['an object where an array belongs', { length: 3 }],
+    ['a string', 'two'],
+    ['a null upgrades field', null],
+  ])('draws the dash, not a count, for %s', (_label, upgrades) => {
+    renderCard({
+      ...CONTRACT,
+      upgrades: upgrades as SmartContractsList['upgrades'],
+    });
+    expect(screen.getByText(/- -/)).toBeTruthy();
+    expect(screen.queryByText('3')).toBeNull();
   });
 
   it('keeps the count when the list is narrowed to a different deployer', () => {

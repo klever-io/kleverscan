@@ -21,6 +21,8 @@ import { useDeployerCount } from './useDeployerCount';
 
 export interface IContractsMobileCardExtras {
   deferred: boolean;
+  /** The deployer this whole list is already narrowed to by its caller. */
+  scopedTo?: string;
 }
 
 export interface IContractsMobileCardProps extends IContractsMobileCardExtras {
@@ -37,6 +39,7 @@ const ContractsMobileCard: React.FC<IContractsMobileCardProps> = ({
   item,
   index,
   deferred,
+  scopedTo,
 }) => {
   const { t } = useTranslation(['smartContracts']);
   const label = (key: ContractColumnKey): string => {
@@ -91,7 +94,11 @@ const ContractsMobileCard: React.FC<IContractsMobileCardProps> = ({
           <AddressLink href={`/account/${deployer}`} title={deployer}>
             {parseAddress(deployer, 12)}
           </AddressLink>
-          <DeployerCountBadge deployer={deployer} count={deployerCount} />
+          <DeployerCountBadge
+            deployer={deployer}
+            count={deployerCount}
+            scopedTo={scopedTo}
+          />
         </DeployerCellRow>
         <MobileMetaItem>
           {label('upgrades')}{' '}

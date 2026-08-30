@@ -16,13 +16,15 @@ const NAME_LIMIT = 32;
  *
  * Enumerated rather than taken by Unicode category: \p{Cf} would say this in
  * one term, but it needs the u flag and this project compiles to es5. The
- * three Hangul fillers are not formatting characters at all, they draw as a
- * blank glyph, which is the same lie by another route. The trailing
- * alternation is the tag block, which lives outside the BMP and so arrives
- * here as a surrogate pair.
+ * four Hangul fillers are not formatting characters at all, they draw as a
+ * blank glyph, which is the same lie by another route; the soft hyphen, the
+ * combining grapheme joiner and the two Khmer inherent vowels play it from
+ * other scripts. The trailing alternation is the tag block plus the
+ * variation selectors supplement, which live outside the BMP and so arrive
+ * here as surrogate pairs.
  */
 const DECEPTIVE =
-  /[\u0000-\u001F\u007F-\u009F\u061C\u115F\u180E\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u206F\u3164\uE000-\uF8FF\uFE00-\uFE0F\uFEFF\uFFA0\uFFF9-\uFFFB]|\uDB40[\uDC00-\uDC7F]/g;
+  /[\u0000-\u001F\u007F-\u009F\u00AD\u034F\u061C\u115F\u1160\u17B4\u17B5\u180E\u200B-\u200F\u202A-\u202E\u2060-\u206F\u3164\uE000-\uF8FF\uFE00-\uFE0F\uFEFF\uFFA0\uFFF9-\uFFFB]|\uDB40[\uDC00-\uDC7F\uDD00-\uDDEF]/g;
 
 /**
  * A name shaped like a wallet address, which no honest name needs to be.

@@ -28,18 +28,25 @@ const SCDeployedByAddress: React.FC<
 > = ({ smartContractsTableProps }) => {
   const header = useContractHeaders();
   const deferred = useDeferred();
+  // This tab narrows by route segment: the request pins the deployer to the
+  // account, so every row shares it and a count badge would be a dead end.
+  // ITxQuery does not name `deployer`; the account page adds it untyped when
+  // it builds these props, so it is read back through the same door.
+  const scopedTo = (
+    smartContractsTableProps.query as { deployer?: string } | undefined
+  )?.deployer;
 
   const tableProps: ITable<IContractsMobileCardExtras> = {
     ...smartContractsTableProps,
     type: 'smartContracts',
     header,
     rowSections: (contract: SmartContractsList | string) =>
-      contractRowSections(contract, { deferred }),
+      contractRowSections(contract, { deferred, scopedTo }),
     dataName: 'sc',
     showLimit: true,
     Filters: ContractsFilters,
     MobileCard: ContractsMobileCard,
-    mobileCardProps: { deferred },
+    mobileCardProps: { deferred, scopedTo },
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
   };

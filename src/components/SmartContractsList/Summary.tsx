@@ -33,7 +33,12 @@ import {
   MostUsedTile,
   SummaryContractLink,
 } from './styles';
-import { shareModel, topContracts } from './summaryFigures';
+import {
+  segmentColor,
+  shareBarLabel,
+  shareModel,
+  topContracts,
+} from './summaryFigures';
 import { CONTRACT_SHARES_QUERY } from './sharesQuery';
 
 /**
@@ -96,26 +101,22 @@ const ContractsSummary: React.FC = () => {
   const leader = busiest?.segments[0];
   const leaderName = leader?.name ? safeContractName(leader.name) : '';
 
-  // blueGray500 is reserved for the Other remainder, the way the transactions
-  // breakdown mutes its own computed rest; rose is the fifth distinct hue.
-  const segmentColor = (index: number): string =>
-    [theme.violet, theme.purple, theme.lightPurple, theme.green, theme.rose][
-      index % 5
-    ];
+  // blueGray500 stays reserved for the Other remainder, the way the
+  // transactions breakdown mutes its own computed rest; rose is the fifth
+  // distinct hue.
+  const palette = [
+    theme.violet,
+    theme.purple,
+    theme.lightPurple,
+    theme.green,
+    theme.rose,
+  ];
 
   const otherLabel = t('smartContracts:List.OtherContracts', {
     defaultValue: 'Other contracts',
   });
 
-  const barLabel = model
-    ? [
-        ...model.segments.map(
-          segment =>
-            `${segment.name ? safeContractName(segment.name) || segment.address : segment.address} ${formatShare(segment.count, model.total)}`,
-        ),
-        `${otherLabel} ${formatShare(model.other, model.total)}`,
-      ].join(', ')
-    : '';
+  const barLabel = shareBarLabel(model, otherLabel);
 
   return (
     <ContractsSummaryCard aria-label={label} data-testid="contracts-summary">
@@ -212,7 +213,7 @@ const ContractsSummary: React.FC = () => {
             {model.segments.map((segment, index) => (
               <DistSegment
                 key={segment.address}
-                $color={segmentColor(index)}
+                $color={segmentColor(index, palette)}
                 $delay={index * 60}
                 style={{
                   width: `${(segment.count / model.total) * 100}%`,
@@ -235,7 +236,7 @@ const ContractsSummary: React.FC = () => {
           <LegendRow>
             {model.segments.map((segment, index) => (
               <LegendItem key={segment.address}>
-                <LegendDot $color={segmentColor(index)} />
+                <LegendDot $color={segmentColor(index, palette)} />
                 {contractLabel(segment, 10)}{' '}
                 <strong>{formatShare(segment.count, model.total)}</strong>
               </LegendItem>

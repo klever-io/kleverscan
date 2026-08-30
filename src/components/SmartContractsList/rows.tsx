@@ -25,6 +25,9 @@ export const COLUMN_LAYOUT: IRowSection[] = CONTRACT_COLUMNS.map(column => ({
 }));
 
 export interface IContractRowContext {
+  /** The deployer this whole list is already narrowed to by its caller, the
+   *  way the account tab scopes by route segment rather than by `?deployer=`. */
+  scopedTo?: string;
   /** False while the table's own request is still in flight, so the per-row
    *  name and deployer-count lookups stay off that path. */
   deferred: boolean;
@@ -32,7 +35,7 @@ export interface IContractRowContext {
 
 export const contractRowSections = (
   contract: SmartContractsList | string,
-  { deferred }: IContractRowContext = { deferred: false },
+  { deferred, scopedTo }: IContractRowContext = { deferred: false },
 ): IRowSection[] => {
   // The header-string probe above. Handled explicitly so a future dereference
   // of the argument cannot take the page down while rendering its own header.
@@ -77,7 +80,13 @@ export const contractRowSections = (
         Component={() => <CustomFieldWrapper>{elapsed}</CustomFieldWrapper>}
       />
     ),
-    deployer: () => <DeployerCell deployer={deployer} deferred={deferred} />,
+    deployer: () => (
+      <DeployerCell
+        deployer={deployer}
+        deferred={deferred}
+        scopedTo={scopedTo}
+      />
+    ),
     deployTx: () => (
       <Link href={`/transaction/${deployTxHash}`} title={deployTxHash}>
         <Mono>{parseAddress(deployTxHash, 12)}</Mono>

@@ -17,9 +17,3 @@ export const contractLabel = (
   const shown = segment.name ? safeContractName(segment.name) : '';
   return shown || parseAddress(segment.address, chars);
 };
-
-/** Whether the label above is a name rather than an address, which decides
- *  the font: a name is words, an address is a hash. */
-export const isNamed = (
-  segment: Pick<IContractShare, 'address' | 'name'>,
-): boolean => Boolean(segment.name && safeContractName(segment.name));

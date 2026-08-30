@@ -691,4 +691,25 @@ describe('Filter keyboard operation', () => {
     fireEvent.click(clear);
     expect(onClick).toHaveBeenCalledWith('All');
   });
+
+  // `disabledInput` gates opening the panel, but the clear button sat outside
+  // that gate: a disabled filter could still be reset, and the reset reached
+  // the router through onClick.
+  it('does not clear through a disabled filter', () => {
+    const onClick = jest.fn();
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current="Fail"
+        disabledInput
+        onClick={onClick}
+      />,
+    );
+
+    const clear = screen.getByRole('button', { name: 'Clear Status filter' });
+    expect(clear).toBeDisabled();
+    fireEvent.click(clear);
+    expect(onClick).not.toHaveBeenCalled();
+  });
 });

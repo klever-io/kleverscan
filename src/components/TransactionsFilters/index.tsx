@@ -161,9 +161,12 @@ const TransactionsFilters: React.FC<
           directly, only the local `query` copy, which is {} on both sides
           until the effect runs. */}
       {filters.map(filter => (
-        // Keyed on the identifier, not the title: a translated title would
-        // otherwise change the key and remount the control.
-        <Filter key={`${filter?.testId}-${filter?.current}`} {...filter} />
+        // Keyed on the identifier alone: a translated title would change a
+        // title-based key, and keying on `current` remounted the control on
+        // every selection, dropping the keyboard focus it now hands back to
+        // its opener. The displayed value keeps up through Filter's own
+        // `current` sync effect.
+        <Filter key={filter?.testId} {...filter} />
       ))}
       <DateFilter />
     </FilterContainer>

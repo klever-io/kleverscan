@@ -284,30 +284,28 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                         {...props}
                         rowSections={true}
                       >
-                        {rowSections(item)?.map(
-                          ({ element: Element, span }, index2) => {
-                            const [updatedSpanCount, isRightAligned] =
-                              processRowSectionsLayout(spanCount, span);
-                            spanCount = updatedSpanCount;
-                            return (
-                              <MobileCardItem
-                                isAssets={
-                                  type === 'assets' || type === 'proposals'
-                                }
-                                isRightAligned={
-                                  (isMobile || isTablet) && isRightAligned
-                                }
-                                key={String(index2) + String(index)}
-                                columnSpan={span}
-                              >
-                                {isMobile || isTablet ? (
-                                  <MobileHeader>{header[index2]}</MobileHeader>
-                                ) : null}
-                                <Element />
-                              </MobileCardItem>
-                            );
-                          },
-                        )}
+                        {rowSections(item)?.map(({ element, span }, index2) => {
+                          const [updatedSpanCount, isRightAligned] =
+                            processRowSectionsLayout(spanCount, span);
+                          spanCount = updatedSpanCount;
+                          return (
+                            <MobileCardItem
+                              isAssets={
+                                type === 'assets' || type === 'proposals'
+                              }
+                              isRightAligned={
+                                (isMobile || isTablet) && isRightAligned
+                              }
+                              key={String(index2) + String(index)}
+                              columnSpan={span}
+                            >
+                              {isMobile || isTablet ? (
+                                <MobileHeader>{header[index2]}</MobileHeader>
+                              ) : null}
+                              {element({})}
+                            </MobileCardItem>
+                          );
+                        })}
                       </Row>
                     )}
                   </React.Fragment>

@@ -3,6 +3,7 @@ import React, {
   PropsWithChildren,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -17,6 +18,7 @@ import {
   HiddenInput,
   Item,
   LoadContainer,
+  OpenerButton,
   SelectorContainer,
 } from './styles';
 
@@ -25,9 +27,11 @@ export interface IFilterItem {
 }
 
 interface ISelectorItemProps {
+  id: string;
   value: string;
   label: string;
   isSelected: boolean;
+  isActive: boolean;
   onSelect: (value: string) => void;
 }
 
@@ -40,19 +44,36 @@ interface ISelectorItemProps {
  * cannot change what reaches the URL and the API.
  */
 const SelectorItem: React.FC<ISelectorItemProps> = ({
+  id,
   value,
   label,
   isSelected,
+  isActive,
   onSelect,
-}) => (
-  <Item
-    onClick={() => onSelect(value)}
-    selected={isSelected}
-    data-testid="selector-item"
-  >
-    <p>{label}</p>
-  </Item>
-);
+}) => {
+  const itemRef = useRef<HTMLDivElement>(null);
+
+  // The panel scrolls at 15rem; keep the arrow-key cursor in view. Optional
+  // call: jsdom has no scrollIntoView.
+  useEffect(() => {
+    if (isActive) itemRef.current?.scrollIntoView?.({ block: 'nearest' });
+  }, [isActive]);
+
+  return (
+    <Item
+      ref={itemRef}
+      id={id}
+      role="option"
+      aria-selected={isSelected}
+      onClick={() => onSelect(value)}
+      selected={isSelected}
+      $active={isActive}
+      data-testid="selector-item"
+    >
+      <p>{label}</p>
+    </Item>
+  );
+};
 
 export interface IFilter {
   title?: string;
@@ -92,6 +113,8 @@ export interface IFilter {
    * namespace at all, so a `t()` in here would render raw keys on their pages.
    */
   notFoundLabel?: string;
+  /** Accessible name for the clear button; same no-translator rule as above. */
+  clearLabel?: string;
   onClick?(selected: string): void;
   onChange?(value: string): void;
   current: string | undefined;
@@ -108,6 +131,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   renderLabel,
   placeholder,
   notFoundLabel,
+  clearLabel,
   onClick,
   onChange,
   current: initial,
@@ -125,6 +149,14 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const [closed, setClosed] = useState(true);
   const [dontBlur, setDontBlur] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  // The arrow-key cursor over the option list; -1 is "none". Options are not
+  // focusable: focus stays on the input, aria-activedescendant points here.
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  const baseId = useId();
+  const labelId = title ? `${baseId}-label` : undefined;
+  const listboxId = `${baseId}-listbox`;
+  const optionId = (index: number) => `${baseId}-option-${index}`;
 
   // Keep display in sync when parent changes `current` (e.g. URL / external chips).
   useEffect(() => {
@@ -134,6 +166,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const contentRef = useRef<HTMLDivElement>(null);
   const selectorRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLInputElement>(null);
+  const openerRef = useRef<HTMLButtonElement>(null);
 
   // Input only mounts after open; focus once it exists so the caret is visible.
   useEffect(() => {
@@ -162,19 +195,31 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const closeDropDown = useCallback(() => {
     setClosed(true);
     setInputValue('');
+    setActiveIndex(-1);
   }, []);
+
+  const getDataArray = useCallback(
+    () => (hideAllOption ? data : [allItem].concat(data)),
+    [hideAllOption, data, allItem],
+  );
+
+  const open = useCallback(() => {
+    setClosed(false);
+    // Start the arrow-key cursor on the current value, as a native select does.
+    setActiveIndex(getDataArray().indexOf(selected));
+  }, [getDataArray, selected]);
 
   const openDropdown = useCallback(() => {
     if (disabledInput) return;
     if (closed) {
-      setClosed(false);
+      open();
       return;
     }
     // Non-typeahead mode: second click on the control closes.
     if (!isHiddenInput) {
       closeDropDown();
     }
-  }, [closed, closeDropDown, disabledInput, isHiddenInput]);
+  }, [closed, closeDropDown, disabledInput, isHiddenInput, open]);
 
   const arrowOnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -182,7 +227,7 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     if (!closed) {
       closeDropDown();
     } else {
-      setClosed(false);
+      open();
     }
   };
 
@@ -203,6 +248,9 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       }
       setSelected(value);
       closeDropDown();
+      // The input the focus was on unmounts with the panel; land it back on
+      // the opener so keyboard users are not dropped to <body>.
+      openerRef.current?.focus({ preventScroll: true });
     },
     [onClick, closeDropDown],
   );
@@ -214,6 +262,12 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     if (onClick) {
       onClick(allItem);
     }
+    // Same order as handleSelect: close first, then land focus on the opener.
+    // Clearing empties the button under the keyboard user's focus (the
+    // `empty` style is display:none), and without the close an open panel
+    // stayed stranded behind an opener whose activation is a no-op.
+    closeDropDown();
+    openerRef.current?.focus({ preventScroll: true });
   };
 
   const handleChange = ({
@@ -226,11 +280,11 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     // label unsearchable. Nothing needs the sanitising: the match below is a
     // literal `includes`, never a RegExp, so the input cannot be a pattern.
     setInputValue(value);
+    setActiveIndex(-1);
     if (onChange) {
       onChange(value);
     }
   };
-  const getDataArray = () => (hideAllOption ? data : [allItem].concat(data));
 
   const filterArrayByInput = (input: string) => {
     if (input === '') {
@@ -255,6 +309,52 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   };
   const filteredArray = filterArrayByInput(inputValue);
 
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const length = filteredArray.length;
+      if (!length) return;
+      const goingDown = event.key === 'ArrowDown';
+      setActiveIndex(previous => {
+        // The cursor may have been seeded against the unfiltered list; treat
+        // an out-of-range value as "none" so the walk starts at an edge.
+        const inRange = previous >= 0 && previous < length;
+        if (goingDown) {
+          return ((inRange ? previous : -1) + 1) % length;
+        }
+        return ((inRange ? previous : 0) - 1 + length) % length;
+      });
+      return;
+    }
+    if (event.key === 'Enter') {
+      if (activeIndex >= 0 && activeIndex < filteredArray.length) {
+        event.preventDefault();
+        handleSelect(filteredArray[activeIndex]);
+      }
+      return;
+    }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      // Only this dropdown: a page dialog listening for Escape must not close.
+      event.stopPropagation();
+      closeDropDown();
+      openerRef.current?.focus({ preventScroll: true });
+    }
+  };
+
+  // On Content rather than on the input: React's onBlur is the bubbling
+  // focusout, so this sees EVERY hop out of the widget. On the input alone,
+  // Tab parked on the opener first ("inside", no close) and the next Tab
+  // left from the opener with no handler, orphaning the panel open.
+  const handleContentBlur = (event: React.FocusEvent<HTMLElement>) => {
+    if (closed) return;
+    if (dontBlur) return;
+    // Focus moving to the clear button or an option is not "leaving".
+    const next = event.relatedTarget as Node | null;
+    if (next && contentRef.current?.contains(next)) return;
+    closeDropDown();
+  };
+
   const contentProps = useMemo(() => {
     return {
       ref: contentRef,
@@ -266,7 +366,6 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
   const selectorProps = {
     ref: selectorRef,
     open: closed,
-    overFlow,
     onClick: () => closeDropDown(),
   };
   // The specific prompts used to be picked by comparing `title` against five
@@ -282,16 +381,17 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
       open={!closed}
       data-testid={testId ? `filter-${testId}` : undefined}
     >
-      <span>{title}</span>
+      <span id={labelId}>{title}</span>
       <Content
         onMouseEnter={() => setDontBlur(true)}
         onMouseLeave={() => setDontBlur(false)}
+        onBlur={handleContentBlur}
         data-testid="selector"
         {...contentProps}
       >
         {!closed && (
           <HiddenInput
-            onBlur={() => !dontBlur && closeDropDown()}
+            onKeyDown={handleInputKeyDown}
             value={inputValue}
             type={inputType}
             ref={focusRef}
@@ -300,25 +400,81 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
             onChange={handleChange}
             isHiddenInput={isHiddenInput}
             aria-label={title ? `Search ${title}` : 'Search filter'}
+            role="combobox"
+            aria-expanded={!closed}
+            aria-controls={listboxId}
+            aria-activedescendant={
+              activeIndex >= 0 && activeIndex < filteredArray.length
+                ? optionId(activeIndex)
+                : undefined
+            }
+            aria-autocomplete="list"
             autoComplete="off"
             spellCheck={false}
           />
         )}
-        <span style={{ overflow: overFlow ? overFlow : 'hidden' }}>
-          {closed && selected ? labelOf(selected) : ''}
-        </span>
+        <OpenerButton
+          ref={openerRef}
+          type="button"
+          // Out of the Tab order while open: focus lives on the search input
+          // then, and this button is a dead stop with a collapsed name. The
+          // Escape/select focus return uses .focus(), which -1 still allows.
+          tabIndex={closed ? undefined : -1}
+          aria-haspopup="listbox"
+          aria-expanded={!closed}
+          aria-controls={!closed ? listboxId : undefined}
+          aria-labelledby={labelId ? `${labelId} ${baseId}-value` : undefined}
+          aria-disabled={disabledInput || undefined}
+          onClick={event => {
+            // Content also opens on click; the second call in the same batch
+            // happens to be idempotent only because it reads a stale `closed`.
+            // Stopping here keeps the toggle off that batching subtlety.
+            event.stopPropagation();
+            openDropdown();
+          }}
+        >
+          <span
+            id={`${baseId}-value`}
+            style={{ overflow: overFlow ?? 'hidden' }}
+          >
+            {closed && selected ? labelOf(selected) : ''}
+          </span>
+        </OpenerButton>
 
         {!hideAllOption && (
-          <CloseContainer empty={selected === allItem} onClick={handleClear}>
+          <CloseContainer
+            type="button"
+            aria-label={
+              clearLabel ?? (title ? `Clear ${title} filter` : 'Clear filter')
+            }
+            empty={selected === allItem}
+            // `disabledInput` blocks opening the panel, but left this button
+            // live: a disabled filter could still be reset, and the reset ran
+            // onClick, pushing the change through to the router.
+            disabled={disabledInput}
+            onClick={handleClear}
+          >
             <AiOutlineClose />
           </CloseContainer>
         )}
 
-        <ArrowDownContainer onClick={arrowOnClick} open={!closed}>
+        <ArrowDownContainer
+          onClick={arrowOnClick}
+          open={!closed}
+          aria-hidden="true"
+        >
           <FilterArrowDown />
         </ArrowDownContainer>
         {!closed && (
-          <SelectorContainer {...selectorProps}>
+          <SelectorContainer
+            {...selectorProps}
+            role="listbox"
+            id={listboxId}
+            aria-labelledby={labelId}
+            // Chromium makes a scrollable box without focusable children a
+            // Tab stop; in an activedescendant pattern the list must not be.
+            tabIndex={-1}
+          >
             {!filteredArray.length && !loading ? (
               <span>{notFoundLabel ?? `${title} not found!`}</span>
             ) : (
@@ -327,9 +483,11 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
                   // Values are not guaranteed unique: the validators filter
                   // lists on-chain names, which nothing dedupes.
                   key={`${index}-${value}`}
+                  id={optionId(index)}
                   value={value}
                   label={labelOf(value)}
                   isSelected={value === selected}
+                  isActive={index === activeIndex}
                   onSelect={handleSelect}
                 />
               ))

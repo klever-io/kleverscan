@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
-import { formatShare } from '@/components/DataList/format';
+import { exactAmount, formatShare } from '@/components/DataList/format';
 import { InlineShare } from '@/components/DataList/styles';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
@@ -68,7 +68,10 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
 
   const formatSupply = (
     value?: number,
-    { infiniteOnZero = false }: { infiniteOnZero?: boolean } = {},
+    {
+      infiniteOnZero = false,
+      exact,
+    }: { infiniteOnZero?: boolean; exact?: string } = {},
   ) => {
     if (isSftCollection) return value;
     if (!asset) return 'N/A';
@@ -76,6 +79,11 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
     // that was never reported, which is the failure this metric prevents.
     if (typeof value !== 'number') return 'N/A';
     if (infiniteOnZero && value === 0) return '∞';
+    // The exact digit twin from the parse boundary (#679), rendered with the
+    // same fixed-decimals presentation the number path produces.
+    if (exact !== undefined) {
+      return exactAmount(exact, asset.precision, { trimFraction: false });
+    }
     return toLocaleFixed(value / 10 ** asset.precision, asset.precision);
   };
 
@@ -84,7 +92,9 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
   // 'loading' state of voidRowState, spelled out here so it narrows the type.
   const renderCirculatingSupply = () => {
     if (!asset) return <Skeleton />;
-    return formatSupply(asset.netCirculatingSupply);
+    return formatSupply(asset.netCirculatingSupply, {
+      exact: asset.netCirculatingSupplyString,
+    });
   };
 
   const renderVoidValue = () => {
@@ -92,7 +102,11 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
     return (
       <Link href={`/account/${VOID_ADDRESS}`} legacyBehavior>
         <HoverAnchor>
-          <small>{formatSupply(asset.voidedSupply)}</small>
+          <small>
+            {formatSupply(asset.voidedSupply, {
+              exact: asset.voidedSupplyString,
+            })}
+          </small>
         </HoverAnchor>
       </Link>
     );
@@ -125,7 +139,10 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         <span>
           <small>
             {asset ? (
-              formatSupply(asset?.maxSupply, { infiniteOnZero: true })
+              formatSupply(asset?.maxSupply, {
+                infiniteOnZero: true,
+                exact: asset?.maxSupplyString,
+              })
             ) : (
               <Skeleton />
             )}
@@ -138,7 +155,13 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         </span>
         <span>
           <small>
-            {asset ? formatSupply(asset?.initialSupply) : <Skeleton />}
+            {asset ? (
+              formatSupply(asset?.initialSupply, {
+                exact: asset?.initialSupplyString,
+              })
+            ) : (
+              <Skeleton />
+            )}
           </small>
         </span>
       </Row>
@@ -148,7 +171,13 @@ export const OverviewTab: React.FC<PropsWithChildren<AssetProps>> = ({
         </span>
         <div>
           <small>
-            {asset ? formatSupply(asset?.circulatingSupply) : <Skeleton />}
+            {asset ? (
+              formatSupply(asset?.circulatingSupply, {
+                exact: asset?.circulatingSupplyString,
+              })
+            ) : (
+              <Skeleton />
+            )}
           </small>
           <Tooltip
             msg={t('assets:Overview.TotalSupplyTooltip')}

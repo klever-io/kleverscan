@@ -66,6 +66,40 @@ describe('exactAmount', () => {
     expect(exactAmount(NaN, 6)).toBe('--');
     expect(exactAmount(-1, 6)).toBe('--');
   });
+
+  it('renders exact digits from a string past what a double can carry', () => {
+    // EMT-NO9T live: JSON.parse rounds this to ...000; the string twin from
+    // the parse boundary keeps the final 1 (#679).
+    expect(exactAmount('100000000000000001', 8)).toBe(
+      '1,000,000,000.00000001',
+    );
+  });
+
+  it('rejects a string that is not pure digits', () => {
+    expect(exactAmount('', 6)).toBe('--');
+    expect(exactAmount('1.5', 6)).toBe('--');
+    expect(exactAmount('-3', 6)).toBe('--');
+    expect(exactAmount('1e17', 6)).toBe('--');
+    expect(exactAmount('abc', 6)).toBe('--');
+  });
+
+  it('walks digit counts far past the double range', () => {
+    expect(exactAmount('123456789012345678901234567890', 6)).toBe(
+      '123,456,789,012,345,678,901,234.56789',
+    );
+  });
+
+  it('keeps the full fraction when asked not to trim', () => {
+    // The fixed-decimals presentation the asset overview shows in body text.
+    expect(exactAmount('9663453870058599', 6, { trimFraction: false })).toBe(
+      '9,663,453,870.058599',
+    );
+    expect(exactAmount('10000000000000000', 8, { trimFraction: false })).toBe(
+      '100,000,000.00000000',
+    );
+    // Precision 0: no fraction exists, trimmed or not.
+    expect(exactAmount('123', 0, { trimFraction: false })).toBe('123');
+  });
 });
 
 describe('klvAmount', () => {

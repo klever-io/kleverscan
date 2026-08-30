@@ -160,24 +160,41 @@ const Assets: React.FC<PropsWithChildren> = () => {
 
     const precisionDivisor = 10 ** precision;
     const { circulating, capBasis } = assetSupplyViews(asset);
+    // Exact digit twins from the parse boundary (#679), preferred wherever a
+    // figure is promised exactly; the number stays the fallback. The
+    // circulating twin mirrors assetSupplyViews' net-versus-raw choice.
+    const circulatingExact = hasVoidSupply(asset)
+      ? (asset.netCirculatingSupplyString ?? circulating)
+      : (asset.circulatingSupplyString ?? circulating);
+    const maxSupplyExact = asset.maxSupplyString ?? maxSupply;
+    const initialSupplyExact = asset.initialSupplyString ?? initialSupply;
+    const burnedValueExact = asset.burnedValueString ?? burnedValue;
     // The cap limits minted minus burned, which is the gross circulating
     // supply: tokens parked on the void address were minted and never
     // burned, so they still take up cap headroom.
     const cap = getCapUsage(capBasis, maxSupply);
     const rewards = getRewardsModel(staking);
     const totalStaked = staking?.totalStaked ?? 0;
+    const totalStakedExact = staking?.totalStakedString ?? totalStaked;
 
     // The cell shows a net circulating figure beside a gross cap, so without
     // the void amount the row reads as a contradiction: "Max 10 M ·
     // Circulating 209 K · Cap Used >99.9%". Burned is a different quantity and
     // invites the wrong reconciliation, so name the void explicitly.
     const supplyTitle = [
-      `Circulating ${exactAmount(circulating, precision)} ${ticker}`,
-      `Max ${maxSupply > 0 ? exactAmount(maxSupply, precision) : 'unlimited'}`,
-      `Initial ${exactAmount(initialSupply, precision)}`,
-      `Burned ${exactAmount(burnedValue, precision)}`,
+      `Circulating ${exactAmount(circulatingExact, precision)} ${ticker}`,
+      `Max ${
+        maxSupply > 0 ? exactAmount(maxSupplyExact, precision) : 'unlimited'
+      }`,
+      `Initial ${exactAmount(initialSupplyExact, precision)}`,
+      `Burned ${exactAmount(burnedValueExact, precision)}`,
       ...(hasVoidSupply(asset)
-        ? [`Void ${exactAmount(asset.voidedSupply, precision)}`]
+        ? [
+            `Void ${exactAmount(
+              asset.voidedSupplyString ?? asset.voidedSupply,
+              precision,
+            )}`,
+          ]
         : []),
       `Precision ${precision}`,
     ].join(' · ');
@@ -245,7 +262,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
         element: () =>
           maxSupply > 0 ? (
             <SupplyCell
-              title={`${exactAmount(maxSupply, precision)} ${ticker}`}
+              title={`${exactAmount(maxSupplyExact, precision)} ${ticker}`}
             >
               <SupplyPrimary>
                 {formatAmount(maxSupply / precisionDivisor)}
@@ -307,7 +324,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
         element: () =>
           staking ? (
             <AmountMuted
-              title={`${exactAmount(totalStaked, precision)} ${ticker} staked · ${formatShare(
+              title={`${exactAmount(totalStakedExact, precision)} ${ticker} staked · ${formatShare(
                 totalStaked,
                 circulating,
               )} of the circulating supply`}

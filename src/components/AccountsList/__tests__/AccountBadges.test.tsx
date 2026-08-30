@@ -37,6 +37,30 @@ jest.mock('next-i18next', () => {
   return { useTranslation: () => ({ t: translate }) };
 });
 
+// Thin, like every suite that meets it: the real one renders through
+// react-tooltip's portal after a delay. What this suite owns is which msg a
+// badge hands it and whether the trigger joined the tab order.
+jest.mock('@/components/Tooltip', () => ({
+  __esModule: true,
+  default: ({
+    msg,
+    focusable,
+    Component,
+  }: {
+    msg: string;
+    focusable?: boolean;
+    Component?: React.FC;
+  }) => (
+    <span
+      title={msg}
+      tabIndex={focusable ? 0 : undefined}
+      data-testid="tooltip-trigger"
+    >
+      {Component ? <Component /> : null}
+    </span>
+  ),
+}));
+
 jest.mock('react-dom', () => {
   const actual = jest.requireActual('react-dom');
   const client = jest.requireActual('react-dom/client');
@@ -89,6 +113,10 @@ const renderBadges = (badges: Partial<IAccountBadges>) =>
     </ThemeProvider>,
   );
 
+/** The focusable trigger wrapping a pill, per the mock above. */
+const triggerOf = (element: HTMLElement) =>
+  element.closest('[data-testid="tooltip-trigger"]');
+
 describe('AccountBadges', () => {
   it('renders nothing at all for an ordinary account', () => {
     const { container } = renderBadges({});
@@ -96,30 +124,54 @@ describe('AccountBadges', () => {
     expect(container.textContent).toBe('');
   });
 
-  it('renders the foundation badge on its own, with its own tooltip', () => {
+  it('renders the foundation badge on its own, with its message readable in place', () => {
     renderBadges({ foundation: true });
 
-    const pill = screen.getByText('Foundation');
+    const trigger = screen.getByTestId('tooltip-trigger');
     expect(screen.queryByText('Validator')).toBeNull();
-    // The validator pill's title was checked twice and this one never: swapping the two keys passed the whole suite.
-    expect(pill.getAttribute('title')).toBe(
+    // The validator pill's tooltip was checked twice and this one never: swapping the two keys passed the whole suite.
+    expect(trigger.getAttribute('title')).toBe(
       "Created in the chain's first block",
     );
+    // The tooltip only mounts on focus; the hidden copy is what browse-mode
+    // readers get, per the multi-contract badge precedent.
+    expect(trigger.textContent).toBe(
+      "Foundation, Created in the chain's first block",
+    );
   });
 
-  it('renders the plain validator badge with its role tooltip', () => {
+  it('renders the plain validator badge with its role message, no state', () => {
     renderBadges({ validator: true });
 
-    const pill = screen.getByText('Validator');
-    expect(pill.getAttribute('title')).toBe('Owns a registered validator node');
+    const trigger = screen.getByTestId('tooltip-trigger');
+    expect(trigger.textContent).toBe(
+      'Validator, Owns a registered validator node',
+    );
+    expect(trigger.getAttribute('title')).toBe(
+      'Owns a registered validator node',
+    );
   });
 
-  it('appends the list state to the tooltip when the chain reports one', () => {
+  it('reads the list state with the badge and appends it to the tooltip', () => {
     renderBadges({ validator: true, validatorList: 'jailed' });
 
-    expect(screen.getByText('Validator').getAttribute('title')).toBe(
+    const trigger = screen.getByTestId('tooltip-trigger');
+    expect(trigger.textContent).toBe(
+      'Validator, Owns a registered validator node (Jailed)',
+    );
+    expect(trigger.getAttribute('title')).toBe(
       'Owns a registered validator node (Jailed)',
     );
+  });
+
+  it('puts every badge trigger in the tab order', () => {
+    renderBadges({ foundation: true, validator: true });
+
+    const triggers = screen.getAllByTestId('tooltip-trigger');
+    expect(triggers).toHaveLength(2);
+    triggers.forEach(trigger => {
+      expect(trigger.getAttribute('tabindex')).toBe('0');
+    });
   });
 
   it('falls back to the raw state for one the bundle does not carry', () => {
@@ -127,7 +179,11 @@ describe('AccountBadges', () => {
     // measured live, and a fifth must read as itself rather than a raw key.
     renderBadges({ validator: true, validatorList: 'somethingNew' });
 
-    expect(screen.getByText('Validator').getAttribute('title')).toBe(
+    const trigger = screen.getByTestId('tooltip-trigger');
+    expect(trigger.textContent).toBe(
+      'Validator, Owns a registered validator node (somethingNew)',
+    );
+    expect(trigger.getAttribute('title')).toBe(
       'Owns a registered validator node (somethingNew)',
     );
   });
@@ -139,8 +195,11 @@ describe('AccountBadges', () => {
       validatorList: 'elected',
     });
 
-    const pill = screen.getByText('Genesis validator');
-    expect(pill.getAttribute('title')).toBe(
+    const trigger = screen.getByTestId('tooltip-trigger');
+    expect(trigger.textContent).toBe(
+      'Genesis validator, Owns a validator registered in the genesis block (Elected)',
+    );
+    expect(trigger.getAttribute('title')).toBe(
       'Owns a validator registered in the genesis block (Elected)',
     );
     // A genesis validator is a validator; saying both would say it twice.
@@ -151,7 +210,9 @@ describe('AccountBadges', () => {
     // Suppression happens upstream in accountBadges; this component renders what it is handed.
     renderBadges({ foundation: true, validator: true });
 
-    expect(screen.getByText('Foundation')).toBeTruthy();
-    expect(screen.getByText('Validator')).toBeTruthy();
+    const triggers = screen.getAllByTestId('tooltip-trigger');
+    expect(triggers).toHaveLength(2);
+    expect(triggers[0].textContent?.startsWith('Foundation')).toBe(true);
+    expect(triggers[1].textContent?.startsWith('Validator')).toBe(true);
   });
 });

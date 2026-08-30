@@ -31,7 +31,7 @@ export const accountBadges = (
   genesisTimestamp: number | undefined,
   // Undefined while the validator set loads, which means "not known yet",
   // never "not a validator".
-  owners: ValidatorOwners | undefined,
+  owners: ValidatorOwners | null | undefined,
 ): IAccountBadges => {
   const validator = owners?.[address];
 

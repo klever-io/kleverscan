@@ -62,7 +62,8 @@
     "NewWindow": "New ({{days}}d)",
     "AcrossDays_one": "across {{count}} day",
     "AcrossDays_other": "across {{count}} days",
-    "Nonce": "Nonce"
+    "Nonce": "Nonce",
+    "ValidatorBadgesLoaded": "Validator badges loaded"
   },
   "Common": {
     "CopyAddress": "Copy address",

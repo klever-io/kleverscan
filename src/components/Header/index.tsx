@@ -130,7 +130,7 @@ const Navbar: React.FC<PropsWithChildren> = () => {
     handleMenu,
     mobileMenuOpen,
     isTablet,
-    isMobile,
+    isCompactHeader,
   } = useMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [modKey, setModKey] = useState('⌘');
@@ -262,7 +262,7 @@ const Navbar: React.FC<PropsWithChildren> = () => {
                   <span>Spotlight</span>
                 </SpotlightTrigger>
               )}
-              {!isMobile && (
+              {!isCompactHeader && (
                 <ConnectContainer
                   onClick={() => {
                     handleClickConnection();
@@ -278,7 +278,7 @@ const Navbar: React.FC<PropsWithChildren> = () => {
           )}
         </Content>
 
-        {isMobile && (
+        {isCompactHeader && (
           <ConnectionWrapper>
             <ConnectContainer
               onClick={() => {

@@ -1,3 +1,4 @@
+import { kbdAccent } from '@/styles/common';
 import styled from 'styled-components';
 
 export const HeroWrap = styled.div`
@@ -98,15 +99,7 @@ export const HeroKbd = styled.kbd`
   font-weight: 700;
   font-family: inherit;
   letter-spacing: 0.02em;
-  color: ${props =>
-    props.theme.dark ? 'rgba(212, 200, 255, 0.95)' : props.theme.purple};
-  background: ${props =>
-    props.theme.dark ? 'rgba(125, 63, 241, 0.16)' : 'rgba(125, 63, 241, 0.08)'};
-  border: 1px solid
-    ${props =>
-      props.theme.dark
-        ? 'rgba(155, 108, 255, 0.35)'
-        : 'rgba(125, 63, 241, 0.18)'};
+  ${kbdAccent}
 `;
 
 export const HeroHint = styled.p`

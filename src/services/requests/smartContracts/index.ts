@@ -1,29 +1,45 @@
 import api from '@/services/api';
 import {
   HotContracts,
-  SmartContractsList,
   SmartContractTransactionData,
 } from '@/types/smart-contract';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 
 const smartContractsListCall = async (): Promise<
-  { smartContracts: SmartContractsList[]; totalContracts: number } | undefined
+  { totalContracts: number } | undefined
 > => {
   try {
     const smartContractsRes = await api.get({
       route: 'sc/list',
+      // Only the record count is used downstream; the rows were fetched and
+      // thrown away on every one of these calls.
+      query: { limit: 1 },
     });
 
     if (!smartContractsRes.error || smartContractsRes.error === '') {
-      return {
-        smartContracts: smartContractsRes.data.sc,
-        totalContracts: smartContractsRes.pagination?.totalRecords || 0,
-      };
+      const total = smartContractsRes.pagination?.totalRecords;
+      // A null or absent count on a 200 must not render as "0 contracts
+      // deployed"; undefined leaves the tile out instead.
+      return Number.isFinite(total) ? { totalContracts: total } : undefined;
     }
   } catch (error) {
     console.error(error);
   }
 };
+
+/**
+ * What narrows this list, named rather than inherited. An allowlist so the
+ * request carries filters only: the page keeps other state in the URL, and
+ * forwarding that would hand the API this table's view state as if it were a
+ * filter. A repeated param (?sortBy=a&sortBy=b) arrives as an array, which the
+ * filter bar never writes, so it is skipped rather than joined.
+ *
+ * The server coerces two of these anyway (baseSmartContractGroup.go): anything
+ * but `totalTransactions` sorts by timestamp, anything but `asc` orders
+ * descending, and neither returns an error. Sending only what the bar writes
+ * keeps that silent fallback from being reached in the first place.
+ */
+const FILTER_PARAMS = ['deployer', 'sortBy', 'orderBy'];
 
 const smartContractsTableRequest = async (
   page: number,
@@ -31,15 +47,22 @@ const smartContractsTableRequest = async (
   query: NextParsedUrlQuery,
 ) => {
   try {
-    const parsedQuery = {
-      deployer: query?.deployer || undefined,
-      sortBy: query?.sortBy || 'totalTransactions',
-      orderBy: query?.orderBy || 'desc',
-      page,
-      limit,
+    const parsedQuery: Record<string, unknown> = {
+      sortBy: 'totalTransactions',
+      orderBy: 'desc',
     };
 
-    !query?.deployer && delete parsedQuery.deployer;
+    FILTER_PARAMS.forEach(key => {
+      const value = query?.[key];
+      if (typeof value === 'string' && value !== '') {
+        parsedQuery[key] = value;
+      }
+    });
+
+    // Last, so a spoofed page or limit in the URL cannot reach the API through
+    // the allowlist above; they come from the caller's arguments instead.
+    parsedQuery.page = page;
+    parsedQuery.limit = limit;
 
     const smartContractsListRes = await api.get({
       route: 'sc/list',
@@ -54,6 +77,63 @@ const smartContractsTableRequest = async (
     console.error('Error fetching smart contracts list:', error);
     throw error;
   }
+};
+
+/**
+ * Every successful contract transaction ever, which is the denominator the
+ * share figures divide by. The same basis as the numerators: `sc/statistics`
+ * counts successful type-63 transactions only, and the two bases partition
+ * cleanly on mainnet (466.863 success + 3.311 fail = 470.174 total, measured).
+ */
+const successfulContractTransactionsCall = async (): Promise<
+  number | undefined
+> => {
+  try {
+    const res = await api.get({
+      route: 'transaction/list',
+      query: {
+        type: 63, // Smart Contract Transactions
+        status: 'success',
+        // Only `totalRecords` is read.
+        limit: 1,
+      },
+    });
+
+    if (!res.error || res.error === '') {
+      const total = res.pagination?.totalRecords;
+      // Same null-on-200 payload as the sibling call below; undefined lets
+      // shareModel refuse the denominator instead of it failing silently.
+      return Number.isFinite(total) ? total : undefined;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+/**
+ * The most-used figures as one bundle: the top-ten aggregation and the
+ * all-time denominator its shares divide by. One call because the summary bar
+ * and the podium cards both need both, under one query key, so the two
+ * surfaces can never show a share computed against different bases.
+ */
+const contractActivitySharesCall = async (): Promise<{
+  statistics: HotContracts[];
+  allSuccessful?: number;
+}> => {
+  const [statistics, allSuccessful] = await Promise.all([
+    smartContractsStatisticCall(),
+    successfulContractTransactionsCall(),
+  ]);
+  // Reject rather than resolve undefined: a resolved bundle is a success to
+  // react-query, which then caches "no statistics" for the full staleTime and
+  // never retries, and the podium renders that failure as the fact "no
+  // contract activity has been recorded yet". A rejection keeps retry and
+  // isError available. The denominator may still be absent; the share labels
+  // are simply left out then.
+  if (statistics === undefined) {
+    throw new Error('sc/statistics gave no statistics');
+  }
+  return { statistics: statistics.statistics, allSuccessful };
 };
 
 const smartContractsStatisticCall = async (): Promise<
@@ -72,71 +152,55 @@ const smartContractsStatisticCall = async (): Promise<
   }
 };
 
-const smartContractsTotalContractsCall = async () => {
-  try {
-    const res = await api.get({
-      route: 'sc/list',
-    });
-
-    if (!res.error || res.error === '') {
-      return res.pagination.totalRecords;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const smartContractTotalTransactionsListCall = async () => {
+const smartContractTotalTransactionsListCall = async (): Promise<
+  number | undefined
+> => {
   try {
     const res = await api.get({
       route: 'transaction/list',
       query: {
         type: 63, // Smart Contract Transactions
+        // Only `totalRecords` is read. Measured: the unlimited call ships
+        // 30.801 bytes for that one number, `limit=1` ships 3.572.
+        limit: 1,
       },
     });
 
     if (!res.error || res.error === '') {
-      return res.pagination.totalRecords;
+      const total = res.pagination?.totalRecords;
+      // A null here survives the `!== undefined` gate upstream and would then
+      // throw on toLocaleString in the middle of a render (the same payload
+      // is documented on this route in transactions/summary.ts).
+      return Number.isFinite(total) ? total : undefined;
     }
   } catch (error) {
     console.error(error);
   }
 };
 
-const scInvokesTotalRecordsCall = async (address: string) => {
-  try {
-    const res = await api.get({
-      route: `sc/invokes/${address}`,
-    });
-
-    if (!res.error || res.error === '') {
-      return res.pagination.totalRecords;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const smartContractsBeforeYesterdayTransactionsCall = async (): Promise<
-  { newTransactions: number; beforeYesterdayTxs: number } | undefined
+/**
+ * Contract transactions in the last 24 hours.
+ *
+ * The bucket is a rolling window anchored at the request (`countDaysQuery` in
+ * the proxy builds `now-1d..now`), not a calendar day, so the "in the last
+ * 24 hours" line means exactly that at any time of day.
+ */
+const contractTransactions24hCall = async (): Promise<
+  { last24h: number } | undefined
 > => {
   try {
     const res = await api.get({
-      route: 'transaction/list/count/2',
+      route: 'transaction/list/count/1',
       query: {
         type: 63, // Smart Contract Transactions
       },
     });
 
     if (!res.error || res.error === '') {
-      const data = {
-        newTransactions: 0,
-        beforeYesterdayTxs: res.data?.number_by_day[1]?.doc_count || 0,
-      };
-      if (res.data?.number_by_day?.length > 0) {
-        data.newTransactions = res.data?.number_by_day[0]?.doc_count || 0;
-      }
-      return data;
+      const count = res.data?.number_by_day?.[0]?.doc_count;
+      // An empty window still arrives as a bucket with doc_count 0; a missing
+      // bucket on a 200 is a malformed success, not a zero the chain reported.
+      return Number.isFinite(count) ? { last24h: count } : undefined;
     }
   } catch (error) {
     console.error(error);
@@ -189,13 +253,12 @@ const smartContractTransactionDetailsCall = async (
 };
 
 export {
-  scInvokesTotalRecordsCall,
+  contractActivitySharesCall,
   smartContractBeforeYesterdayTransactionsCall,
-  smartContractsBeforeYesterdayTransactionsCall,
+  contractTransactions24hCall,
   smartContractsListCall,
   smartContractsStatisticCall,
   smartContractsTableRequest,
-  smartContractsTotalContractsCall,
   smartContractTotalTransactionsListCall,
   smartContractTransactionDetailsCall,
 };

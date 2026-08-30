@@ -444,13 +444,6 @@ export const initialsTableHeaders = [
   'Contract',
 ];
 
-export const smartContractsTableHeaders = [
-  'Contract',
-  'Total Transactions',
-  'Deployer',
-  'Deploy Hash / Time',
-];
-
 export const smartContractInvokesTransactionsTableHeaders = [
   'Tx Hash',
   'Age',

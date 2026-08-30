@@ -1,13 +1,6 @@
 {
   "Titles": {
-    "Most Used Applications": "Aplicações Mais Utilizadas",
-    "Daily": "Diariamente",
-    "Transactions": "Transações"
-  },
-  "Cards": {
-    "Deployer": "Implantador",
-    "Deployer Hash": "Hash do Implantador",
-    "Total Transactions": "Total de Transações"
+    "MostUsed": "Aplicações Mais Utilizadas"
   },
   "ContractInteraction": {
     "noReadable": "Nenhuma função de leitura disponível para este contrato.",
@@ -37,5 +30,43 @@
       "failed": "Transação falhou",
       "notSuccessful": "A transação não foi bem-sucedida."
     }
+  },
+  "Table": {
+    "Contract": "Contrato",
+    "Deployed": "Implantado",
+    "Deployer": "Implantador",
+    "DeployTx": "Tx de implantação",
+    "Upgrades": "Atualizações",
+    "Transactions": "Transações"
+  },
+  "List": {
+    "SummaryAria": "Estatísticas de contratos inteligentes",
+    "ContractsDeployed": "Contratos implantados",
+    "ContractTransactions": "Transações de contratos",
+    "MostUsed": "Contrato mais utilizado",
+    "LeaderTransactions": "{{amount}} transações, desde o início",
+    "MostUsedNote": "Por transações de contrato bem-sucedidas, desde o início.",
+    "NoStatistics": "Nenhuma atividade de contrato foi registrada até agora.",
+    "DeployerCountTitle": "Mostrar os {{count}} contratos deste implantador",
+    "ClearFilter": "Limpar filtro",
+    "Last24h": "{{formatted}} nas últimas 24 horas",
+    "MostUsedLoading": "Carregando as aplicações mais utilizadas",
+    "OtherContracts": "Outros contratos",
+    "DeployedByShort": "Implantado por",
+    "TransactionsShort": "Tx"
+  },
+  "Filters": {
+    "SortBy": "Ordenar por",
+    "Order": "Ordem",
+    "SortTransactions": "Transações",
+    "SortDeployed": "Implantado",
+    "OrderDesc": "Decrescente",
+    "OrderAsc": "Crescente"
+  },
+  "Common": {
+    "CopyAddress": "Copiar endereço do contrato",
+    "AddressCopied": "Endereço do contrato copiado para a área de transferência",
+    "OpenContract": "Abrir contrato",
+    "OpenInNewTab": "Abrir em uma nova aba"
   }
 }

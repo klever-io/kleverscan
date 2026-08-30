@@ -1,3 +1,4 @@
+import { kbdAccent } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 
 /**
@@ -14,6 +15,8 @@ const t = {
     divider: 'rgba(255, 255, 255, 0.07)',
     title: '#EDEDF5',
     subtitle: '#A8A9C4',
+    kbdBg: 'rgba(255, 255, 255, 0.05)',
+    kbdBorder: 'rgba(255, 255, 255, 0.1)',
     muted: 'rgba(168, 169, 196, 0.72)',
     mutedSoft: 'rgba(168, 169, 196, 0.5)',
     icon: '#C4B5FD',
@@ -26,8 +29,6 @@ const t = {
     badgeBg: 'rgba(255, 255, 255, 0.03)',
     badgeBorder: 'rgba(255, 255, 255, 0.1)',
     badgeText: 'rgba(168, 169, 196, 0.9)',
-    kbdBg: 'rgba(255, 255, 255, 0.05)',
-    kbdBorder: 'rgba(255, 255, 255, 0.1)',
     footerBg: 'rgba(0, 0, 0, 0.28)',
     selection: 'rgba(155, 108, 255, 0.4)',
     spinnerTrack: 'rgba(155, 108, 255, 0.22)',
@@ -42,6 +43,8 @@ const t = {
     divider: 'rgba(0, 0, 0, 0.07)',
     title: '#12121A',
     subtitle: '#5C5E78',
+    kbdBg: 'rgba(0, 0, 0, 0.04)',
+    kbdBorder: 'rgba(0, 0, 0, 0.08)',
     muted: '#6B6D88',
     mutedSoft: '#8A8BA3',
     icon: '#7D3FF1',
@@ -53,8 +56,6 @@ const t = {
     badgeBg: 'rgba(0, 0, 0, 0.02)',
     badgeBorder: 'rgba(0, 0, 0, 0.1)',
     badgeText: '#6B6D88',
-    kbdBg: 'rgba(0, 0, 0, 0.04)',
-    kbdBorder: 'rgba(0, 0, 0, 0.08)',
     footerBg: 'rgba(244, 244, 248, 0.9)',
     selection: 'rgba(125, 63, 241, 0.28)',
     spinnerTrack: 'rgba(125, 63, 241, 0.2)',
@@ -198,9 +199,7 @@ export const Kbd = styled.kbd`
   font-weight: 600;
   font-family: inherit;
   letter-spacing: 0.02em;
-  color: ${props => tokens(props.theme.dark).subtitle};
-  background: ${props => tokens(props.theme.dark).kbdBg};
-  border: 1px solid ${props => tokens(props.theme.dark).kbdBorder};
+  ${kbdAccent}
 `;
 
 export const EscHint = styled.div`

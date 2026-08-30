@@ -97,6 +97,26 @@ describe('api.get carries the exact digits through the parse boundary', () => {
     );
   });
 
+  it('rejects on a malformed body in a single attempt, as response.json() did', async () => {
+    // The parse runs in a returned, unawaited promise on purpose: rejection
+    // must bypass the request's catch (which resolves error shapes) and must
+    // not pay the retry loop. A proxy 504 HTML page is the realistic body.
+    const original = global.fetch;
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => '<html>504 Gateway Time-out</html>',
+    });
+    global.fetch = fetchMock as never;
+
+    try {
+      await expect(api.get({ route: 'assets/list' })).rejects.toThrow();
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+    } finally {
+      global.fetch = original;
+    }
+  });
+
   it('leaves a response verbatim without the opt-in, so raw views stay honest', async () => {
     // A CreateAsset transaction carries the same field names inside its
     // contract parameter; the Raw Tx card renders this object as-is.

@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { IconHelp } from '@/assets/help';
 import { ICustomStyles } from '@/types/index';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyledTooltip, ToolTipSpan } from './styles';
 
 interface ITooltipProps {
@@ -29,14 +29,28 @@ const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
 }) => {
   const [displayMessage, setDisplayMessage] = useState(false);
   const parsedMsgs = msg.split('\n');
+
+  // WCAG 1.4.13: content shown on hover or focus must be dismissible without
+  // moving either. Keyboard events go to the FOCUSED element, and hover-only
+  // tooltips hold no focus, so the span handler below cannot reach them: a
+  // document listener, alive only while a tip is showing, covers that case.
+  useEffect(() => {
+    if (!displayMessage) return;
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setDisplayMessage(false);
+    };
+    document.addEventListener('keydown', dismiss);
+    return () => document.removeEventListener('keydown', dismiss);
+  }, [displayMessage]);
+
   return (
     <ToolTipSpan
       className="button-tooltip"
       onMouseOver={() => setDisplayMessage(true)}
       onMouseLeave={() => setDisplayMessage(false)}
-      // WCAG 1.4.13: content shown on hover or focus must be dismissible
-      // without moving either. Stops propagation only while actually open,
-      // so a surrounding dialog's Escape keeps working when no tip shows.
+      // The focused-trigger path: same dismissal, plus it stops propagation
+      // so a surrounding dialog's Escape does not also fire while a tip is
+      // open under focus.
       onKeyDown={event => {
         if (event.key === 'Escape' && displayMessage) {
           event.stopPropagation();

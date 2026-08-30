@@ -613,6 +613,51 @@ describe('Filter keyboard operation', () => {
     expect(openerElement).toHaveFocus();
   });
 
+  it('closes the panel when clearing while open, same order as selecting', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current="Fail"
+        onClick={jest.fn()}
+      />,
+    );
+
+    const openerElement = screen.getByRole('button', { name: 'Status Fail' });
+    fireEvent.click(openerElement);
+    await screen.findByLabelText('Search Status');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Status filter' }));
+
+    // Without the close, the listbox stayed stranded open behind an opener
+    // whose activation is a no-op in typeahead mode.
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(openerElement).toHaveFocus();
+  });
+
+  it('survives arrow keys when the search matches nothing', async () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current={undefined}
+        onClick={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(opener());
+    const input = await screen.findByLabelText('Search Status');
+
+    fireEvent.change(input, { target: { value: 'zzz' } });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+
+    // Empty list: no active descendant, no crash, panel still open.
+    expect(input.getAttribute('aria-activedescendant')).toBeNull();
+    expect(screen.getByLabelText('Search Status')).toBeInTheDocument();
+  });
+
   it('does not close on blur while the pointer rests on the control', async () => {
     renderWithTheme(
       <Filter

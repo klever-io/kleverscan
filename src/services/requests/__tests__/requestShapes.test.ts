@@ -40,6 +40,7 @@ import {
 } from '@/services/requests/asset';
 import { requestAssets, requestAssetsQuery } from '@/services/requests/assets';
 import { requestAssetsPoolsQuery } from '@/services/requests/assetsPools';
+import getTransaction from '@/services/requests/transaction';
 import { collectionListCall } from '@/services/requests/collection';
 import { requestAssetsList } from '@/services/requests/ito';
 import { getMarketplace } from '@/services/requests/marketplace';
@@ -251,5 +252,11 @@ describe('preserved big amounts stay opt-in per request', () => {
     await transactionCall(routerWith({ asset: 'KLV' }));
 
     expect(callArg()).not.toHaveProperty('preserveBigAmounts');
+  });
+
+  it('nor does the by-hash request that feeds the Raw Tx card', async () => {
+    await getTransaction('abc123');
+
+    expect(callArg()).toEqual({ route: 'transaction/abc123' });
   });
 });

@@ -262,8 +262,11 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
     if (onClick) {
       onClick(allItem);
     }
+    // Same order as handleSelect: close first, then land focus on the opener.
     // Clearing empties the button under the keyboard user's focus (the
-    // `empty` style is display:none); land it on the opener, not on <body>.
+    // `empty` style is display:none), and without the close an open panel
+    // stayed stranded behind an opener whose activation is a no-op.
+    closeDropDown();
     openerRef.current?.focus({ preventScroll: true });
   };
 

@@ -244,10 +244,15 @@ export const withoutBody = async (
         };
       }
 
-      // Through text so the exact digits survive the parse boundary (#679);
-      // a body that is not JSON still lands in the catch below, as before.
-      const text = await response.text();
-      return JSON.parse(preserveBigAmounts ? preserveBigDigits(text) : text);
+      // Through text so the exact digits survive the parse boundary (#679).
+      // Returned WITHOUT await, exactly like `return response.json()` was: a
+      // returned promise's rejection bypasses this try/catch, so a malformed
+      // body still rejects the call in one attempt instead of resolving as an
+      // error shape and paying the full retry loop.
+      return (async () => {
+        const text = await response.text();
+        return JSON.parse(preserveBigAmounts ? preserveBigDigits(text) : text);
+      })();
     } catch (error) {
       return {
         data: null,

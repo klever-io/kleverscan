@@ -157,4 +157,16 @@ describe('shareBarLabel', () => {
     expect(label).toContain('Other contracts');
     expect(label.split(', ')).toHaveLength(4);
   });
+
+  // The clamp in shareModel leaves no remainder whenever the segments are the
+  // whole chain, which is the steady state on a network with five or fewer
+  // contracts rather than a rare race. Summary gates the Other segment and its
+  // legend entry on the same figure, so a label naming it describes a band
+  // that was never drawn.
+  it('leaves out the remainder it has nothing to draw for', () => {
+    const label = shareBarLabel({ ...model, other: 0 }, 'Other contracts');
+    expect(label).toBe('Bitcoin.me 30%, klv1bare 20%, klv1sneaky 10%');
+    expect(label).not.toContain('Other contracts');
+    expect(label.split(', ')).toHaveLength(3);
+  });
 });

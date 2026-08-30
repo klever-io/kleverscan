@@ -110,8 +110,9 @@ export const segmentColor = (
 
 /**
  * The share bar's accessible label: every drawn segment with its share, then
- * the Other remainder, as one string. Names pass safeContractName with the
- * full address as fallback, the same rule the legend draws by.
+ * the Other remainder when there is one, as one string. Names pass
+ * safeContractName with the full address as fallback, the same rule the legend
+ * draws by.
  */
 export const shareBarLabel = (
   model: IShareModel | undefined,
@@ -123,6 +124,13 @@ export const shareBarLabel = (
           segment =>
             `${segment.name ? safeContractName(segment.name) || segment.address : segment.address} ${formatShare(segment.count, model.total)}`,
         ),
-        `${otherLabel} ${formatShare(model.other, model.total)}`,
+        // Only when there is a remainder to name. Summary draws the Other
+        // segment and its legend entry under the same condition, and a label
+        // that announces "Other contracts 0%" describes a band nobody sees.
+        // Reached whenever the segments are the whole chain: a network with
+        // five or fewer contracts leaves the denominator equal to their sum.
+        ...(model.other > 0
+          ? [`${otherLabel} ${formatShare(model.other, model.total)}`]
+          : []),
       ].join(', ')
     : '';

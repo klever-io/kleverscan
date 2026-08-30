@@ -249,7 +249,7 @@ describe('preserved big amounts stay opt-in per request', () => {
   });
 
   it('a transaction request does not, so the raw view stays verbatim', async () => {
-    await transactionCall(routerWith({ asset: 'KLV' }));
+    await transactionCall('KLV');
 
     expect(callArg()).not.toHaveProperty('preserveBigAmounts');
   });

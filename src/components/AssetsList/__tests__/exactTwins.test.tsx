@@ -83,7 +83,7 @@ jest.mock('react-dom', () => {
   };
 });
 
-import Assets from '../index';
+import Assets from '@/pages/assets';
 import { IRowSection } from '@/types/index';
 
 /**

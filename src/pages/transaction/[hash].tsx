@@ -124,9 +124,12 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
     }
   };
 
+  // Keyed on the fee asset, not on mount: the page no longer remounts between
+  // two transactions, so empty deps kept the previous transaction's precision.
   useEffect(() => {
     getPrecisionTransaction();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kdaFee?.kda]);
 
   const overviewProps = {
     hash,

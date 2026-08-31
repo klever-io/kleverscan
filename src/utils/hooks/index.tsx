@@ -47,12 +47,23 @@ export function usePrecision(
   const [precision, setPrecision] = useState<
     number | { [assetId: string]: number }
   >(0);
+  // Keyed on the ids themselves, not the array identity: callers build the list
+  // inline, so a reference dep would refetch every render. Empty deps used to be
+  // harmless only because the app remounted on every navigation.
+  const assetKey = Array.isArray(assetIds) ? assetIds.join(',') : assetIds;
   useEffect(() => {
+    let active = true;
     const precisionCall = async () => {
-      setPrecision(await getPrecision(assetIds));
+      const resolved = await getPrecision(assetIds);
+      // A slower earlier request must not overwrite a newer one's answer.
+      if (active) setPrecision(resolved);
     };
     precisionCall();
-  }, []);
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assetKey]);
   if (typeof precision === 'number') {
     return precision as number;
   } else {

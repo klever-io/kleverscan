@@ -68,13 +68,9 @@ const copyStyle = {
 const TokenOperations: React.FC<Props> = ({ receipts }) => {
   const [expanded, setExpanded] = useState(false);
 
-  if (!receipts || receipts.length === 0) return null;
-
-  const operations = receipts.filter((r: any) =>
+  const operations = (receipts || []).filter((r: any) =>
     ['Transfer'].includes(r.typeString),
   );
-
-  if (!operations.length) return null;
 
   const assetIdsToSearch = Array.from(
     new Set(
@@ -88,7 +84,11 @@ const TokenOperations: React.FC<Props> = ({ receipts }) => {
     ),
   );
 
+  // Above the early return on purpose: a transaction with no transfer receipts
+  // used to return before this line, so the hook count depended on the data.
   const precisions = usePrecision(assetIdsToSearch as string[]);
+
+  if (!operations.length) return null;
 
   const visible = expanded ? operations : operations.slice(0, 2);
 

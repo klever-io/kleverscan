@@ -138,6 +138,26 @@ describe('usePackInfoPrecisions', () => {
     expect(screen.getByTestId('out').textContent).toBe('{"DVK-34ZH":0}');
   });
 
+  it('keeps the zero map and stays quiet when the lookup rejects', async () => {
+    const unhandled: unknown[] = [];
+    const track = (reason: unknown) => {
+      unhandled.push(reason);
+    };
+    process.on('unhandledRejection', track);
+
+    mockGetPrecision.mockRejectedValueOnce(new Error('api down'));
+    render(<Harness initial={packsFor('KLV')} />);
+    await flush();
+    // Two macrotask ticks: node reports an unhandled rejection only after
+    // the microtask queue has drained past it.
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    process.off('unhandledRejection', track);
+    expect(screen.getByTestId('out').textContent).toBe('{"KLV":0}');
+    expect(unhandled).toHaveLength(0);
+  });
+
   it('lets a newer answer stand when an older one resolves late', async () => {
     let resolveFirst: (v: unknown) => void = () => undefined;
     mockGetPrecision

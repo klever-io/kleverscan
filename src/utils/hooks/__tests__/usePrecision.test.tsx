@@ -155,7 +155,31 @@ describe('usePrecision', () => {
     });
     await flush();
 
-    expect(screen.getByTestId('out').textContent).toBe('0');
+    // A zero MAP, not the number 0: consumers index the array overload's
+    // result, and 10 ** undefined renders NaN.
+    expect(screen.getByTestId('out').textContent).toBe('{"KFI":0}');
+  });
+
+  // The failure path: a rejected lookup settles on the reset value and must
+  // not surface as an unhandled rejection.
+  it('keeps the zero map and stays quiet when the lookup rejects', async () => {
+    const unhandled: unknown[] = [];
+    const track = (reason: unknown) => {
+      unhandled.push(reason);
+    };
+    process.on('unhandledRejection', track);
+
+    mockGetPrecision.mockRejectedValueOnce(new Error('api down'));
+    render(<Harness initial={['KLV']} />);
+    await flush();
+    // Two macrotask ticks: node reports an unhandled rejection only after
+    // the microtask queue has drained past it.
+    await new Promise(resolve => setTimeout(resolve, 0));
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    process.off('unhandledRejection', track);
+    expect(screen.getByTestId('out').textContent).toBe('{"KLV":0}');
+    expect(unhandled).toHaveLength(0);
   });
 
   it('lets a newer answer stand when an older one resolves late', async () => {

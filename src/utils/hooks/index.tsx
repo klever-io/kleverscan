@@ -52,16 +52,24 @@ export function usePrecision(
   const assetKey = Array.isArray(assetIds) ? assetIds.join(',') : assetIds;
   useEffect(() => {
     let active = true;
-    // Back to the initial value first: on a rejected lookup, and during the
+    // Back to the initial shape first: on a rejected lookup, and during the
     // window before the new one resolves, the previous asset's precision must
-    // not scale the new asset's amounts.
-    setPrecision(0);
+    // not scale the new asset's amounts. The array overload resets to a map
+    // of zeros, keyed like getPrecision keys its result, because consumers
+    // index it and 10 ** undefined renders NaN.
+    setPrecision(
+      Array.isArray(assetIds)
+        ? Object.fromEntries(assetIds.map(id => [id.split('/')[0], 0]))
+        : 0,
+    );
     const precisionCall = async () => {
       const resolved = await getPrecision(assetIds);
       // A slower earlier request must not overwrite a newer one's answer.
       if (active) setPrecision(resolved);
     };
-    precisionCall();
+    // The reset above IS the failure fallback; without this catch every
+    // failed lookup is an unhandled rejection.
+    precisionCall().catch(() => undefined);
     return () => {
       active = false;
     };
@@ -227,7 +235,8 @@ export const usePackInfoPrecisions = (
       const precisions = await getPrecision(ids);
       if (active) setPacksPrecision(precisions);
     };
-    getPacksPrecision();
+    // Same reason as usePrecision: the zero map above is the fallback.
+    getPacksPrecision().catch(() => undefined);
     return () => {
       active = false;
     };

@@ -74,7 +74,8 @@ import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
-import React, { PropsWithChildren } from 'react';
+import type { ParsedUrlQuery } from 'querystring';
+import React, { PropsWithChildren, useCallback } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 
 interface IRequestTxQuery {
@@ -273,7 +274,10 @@ export const getCustomFields = (
   return filteredSectionsResult;
 };
 
-export const transactionRowSections = (props: ITransaction): IRowSection[] => {
+export const transactionRowSections = (
+  props: ITransaction,
+  routeState?: { pathname?: string; query?: ParsedUrlQuery },
+): IRowSection[] => {
   const {
     hash,
     blockNum,
@@ -287,7 +291,6 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
     precision,
     data,
   } = props;
-  const router = useRouter();
 
   const contractType = contractTypes(contract);
   // The counterparty, the second type badge and the contract-mark tooltip,
@@ -303,8 +306,8 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
 
   const inOrOut = valueDirection({
     account:
-      typeof router?.query?.account === 'string'
-        ? router.query.account
+      typeof routeState?.query?.account === 'string'
+        ? routeState.query.account
         : undefined,
     sender,
     contractType,
@@ -542,8 +545,24 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
 
   // Ordered by the column list rather than assembled here, so the cells and
   // the headings above them come from the same decision.
-  return getTransactionColumns({ showInOut: showsInOut(router) }).map(
+  return getTransactionColumns({ showInOut: showsInOut(routeState ?? {}) }).map(
     column => sectionByColumn[column.key],
+  );
+};
+
+/**
+ * Companion to `useTransactionHeaders`: the account that decides the In/Out
+ * direction comes from the URL, and a row builder is called by the table
+ * rather than mounted, so it cannot read a hook itself.
+ */
+export const useTransactionRowSections = (): ((
+  props: ITransaction,
+) => IRowSection[]) => {
+  const { pathname, query } = useRouter();
+
+  return useCallback(
+    (props: ITransaction) => transactionRowSections(props, { pathname, query }),
+    [pathname, query],
   );
 };
 
@@ -551,11 +570,12 @@ const Transactions: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'transactions']);
   const header = useTransactionHeaders();
+  const rowSections = useTransactionRowSections();
 
   const tableProps: ITable = {
     type: 'transactions',
     header,
-    rowSections: transactionRowSections,
+    rowSections,
     dataName: 'transactions',
     request: (page, limit) => requestTransactionsDefault(page, limit, router),
     Filters: TransactionsFilters,

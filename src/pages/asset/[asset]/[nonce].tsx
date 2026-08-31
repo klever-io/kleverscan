@@ -6,7 +6,7 @@ import { ITable } from '@/components/Table';
 import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import TransactionsFilters from '@/components/TransactionsFilters';
-import { transactionRowSections } from '@/pages/transactions';
+import { useTransactionRowSections } from '@/pages/transactions';
 import api from '@/services/api';
 import { requestNonceDetails } from '@/services/requests/asset/nonce';
 import { Container, Header, SpacedContainer } from '@/styles/common';
@@ -59,10 +59,12 @@ const AssetNonce: React.FC<PropsWithChildren> = () => {
     };
   };
 
+  const rowSections = useTransactionRowSections();
+
   const tableProps: ITable = {
     type: 'transactions',
     header: transactionHeaders,
-    rowSections: transactionRowSections,
+    rowSections,
     dataName: 'transactions',
     request: (page, limit) => requestTransactions(page, limit),
     Filters: TransactionsFilters,

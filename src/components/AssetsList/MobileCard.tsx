@@ -1,5 +1,6 @@
 import { useTranslation } from 'next-i18next';
 import React from 'react';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
@@ -73,24 +74,27 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
           verified={verified}
         />
         {assetType === 'NonFungible' && (
-          <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
+          <ExplainedBadge variant="neutral" msg={t(ASSET_BADGE_TOOLTIPS.nft)}>
             {t('assets:List.Nft')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         {assetType === 'SemiFungible' && (
-          <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
+          <ExplainedBadge variant="neutral" msg={t(ASSET_BADGE_TOOLTIPS.sft)}>
             {t('assets:List.Sft')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         {attributes?.isPaused && (
-          <BadgePill $variant="warning" title={t(ASSET_BADGE_TOOLTIPS.paused)}>
+          <ExplainedBadge
+            variant="warning"
+            msg={t(ASSET_BADGE_TOOLTIPS.paused)}
+          >
             {t('assets:List.Paused')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         {hasKdaPool && (
-          <BadgePill $variant="accent" title={t(ASSET_BADGE_TOOLTIPS.pool)}>
+          <ExplainedBadge variant="accent" msg={t(ASSET_BADGE_TOOLTIPS.pool)}>
             Fee Pool
-          </BadgePill>
+          </ExplainedBadge>
         )}
         <RowActions>
           <CopyAction
@@ -160,9 +164,9 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
             <RewardsUnit>{t('assets:List.Apr')}</RewardsUnit>
           )}
           {rewards.kind === 'fpr' && (
-            <BadgePill $variant="neutral" title={t(FPR_TOOLTIP)}>
+            <ExplainedBadge variant="neutral" msg={t(FPR_TOOLTIP)}>
               FPR
-            </BadgePill>
+            </ExplainedBadge>
           )}
           {rewards.kind === 'none' && t('assets:List.RewardsUnavailable')}
         </MobileMetaItem>

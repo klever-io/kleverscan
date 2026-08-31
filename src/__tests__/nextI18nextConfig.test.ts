@@ -14,7 +14,7 @@ describe('next-i18next config', () => {
 
   const loadConfig = () => {
     jest.resetModules();
-     
+
     return require(configPath);
   };
 

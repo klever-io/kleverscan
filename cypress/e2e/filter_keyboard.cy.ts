@@ -110,7 +110,13 @@ describe('Shared filter dropdown, keyboard only', () => {
     cy.get(LISTBOX).should('be.visible');
     cy.get(OPTION).should('have.length.greaterThan', 1);
     // Arrow keys walk the list through the input, not through focus moves.
-    cy.focused().should('have.attr', 'aria-activedescendant');
+    // Dereferenced, not just present: a dangling id would keep a reader
+    // silent while a has-attribute assertion stays green.
+    cy.focused()
+      .invoke('attr', 'aria-activedescendant')
+      .then(id => {
+        cy.get(`#${id}`).should('have.attr', 'role', 'option');
+      });
   });
 
   it('walks the options with the arrow keys and selects with Enter', () => {
@@ -130,7 +136,9 @@ describe('Shared filter dropdown, keyboard only', () => {
 
     cy.location('search').should('include', 'type=');
     cy.get(LISTBOX).should('not.exist');
-    // Focus must come back to the control the reader opened, not to body.
+    // Focus must come back to the control the reader opened, not to body,
+    // pinned to THIS filter's container rather than any opener on the page.
+    cy.focused().closest('[data-testid="filter-account-type"]').should('exist');
     cy.focused().should('have.attr', 'aria-haspopup', 'listbox');
   });
 
@@ -146,9 +154,32 @@ describe('Shared filter dropdown, keyboard only', () => {
 
       cy.get(LISTBOX).should('not.exist');
       cy.get(OPENER).should('have.attr', 'aria-expanded', 'false');
+      cy.focused()
+        .closest('[data-testid="filter-account-type"]')
+        .should('exist');
       cy.focused().should('have.attr', 'aria-haspopup', 'listbox');
       cy.location('search').should('eq', search);
     });
+  });
+
+  // The reopen announcement is what confirms an earlier selection took:
+  // the chosen option must read as selected and the cursor must start on it.
+  it('marks the chosen option as selected on reopen', () => {
+    cy.get(OPENER).focus();
+    cy.realPress('Enter');
+    cy.realPress('ArrowDown');
+    cy.realPress('Enter');
+    cy.location('search').should('include', 'type=');
+
+    cy.realPress('Enter');
+
+    cy.get(LISTBOX).should('be.visible');
+    cy.get(`${OPTION}[aria-selected="true"]`).should('have.length', 1);
+    cy.focused()
+      .invoke('attr', 'aria-activedescendant')
+      .then(id => {
+        cy.get(`#${id}`).should('have.attr', 'aria-selected', 'true');
+      });
   });
 
   // The defect the #704 review round actually found: focus left the widget

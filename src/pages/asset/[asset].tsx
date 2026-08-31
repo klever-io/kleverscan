@@ -82,7 +82,9 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
       setQueryAndRouter(initialQueryState, router);
       setSelectedTab((router.query.tab as string) || getTableHeaders()[0]);
     }
-  }, [router.isReady]);
+    // Also keyed on the asset: the page persists across asset-to-asset
+    // navigation now, and a kept Holders tab does not exist on an SFT.
+  }, [router.isReady, router.query.asset]);
 
   const requestTransactions = async (page: number, limit: number) => {
     const newQuery = {
@@ -158,6 +160,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     <AssetPageContainer>
       <AssetSummary asset={asset} ITO={ITO} />
       <AssetTabs
+        key={String(router.query.asset)}
         asset={asset}
         ITO={ITO}
         assetPool={assetPool}

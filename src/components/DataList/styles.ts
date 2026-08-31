@@ -86,6 +86,9 @@ export const focusRing = css`
 `;
 
 export const VisuallyHidden = styled.span`
+  /* Readers get the rendered text: inheriting the badge's uppercase handed
+     them whole sentences in caps, which VoiceOver spells out. */
+  text-transform: none;
   position: absolute;
   width: 1px;
   height: 1px;

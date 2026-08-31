@@ -205,27 +205,26 @@ type PackInfoHookResult = [
 export const usePackInfoPrecisions = (
   packInfo: IPackInfo[],
 ): PackInfoHookResult => {
-  const assetIds: string[] = [];
-  const getInitialPrecisions = () => {
-    const initialPrecisions: { [key: string]: number } = {};
-    for (let index = 0; index < packInfo.length; index++) {
-      assetIds.push(packInfo[index].key);
-      initialPrecisions[packInfo[index].key] = 0;
-    }
-    return initialPrecisions;
-  };
-
-  const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(
-    getInitialPrecisions(),
+  const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(() =>
+    Object.fromEntries(packInfo.map(pack => [pack.key, 0])),
   );
 
+  // Same treatment as usePrecision above: the ids used to be collected inside
+  // the useState initializer, so they were frozen at mount and the effect
+  // never saw a later packInfo.
+  const assetKey = packInfo.map(pack => pack.key).join(',');
   useEffect(() => {
+    let active = true;
     const getPacksPrecision = async () => {
-      const precisions = await getPrecision(assetIds);
-      setPacksPrecision(precisions);
+      const ids = assetKey === '' ? [] : assetKey.split(',');
+      const precisions = await getPrecision(ids);
+      if (active) setPacksPrecision(precisions);
     };
     getPacksPrecision();
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [assetKey]);
 
   return [packsPrecision, setPacksPrecision];
 };

@@ -68,7 +68,7 @@ const copyStyle = {
 const TokenOperations: React.FC<Props> = ({ receipts }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const operations = (receipts || []).filter((r: any) =>
+  const operations = (receipts ?? []).filter((r: any) =>
     ['Transfer'].includes(r.typeString),
   );
 

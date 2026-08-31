@@ -128,7 +128,6 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   // two transactions, so empty deps kept the previous transaction's precision.
   useEffect(() => {
     getPrecisionTransaction();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kdaFee?.kda]);
 
   const overviewProps = {

@@ -1,9 +1,9 @@
 import { TextDecoder, TextEncoder } from 'util';
 
 // jsdom doesn't expose these globally; the util (and this test) use them.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 (global as any).TextEncoder = (global as any).TextEncoder || TextEncoder;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 (global as any).TextDecoder = (global as any).TextDecoder || TextDecoder;
 
 import { readBuildVersionsFromZip } from '../abiVersions';
@@ -97,7 +97,7 @@ function fileFrom(bytes: Uint8Array): File {
     bytes.byteOffset,
     bytes.byteOffset + bytes.byteLength,
   );
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   return { arrayBuffer: async () => ab } as any as File;
 }
 

@@ -27,7 +27,7 @@ import React, {
 } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { transactionRowSections } from '../transactions';
+import { useTransactionRowSections } from '../transactions';
 
 const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
@@ -108,10 +108,12 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     };
   };
 
+  const rowSections = useTransactionRowSections();
+
   const tableProps: ITable = {
     type: 'transactions',
     header: transactionHeaders,
-    rowSections: transactionRowSections,
+    rowSections,
     dataName: 'transactions',
     request: (page, limit) => requestTransactions(page, limit),
     Filters: TransactionsFilters,

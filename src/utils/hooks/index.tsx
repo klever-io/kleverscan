@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
 import { IAssetsResponse, IValidatorResponse } from '@/types';
@@ -62,7 +61,6 @@ export function usePrecision(
     return () => {
       active = false;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assetKey]);
   if (typeof precision === 'number') {
     return precision as number;

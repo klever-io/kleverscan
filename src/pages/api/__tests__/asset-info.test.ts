@@ -13,7 +13,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 process.env.DEFAULT_KLEVERSCAN_API_URL = 'https://info.example.com';
 process.env.DEFAULT_KLEVERSCAN_API_KEY = 'test-key';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const handler = require('../asset-info').default as (
   req: NextApiRequest,
   res: NextApiResponse,

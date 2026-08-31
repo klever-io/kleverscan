@@ -13,6 +13,13 @@ jest.mock('@/assets/help', () => ({
   IconHelp: () => null,
 }));
 
+// react-tooltip renders null in jsdom (no real anchor/portal), which made the
+// shown and suppressed states indistinguishable to any DOM assertion. The mock
+// leaves a marker so the render condition itself becomes testable.
+jest.mock('react-tooltip', () => ({
+  Tooltip: () => <div data-testid="tip-body" />,
+}));
+
 jest.mock('react-dom', () => {
   const actual = jest.requireActual('react-dom');
   const client = jest.requireActual('react-dom/client');
@@ -135,6 +142,33 @@ describe('Tooltip trigger and anchor', () => {
 
     expect(container.querySelector('[data-testid="own-trigger"]')).toBeNull();
     expect(container.querySelector('.button-tooltip')).not.toBeNull();
+  });
+
+  // The changed condition's third arm: a trigger with a message under the
+  // threshold suppresses the tooltip entirely.
+
+  it('renders the tooltip when the message clears minMsgLength', () => {
+    const { container } = render(
+      wrap(
+        <Tooltip msg="long enough" minMsgLength={5}>
+          <span>icon</span>
+        </Tooltip>,
+      ),
+    );
+
+    expect(container.querySelector('[data-testid="tip-body"]')).not.toBeNull();
+  });
+
+  it('renders no tooltip when the message is under minMsgLength', () => {
+    const { container } = render(
+      wrap(
+        <Tooltip msg="ok" minMsgLength={5}>
+          <span>icon</span>
+        </Tooltip>,
+      ),
+    );
+
+    expect(container.querySelector('[data-testid="tip-body"]')).toBeNull();
   });
 
   it('gives each instance its own anchor, so one does not bind the others', () => {

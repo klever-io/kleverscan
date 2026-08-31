@@ -76,9 +76,25 @@ const Harness: React.FC<{ initial: string[] }> = ({ initial }) => {
   );
 };
 
+const SingleHarness: React.FC = () => {
+  const precision = usePrecision('KLV');
+  return <span data-testid="single">{String(precision)}</span>;
+};
+
 describe('usePrecision', () => {
   beforeEach(() => {
     mockGetPrecision.mockReset();
+  });
+
+  // The other arm of the input type: a single id resolves to a number.
+  it('resolves a single string id to a number', async () => {
+    mockGetPrecision.mockResolvedValue(6);
+
+    render(<SingleHarness />);
+    await flush();
+
+    expect(mockGetPrecision).toHaveBeenCalledWith('KLV');
+    expect(screen.getByTestId('single').textContent).toBe('6');
   });
 
   it('resolves the precisions for the ids it was given', async () => {

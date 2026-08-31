@@ -17,7 +17,9 @@ export const MultiSignList: React.FC<PropsWithChildren<IMultisignList>> = ({
   const items = [
     {
       title: 'Transactions hash',
-      data: hashs || 'None',
+      // The interface wants string[]; the old `hashs || 'None'` handed the
+      // filter a bare string, which only worked by accident of concat.
+      data: hashs?.length ? hashs : ['None'],
       onClick: (selected: string) => setSelectedHash(selected),
       current: selectedHash,
       loading: false,
@@ -29,7 +31,7 @@ export const MultiSignList: React.FC<PropsWithChildren<IMultisignList>> = ({
     <MultiSigList>
       <FilterContainer>
         {items.map(filter => (
-          <Filter key={JSON.stringify(filter)} {...filter} />
+          <Filter key={filter.title} {...filter} />
         ))}
       </FilterContainer>
     </MultiSigList>

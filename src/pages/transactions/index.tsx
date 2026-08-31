@@ -104,10 +104,12 @@ export const toAddressSectionElement = (
     </LinkWithDropdown>
   );
 };
-export const mobileAddressSectionElement = (
-  toAddress: string,
-  chars = 16,
-): React.ReactElement => {
+/** A component, not a render helper: it reads the mobile context, and row
+ *  cells are called as plain functions where a hook is illegal (#697). */
+export const MobileAddressSection: React.FC<{
+  toAddress: string;
+  chars?: number;
+}> = ({ toAddress, chars = 16 }) => {
   const { isMobile } = useMobile();
   if (isMobile) {
     return (
@@ -427,7 +429,7 @@ export const transactionRowSections = (props: ITransaction): IRowSection[] => {
               across both, against a 100px overflow at a 1100px viewport: the
               table scrolled sideways at 12 as well, and at 1280 it scrolls at
               neither. */}
-          {mobileAddressSectionElement(sender, 16)}
+          <MobileAddressSection toAddress={sender} chars={16} />
         </CenteredRow>
       ),
       span: 1,

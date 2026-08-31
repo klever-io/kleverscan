@@ -62,7 +62,8 @@
     "NewWindow": "Novas ({{days}}d)",
     "AcrossDays_one": "em {{count}} dia",
     "AcrossDays_other": "em {{count}} dias",
-    "Nonce": "Nonce"
+    "Nonce": "Nonce",
+    "ValidatorBadgesLoaded": "Selos de validador carregados"
   },
   "Common": {
     "CopyAddress": "Copiar endereço",

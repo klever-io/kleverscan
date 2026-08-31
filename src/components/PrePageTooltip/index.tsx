@@ -245,23 +245,21 @@ const PrePageTooltip: React.FC<PropsWithChildren<IPrePageTooltip>> = ({
       {!isLoading && canSearchResult && data?.data && (
         <TooltipWrapper>
           {data &&
-            getCorrectRowSections(data).map(
-              ({ element: Element, span }, index) => {
-                const [updatedSpanCount, isRightAligned] =
-                  processRowSectionsLayout(spanCount, span);
-                spanCount = updatedSpanCount;
-                return (
-                  <CardItem
-                    key={index}
-                    isRightAligned={isRightAligned}
-                    columnSpan={span}
-                    data-testid="card-item"
-                  >
-                    <Element />
-                  </CardItem>
-                );
-              },
-            )}
+            getCorrectRowSections(data).map(({ element, span }, index) => {
+              const [updatedSpanCount, isRightAligned] =
+                processRowSectionsLayout(spanCount, span);
+              spanCount = updatedSpanCount;
+              return (
+                <CardItem
+                  key={index}
+                  isRightAligned={isRightAligned}
+                  columnSpan={span}
+                  data-testid="card-item"
+                >
+                  {element({})}
+                </CardItem>
+              );
+            })}
         </TooltipWrapper>
       )}
       {!isLoading && !canSearchResult && (

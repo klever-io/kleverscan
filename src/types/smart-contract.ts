@@ -6,12 +6,24 @@ export interface HotContracts {
   count: number;
 }
 
+/**
+ * One redeploy of a contract under the same address. Verified against mainnet
+ * `sc/list`: objects, not the transaction hashes three declarations here used
+ * to claim. 82 of 100 contracts on one page carry at least one.
+ */
+export interface ISmartContractUpgrade {
+  upgradeTxHash: string;
+  upgrader: string;
+  timestamp: number;
+}
+
 export interface SmartContractsList {
-  name: string;
+  /** Absent for most contracts: `sc/list` resolves names best-effort. */
+  name?: string;
   deployTxHash: string;
   deployer: string;
   timestamp: number;
-  upgrades: string[];
+  upgrades: ISmartContractUpgrade[];
   totalTransactions: number;
   contractAddress: string;
 }
@@ -45,11 +57,7 @@ export interface SmartContractDetailsData {
   deployer: string;
   deployTxHash: string;
   timestamp: number;
-  upgrades?: Array<{
-    upgradeTxHash: string;
-    upgrader: string;
-    timestamp: number;
-  }>;
+  upgrades?: ISmartContractUpgrade[];
   properties?: {
     payable?: boolean;
     payableBySC?: boolean;
@@ -147,7 +155,7 @@ export interface ISmartContractResponse extends IResponse {
         upgradeable?: boolean;
         readable?: boolean;
       };
-      upgrades: string[];
+      upgrades: ISmartContractUpgrade[];
       timestamp: number;
     };
   };

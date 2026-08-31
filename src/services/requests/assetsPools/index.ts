@@ -55,6 +55,8 @@ export const requestAssetsPoolsQuery = async (
   const response = await api.get({
     route: `assets/pool/list`,
     query: localQuery,
+    // The reserve tooltips show the balances exactly (#679).
+    preserveBigAmounts: true,
   });
 
   // Keep the shape the return type promises even on the error path, so a

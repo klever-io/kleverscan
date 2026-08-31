@@ -1,7 +1,9 @@
 import { transparentize } from 'polished';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
+import { kbdAccent } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
 import { DefaultCardStyleWithBorder } from '@/styles/common';
+import { ConnectButton } from './ConnectWallet/styles';
 
 interface IMobileMenu {
   opened: boolean;
@@ -213,13 +215,7 @@ export const SpotlightTrigger = styled.button`
     font-size: 0.68rem;
     font-weight: 700;
     font-family: inherit;
-    color: ${props =>
-      props.theme.dark ? 'rgba(198, 199, 235, 0.85)' : props.theme.gray800};
-    background: ${props =>
-      props.theme.dark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)'};
-    border: 1px solid
-      ${props =>
-        props.theme.dark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'};
+    ${kbdAccent}
   }
 
   svg {
@@ -496,6 +492,11 @@ export const SvgWrapper = styled.div`
   justify-content: center;
 `;
 
+/**
+ * The wallet button on its own row under the bar, for the widths where the bar
+ * itself has no room left for it. Its full width belongs to this spot rather
+ * than to a breakpoint: the pill keeps its 200px cap wherever the bar holds it.
+ */
 export const ConnectionWrapper = styled.div`
   width: 100%;
   position: relative;
@@ -506,4 +507,8 @@ export const ConnectionWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  ${ConnectButton} {
+    max-width: 100%;
+  }
 `;

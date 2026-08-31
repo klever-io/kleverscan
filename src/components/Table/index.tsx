@@ -38,7 +38,6 @@ import {
   TableRowProps,
   TableEmptyData,
 } from './styles';
-import SmartContractCard from '../SmartContracts/SmartContractCard';
 
 export interface ITable<TCard = Record<string, never>> {
   type:
@@ -428,20 +427,6 @@ const Table = <TCard,>({
                 );
               }
 
-              if (type === 'smartContracts' && (isMobile || isTablet)) {
-                return (
-                  <SmartContractCard
-                    key={index}
-                    name={item?.name}
-                    timestamp={item?.timestamp}
-                    contractAddress={item?.contractAddress}
-                    deployer={item?.deployer}
-                    deployTxHash={item?.deployTxHash}
-                    totalTransactions={item?.totalTransactions}
-                  />
-                );
-              }
-
               return (
                 <TableRow
                   key={JSON.stringify(item)}
@@ -450,7 +435,7 @@ const Table = <TCard,>({
                 >
                   {rowSections &&
                     rowSections(item)?.map(
-                      ({ element: Element, span, width, maxWidth }, index2) => {
+                      ({ element, span, width, maxWidth }, index2) => {
                         const [updatedSpanCount, isRightAligned] =
                           processRowSectionsLayout(spanCount, span);
                         spanCount = updatedSpanCount;
@@ -474,7 +459,11 @@ const Table = <TCard,>({
                             {isMobile || isTablet ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
-                            <Element $smaller={smaller} />
+                            {/* Called, not mounted as a component type: the
+                                builder returns a fresh arrow per render, and
+                                as a type that remounted every cell, dropping
+                                focus and cell state (#697). */}
+                            {element({ $smaller: smaller })}
                           </MobileCardItem>
                         );
                       },

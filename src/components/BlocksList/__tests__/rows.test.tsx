@@ -89,11 +89,8 @@ const BLOCK = {
 const renderCell = (key: string, block: IBlock = BLOCK) => {
   const sections = blockRowSections(block);
   const index = BLOCK_COLUMNS.findIndex(column => column.key === key);
-  const Element = sections[index].element;
   return render(
-    <ThemeProvider theme={theme}>
-      <Element />
-    </ThemeProvider>,
+    <ThemeProvider theme={theme}>{sections[index].element({})}</ThemeProvider>,
   );
 };
 

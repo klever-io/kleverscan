@@ -5,12 +5,9 @@ import Table, { ITable } from '@/components/Table';
 import { homeDefaultInterval, useHomeData } from '@/contexts/mainPage';
 import { useMobile } from '@/contexts/mobile';
 import { defaultPagination } from '@/services/apiCalls';
-import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
+import { CenteredRow, DoubleRow } from '@/styles/common';
 import { IBlock } from '@/types/blocks';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
-import { formatAmount } from '@/utils/formatFunctions';
-import { bandwidthFeeReward } from '@/utils/fees';
-import { KLV_PRECISION } from '@/utils/globalVariables';
 import { parseAddress } from '@/utils/parseValues';
 import {
   ArrowHide,
@@ -22,7 +19,7 @@ import ExplorerLink from '@/components/ExplorerLink';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { ValidatorName } from './style';
+import { blockFeesCell, blockRewardsCell, blockSizeTxsCell } from './cells';
 import SkeletonTable from '@/components/SkeletonTable';
 
 export const blocksHeader = [
@@ -32,29 +29,10 @@ export const blocksHeader = [
   'Fees(Kapp/Burned)',
   'Rewards(Fee/Block)',
 ];
-export const blocksTabletHeader = [
-  '',
-  'Block',
-  'Size/TXs',
-  'Fees(Kapp/Burned)',
-  'Rewards(Fee/Block)',
-];
 
 export const blocksRowSections = (block: IBlock): IRowSection[] => {
-  const {
-    nonce,
-    size,
-    epoch,
-    producerName,
-    producerOwnerAddress,
-    producerLogo,
-    timestamp,
-    txCount,
-    txFees,
-    kAppFees,
-    txBurnedFees,
-    blockRewards,
-  } = block;
+  const { nonce, epoch, producerName, producerOwnerAddress, producerLogo } =
+    block;
 
   const producerNameIsAddress = producerName === producerOwnerAddress;
 
@@ -91,61 +69,17 @@ export const blocksRowSections = (block: IBlock): IRowSection[] => {
       ),
       span: 1,
     },
-    {
-      element: props => (
-        <DoubleRow {...props} key={txCount + size}>
-          <span>{size} Bytes</span>
-          <span>
-            {txCount} TX{txCount > 1 ? 's' : ''}
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(kAppFees) + String(txBurnedFees)}>
-          <span>{formatAmount((kAppFees || 0) / 10 ** KLV_PRECISION)} KLV</span>
-          <span>{`${formatAmount(
-            (txBurnedFees || 0) / 10 ** KLV_PRECISION,
-          )} KLV`}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
-          <span>
-            {formatAmount(bandwidthFeeReward(txFees) / 10 ** KLV_PRECISION)} KLV
-          </span>
-          <span>
-            {formatAmount((blockRewards || 0) / 10 ** KLV_PRECISION)} KLV
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
+    blockSizeTxsCell(block),
+    blockFeesCell(block),
+    blockRewardsCell(block),
   ];
 
   return sections;
 };
 
 export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
-  const {
-    nonce,
-    size,
-    epoch,
-    producerName,
-    producerOwnerAddress,
-    producerLogo,
-    timestamp,
-    txCount,
-    txFees,
-    kAppFees,
-    txBurnedFees,
-    blockRewards,
-  } = block;
+  const { nonce, epoch, producerName, producerOwnerAddress, producerLogo } =
+    block;
 
   const sections: IRowSection[] = [
     {
@@ -177,41 +111,9 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
       ),
       span: 1,
     },
-    {
-      element: props => (
-        <DoubleRow {...props} key={txCount + size}>
-          <span>{size} Bytes</span>
-          <span>
-            {txCount} TX{txCount > 1 ? 's' : ''}
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(kAppFees) + String(txBurnedFees)}>
-          <span>{formatAmount((kAppFees || 0) / 10 ** KLV_PRECISION)} KLV</span>
-          <span>{`${formatAmount(
-            (txBurnedFees || 0) / 10 ** KLV_PRECISION,
-          )} KLV`}</span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
-    {
-      element: props => (
-        <DoubleRow {...props} key={String(txFees) + String(blockRewards)}>
-          <span>
-            {formatAmount(bandwidthFeeReward(txFees) / 10 ** KLV_PRECISION)} KLV
-          </span>
-          <span>
-            {formatAmount((blockRewards || 0) / 10 ** KLV_PRECISION)} KLV
-          </span>
-        </DoubleRow>
-      ),
-      span: 1,
-    },
+    blockSizeTxsCell(block),
+    blockFeesCell(block),
+    blockRewardsCell(block),
   ];
 
   return sections;
@@ -219,7 +121,6 @@ export const blocksTabletRowSections = (block: IBlock): IRowSection[] => {
 
 const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
   const { blocks, loadingBlocks } = useHomeData();
-  const { t: commonT } = useTranslation('common');
   const { t } = useTranslation('blocks');
   const [hideMenu, setHideMenu] = useState(false);
   const { isTablet } = useMobile();
@@ -242,7 +143,7 @@ const BlockCardFetcher: React.FC<PropsWithChildren> = () => {
 
   const tableProps: ITable = {
     type: 'blocks',
-    header: isTablet ? blocksTabletHeader : blocksHeader,
+    header: blocksHeader,
     rowSections: isTablet ? blocksTabletRowSections : blocksRowSections,
     dataName: 'blocks',
     request: (page: number, limit: number) => homeBlocksCall(page, limit),

@@ -1,6 +1,6 @@
 import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
-import { Dispatch, PropsWithChildren, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { IBlock, IBlockResponse } from './blocks';
 import {
   Contract,
@@ -424,6 +424,8 @@ export interface IStaking {
   interestType: string;
   minEpochsToWithdraw: number;
   totalStaked: number;
+  /** Exact digit twin from the parse boundary, values past 2^53 (#679). */
+  totalStakedString?: string;
   apr:
     | {
         timestamp: number;
@@ -464,6 +466,14 @@ export interface IAsset {
   voidedSupply?: number;
   netCirculatingSupply?: number;
   maxSupply: number;
+  // Exact digit twins, injected at the parse boundary for values past 2^53
+  // (#679); present only when the wire value was 16 digits or more.
+  initialSupplyString?: string;
+  circulatingSupplyString?: string;
+  voidedSupplyString?: string;
+  netCirculatingSupplyString?: string;
+  maxSupplyString?: string;
+  burnedValueString?: string;
   royalties: IRoyalties;
   mintedValue: number;
   issueDate: number;
@@ -537,6 +547,9 @@ export interface IAssetPool {
   active: boolean;
   klvBalance: number;
   kdaBalance: number;
+  /** Exact digit twins from the parse boundary, values past 2^53 (#679). */
+  klvBalanceString?: string;
+  kdaBalanceString?: string;
   convertedFees: number;
   adminAddress: string;
   fRatioKLV: number;
@@ -1100,7 +1113,14 @@ export interface TableRowElementProps {
   $smaller?: boolean;
 }
 export interface IRowSection {
-  element: React.FC<PropsWithChildren<TableRowElementProps>>;
+  /**
+   * A plain function the tables CALL, not a component type they mount: builders
+   * hand over a fresh arrow every render, and rendering that as `<Element />`
+   * gave every cell a new identity, so React remounted all of them on each
+   * re-render, dropping keyboard focus and cell state (#697). Consequence: no
+   * hooks inside; a cell needing hooks renders a real component instead.
+   */
+  element: (props: TableRowElementProps) => React.ReactNode;
   span: number;
   width?: number;
   maxWidth?: number;

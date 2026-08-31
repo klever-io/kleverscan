@@ -25,6 +25,13 @@ export interface IProps {
   service?: Service;
   requestMode?: RequestMode;
   tries?: number;
+  /**
+   * Opt-in for `preserveBigDigits` on this response. Off by default on
+   * purpose: the field names also occur inside transaction payloads, and the
+   * raw-JSON surfaces (the Raw Tx card, the JSON export) must show the wire
+   * verbatim. A consumer that reads `<field>String` twins asks for them here.
+   */
+  preserveBigAmounts?: boolean;
 }
 
 export interface IAssetInfoRequestProps {
@@ -55,6 +62,48 @@ const pagination = {
   totalPages: 0,
   totalRecords: 0,
 };
+
+/**
+ * Amount fields that some surface displays exactly (tooltips, the asset
+ * overview figures). Only these get the preserved-digits treatment: the goal
+ * is the exact display path, not a general bigint payload.
+ */
+const BIG_AMOUNT_FIELDS = [
+  'circulatingSupply',
+  'netCirculatingSupply',
+  'voidedSupply',
+  'initialSupply',
+  'maxSupply',
+  'burnedValue',
+  'totalStaked',
+  'klvBalance',
+  'kdaBalance',
+] as const;
+
+/**
+ * `[{,]` anchors a real key (no suffix matches, and inside a JSON string a
+ * quote is always escaped, so `"maxSupply":` cannot occur there); 16 digits is
+ * where integers can pass Number.MAX_SAFE_INTEGER; the lookahead rejects
+ * fractions and exponents, which these chain integers never carry.
+ */
+const BIG_AMOUNT_PATTERN = new RegExp(
+  String.raw`([{,]\s*"(${BIG_AMOUNT_FIELDS.join('|')})"\s*:\s*)(\d{16,})(?=\s*[,}\]])`,
+  'g',
+);
+
+/**
+ * JSON.parse maps every number onto a double, exact only up to 2^53, and
+ * chain supplies routinely exceed that: the last digits were gone before any
+ * code ran (#679). This raw-text pass leaves the number token untouched, so
+ * everything numeric parses bit-identically to before, and injects an exact
+ * `<field>String` sibling for the display path to prefer.
+ */
+export const preserveBigDigits = (text: string): string =>
+  text.replace(
+    BIG_AMOUNT_PATTERN,
+    (_match, prefix: string, field: string, digits: string) =>
+      `${prefix}${digits},"${field}String":"${digits}"`,
+  );
 
 /**
  * Percent-encodes both sides of every pair.
@@ -157,7 +206,8 @@ export const withoutBody = async (
 ): Promise<any> => {
   const request = async () => {
     try {
-      const { route, query, service, apiVersion } = getProps(props);
+      const { route, query, service, apiVersion, preserveBigAmounts } =
+        getProps(props);
       const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
       // No Content-Type here on purpose: this path carries no body, so the
@@ -194,7 +244,15 @@ export const withoutBody = async (
         };
       }
 
-      return response.json();
+      // Through text so the exact digits survive the parse boundary (#679).
+      // Returned WITHOUT await, exactly like `return response.json()` was: a
+      // returned promise's rejection bypasses this try/catch, so a malformed
+      // body still rejects the call in one attempt instead of resolving as an
+      // error shape and paying the full retry loop.
+      return (async () => {
+        const text = await response.text();
+        return JSON.parse(preserveBigAmounts ? preserveBigDigits(text) : text);
+      })();
     } catch (error) {
       return {
         data: null,

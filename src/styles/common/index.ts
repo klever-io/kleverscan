@@ -886,3 +886,21 @@ export const NoNftsFound = styled.div`
   padding: 2rem;
   color: #666;
 `;
+
+/**
+ * The accent palette of a keyboard-shortcut pill, the one the home hero's
+ * Spotlight badge established. One definition on purpose: the navbar badge
+ * and the Spotlight modal's key hints each carried their own gray variant of
+ * the same pill, and three hand-kept copies of one look is how that happened.
+ */
+export const kbdAccent = css`
+  color: ${props =>
+    props.theme.dark ? 'rgba(212, 200, 255, 0.95)' : props.theme.purple};
+  background: ${props =>
+    props.theme.dark ? 'rgba(125, 63, 241, 0.16)' : 'rgba(125, 63, 241, 0.08)'};
+  border: 1px solid
+    ${props =>
+      props.theme.dark
+        ? 'rgba(155, 108, 255, 0.35)'
+        : 'rgba(125, 63, 241, 0.18)'};
+`;

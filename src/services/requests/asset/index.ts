@@ -34,6 +34,8 @@ const parseURIs = (asset: IAsset) => {
 export const getAsset = async (assetId: string): Promise<IAssetResponse> =>
   api.get({
     route: `assets/${assetId}`,
+    // The overview shows the supply figures exactly (#679).
+    preserveBigAmounts: true,
   });
 
 export const getAssetByPartialSymbol = async (
@@ -79,6 +81,8 @@ export const assetCall = async (
     const assetId = router.query?.asset as string;
     const res = await api.get({
       route: `assets/${assetId}`,
+      // The overview shows the supply figures exactly (#679).
+      preserveBigAmounts: true,
     });
 
     if (res?.error === 'cannot find asset in database') {

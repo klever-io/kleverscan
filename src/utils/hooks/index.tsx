@@ -52,6 +52,10 @@ export function usePrecision(
   const assetKey = Array.isArray(assetIds) ? assetIds.join(',') : assetIds;
   useEffect(() => {
     let active = true;
+    // Back to the initial value first: on a rejected lookup, and during the
+    // window before the new one resolves, the previous asset's precision must
+    // not scale the new asset's amounts.
+    setPrecision(0);
     const precisionCall = async () => {
       const resolved = await getPrecision(assetIds);
       // A slower earlier request must not overwrite a newer one's answer.
@@ -215,8 +219,11 @@ export const usePackInfoPrecisions = (
   const assetKey = packInfo.map(pack => pack.key).join(',');
   useEffect(() => {
     let active = true;
+    const ids = assetKey === '' ? [] : assetKey.split(',');
+    // Same reset as usePrecision: a rejected or still-pending lookup must not
+    // leave the previous packs' precisions under the new packs.
+    setPacksPrecision(Object.fromEntries(ids.map(id => [id, 0])));
     const getPacksPrecision = async () => {
-      const ids = assetKey === '' ? [] : assetKey.split(',');
       const precisions = await getPrecision(ids);
       if (active) setPacksPrecision(precisions);
     };

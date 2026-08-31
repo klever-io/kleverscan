@@ -119,6 +119,25 @@ describe('usePackInfoPrecisions', () => {
     expect(mockGetPrecision).toHaveBeenCalledWith([]);
   });
 
+  // The reset guard: pending or failed, the old packs' precisions must not
+  // sit under the new packs.
+  it('clears the previous answer while a new lookup is unresolved', async () => {
+    mockGetPrecision
+      .mockResolvedValueOnce({ KLV: 6 })
+      .mockImplementationOnce(() => new Promise(() => undefined));
+
+    render(<Harness initial={packsFor('KLV')} />);
+    await flush();
+    expect(screen.getByTestId('out').textContent).toBe('{"KLV":6}');
+
+    await act(async () => {
+      screen.getByText('swap').click();
+    });
+    await flush();
+
+    expect(screen.getByTestId('out').textContent).toBe('{"DVK-34ZH":0}');
+  });
+
   it('lets a newer answer stand when an older one resolves late', async () => {
     let resolveFirst: (v: unknown) => void = () => undefined;
     mockGetPrecision

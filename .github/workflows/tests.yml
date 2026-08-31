@@ -6,6 +6,11 @@ on:
   push:
     branches: ['develop', 'staging', 'master']
 
+# Checkout and setup-node need repository read; Codecov authenticates with its
+# own secret, so the default broader GITHUB_TOKEN grant buys nothing here.
+permissions:
+  contents: read
+
 jobs:
   unit-tests:
     runs-on: ubuntu-latest

@@ -139,6 +139,25 @@ describe('usePrecision', () => {
     expect(mockGetPrecision).toHaveBeenCalledTimes(1);
   });
 
+  // The reset guard: a pending or failed lookup must not leave the previous
+  // asset's precision under the new one.
+  it('clears the previous answer while a new lookup is unresolved', async () => {
+    mockGetPrecision
+      .mockResolvedValueOnce({ KLV: 6 })
+      .mockImplementationOnce(() => new Promise(() => undefined));
+
+    render(<Harness initial={['KLV']} />);
+    await flush();
+    expect(screen.getByTestId('out').textContent).toBe('{"KLV":6}');
+
+    await act(async () => {
+      screen.getByText('swap').click();
+    });
+    await flush();
+
+    expect(screen.getByTestId('out').textContent).toBe('0');
+  });
+
   it('lets a newer answer stand when an older one resolves late', async () => {
     let resolveFirst: (v: unknown) => void = () => undefined;
     mockGetPrecision

@@ -1,5 +1,6 @@
 import { useTranslation } from 'next-i18next';
 import React from 'react';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import { exactAmount } from '@/components/DataList/format';
@@ -52,9 +53,9 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
           verified={assetVerified}
         />
         {!active && (
-          <BadgePill $variant="warning" title={t(POOL_DISABLED_TOOLTIP)}>
+          <ExplainedBadge variant="warning" msg={t(POOL_DISABLED_TOOLTIP)}>
             {t('assets:Pools.Disabled')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         <RowActions>
           <CopyAction

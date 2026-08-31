@@ -1,4 +1,5 @@
 import { Assets as Icon } from '@/assets/title-icons';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import AssetsPools from '@/components/AssetsPools';
 import {
   APR_CONFIGURED_TOOLTIP,
@@ -220,27 +221,36 @@ const Assets: React.FC<PropsWithChildren> = () => {
               verified={verified}
             />
             {assetType === 'NonFungible' && (
-              <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
+              <ExplainedBadge
+                variant="neutral"
+                msg={t(ASSET_BADGE_TOOLTIPS.nft)}
+              >
                 {t('assets:List.Nft')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {assetType === 'SemiFungible' && (
-              <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
+              <ExplainedBadge
+                variant="neutral"
+                msg={t(ASSET_BADGE_TOOLTIPS.sft)}
+              >
                 {t('assets:List.Sft')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {attributes?.isPaused && (
-              <BadgePill
-                $variant="warning"
-                title={t(ASSET_BADGE_TOOLTIPS.paused)}
+              <ExplainedBadge
+                variant="warning"
+                msg={t(ASSET_BADGE_TOOLTIPS.paused)}
               >
                 {t('assets:List.Paused')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {hasKdaPool && (
-              <BadgePill $variant="accent" title={t(ASSET_BADGE_TOOLTIPS.pool)}>
+              <ExplainedBadge
+                variant="accent"
+                msg={t(ASSET_BADGE_TOOLTIPS.pool)}
+              >
                 Fee Pool
-              </BadgePill>
+              </ExplainedBadge>
             )}
             <RowActions>
               <CopyAction
@@ -357,9 +367,9 @@ const Assets: React.FC<PropsWithChildren> = () => {
               </RewardsMuted>
             )}
             {rewards.kind === 'fpr' && (
-              <BadgePill $variant="neutral" title={t(FPR_TOOLTIP)}>
+              <ExplainedBadge variant="neutral" msg={t(FPR_TOOLTIP)}>
                 FPR
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {rewards.kind === 'none' && (
               <RewardsMuted>{t('assets:List.NotAvailable')}</RewardsMuted>

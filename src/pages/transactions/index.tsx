@@ -13,6 +13,7 @@ import {
 import { BadgePill, VisuallyHidden } from '@/components/DataList/styles';
 import { CustomFieldWrapper } from '@/components/Table/styles';
 import {
+  DIRECTION_GLYPHS,
   InOutBadge,
   MultiContractBadge,
   statusVariant,
@@ -25,10 +26,10 @@ import {
   valueDirection,
 } from '@/components/TransactionsList/rowDetails';
 import TransactionsSummary from '@/components/TransactionsList/Summary';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import {
   ContractMark,
   DirectionStatusBadge,
-  TransactionsTableWrapper,
 } from '@/components/TransactionsList/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
@@ -64,12 +65,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { TXType } from '@klever/connect';
 import { GetServerSideProps } from 'next';
-import {
-  MdAccessTime,
-  MdArrowForward,
-  MdOutlineDescription,
-  MdPriorityHigh,
-} from 'react-icons/md';
+import { MdOutlineDescription } from 'react-icons/md';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -83,13 +79,6 @@ interface IRequestTxQuery {
   address?: string;
 }
 
-/** One glyph per status, so the arrow's color is never the only signal. */
-const DIRECTION_GLYPHS = {
-  success: MdArrowForward,
-  danger: MdPriorityHigh,
-  warning: MdAccessTime,
-  neutral: MdArrowForward,
-} as const;
 export const toAddressSectionElement = (
   toAddress: string,
   chars = 16,
@@ -368,7 +357,7 @@ export const transactionRowSections = (
       span: 1,
       // Hinted like every other column: the one unhinted column would
       // absorb all of the table's slack and open a gulf behind the hash.
-      width: 190,
+      width: 186,
     },
     type: {
       element: props => (
@@ -392,14 +381,14 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 170,
+      width: 191,
     },
     block: {
       element: props => (
         <ExplorerLink type="block" value={String(blockNum || 0)} compact />
       ),
       span: 1,
-      width: 95,
+      width: 98,
     },
     age: {
       element: props => (
@@ -412,7 +401,7 @@ export const transactionRowSections = (
         />
       ),
       span: 1,
-      width: 110,
+      width: 114,
     },
     from: {
       element: props => (
@@ -436,7 +425,7 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 140,
+      width: 182,
     },
     direction: {
       element: props => {
@@ -462,7 +451,7 @@ export const transactionRowSections = (
         );
       },
       span: 1,
-      width: 36,
+      width: 48,
     },
     to: {
       element: props => (
@@ -507,7 +496,9 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 150,
+      // Follows ContractName's own box, which holds a 16-character address at
+      // 160px; 150 here left the column hint disagreeing with its content.
+      width: 205,
     },
     inOut: {
       element: props => (
@@ -530,7 +521,7 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 130,
+      width: 150,
     },
     fee: {
       element: props => (
@@ -539,7 +530,7 @@ export const transactionRowSections = (
         </span>
       ),
       span: 1,
-      width: 100,
+      width: 104,
     },
   };
 
@@ -596,9 +587,7 @@ const Transactions: React.FC<PropsWithChildren> = () => {
           onto `address` before the request goes out. */}
       {listsWholeChain(router) && <TransactionsSummary />}
 
-      <TransactionsTableWrapper>
-        <Table {...tableProps} />
-      </TransactionsTableWrapper>
+      <TransactionsTable {...tableProps} />
     </Container>
   );
 };

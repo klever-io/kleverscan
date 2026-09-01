@@ -1,13 +1,19 @@
 import {
+  ExportContainer,
+  FloatContainer,
   HeaderItem,
+  LimitContainer,
   MobileCardItem,
   TableBody,
+  TableControls,
   TableEmptyData,
   TableGradientBorder,
   TableRow,
 } from '@/components/Table/styles';
 import Link from 'next/link';
 import { mix, transparentize } from 'polished';
+import { Content as FilterContent } from '@/components/Filter/styles';
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import styled, { css, DefaultTheme, keyframes } from 'styled-components';
 
 /**
@@ -90,14 +96,30 @@ export const VisuallyHidden = styled.span`
      them whole sentences in caps, which VoiceOver spells out. */
   text-transform: none;
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
   clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
+
+  /* Doubled class, the same trick inCard uses and for the same reason: the
+     cell rules give every span inside a data-list cell display:flex, a height
+     and min-width:fit-content, and a min-width beats a width. This
+     box therefore grew to the full width of the sentence it hides, measured at
+     482px in the assets rewards column, and being absolutely positioned it
+     took the page with it: 358px of horizontal scroll at a 1440 viewport.
+     Fourteen of the 24 on that page were oversized, and four of the six list
+     pages carried at least one. */
+  && {
+    display: block;
+    width: 1px;
+    min-width: 0;
+    max-width: 1px;
+    height: 1px;
+    min-height: 0;
+    max-height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    white-space: nowrap;
+    border: 0;
+  }
 `;
 
 /* --------------------------------- badges -------------------------------- */
@@ -242,15 +264,6 @@ export const RowActions = styled.span`
   }
   gap: 4px;
   margin-left: auto;
-
-  /* Hover-capable pointers only: on a large touch screen there is no hover,
-     so the actions would be invisible yet tappable. */
-  @media screen and (min-width: ${props =>
-      props.theme.breakpoints.tablet}) and (hover: hover) {
-    opacity: 0;
-    transition: opacity 150ms ease-out;
-    ${reducedMotion}
-  }
 `;
 
 /* ------------------------------ identity cells --------------------------- */
@@ -422,7 +435,10 @@ export const TilesGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 24px;
 
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+  /* 767.98, not 768: a max-width and a min-width rule on the same value both
+     match at that width, and the pages that switch their own layout there
+     ended up with a two-column tile grid that exists at no other width. */
+  @media screen and (max-width: 767.98px) {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
@@ -543,6 +559,102 @@ export const LegendDot = styled.span<{ $color: string }>`
   border-radius: 50%;
   flex-shrink: 0;
   background-color: ${props => props.$color};
+`;
+
+/* --------------------------- compact filter row --------------------------- */
+
+/**
+ * A filter bar of at most two dropdowns beside the page-size controls, on one
+ * row for as long as they fit.
+ *
+ * The shared FilterContainer stacks below the tablet breakpoint: each filter
+ * full-width, controls on a row of their own. That suits the pages with four
+ * filters; for one or two it wastes two rows on three small controls
+ * (decided on /validators, 2026-08-31, then rolled out to the other short
+ * bars). Each filter keeps the 13rem every filter measures on desktop; on
+ * mobile the pair spreads over the full width at half each.
+ */
+export const CompactFilterBar = styled(FilterContainer)`
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: row;
+    width: auto;
+
+    > div {
+      width: auto;
+      flex: 0 0 13rem;
+    }
+  }
+
+  /* On mobile a PAIR takes the whole width, half each, and the page-size
+     controls drop to the row below. The base bar's 13rem minimum has to go
+     with it: two of those overflow a 390px screen. Read off the DOM instead of
+     a prop so a page that gains or loses a filter cannot get it wrong; a lone
+     filter keeps its 13rem and stays beside the controls. */
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    &:has(> div + div) {
+      width: 100%;
+
+      > div {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      /* The minimum has to reach the dropdown itself: Filter's own Content
+         carries a 12rem minimum, so at 320px the pair kept 168px each inside
+         139px wrappers and pushed the page sideways by 13px, measured. */
+      ${FilterContent} {
+        min-width: 0;
+      }
+    }
+  }
+
+  /* Where even a lone filter no longer fits beside the page-size controls:
+     182px for the filter, 214 for the pills and the button, the 16px gap and
+     the container's padding come to 444, so 443 is the first width that wraps.
+     It takes the whole row there rather than leaving the dead space beside
+     it. */
+  @media (max-width: 443px) {
+    width: 100%;
+
+    > div {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+`;
+
+/** The wrapper-side half of the same decision: keeps the shared
+ *  FloatContainer a flex row below the tablet breakpoint, where it otherwise
+ *  turns into a grid that parks the controls under the filter bar. */
+export const compactFilterRow = css`
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    ${FloatContainer} {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    /* nowrap so the refresh button stays beside the page-size pills: the
+       wrapping row always had a width where the pills still fit and the button
+       alone dropped under them. Same fix as /smart-contracts. */
+    ${TableControls} {
+      margin-left: auto;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Both controls carry a 10px bottom margin below this width, put there for
+       the stacked layout this row replaces. With align-items on the ends it
+       lifted the pills 10px above the filter bottoms, measured on all three
+       short-bar pages; leaving it on the button alone hung it 10px above the
+       pills. */
+    ${LimitContainer},
+    ${ExportContainer} {
+      margin-bottom: 0;
+    }
+  }
 `;
 
 /* ------------------------------ mobile card ------------------------------ */
@@ -703,6 +815,23 @@ export const dataListTableSkin = css`
 
     ${TableRow}:last-child ${MobileCardItem}:last-child {
       border-bottom-right-radius: 15px;
+    }
+
+    /* Hidden until its row is hovered, on hover-capable pointers only: on a
+       large touch screen there is no hover, so the actions would be invisible
+       yet tappable.
+
+       Carried by the row rather than by the actions themselves. As a rule on
+       RowActions it also caught a card rendered at this width, which happens
+       on a list whose row needs more room than the shared breakpoint gives it,
+       and there is no row there to reveal them again: the copy and open
+       buttons were invisible on every card and stayed that way. */
+    @media (hover: hover) {
+      ${TableRow} ${RowActions} {
+        opacity: 0;
+        transition: opacity 150ms ease-out;
+        ${reducedMotion}
+      }
     }
 
     ${TableRow}:hover ${RowActions},

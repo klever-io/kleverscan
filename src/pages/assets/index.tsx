@@ -17,6 +17,7 @@ import AssetsMobileCard from '@/components/AssetsList/MobileCard';
 import RegistryStrip from '@/components/AssetsList/RegistryStrip';
 import {
   AssetsTableWrapper,
+  ROW_LAYOUT_MIN_WIDTH,
   CapContext,
   RewardsCell,
   RewardsMuted,
@@ -267,6 +268,10 @@ const Assets: React.FC<PropsWithChildren> = () => {
           </IdentityCell>
         ),
         span: 1,
+        // Pinned like the rest: an unhinted column takes whatever is left, and
+        // what is left differs between a skeleton row and a loaded one, which
+        // moved every heading after it when the data arrived.
+        width: 418,
       },
       {
         element: () =>
@@ -328,7 +333,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
             </ShareCell>
           ),
         span: 1,
-        width: 200,
+        width: 210,
       },
       {
         element: () =>
@@ -391,6 +396,9 @@ const Assets: React.FC<PropsWithChildren> = () => {
     Filters: AssetsFilters,
     MobileCard: AssetsMobileCard,
     singleLineSkeleton: true,
+    // Same constant the wrapper's media queries read, so the loading rows and
+    // the loaded rows cannot end up in different shapes.
+    cardBreakpoint: ROW_LAYOUT_MIN_WIDTH,
     rightAlignedSkeletonColumns: [1, 2, 4, 5],
   };
 

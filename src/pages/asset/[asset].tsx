@@ -1,9 +1,9 @@
 import { AssetSummary } from '@/components/Asset/AssetSummary';
 import { AssetTabs } from '@/components/Asset/AssetTabs';
 import Tabs, { ITabs } from '@/components/NewTabs';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
 import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
-import { TransactionsTableWrapper } from '@/components/TransactionsList/styles';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import Holders from '@/components/Tabs/Holders';
 import TransactionsFilters from '@/components/TransactionsFilters';
@@ -129,11 +129,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const renderSelectedTab = (): ReactNode => {
     switch (selectedTab) {
       case `${t('common:Titles.Transactions')}`:
-        return (
-          <TransactionsTableWrapper>
-            <Table {...tableProps} />
-          </TransactionsTableWrapper>
-        );
+        return <TransactionsTable {...tableProps} />;
       case `${t('common:Tabs.Holders')}`:
         if (asset && asset.assetType !== AssetTypeString.SemiFungible) {
           return <Holders asset={asset} />;

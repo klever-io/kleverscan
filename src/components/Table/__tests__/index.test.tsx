@@ -114,7 +114,12 @@ const makeResponse = (items: Array<Record<string, unknown>>) => ({
  */
 const makeProps = (
   request: ITable['request'],
-  options: { refreshKey?: number; smaller?: boolean } = {},
+  options: {
+    refreshKey?: number;
+    smaller?: boolean;
+    cardBreakpoint?: number;
+    MobileCard?: ITable['MobileCard'];
+  } = {},
 ): ITable => ({
   type: 'accounts',
   header: ['Cell', 'Other'],
@@ -133,6 +138,8 @@ const makeProps = (
   showPagination: false,
   refreshKey: options.refreshKey,
   smaller: options.smaller,
+  cardBreakpoint: options.cardBreakpoint,
+  MobileCard: options.MobileCard,
 });
 
 const renderTable = (ui: React.ReactElement) => {
@@ -192,5 +199,92 @@ describe('Table row cells', () => {
     renderTable(<Table {...makeProps(request, { smaller: true })} />);
 
     expect(await screen.findByTestId('plain-cell')).toHaveTextContent('true');
+  });
+});
+
+/**
+ * The card/row switch a wide list opts into. `useMobile` is mocked false above,
+ * so the only thing that can flip it here is the breakpoint, which is the
+ * point: this is the path three pages and five call sites depend on, and none
+ * of it was executed by a test.
+ */
+describe('Table cardBreakpoint', () => {
+  const realMatchMedia = window.matchMedia;
+
+  const setBelowBreakpoint = (matches: boolean): void => {
+    window.matchMedia = ((media: string) => ({
+      media,
+      matches,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    })) as unknown as typeof window.matchMedia;
+  };
+
+  const MobileCardStub: ITable['MobileCard'] = ({ item }) => (
+    <div data-testid="mobile-card">{`card:${item.id}`}</div>
+  );
+
+  afterEach(() => {
+    window.matchMedia = realMatchMedia;
+  });
+
+  it('renders cards, and no header, under the breakpoint', async () => {
+    setBelowBreakpoint(true);
+    const request = async () => makeResponse([{ id: 1 }]);
+
+    renderTable(
+      <Table
+        {...makeProps(request, {
+          cardBreakpoint: 1240,
+          MobileCard: MobileCardStub,
+        })}
+      />,
+    );
+
+    expect(await screen.findByTestId('mobile-card')).toHaveTextContent(
+      'card:1',
+    );
+    expect(screen.queryByTestId('table-header')).toBeNull();
+    expect(screen.queryByTestId('stateful-cell')).toBeNull();
+  });
+
+  /* The other direction, and the one that would break the desktop table for
+     every page at once if the hook ever answered true by default. */
+  it('renders rows and the header over the breakpoint', async () => {
+    setBelowBreakpoint(false);
+    const request = async () => makeResponse([{ id: 1 }]);
+
+    renderTable(
+      <Table
+        {...makeProps(request, {
+          cardBreakpoint: 1240,
+          MobileCard: MobileCardStub,
+        })}
+      />,
+    );
+
+    expect(await screen.findByTestId('stateful-cell')).toBeInTheDocument();
+    expect(screen.getByTestId('table-header')).toBeInTheDocument();
+    expect(screen.queryByTestId('mobile-card')).toBeNull();
+  });
+
+  /* A table that does not opt in must not consult the viewport at all, or
+     every existing list would gain a breakpoint it never asked for. */
+  it('leaves a table without the prop on the shared breakpoint', async () => {
+    const matchMedia = jest.fn(() => ({
+      matches: true,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }));
+    window.matchMedia = matchMedia as unknown as typeof window.matchMedia;
+    const request = async () => makeResponse([{ id: 1 }]);
+
+    renderTable(
+      <Table {...makeProps(request, { MobileCard: MobileCardStub })} />,
+    );
+
+    expect(await screen.findByTestId('stateful-cell')).toBeInTheDocument();
+    expect(screen.queryByTestId('mobile-card')).toBeNull();
+    expect(matchMedia).not.toHaveBeenCalled();
   });
 });

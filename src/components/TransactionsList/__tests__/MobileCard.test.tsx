@@ -178,7 +178,8 @@ describe('TransactionsMobileCard', () => {
     const hashLink = within(card).getByTestId('transaction-link');
     expect(hashLink.getAttribute('href')).toBe('/transaction/abc123def456');
 
-    expect(within(card).getByText('Type')).toBeTruthy();
+    // The type is the header badge now, so it appears as its value alone.
+    expect(within(card).queryByText('Type')).toBeNull();
     expect(within(card).getByText('Transfer')).toBeTruthy();
     expect(within(card).getByText('From')).toBeTruthy();
     expect(within(card).getByText('To')).toBeTruthy();
@@ -186,7 +187,9 @@ describe('TransactionsMobileCard', () => {
     expect(within(card).getByText('4242').getAttribute('href')).toBe(
       '/block/4242',
     );
-    expect(within(card).getByText('Success')).toBeTruthy();
+    // Twice on purpose: the pill for phone widths, the glyph's hidden word
+    // for the widths where the pill is not rendered.
+    expect(within(card).getAllByText('Success')).toHaveLength(2);
     expect(within(card).getByText('Amount')).toBeTruthy();
   });
 
@@ -219,7 +222,7 @@ describe('TransactionsMobileCard', () => {
     renderCard(transfer());
     const card = screen.getByTestId('table-row-3');
 
-    expect(within(card).getAllByText('Type')).toHaveLength(1);
+    expect(within(card).queryByText('Type')).toBeNull();
     expect(within(card).getByText('Action type')).toBeTruthy();
   });
 

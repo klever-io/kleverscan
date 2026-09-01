@@ -26,11 +26,24 @@ import {
   InOutBadge,
   MultiContractBadge,
   TransactionStatusBadge,
+  TransactionStatusPill,
+  TransactionTypeBadge,
 } from './badges';
 import { showsInOut } from './columns';
 import ContractTargetLabel from './ContractTargetLabel';
 import { getTransactionRowDetails, valueDirection } from './rowDetails';
-import { CardHashLink, CardLabel, CardRow, CardValue } from './styles';
+import {
+  CardFields,
+  CardHashLink,
+  CardLabel,
+  CardRow,
+  CardStatusCell,
+  CardTime,
+  CardValue,
+  TimeExact,
+  HeaderStatusPill,
+  ToLabel,
+} from './styles';
 
 export interface ITransactionsMobileCardProps {
   item: ITransaction;
@@ -113,8 +126,26 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
         >
           <Mono>{parseAddress(hash, 16)}</Mono>
         </CardHashLink>
-        <TransactionStatusBadge status={status} />
+        {contractType === 'Multi contract' ? (
+          <MultiContractBadge contract={contract} />
+        ) : (
+          <TransactionTypeBadge label={typeLabel} contractType={contractType} />
+        )}
+        <HeaderStatusPill>
+          <TransactionStatusPill status={status} />
+        </HeaderStatusPill>
         {showDirection && <InOutBadge direction={direction} />}
+        <CardTime title={formatDate(timestamp || Date.now())}>
+          {/* The same expression the desktop column uses, rather than a
+              hand-built one: formatDate's elapsed form is
+              "<n> <unit> ago (<date> UTC)" and both halves come from it. */}
+          {
+            formatDate(timestamp || Date.now(), {
+              showElapsedTime: true,
+            }).split(' (')[0]
+          }
+          <TimeExact>{` (${formatDate(timestamp || Date.now())})`}</TimeExact>
+        </CardTime>
         <RowActions>
           <CopyAction
             value={hash}
@@ -138,91 +169,82 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
           />
         </RowActions>
       </MobileTopRow>
-      <CardRow>
-        <CardLabel>
-          {t('transactions:Table.Type', { defaultValue: 'Type' })}
-        </CardLabel>
-        <CardValue>
-          {contractType === 'Multi contract' ? (
-            <MultiContractBadge contract={contract} />
-          ) : (
-            typeLabel
-          )}
-        </CardValue>
-      </CardRow>
-      <CardRow>
-        <CardLabel>
-          {t('transactions:From', { defaultValue: 'From' })}
-        </CardLabel>
-        <CardValue>
-          <Link href={`/account/${sender}`}>
-            <Mono>{parseAddress(sender, 16)}</Mono>
-          </Link>
-        </CardValue>
-      </CardRow>
-      <CardRow>
-        <CardLabel>{t('transactions:To', { defaultValue: 'To' })}</CardLabel>
-        <CardValue>
-          {target ? (
-            <Link
-              href={`${target.isContract ? '/smart-contract' : '/account'}/${
-                target.address
-              }`}
-            >
-              <ContractTargetLabel
-                address={target.address}
-                isContract={target.isContract}
-                truncateTo={16}
-              />
+      <CardFields>
+        <CardRow>
+          <CardLabel>
+            {t('transactions:From', { defaultValue: 'From' })}
+          </CardLabel>
+          <CardValue>
+            <Link href={`/account/${sender}`}>
+              <Mono>{parseAddress(sender, 16)}</Mono>
             </Link>
-          ) : (
-            <>
-              <Mono aria-hidden="true">--</Mono>
-              <VisuallyHidden>
-                {t('transactions:Table.NotApplicable', {
-                  defaultValue: 'Not applicable',
-                })}
-              </VisuallyHidden>
-            </>
-          )}
-        </CardValue>
-      </CardRow>
-      <CardRow>
-        <CardLabel>
-          {t('transactions:Table.BlockFees', { defaultValue: 'Block/Fees' })}
-        </CardLabel>
-        <CardValue>
-          <Link href={`/block/${blockNum || 0}`}>{blockNum || 0}</Link>
-          <MobileMetaItem>
-            {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
-          </MobileMetaItem>
-        </CardValue>
-      </CardRow>
-      {customLabels.map((label, fieldIndex) =>
-        customFields[fieldIndex] ? (
-          // Index in the key too: several sets already name a field "Type",
-          // and a repeated label would silently collapse two rows into one.
-          <CardRow key={`${fieldIndex}-${label}`}>
-            <CardLabel>
-              {label === 'Type'
-                ? // Several label sets (Smart Contract, ITO Trigger) name
-                  // their first field "Type" too; on desktop the column
-                  // headings disambiguate, on one card the same label twice
-                  // with different values reads as a contradiction.
-                  t('transactions:Table.ActionType', {
-                    defaultValue: 'Action type',
-                  })
-                : label}
-            </CardLabel>
-            <CardValue>{customFields[fieldIndex]}</CardValue>
-          </CardRow>
-        ) : null,
-      )}
-      <CardRow>
-        <MobileMetaItem>
-          {formatDate(timestamp || Date.now(), { showElapsedTime: true })}
-        </MobileMetaItem>
-      </CardRow>
+          </CardValue>
+        </CardRow>
+        {/* Between the two addresses, as on the desktop row, so the glyph
+            reads as the direction of the transfer rather than as a property
+            of the hash. */}
+        <CardStatusCell>
+          <TransactionStatusBadge status={status} />
+        </CardStatusCell>
+        <CardRow>
+          <ToLabel>{t('transactions:To', { defaultValue: 'To' })}</ToLabel>
+          <CardValue>
+            {target ? (
+              <Link
+                href={`${target.isContract ? '/smart-contract' : '/account'}/${
+                  target.address
+                }`}
+              >
+                <ContractTargetLabel
+                  address={target.address}
+                  isContract={target.isContract}
+                  truncateTo={16}
+                />
+              </Link>
+            ) : (
+              <>
+                <Mono aria-hidden="true">--</Mono>
+                <VisuallyHidden>
+                  {t('transactions:Table.NotApplicable', {
+                    defaultValue: 'Not applicable',
+                  })}
+                </VisuallyHidden>
+              </>
+            )}
+          </CardValue>
+        </CardRow>
+        <CardRow>
+          <CardLabel>
+            {t('transactions:Table.BlockFees', { defaultValue: 'Block/Fees' })}
+          </CardLabel>
+          <CardValue>
+            <Link href={`/block/${blockNum || 0}`}>{blockNum || 0}</Link>
+            <MobileMetaItem>
+              {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+            </MobileMetaItem>
+          </CardValue>
+        </CardRow>
+        {customLabels.map((label, fieldIndex) =>
+          customFields[fieldIndex] ? (
+            // Index in the key too: several sets already name a field "Type",
+            // and a repeated label would silently collapse two rows into one.
+            <CardRow key={`${fieldIndex}-${label}`}>
+              <CardLabel>
+                {label === 'Type'
+                  ? // Several label sets (Smart Contract, ITO Trigger) name
+                    // their first field "Type"; beside the contract-type badge
+                    // in the header, a second unqualified type on the same card
+                    // reads as a contradiction.
+                    t('transactions:Table.ActionType', {
+                      defaultValue: 'Action type',
+                    })
+                  : label}
+              </CardLabel>
+              <CardValue>{customFields[fieldIndex]}</CardValue>
+            </CardRow>
+          ) : null,
+        )}
+      </CardFields>
     </MobileListCard>
   );
 };

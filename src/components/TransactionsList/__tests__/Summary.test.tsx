@@ -1,6 +1,6 @@
 import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
@@ -126,6 +126,15 @@ const card = (): HTMLElement =>
 
 const digitsOf = (text: string): string => text.replace(/\D/g, '');
 
+/** The card once the figures have landed. The loading shape carries the same
+ *  labels as the loaded one (that is what keeps its line boxes identical), so
+ *  waiting on a label would match the skeleton and assert against it. Only
+ *  `aria-busy` tells the two apart. */
+const loadedCard = async (): Promise<HTMLElement> => {
+  await waitFor(() => expect(card().getAttribute('aria-busy')).toBeNull());
+  return card();
+};
+
 beforeEach(() => {
   summaryCall.mockReset();
   breakdownCall.mockReset();
@@ -139,9 +148,27 @@ describe('TransactionsSummary', () => {
 
     renderSummary();
 
-    // Named for assistive tech before its content is known, and holding no
-    // figure yet, so the page below it does not jump when they arrive.
-    expect(digitsOf(card().textContent ?? '')).toBe('');
+    // Named for assistive tech before its content is known, and holding
+    // placeholders where the figures go, so the page below it does not jump
+    // when they arrive. The labels are real and one of them reads "(24h)", so
+    // the card's own text is no longer a figure test.
+    expect(card().getAttribute('aria-busy')).toBe('true');
+    expect(
+      card().querySelectorAll('[data-testid="skeleton"]').length,
+    ).toBeGreaterThan(0);
+    // The labels are constants and one of them reads "(24h)", so the card's
+    // whole text is not a figure test and asserting on a label alone can never
+    // fail. Strip the three labels; a digit left over is a leaked figure.
+    const labels = [
+      'Transactions (24h)',
+      'Total transactions',
+      'Most transacted',
+    ];
+    const withoutLabels = labels.reduce(
+      (text, label) => text.split(label).join(''),
+      card().textContent ?? '',
+    );
+    expect(digitsOf(withoutLabels)).toBe('');
   });
 
   it('writes the chain total out in full and compacts the day figure', async () => {
@@ -189,9 +216,10 @@ describe('TransactionsSummary', () => {
 
     renderSummary();
 
-    expect(await screen.findByText('Total transactions')).toBeTruthy();
+    const kaart = await loadedCard();
+    expect(within(kaart).getByText('Total transactions')).toBeTruthy();
     // No zero the chain never had, and no percentage computed from one.
-    expect(screen.queryByText('Transactions (24h)')).toBeNull();
+    expect(within(kaart).queryByText('Transactions (24h)')).toBeNull();
   });
 
   it('asks for nothing while the page still has work in flight', async () => {
@@ -220,12 +248,14 @@ describe('TransactionsSummary', () => {
 
     renderSummary();
 
-    expect(await screen.findByText('Total transactions')).toBeTruthy();
-    const kaart = screen.getByLabelText('Transaction statistics');
-    // The bar plus a legend line per entry: the placeholder wraps like the
-    // real legend since the one-line version held the card 33px short at
-    // 390px, measured on /blocks.
-    expect(kaart.querySelectorAll('[data-testid="skeleton"]').length).toBe(4);
+    const kaart = await loadedCard();
+    expect(within(kaart).getByText('Total transactions')).toBeTruthy();
+    // The bar plus one entry per contract type the breakdown names: the same
+    // placeholder the full skeleton uses, so this middle state is the same
+    // height as the states either side of it. Three 150px entries, which is
+    // what the shared placeholder draws, take one line at 390px where these
+    // five take two, and the card dropped 17px and grew back.
+    expect(kaart.querySelectorAll('[data-testid="skeleton"]').length).toBe(6);
     expect(screen.queryByLabelText(/Contract types/)).toBeNull();
   });
 

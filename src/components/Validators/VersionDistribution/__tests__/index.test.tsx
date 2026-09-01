@@ -42,6 +42,51 @@ jest.mock('react-dom', () => {
   };
 });
 
+/**
+ * Resolves against the real `en` bundle rather than echoing keys back, so
+ * every assertion below keeps checking the words a reader actually sees, and a
+ * key that never lands in the JSON fails here instead of rendering its own
+ * name at the user.
+ */
+jest.mock('next-i18next', () => {
+  const bundle = jest.requireActual(
+    '../../../../../public/locales/en/validators.json',
+  );
+
+  const lookup = (key: string): string | undefined =>
+    key
+      .replace(/^validators:/, '')
+      .split('.')
+      .reduce<unknown>(
+        (node, part) =>
+          node && typeof node === 'object'
+            ? (node as Record<string, unknown>)[part]
+            : undefined,
+        bundle,
+      ) as string | undefined;
+
+  return {
+    useTranslation: () => ({
+      t: (key: string, options?: Record<string, unknown>) => {
+        const count = options?.count;
+        const resolved =
+          count === undefined
+            ? lookup(key)
+            : (lookup(`${key}_${count === 1 ? 'one' : 'other'}`) ??
+              lookup(key));
+        if (resolved === undefined) {
+          throw new Error(`missing translation key: ${key}`);
+        }
+        return Object.entries(options ?? {}).reduce(
+          (text, [name, value]) =>
+            text.replace(new RegExp(`{{${name}}}`, 'g'), String(value)),
+          resolved,
+        );
+      },
+    }),
+  };
+});
+
 import VersionDistribution from '../index';
 
 const renderWithTheme = (ui: React.ReactElement) =>
@@ -83,7 +128,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -93,13 +137,32 @@ describe('VersionDistribution', () => {
       />,
     );
 
-    expect(screen.getByText('20')).toBeInTheDocument();
     expect(screen.getAllByText('v1.7.21-rc1').length).toBeGreaterThan(0);
     expect(screen.getByTestId('on-latest-callout')).toHaveTextContent('50.0%');
-    expect(
-      screen.getByText(/50.0% of nodes on latest \(v1.7.21-rc1\)/),
-    ).toBeInTheDocument();
+    // The version itself is printed once, beside "Newest"; repeating it here
+    // was one of three copies of the same string in this block.
+    expect(screen.getByText(/50.0% of nodes on latest/)).toBeInTheDocument();
     expect(screen.getByText('10 nodes')).toBeInTheDocument();
+  });
+
+  // The validator count moved to the page summary, which already carried it as
+  // its first tile. Two elements printing the same number a card apart is what
+  // made this block read as a competing section.
+  it('no longer repeats the validator count the summary owns', () => {
+    renderWithTheme(
+      <VersionDistribution
+        stats={baseStats}
+        latestVersion="v1.7.21-rc1"
+        loading={false}
+        heartbeatAvailable
+        validatorsAvailable
+        mode="nodes"
+        onModeChange={jest.fn()}
+        onSelectVersion={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('Total Validators')).not.toBeInTheDocument();
   });
 
   it('shows loading skeletons while loading', () => {
@@ -160,7 +223,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -180,7 +242,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -199,7 +260,6 @@ describe('VersionDistribution', () => {
         <VersionDistribution
           stats={baseStats}
           latestVersion="v1.7.21-rc1"
-          totalValidators={20}
           loading={false}
           heartbeatAvailable
           validatorsAvailable
@@ -220,7 +280,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -230,9 +289,7 @@ describe('VersionDistribution', () => {
       />,
     );
 
-    expect(
-      screen.getByText(/60.0% of stake on latest \(v1.7.21-rc1\)/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/60.0% of stake on latest/)).toBeInTheDocument();
   });
 
   it('expands when more than the collapse threshold versions exist', () => {
@@ -250,7 +307,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={many}
         latestVersion="v1.0.4"
-        totalValidators={5}
         loading={false}
         heartbeatAvailable
         validatorsAvailable

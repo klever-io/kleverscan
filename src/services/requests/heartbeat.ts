@@ -1,15 +1,37 @@
 export const UNKNOWN_VERSION = 'Unknown';
 
+/**
+ * One node as `/node/heartbeatstatus` reports it. Every field the endpoint
+ * sends, measured against mainnet (214 entries, 2026-08-31): the type used to
+ * name four of the twelve and the parser read two, so the node's own view of
+ * uptime, liveness and peer role was arriving and being dropped.
+ */
 export interface HeartbeatEntry {
   publicKey: string;
   versionNumber: string;
   isActive: boolean;
   timestamp: string;
+  /** `elected` | `eligible` | `waiting` | `observer`. Note the node has no
+   *  `jailed` or `inactive`: both arrive here as `observer`, so this does not
+   *  replace the proxy's `list` field, it adds the observers that field never
+   *  mentions. */
+  peerType?: string;
+  totalUpTimeSec?: number;
+  totalDownTimeSec?: number;
+  maxInactiveTime?: string;
+  /** Set on all 214 mainnet nodes, where `identity` is empty on all of them. */
+  nodeDisplayName?: string;
+  identity?: string;
+  nonce?: number;
+  numInstances?: number;
 }
 
 export interface HeartbeatStatus {
   versionMap: Record<string, string>;
   latestVersion: string;
+  /** The raw entries, so callers can read the nine fields the version map
+   *  throws away without asking the node a second time. */
+  entries: HeartbeatEntry[];
 }
 
 export interface VersionStat {
@@ -148,7 +170,7 @@ const parseHeartbeatPayload = (data: any): HeartbeatStatus | undefined => {
     return undefined;
   }
 
-  return { versionMap, latestVersion };
+  return { versionMap, latestVersion, entries: heartbeats as HeartbeatEntry[] };
 };
 
 /**

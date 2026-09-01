@@ -1,530 +1,217 @@
-import { Validators as Icon } from '@/assets/cards';
-import Copy from '@/components/Copy';
-import Detail from '@/components/Detail';
-import { IFilter } from '@/components/Filter';
-import Progress from '@/components/Progress';
-import { ITable } from '@/components/Table';
-import { CustomFieldWrapper, Status } from '@/components/Table/styles';
-import Tooltip from '@/components/Tooltip';
+import { Validators as Icon } from '@/assets/title-icons';
+import { klvAmount } from '@/components/DataList/format';
+import Title from '@/components/Layout/Title';
+import Table, { ITable } from '@/components/Table';
+import {
+  RIGHT_ALIGNED_COLUMNS,
+  ROW_LAYOUT_MIN_WIDTH,
+} from '@/components/ValidatorsList/columns';
+import ValidatorsFilters from '@/components/ValidatorsList/Filters';
+import ValidatorsMobileCard, {
+  type IValidatorsMobileCardExtras,
+} from '@/components/ValidatorsList/MobileCard';
+import {
+  validatorRowSections,
+  IValidatorRowContext,
+} from '@/components/ValidatorsList/rows';
+import { ValidatorsTableWrapper } from '@/components/ValidatorsList/styles';
+import ValidatorsSummary from '@/components/ValidatorsList/Summary';
+import { useValidatorHeaders } from '@/components/ValidatorsList/useValidatorHeaders';
+import { useValidatorSources } from '@/components/ValidatorsList/useValidatorSources';
 import VersionDistribution, {
   DistributionMode,
 } from '@/components/Validators/VersionDistribution';
-import api from '@/services/api';
 import {
   buildVersionStats,
-  fetchHeartbeatStatus,
   latestVersionAmongValidators,
-  resolveValidatorVersion,
-  UNKNOWN_VERSION,
 } from '@/services/requests/heartbeat';
-import { fetchAllValidators } from '@/services/requests/validators';
-import { CenteredRow, DoubleRow, Mono } from '@/styles/common';
-import { IPaginatedResponse, IRowSection, IValidator } from '@/types/index';
+import { validatorsTableRequest } from '@/services/requests/validators';
+import {
+  canFilterByVersion,
+  versionFilteredPage,
+} from '@/services/requests/validators/versionFilter';
+import { Container, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
-import { capitalizeString } from '@/utils/convertString';
-import { formatAmount } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
-import { useFetchPartial } from '@/utils/hooks';
-import { parseValidators } from '@/utils/parseValues';
-import { AddressContainer } from '@/views/validators/detail';
-import Link from 'next/link';
+import { IPaginatedResponse, IRowSection, IValidator } from '@/types/index';
+import { GetServerSideProps } from 'next';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { transparentize } from 'polished';
-import styled from 'styled-components';
-
-/** Matches Version Distribution badges: green = latest, amber = behind (not error red). */
-const VersionStatus = styled(Status)`
-  width: fit-content;
-  max-width: none;
-  padding: 2px 10px;
-
-  /* Light mode: stronger chip contrast (same tokens as distribution panel). */
-  ${props =>
-    !props.theme.dark &&
-    props.status === 'success' &&
-    `
-      color: #1b7a4e !important;
-      background-color: #e6f6ee !important;
-    `}
-
-  ${props =>
-    !props.theme.dark &&
-    props.status === 'pending' &&
-    `
-      color: #9a6200 !important;
-      background-color: #fff4e0 !important;
-    `}
-
-  ${props =>
-    props.theme.dark &&
-    props.status === 'pending' &&
-    `
-      color: ${props.theme.table.pending} !important;
-      background-color: ${transparentize(0.85, props.theme.table.pending)} !important;
-    `}
-`;
-
-export const validatorsHeaders = [
-  'Rank',
-  'Name/Can Delegate',
-  'Status/Rating',
-  'Stake/Commission',
-  'Produced / Missed',
-  'Software Version',
-  'Cumulative Stake',
-];
-
-const omitEmptyQuery = (
-  query: Record<string, string | string[] | undefined>,
-): Record<string, string | string[] | undefined> => {
-  const next: Record<string, string | string[] | undefined> = {};
-  Object.entries(query).forEach(([key, value]) => {
-    if (value === undefined || value === '') return;
-    next[key] = value;
-  });
-  return next;
-};
+import React, { PropsWithChildren, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const [filterValidators, fetchPartialValidator, loading, setLoading] =
-    useFetchPartial<IValidator>('validators', 'validator/list', 'name');
-  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const [versionMap, setVersionMap] = useState<Record<string, string>>({});
-  const [versionLoading, setVersionLoading] = useState(true);
-  const [heartbeatAvailable, setHeartbeatAvailable] = useState(false);
-  const [allValidators, setAllValidators] = useState<IValidator[]>([]);
-  const [validatorsLoading, setValidatorsLoading] = useState(true);
-  const [validatorsAvailable, setValidatorsAvailable] = useState(false);
-  const [totalValidators, setTotalValidators] = useState<number | undefined>();
+  const header = useValidatorHeaders();
+  const { t } = useTranslation(['common', 'validators']);
+  // The page owns the recovery poll; the summary and the filter bar read the
+  // same query without adding a second and third timer to it.
+  const { data: sources, isLoading, dataUpdatedAt } = useValidatorSources(true);
   const [distributionMode, setDistributionMode] =
     useState<DistributionMode>('nodes');
-  // Bumps only when a version filter is active and join data becomes ready.
-  const [versionFilterReadyKey, setVersionFilterReadyKey] = useState(0);
 
-  // Refs so table request always sees the latest join data without stale closures.
-  const versionMapRef = useRef(versionMap);
-  const allValidatorsRef = useRef(allValidators);
-  // Lazy-init once: useRef(new Promise(...)) re-runs the initializer every
-  // render and would overwrite the resolve callback while keeping the first
-  // promise — hangers on await dataReadyPromiseRef when ?version= is set.
-  const dataReadyResolveRef = useRef<(() => void) | null>(null);
-  const dataReadyPromiseRef = useRef<Promise<void> | null>(null);
-  if (!dataReadyPromiseRef.current) {
-    dataReadyPromiseRef.current = new Promise<void>(resolve => {
-      dataReadyResolveRef.current = resolve;
-    });
-  }
-  const dataReadyRef = useRef(false);
+  const latestVersion =
+    latestVersionAmongValidators(sources.validators, sources.versionMap) ||
+    undefined;
 
-  useEffect(() => {
-    versionMapRef.current = versionMap;
-  }, [versionMap]);
-
-  useEffect(() => {
-    allValidatorsRef.current = allValidators;
-  }, [allValidators]);
+  const labels: IValidatorRowContext['labels'] = {
+    copyAddress: t('validators:List.CopyAddress'),
+    addressCopied: t('validators:List.AddressCopied'),
+    openValidator: t('validators:List.OpenValidator'),
+    openInNewTab: t('validators:List.OpenInNewTab'),
+    canDelegate: t('validators:List.CanDelegate'),
+    canDelegateTooltip: t('validators:List.CanDelegateTooltip'),
+    cannotDelegate: t('validators:List.CannotDelegate'),
+    cannotDelegateTooltip: t('validators:List.CannotDelegateTooltip'),
+    missedShare: t('validators:List.MissedShare'),
+    unknownVersion: t('validators:List.UnknownVersion'),
+    versionUnavailable: t('validators:List.VersionUnavailable'),
+    versionUnavailableTooltip: t('validators:List.VersionUnavailableTooltip'),
+    noDelegationLimit: t('validators:List.NoDelegationLimit'),
+    capacityDetail: (staked, cap) =>
+      t('validators:List.CapacityDetail', {
+        staked: klvAmount(staked),
+        cap: klvAmount(cap),
+      }),
+  };
 
   const selectedVersion =
     typeof router.query.version === 'string' ? router.query.version : undefined;
 
-  useEffect(() => {
-    if (!versionLoading && !validatorsLoading && !dataReadyRef.current) {
-      dataReadyRef.current = true;
-      dataReadyResolveRef.current?.();
-      // Safety re-fetch if a deep-linked version filter resolved before join data.
-      if (selectedVersion) {
-        setVersionFilterReadyKey(k => k + 1);
-      }
-    }
-  }, [versionLoading, validatorsLoading, selectedVersion]);
+  const versionStats = sources.validatorsAvailable
+    ? buildVersionStats(
+        sources.validators,
+        sources.versionMap,
+        latestVersion ?? '',
+      )
+    : [];
 
-  useEffect(() => {
-    const loadHeartbeat = async () => {
-      const result = await fetchHeartbeatStatus();
-      if (result) {
-        setVersionMap(result.versionMap);
-        setHeartbeatAvailable(true);
-      } else {
-        setHeartbeatAvailable(false);
-      }
-      setVersionLoading(false);
-    };
-    loadHeartbeat();
-  }, []);
+  const handleSelectVersion = (version: string | undefined): void => {
+    // Back to page one: a narrower set has fewer pages, so staying put would
+    // land on an empty page with no control to get back from.
+    const updated: NextParsedUrlQuery = { ...router.query, version };
+    if (!version) delete updated.version;
+    delete updated.page;
+    setQueryAndRouter(updated, router);
+  };
 
-  useEffect(() => {
-    const loadValidators = async () => {
-      try {
-        const result = await fetchAllValidators();
-        setAllValidators(result.validators);
-        setTotalValidators(result.totalRecords);
-        setValidatorsAvailable(true);
-      } catch {
-        // Keep totalValidators undefined so the table path can still set it.
-        setValidatorsAvailable(false);
-        setAllValidators([]);
-      } finally {
-        setValidatorsLoading(false);
-      }
-    };
-    loadValidators();
-  }, []);
-
-  // Newest version among listed validators with heartbeat (not observers).
-  const latestVersion = useMemo(() => {
-    if (!Object.keys(versionMap).length) return undefined;
-    const among = latestVersionAmongValidators(allValidators, versionMap);
-    return among || undefined;
-  }, [allValidators, versionMap]);
-
-  const versionStats = useMemo(
-    () =>
-      validatorsAvailable
-        ? buildVersionStats(allValidators, versionMap, latestVersion ?? '')
-        : [],
-    [allValidators, versionMap, latestVersion, validatorsAvailable],
-  );
-
-  const updateQuery = useCallback(
-    (patch: Record<string, string | undefined>) => {
-      const merged = omitEmptyQuery({
-        ...router.query,
-        ...patch,
-        page: patch.page !== undefined ? patch.page : '1',
-      });
-      // Drop page when resetting to first page to keep URLs clean.
-      if (merged.page === '1') {
-        delete merged.page;
-      }
-      setQueryAndRouter(merged, router);
-    },
-    [router],
-  );
-
-  const handleSelectVersion = useCallback(
-    (version: string | undefined) => {
-      updateQuery({ version, page: '1' });
-    },
-    [updateQuery],
-  );
-
-  const validatorsRowSections = useCallback(
-    (validator: IValidator): IRowSection[] => {
-      const {
-        name,
-        ownerAddress,
-        parsedAddress,
-        rank,
-        staked,
-        commission,
-        cumulativeStaked,
-        rating,
-        status,
-        totalProduced,
-        totalMissed,
-        canDelegate,
-        blsPublicKey,
-      } = validator;
-
-      const softwareVersionRaw = blsPublicKey
-        ? resolveValidatorVersion(blsPublicKey, versionMap)
-        : undefined;
-      const softwareVersion =
-        softwareVersionRaw && softwareVersionRaw !== UNKNOWN_VERSION
-          ? softwareVersionRaw
-          : undefined;
-      const sections: IRowSection[] = ownerAddress
-        ? [
-            {
-              element: props => <p key={rank}>{rank}°</p>,
-              span: 1,
-              width: 100,
-            },
-            {
-              element: props => (
-                <DoubleRow key={ownerAddress + status} {...props}>
-                  <span>
-                    {
-                      <AddressContainer>
-                        <Link
-                          href={`validator/${ownerAddress}`}
-                          data-testid="validator-link"
-                        >
-                          {name ? name : <Mono>{parsedAddress}</Mono>}
-                        </Link>
-                        <Copy data={ownerAddress} info="Validator Address" />
-                      </AddressContainer>
-                    }
-                  </span>
-                  <Status
-                    status={canDelegate ? 'success' : 'fail'}
-                    key={String(canDelegate)}
-                  >
-                    {canDelegate ? 'Yes' : 'No'}
-                  </Status>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
-
-            {
-              element: props => (
-                <DoubleRow key={status + rating} {...props}>
-                  <span>{capitalizeString(status)}</span>
-                  <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <DoubleRow key={staked} {...props}>
-                  <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
-                  <span key={commission}>{commission / 10 ** 2}%</span>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <DoubleRow key={totalProduced} {...props}>
-                  <span>{totalProduced}</span>
-                  <CenteredRow>
-                    <span>{totalMissed}</span>
-                    <Tooltip
-                      msg="Missed Percentage"
-                      Component={() => (
-                        <CustomFieldWrapper>
-                          <span>
-                            {' '}
-                            (
-                            {totalProduced
-                              ? (
-                                  ((totalMissed || 0) * 100) /
-                                  totalProduced
-                                ).toFixed(2)
-                              : '- -'}
-                            %)
-                          </span>
-                        </CustomFieldWrapper>
-                      )}
-                    />
-                  </CenteredRow>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <CenteredRow key={softwareVersion}>
-                  {softwareVersion ? (
-                    <VersionStatus
-                      status={
-                        softwareVersion === latestVersion
-                          ? 'success'
-                          : 'pending'
-                      }
-                    >
-                      {softwareVersion}
-                    </VersionStatus>
-                  ) : (
-                    <span>-</span>
-                  )}
-                </CenteredRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <Progress percent={cumulativeStaked} key={cumulativeStaked} />
-              ),
-              span: 2,
-            },
-          ]
-        : [];
-
-      return sections;
-    },
-    [latestVersion, versionMap],
-  );
-
-  const filters: IFilter[] = useMemo(() => {
-    return [
-      {
-        title: 'Name',
-        placeholder: 'Search name…',
-        data: filterValidators
-          .map(validator => validator.name)
-          .filter(validator => !!validator) as string[],
-        onClick: async value => {
-          if (value === 'All') {
-            updateQuery({ name: undefined, page: '1' });
-          } else {
-            updateQuery({ name: value, page: '1' });
-          }
-        },
-        onChange: async value => {
-          setLoading(true);
-          if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-          searchTimeoutRef.current = setTimeout(() => {
-            updateQuery({ name: value || undefined, page: '1' });
-          }, 500);
-          await fetchPartialValidator(value);
-        },
-        current: (router.query.name as string) || undefined,
-        loading,
-      },
-      {
-        title: 'Version',
-        placeholder: 'Search version…',
-        data: versionStats.map(stat => stat.version),
-        onClick: async value => {
-          if (value === 'All') {
-            handleSelectVersion(undefined);
-          } else {
-            handleSelectVersion(value);
-          }
-        },
-        current: selectedVersion,
-        loading: versionLoading || validatorsLoading,
-      },
-    ];
-  }, [
-    filterValidators,
-    router.query.name,
-    loading,
-    versionStats,
-    selectedVersion,
-    versionLoading,
-    validatorsLoading,
-    updateQuery,
-    handleSelectVersion,
-    fetchPartialValidator,
-    setLoading,
-  ]);
-
-  const requestValidators = async (
+  const request = async (
     page: number,
     limit: number,
   ): Promise<IPaginatedResponse> => {
-    const versionFilter =
-      typeof router.query.version === 'string'
-        ? router.query.version
-        : undefined;
-    const nameFilter =
-      typeof router.query.name === 'string' ? router.query.name : undefined;
-
-    // Client-side path: version filter requires heartbeat join.
-    if (versionFilter) {
-      if (!dataReadyRef.current) {
-        await dataReadyPromiseRef.current!;
-      }
-
-      let list = allValidatorsRef.current;
-      const map = versionMapRef.current;
-
-      if (nameFilter) {
-        // Mirror validator/list name matching: case-insensitive prefix.
-        const needle = nameFilter.toLowerCase();
-        list = list.filter(v => v.name?.toLowerCase().startsWith(needle));
-      }
-
-      const normalizedVersionFilter = versionFilter.toLowerCase();
-      list = list.filter(
-        v =>
-          resolveValidatorVersion(v.blsPublicKey, map).toLowerCase() ===
-          normalizedVersionFilter,
-      );
-
-      const totalRecords = list.length;
-      const totalPages = Math.max(1, Math.ceil(totalRecords / limit) || 1);
-      const safePage = Math.min(Math.max(page, 1), totalPages);
-      const start = (safePage - 1) * limit;
-      // Preserve network election rank from parseValidators.
-      const pageItems = list.slice(start, start + limit);
-
-      return {
-        data: { validators: pageItems },
-        pagination: {
-          self: safePage,
-          next: Math.min(safePage + 1, totalPages),
-          previous: Math.max(safePage - 1, 1),
-          perPage: limit,
-          totalPages,
-          totalRecords,
+    // The version filter has no server-side counterpart, so it is resolved
+    // against the heartbeat join the shared query already holds. With either
+    // half of that join down the filter is dropped rather than answered: the
+    // unfiltered list is a true answer where an empty filtered page is not,
+    // and the version card above already names the outage.
+    if (
+      canFilterByVersion({
+        version: selectedVersion,
+        heartbeatAvailable: sources.heartbeatAvailable,
+        validatorsAvailable: sources.validatorsAvailable,
+      })
+    ) {
+      /* No guard holding this pending until the join lands. That was tried and
+         measured: react-query keeps the first promise a key produces, so a
+         never-settling one leaves the table on ten skeleton rows for the whole
+         outage, with the refresh and retry controls both inert because the
+         query has no data to cancel against. Answering from whatever arrived
+         reaches a terminal state, and `refreshKey` below re-runs it the moment
+         the version map does arrive: measured, the table went from the empty
+         state to 100 rows without a reload. */
+      return versionFilteredPage(
+        sources.validators,
+        sources.versionMap,
+        {
+          version: selectedVersion,
+          name:
+            typeof router.query.name === 'string'
+              ? router.query.name
+              : undefined,
         },
-        error: '',
-        code: 'successful',
-      };
+        page,
+        limit,
+      );
     }
-
-    const localQuery = { ...router.query, page, limit };
-    // Never send client-only version param to the list API.
-    delete (localQuery as Record<string, unknown>).version;
-
-    const validators = await api.get({
-      route: 'validator/list',
-      query: { sort: 'elected', ...localQuery },
-    });
-
-    if (!validators.error) {
-      const parsedValidators = parseValidators(validators);
-      if (totalValidators === undefined) {
-        setTotalValidators(validators.pagination?.totalRecords ?? undefined);
-      }
-      return { ...validators, data: { validators: parsedValidators } };
-    }
-
-    return validators;
+    return validatorsTableRequest(page, limit, router.query);
   };
 
-  const tableProps: ITable = {
+  const tableProps: ITable<IValidatorsMobileCardExtras> = {
     type: 'validators',
-    header: validatorsHeaders,
-    rowSections: validatorsRowSections,
-    request: (page, limit) => requestValidators(page, limit),
+    header,
+    rowSections: (validator: IValidator | string): IRowSection[] =>
+      validatorRowSections(validator, {
+        versionMap: sources.versionMap,
+        latestVersion,
+        heartbeatAvailable: sources.heartbeatAvailable,
+        labels,
+      }),
     dataName: 'validators',
-    // Only re-run when deep-linked version filter can resolve against join data.
-    refreshKey: versionFilterReadyKey,
+    request,
+    Filters: ValidatorsFilters,
+    MobileCard: ValidatorsMobileCard,
+    // Once here, not per card: ten cards resolving the join themselves would
+    // each subscribe to the same shared query.
+    mobileCardProps: {
+      versionMap: sources.versionMap,
+      latestVersion,
+      heartbeatAvailable: sources.heartbeatAvailable,
+    },
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
+    // Same source as the wrapper's media queries, so the loading rows and the
+    // loaded rows cannot end up in different shapes.
+    cardBreakpoint: ROW_LAYOUT_MIN_WIDTH,
+    /* Keyed on when the shared query last settled, not on a shape derived from
+       one of its halves. Both earlier keys did the latter and each left the
+       other half's recovery invisible: on the list it missed a returning
+       heartbeat, on the version map it missed a returning list, and that
+       second one was reproduced with a control (list blocked, then released:
+       the version card reported 143 nodes on a version while the table
+       filtered on it stayed empty indefinitely). This marker moves whenever
+       either half does. */
+    refreshKey: selectedVersion ? dataUpdatedAt : 0,
   };
 
-  const headerLoading = versionLoading || validatorsLoading;
+  return (
+    <Container>
+      <Header>
+        <Title title={t('common:Titles.Validators')} Icon={Icon} />
+      </Header>
 
-  const versionCard = (
-    <VersionDistribution
-      stats={versionStats}
-      latestVersion={latestVersion}
-      totalValidators={totalValidators}
-      loading={headerLoading}
-      heartbeatAvailable={heartbeatAvailable}
-      validatorsAvailable={validatorsAvailable}
-      mode={distributionMode}
-      onModeChange={setDistributionMode}
-      selectedVersion={selectedVersion}
-      onSelectVersion={handleSelectVersion}
-    />
+      <ValidatorsSummary />
+
+      <VersionDistribution
+        stats={versionStats}
+        latestVersion={latestVersion}
+        loading={isLoading}
+        heartbeatAvailable={sources.heartbeatAvailable}
+        validatorsAvailable={sources.validatorsAvailable}
+        mode={distributionMode}
+        onModeChange={setDistributionMode}
+        selectedVersion={selectedVersion}
+        onSelectVersion={handleSelectVersion}
+      />
+
+      <ValidatorsTableWrapper>
+        <Table {...tableProps} />
+      </ValidatorsTableWrapper>
+    </Container>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'validators', 'table'],
+    nextI18nextConfig,
+    ['en'],
   );
 
-  const detailProps = {
-    title: 'Validators',
-    headerIcon: Icon,
-    cards: undefined,
-    tableProps,
-    filters,
-    customHeader: versionCard,
-  };
-
-  return <Detail {...detailProps} />;
+  return { props };
 };
 
 export default Validators;

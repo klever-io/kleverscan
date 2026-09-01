@@ -20,6 +20,29 @@ import { ParsedUrlQuery } from 'querystring';
  * (tag benchmark/two-line-rows).
  */
 
+/**
+ * The viewport width from which a transaction fits on one row.
+ *
+ * Measured over 50 rows, per column, as the widest text each one carries plus
+ * its cell padding: 1204px for the nine-column list and 1269 for the ten-column
+ * account variant, against a content box of `viewport - 32`. The two constants
+ * below are those totals rounded up.
+ *
+ * Below this the list renders as cards and the filters sit above the page-size
+ * controls rather than beside them. Four filters are 878px and the controls
+ * 265, which with the 16px gap between them need 1191px, so the same number
+ * answers the filter bar as well.
+ *
+ * These live next to the column list because that is what they measure. A new
+ * column, a wider badge or a longer address moves the width a row needs, and
+ * these have to be re-measured with it. `TransactionsTable` is the only place
+ * that reads them, and it hands the same number to the JS and to the CSS.
+ */
+export const ROW_LAYOUT_MIN_WIDTH = 1240;
+
+/** The account-scoped list carries an In/Out column the others do not. */
+export const ROW_LAYOUT_MIN_WIDTH_WITH_IN_OUT = 1310;
+
 export type TransactionColumnKey =
   | 'hash'
   | 'type'
@@ -102,6 +125,11 @@ export const getTransactionColumns = ({
   if (showInOut) columns.splice(IN_OUT_INDEX, 0, IN_OUT_COLUMN);
   return columns;
 };
+
+/** The width this list's row needs, which depends on whether it carries the
+ *  In/Out column. */
+export const rowLayoutMinWidth = (showInOut: boolean): number =>
+  showInOut ? ROW_LAYOUT_MIN_WIDTH_WITH_IN_OUT : ROW_LAYOUT_MIN_WIDTH;
 
 /**
  * Whether this list carries a direction. Both the headings and the cells ask

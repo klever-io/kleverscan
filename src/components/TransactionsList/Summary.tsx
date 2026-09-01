@@ -15,7 +15,9 @@ import {
 // The same percent policy the holders and assets legends use, so the two
 // visually identical legends cannot format the same quantity differently.
 import { formatShare } from '@/components/DataList/format';
-import { SummaryBarPlaceholder } from '@/components/DataList/SummaryLoading';
+import TransactionsSummaryLoadingCard, {
+  ContractsBarPlaceholder,
+} from './LoadingCard';
 import {
   ITransactionTypeShare,
   buildBreakdown,
@@ -30,12 +32,7 @@ import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useTheme } from 'styled-components';
 import { useDeferred } from '@/components/DataList/useDeferred';
-import {
-  PageSummaryCard,
-  PageSummaryLoading,
-  SummaryAssetLink,
-  TrendValue,
-} from './styles';
+import { PageSummaryCard, SummaryAssetLink, TrendValue } from './styles';
 
 /**
  * A quarter of an hour. These are 24 hour figures, so a fresh reading moves
@@ -91,7 +88,10 @@ const TransactionsSummary: React.FC = () => {
   });
 
   if (!summary) {
-    return <PageSummaryLoading label={label} tiles={3} bar />;
+    // Five: the breakdown names Transfer, Smart Contract, Claim, Freeze and
+    // Other, and three placeholders left the legend a line short of the loaded
+    // one at 390px, measured.
+    return <TransactionsSummaryLoadingCard label={label} />;
   }
 
   /** One color per named type, with the computed remainder muted. */
@@ -241,7 +241,7 @@ const TransactionsSummary: React.FC = () => {
           drawn once with only the first of them. Holding the bar's space
           until its own request settles keeps that middle state the same
           height as the two around it. */}
-      {breakdownPending && <SummaryBarPlaceholder />}
+      {breakdownPending && <ContractsBarPlaceholder />}
       {!breakdownPending && breakdown.length > 1 && breakdownTotal > 0 && (
         <>
           <DistBar

@@ -57,6 +57,7 @@
   "List": {
     "SummaryAria": "Account statistics",
     "OnChain": "on chain",
+    "TotalShort": "Accounts",
     "New24h": "New (24h)",
     "VersusYesterday": "{{change}} vs yesterday",
     "NewWindow": "New ({{days}}d)",

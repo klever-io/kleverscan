@@ -3,6 +3,7 @@ import {
   dataListTableSkin,
   inCard,
   MobileListCard,
+  MobileTotalRow,
   RowActions,
 } from '@/components/DataList/styles';
 import {
@@ -133,7 +134,10 @@ export const MobileCapRow = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 8px;
+
+  /* Sits right after the Circulating label and lets the figure keep the far
+     end of the line. */
+  margin-right: auto;
 `;
 
 export const MobileCapCaption = styled.span`
@@ -166,6 +170,28 @@ export const AssetsTableWrapper = styled.div`
      Same rule the validator card carries, so the two lists behave alike. */
   ${MobileListCard} ${RowActions} {
     margin-left: 0;
+  }
+
+  /* The cap bar shares the Circulating line only where that line has room for
+     it. A phone card is about 300px wide, and the 150px track plus its caption
+     left the figure 90px, which broke "10.99 M KFI" across two lines. Below
+     the mobile width the bar takes a line of its own again, after the figure,
+     and the card is four rows there instead of three. */
+  @media screen and (max-width: 767.98px) {
+    ${MobileTotalRow} {
+      flex-wrap: wrap;
+    }
+
+    ${MobileTotalRow} > strong {
+      white-space: nowrap;
+    }
+
+    ${MobileCapRow} {
+      order: 1;
+      flex-basis: 100%;
+      margin-right: 0;
+      margin-top: 4px;
+    }
   }
 
   /* Between the shared breakpoint and this list's own the rows are cards, and

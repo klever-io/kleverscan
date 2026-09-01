@@ -51,11 +51,12 @@ export const validatorsCall = async (
  * first. `validatorsCall` still filters, because it feeds the delegation form
  * and a jailed validator cannot be delegated to.
  */
-export const fetchAllValidators = async (): Promise<{
+export interface IAllValidators {
   validators: IValidator[];
   totalRecords: number;
-  networkTotalStake: number;
-}> => {
+}
+
+export const fetchAllValidators = async (): Promise<IAllValidators> => {
   const first = await api.get({
     route: 'validator/list',
     query: { sort: 'elected', page: 1, limit: VALIDATOR_PAGE_LIMIT },
@@ -110,10 +111,6 @@ export const fetchAllValidators = async (): Promise<{
     // reports a count beside an empty list, which is the mismatch this page
     // exists to remove.
     totalRecords: validators.length,
-    // Passed through rather than re-derived: this is the same denominator
-    // `parseValidators` divides each row by, so the summary tile and the
-    // per-row shares agree by construction.
-    networkTotalStake: first.data?.networkTotalStake ?? 0,
   };
 };
 

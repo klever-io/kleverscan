@@ -7,7 +7,7 @@ import {
   entriesByPublicKey,
   listComposition,
   nodeFigures,
-  stakeFigures,
+  sumStaked,
 } from '../summaryFigures';
 
 const validator = (overrides: Partial<IValidator> = {}): IValidator =>
@@ -113,36 +113,19 @@ describe('listComposition', () => {
   });
 });
 
-describe('stakeFigures', () => {
-  it('sums the stake and shares it against the network', () => {
+describe('sumStaked', () => {
+  it('adds the staked amounts', () => {
     const set = [validator({ staked: 300 }), validator({ staked: 200 })];
-    expect(stakeFigures(set, 1_000)).toEqual({
-      totalStaked: 500,
-      shareOfNetwork: 50,
-    });
-  });
-
-  // A zero or broken denominator must leave the share out, not print 0%: the
-  // set plainly holds stake, so 0% would be a visible lie.
-  it.each([
-    ['zero', 0],
-    ['negative', -1],
-    ['NaN', NaN],
-    ['Infinity', Infinity],
-  ])('omits the share when the network total is %s', (_l, total) => {
-    const figures = stakeFigures([validator({ staked: 300 })], total as number);
-    expect(figures.totalStaked).toBe(300);
-    expect(figures.shareOfNetwork).toBeUndefined();
+    expect(sumStaked(set)).toBe(500);
   });
 
   it('ignores an unusable stake instead of totalling to NaN', () => {
     const set = [validator({ staked: NaN }), validator({ staked: 200 })];
-    expect(stakeFigures(set, 1_000).totalStaked).toBe(200);
+    expect(sumStaked(set)).toBe(200);
   });
 
-  it('never reports more than the whole network', () => {
-    const set = [validator({ staked: 5_000 })];
-    expect(stakeFigures(set, 1_000).shareOfNetwork).toBe(100);
+  it('is zero for an empty set', () => {
+    expect(sumStaked([])).toBe(0);
   });
 });
 
@@ -216,15 +199,14 @@ describe('delegationRoom', () => {
 });
 
 describe('nodeFigures', () => {
-  it('counts nodes, active nodes and uptime', () => {
+  it('counts nodes and active nodes', () => {
     const entries = [
-      beat({ publicKey: 'BLS1', totalUpTimeSec: 90, totalDownTimeSec: 10 }),
-      beat({ publicKey: 'BLS2', isActive: false, totalUpTimeSec: 100 }),
+      beat({ publicKey: 'BLS1' }),
+      beat({ publicKey: 'BLS2', isActive: false }),
     ];
     const figures = nodeFigures(entries, [validator({ blsPublicKey: 'BLS1' })]);
     expect(figures.total).toBe(2);
     expect(figures.active).toBe(1);
-    expect(figures.uptime).toBeCloseTo(95);
   });
 
   it('counts an observer as a node that is not in the validator list', () => {
@@ -234,11 +216,11 @@ describe('nodeFigures', () => {
     ).toBe(1);
   });
 
-  // The reason observers are counted from the keys and not from `peerType`:
-  // the node calls a jailed validator an observer too, and counting that way
-  // would report a validator as a non-validator.
+  // The reason observers are counted from the keys and not from the node's
+  // `peerType`: the node calls a jailed validator an observer too, and counting
+  // that way would report a validator as a non-validator.
   it('does not count a jailed validator as an observer', () => {
-    const entries = [beat({ publicKey: 'BLS1', peerType: 'observer' })];
+    const entries = [beat({ publicKey: 'BLS1' })];
     const set = [validator({ blsPublicKey: 'BLS1', status: 'jailed' })];
     expect(nodeFigures(entries, set).observers).toBe(0);
   });
@@ -248,11 +230,6 @@ describe('nodeFigures', () => {
     expect(
       nodeFigures(entries, [validator({ blsPublicKey: 'BLS1' })]).observers,
     ).toBe(0);
-  });
-
-  it('leaves uptime out when no node reported any time', () => {
-    expect(nodeFigures([beat()], []).uptime).toBeUndefined();
-    expect(nodeFigures([], []).uptime).toBeUndefined();
   });
 });
 

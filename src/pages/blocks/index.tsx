@@ -1,12 +1,15 @@
 import { Blocks as Icon } from '@/assets/title-icons';
 import AutoUpdate from '@/components/BlocksList/AutoUpdate';
 import BlocksFilters from '@/components/BlocksList/Filters';
-import { RIGHT_ALIGNED_COLUMNS } from '@/components/BlocksList/columns';
+import {
+  RIGHT_ALIGNED_COLUMNS,
+  BLOCK_COLUMNS,
+} from '@/components/BlocksList/columns';
 import BlocksMobileCard from '@/components/BlocksList/MobileCard';
 import { blockRowSections } from '@/components/BlocksList/rows';
 import { BlocksTableWrapper } from '@/components/BlocksList/styles';
 import BlocksSummary from '@/components/BlocksList/Summary';
-import { useBlockHeaders } from '@/components/BlocksList/useBlockHeaders';
+import { useColumnHeaders } from '@/components/DataList/useColumnHeaders';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
 import { blockListCall } from '@/services/requests/block';
@@ -28,7 +31,7 @@ const AUTO_UPDATE_INTERVAL = 4 * 1000;
 
 const Blocks: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const header = useBlockHeaders();
+  const header = useColumnHeaders(BLOCK_COLUMNS);
   const { t } = useTranslation(['blocks']);
   // Translated here and handed down: the row builder is no component, so
   // t() is out of its reach, and the mobile card already translates this key.

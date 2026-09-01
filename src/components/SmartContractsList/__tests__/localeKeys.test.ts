@@ -1,17 +1,7 @@
 import enSmartContracts from '../../../../public/locales/en/smartContracts.json';
 import ptSmartContracts from '../../../../public/locales/pt-BR/smartContracts.json';
+import { lookup } from '@/utils/localeKeys';
 import { CONTRACT_COLUMNS } from '../columns';
-
-const lookup = (bundle: unknown, path: string): unknown =>
-  path
-    .split('.')
-    .reduce<unknown>(
-      (node, part) =>
-        node && typeof node === 'object'
-          ? (node as Record<string, unknown>)[part]
-          : undefined,
-      bundle,
-    );
 
 /**
  * Every key the page asks for, listed here rather than scraped from the

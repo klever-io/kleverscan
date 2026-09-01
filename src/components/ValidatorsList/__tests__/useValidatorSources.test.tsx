@@ -58,7 +58,6 @@ import { useValidatorSources } from '../useValidatorSources';
 const list = {
   validators: [{ blsPublicKey: 'BLS1', staked: 10 }],
   totalRecords: 1,
-  networkTotalStake: 100,
 };
 
 const heartbeat = {
@@ -106,7 +105,6 @@ describe('useValidatorSources', () => {
     await settle();
 
     expect(latest.data.validators).toHaveLength(1);
-    expect(latest.data.networkTotalStake).toBe(100);
     expect(latest.data.versionMap).toEqual({ bls1: 'v1.7.21' });
     expect(latest.data.entries).toHaveLength(1);
     expect(latest.data.heartbeatAvailable).toBe(true);
@@ -139,7 +137,6 @@ describe('useValidatorSources', () => {
     expect(latest.data.heartbeatAvailable).toBe(true);
     expect(latest.data.validatorsAvailable).toBe(false);
     expect(latest.data.validators).toEqual([]);
-    expect(latest.data.networkTotalStake).toBe(0);
   });
 
   // `fetchHeartbeatStatus` resolves undefined on failure rather than throwing,
@@ -154,7 +151,7 @@ describe('useValidatorSources', () => {
     expect(latest.data.heartbeatAvailable).toBe(false);
   });
 
-  it('keeps asking while one half is still missing', async () => {
+  it('keeps asking the half that is still missing', async () => {
     // The query cannot reject: both halves are settled, so a failed source is
     // a successful answer carrying a fallback and react-query's own retry
     // never fires. Without this interval a transient outage held until the
@@ -167,14 +164,40 @@ describe('useValidatorSources', () => {
     await act(async () => {
       await Promise.resolve();
     });
-    const first = mockFetchAll.mock.calls.length;
+    const first = mockHeartbeat.mock.calls.length;
 
     await act(async () => {
       jest.advanceTimersByTime(31_000);
       await Promise.resolve();
     });
 
-    expect(mockFetchAll.mock.calls.length).toBeGreaterThan(first);
+    expect(mockHeartbeat.mock.calls.length).toBeGreaterThan(first);
+    jest.useRealTimers();
+  });
+
+  /* The other half of the same tick. `fetchAllValidators` is three
+     `validator/list` requests on mainnet, so re-running it to retry one
+     `/api/heartbeat` call spent 27 requests over the recovery window against a
+     rate limit CI shares. */
+  it('does not re-ask the half that already answered', async () => {
+    jest.useFakeTimers();
+    mockFetchAll.mockResolvedValue(list);
+    mockHeartbeat.mockResolvedValue(undefined);
+
+    renderSources(true);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const first = mockFetchAll.mock.calls.length;
+
+    await act(async () => {
+      jest.advanceTimersByTime(91_000);
+      await Promise.resolve();
+    });
+
+    expect(mockFetchAll.mock.calls.length).toBe(first);
+    expect(latest.data.validators).toHaveLength(1);
+    expect(latest.data.validatorsAvailable).toBe(true);
     jest.useRealTimers();
   });
 

@@ -5,21 +5,23 @@ import {
   BadgePill,
   BadgeVariant,
   DATA_LIST_ROW_HEIGHT,
+  dataListCardBand,
+  dataListRowPadding,
   dataListTableSkin,
   focusRing,
+  visuallyHiddenRules,
   inCard,
   MobileTopRow,
   RowActions,
   SummaryCard,
   TilesGrid,
 } from '@/components/DataList/styles';
-import SummaryLoading from '@/components/DataList/SummaryLoading';
+import { belowWidth } from '@/components/DataList/layout';
 import {
   FloatContainer,
   HeaderItem,
   MobileCardItem,
   MobileHeader,
-  TableBody,
   TableControls,
   TableRow,
 } from '@/components/Table/styles';
@@ -44,7 +46,7 @@ interface IRowLayoutWidth {
 /** Same reason as BELOW_ROW_LAYOUT one breakpoint up: `max-width: N` and
  *  `min-width: N` both match at exactly N, and the row layout owns N. */
 const belowRow = (props: IRowLayoutWidth): string =>
-  `${props.$rowLayoutMin - 0.02}px`;
+  belowWidth(props.$rowLayoutMin);
 
 const fromRow = (props: IRowLayoutWidth): string => `${props.$rowLayoutMin}px`;
 
@@ -139,56 +141,7 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
     }
   }
 
-  /* Between the shared breakpoint and this list's own, the rows are cards and
-     the shared stylesheet still lays the surface out as a table. A styled
-     component's own media query is not reachable from outside it, so it is
-     undone here.
-
-     The TableBody rule is not cosmetic: display:table wraps each
-     MobileListCard in an anonymous cell, which puts all ten of them side by
-     side on a single line. */
-  @media screen and (min-width: ${props =>
-      props.theme.breakpoints.tablet}) and (max-width: ${belowRow}) {
-    ${TableBody} {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 0;
-      border: none;
-      background-image: none;
-    }
-
-    ${TableRow} {
-      display: grid;
-      gap: 4px;
-      padding: 16px;
-      border-radius: 16px;
-      border: solid 1px
-        ${props =>
-          props.theme.dark ? props.theme.darkGray : props.theme.black10};
-      background-color: ${props => props.theme.white};
-    }
-
-    /* Through TableRow to clear the skin's own :first-child and :last-child
-       cell padding, which matches on class count alone. */
-    ${TableRow} ${MobileCardItem} {
-      display: flex;
-      flex-direction: column;
-      width: auto;
-      max-width: none;
-      height: auto;
-      padding: 0;
-      border-bottom: none;
-      font-size: 0.75rem;
-    }
-
-    ${TableRow} ${MobileCardItem} a,
-    ${TableRow} ${MobileCardItem} span {
-      height: auto;
-      min-width: 0;
-      white-space: normal;
-    }
-  }
+  ${dataListCardBand(belowRow)}
 
   /* The card header holds a hash, two badges, a timestamp and two buttons on
      one nowrap line. Below the mobile width that is 15px more than it has, and
@@ -283,35 +236,9 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
   /* ----------------------------- the row band ------------------------------ */
 
   @media screen and (min-width: ${fromRow}) {
-    /* 8px of side padding rather than the skin's 12, and 12 rather than 16 on
-       the two outer edges. Nine columns is more than any other list here
-       carries, and the skin's spacing spent 224px of the row on padding
-       against 1045px of text; this spends 152. The 72px it frees is what lets
-       the row fit a 1280px laptop instead of asking for 1360. The header takes
-       the same values or the columns stop lining up. */
-    ${MobileCardItem} {
-      padding: 8px;
-    }
-
-    ${MobileCardItem}:first-child {
-      padding-left: 12px;
-    }
-
-    ${MobileCardItem}:last-child {
-      padding-right: 12px;
-    }
-
-    ${HeaderItem} {
-      padding: 12px 8px;
-    }
-
-    ${HeaderItem}:first-child {
-      padding-left: 12px;
-    }
-
-    ${HeaderItem}:last-child {
-      padding-right: 12px;
-    }
+    /* The 72px this frees against the skin's own spacing is what lets a
+       nine-column row fit a 1280px laptop instead of asking for 1360. */
+    ${dataListRowPadding}
 
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};
@@ -347,14 +274,16 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
       text-decoration: underline;
       text-underline-offset: 0.2rem;
     }
+  }
 
-    /* Set by TransactionTypeBadge on every badge sharing the hovered
-       contract type. */
-    ${BadgePill}.type-hover-match {
-      outline: 1px dashed
-        ${props => (props.theme.dark ? '#C95ED4' : props.theme.violet)};
-      outline-offset: 1px;
-    }
+  /* Outside the row band on purpose: the hover handler sits on the badge,
+     which the mobile card renders too, so scoping the paint to the row left
+     every width below it sweeping the whole table body on each pointer move
+     and painting nothing. */
+  ${BadgePill}.type-hover-match {
+    outline: 1px dashed
+      ${props => (props.theme.dark ? '#C95ED4' : props.theme.violet)};
+    outline-offset: 1px;
   }
 `;
 
@@ -404,11 +333,6 @@ const threeTilesThenTwo = css`
 `;
 
 export const PageSummaryCard = styled(SummaryCard)`
-  ${pageSummarySpacing}
-  ${threeTilesThenTwo}
-`;
-
-export const PageSummaryLoading = styled(SummaryLoading)`
   ${pageSummarySpacing}
   ${threeTilesThenTwo}
 `;
@@ -589,15 +513,7 @@ export const CardLabel = styled.span`
  *  hidden text from the width where the glyph lane takes over. */
 export const ToLabel = styled(CardLabel)`
   @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
+    ${visuallyHiddenRules}
   }
 `;
 

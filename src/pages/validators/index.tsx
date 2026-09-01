@@ -2,9 +2,10 @@ import { Validators as Icon } from '@/assets/title-icons';
 import { klvAmount } from '@/components/DataList/format';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
 import {
   RIGHT_ALIGNED_COLUMNS,
-  ROW_LAYOUT_MIN_WIDTH,
+  VALIDATOR_COLUMNS,
 } from '@/components/ValidatorsList/columns';
 import ValidatorsFilters from '@/components/ValidatorsList/Filters';
 import ValidatorsMobileCard, {
@@ -16,15 +17,12 @@ import {
 } from '@/components/ValidatorsList/rows';
 import { ValidatorsTableWrapper } from '@/components/ValidatorsList/styles';
 import ValidatorsSummary from '@/components/ValidatorsList/Summary';
-import { useValidatorHeaders } from '@/components/ValidatorsList/useValidatorHeaders';
+import { useColumnHeaders } from '@/components/DataList/useColumnHeaders';
 import { useValidatorSources } from '@/components/ValidatorsList/useValidatorSources';
+import { useVersionStats } from '@/components/ValidatorsList/useVersionStats';
 import VersionDistribution, {
   DistributionMode,
 } from '@/components/Validators/VersionDistribution';
-import {
-  buildVersionStats,
-  latestVersionAmongValidators,
-} from '@/services/requests/heartbeat';
 import { validatorsTableRequest } from '@/services/requests/validators';
 import {
   canFilterByVersion,
@@ -43,17 +41,14 @@ import nextI18nextConfig from '../../../next-i18next.config';
 
 const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const header = useValidatorHeaders();
+  const header = useColumnHeaders(VALIDATOR_COLUMNS);
   const { t } = useTranslation(['common', 'validators']);
   // The page owns the recovery poll; the summary and the filter bar read the
   // same query without adding a second and third timer to it.
   const { data: sources, isLoading, dataUpdatedAt } = useValidatorSources(true);
+  const { latestVersion, stats: versionStats } = useVersionStats();
   const [distributionMode, setDistributionMode] =
     useState<DistributionMode>('nodes');
-
-  const latestVersion =
-    latestVersionAmongValidators(sources.validators, sources.versionMap) ||
-    undefined;
 
   const labels: IValidatorRowContext['labels'] = {
     copyAddress: t('validators:List.CopyAddress'),
@@ -67,8 +62,10 @@ const Validators: React.FC<PropsWithChildren> = () => {
     missedShare: t('validators:List.MissedShare'),
     unknownVersion: t('validators:List.UnknownVersion'),
     versionUnavailable: t('validators:List.VersionUnavailable'),
-    versionUnavailableTooltip: t('validators:List.VersionUnavailableTooltip'),
+    versionUnavailableReason: t('validators:List.VersionUnavailableReason'),
     noDelegationLimit: t('validators:List.NoDelegationLimit'),
+    statusLabel: (status: string) =>
+      t(`validators:States.${status}`, { defaultValue: status }),
     capacityDetail: (staked, cap) =>
       t('validators:List.CapacityDetail', {
         staked: klvAmount(staked),
@@ -79,13 +76,11 @@ const Validators: React.FC<PropsWithChildren> = () => {
   const selectedVersion =
     typeof router.query.version === 'string' ? router.query.version : undefined;
 
-  const versionStats = sources.validatorsAvailable
-    ? buildVersionStats(
-        sources.validators,
-        sources.versionMap,
-        latestVersion ?? '',
-      )
-    : [];
+  const versionFilterable = canFilterByVersion({
+    version: selectedVersion,
+    heartbeatAvailable: sources.heartbeatAvailable,
+    validatorsAvailable: sources.validatorsAvailable,
+  });
 
   const handleSelectVersion = (version: string | undefined): void => {
     // Back to page one: a narrower set has fewer pages, so staying put would
@@ -105,21 +100,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
     // half of that join down the filter is dropped rather than answered: the
     // unfiltered list is a true answer where an empty filtered page is not,
     // and the version card above already names the outage.
-    if (
-      canFilterByVersion({
-        version: selectedVersion,
-        heartbeatAvailable: sources.heartbeatAvailable,
-        validatorsAvailable: sources.validatorsAvailable,
-      })
-    ) {
-      /* No guard holding this pending until the join lands. That was tried and
-         measured: react-query keeps the first promise a key produces, so a
-         never-settling one leaves the table on ten skeleton rows for the whole
-         outage, with the refresh and retry controls both inert because the
-         query has no data to cancel against. Answering from whatever arrived
-         reaches a terminal state, and `refreshKey` below re-runs it the moment
-         the version map does arrive: measured, the table went from the empty
-         state to 100 rows without a reload. */
+    if (versionFilterable) {
       return versionFilteredPage(
         sources.validators,
         sources.versionMap,
@@ -145,6 +126,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
         versionMap: sources.versionMap,
         latestVersion,
         heartbeatAvailable: sources.heartbeatAvailable,
+        sourcesLoading: isLoading,
         labels,
       }),
     dataName: 'validators',
@@ -157,21 +139,26 @@ const Validators: React.FC<PropsWithChildren> = () => {
       versionMap: sources.versionMap,
       latestVersion,
       heartbeatAvailable: sources.heartbeatAvailable,
+      sourcesLoading: isLoading,
     },
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
     // Same source as the wrapper's media queries, so the loading rows and the
     // loaded rows cannot end up in different shapes.
     cardBreakpoint: ROW_LAYOUT_MIN_WIDTH,
-    /* Keyed on when the shared query last settled, not on a shape derived from
-       one of its halves. Both earlier keys did the latter and each left the
-       other half's recovery invisible: on the list it missed a returning
-       heartbeat, on the version map it missed a returning list, and that
-       second one was reproduced with a control (list blocked, then released:
-       the version card reported 143 nodes on a version while the table
-       filtered on it stayed empty indefinitely). This marker moves whenever
-       either half does. */
-    refreshKey: selectedVersion ? dataUpdatedAt : 0,
+    /* A version-filtered URL cannot be answered from the API, so the table
+       holds its loading rows until the join has settled one way or the other.
+       Answering meanwhile served the unfiltered list, with the unfiltered
+       record count in the pager, under a filtered URL. */
+    requestReady: !selectedVersion || !isLoading,
+    /* Keyed on when the shared query last settled, and only while the filter
+       can actually be answered from it. Both earlier keys were derived from
+       one half of the join and each left the other half's recovery invisible.
+       Gating on `canFilterByVersion` keeps the recovery poll from minting a
+       key per settle in the state where the request goes to the API anyway:
+       measured with the heartbeat blocked, three identical list requests where
+       the same page without `?version=` made one. */
+    refreshKey: versionFilterable ? dataUpdatedAt : 0,
   };
 
   return (

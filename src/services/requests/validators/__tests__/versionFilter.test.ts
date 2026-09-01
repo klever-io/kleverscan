@@ -5,7 +5,6 @@ import {
   filterByName,
   filterByVersion,
   paginateValidators,
-  usablePageNumber,
   versionFilteredPage,
 } from '../versionFilter';
 
@@ -34,30 +33,6 @@ const validator = (
 
 const many = (count: number): IValidator[] =>
   Array.from({ length: count }, (_, i) => validator(i + 1));
-
-describe('usablePageNumber', () => {
-  it('takes a sane integer as-is', () => {
-    expect(usablePageNumber(3, 1)).toBe(3);
-    expect(usablePageNumber(1, 1)).toBe(1);
-  });
-
-  it('floors a fractional value', () => {
-    expect(usablePageNumber(2.9, 1)).toBe(2);
-  });
-
-  // The whole domain of the type, not the cases the code suggests: these
-  // arrive from `router.query`, where anything can be typed.
-  it.each([
-    ['zero', 0],
-    ['negative', -5],
-    ['fractional below one', 0.4],
-    ['NaN', NaN],
-    ['Infinity', Infinity],
-    ['-Infinity', -Infinity],
-  ])('falls back on %s', (_label, value) => {
-    expect(usablePageNumber(value as number, 7)).toBe(7);
-  });
-});
 
 describe('paginateValidators', () => {
   it('cuts the page and reports the totals', () => {

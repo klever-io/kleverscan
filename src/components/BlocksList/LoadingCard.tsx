@@ -1,3 +1,4 @@
+import { HOLD_LINE, SKELETON_INLINE } from '@/components/DataList/loadingText';
 import Skeleton from '@/components/Skeleton';
 import {
   DistBar,
@@ -14,15 +15,6 @@ import { useTheme } from '@/contexts/theme';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { BlocksSummaryCard, UpdatedNote, feeSegmentColor } from './styles';
-
-/** Occupies a text line without painting one, so each slot keeps the exact
- *  line box its value will have, at every root font size and in every locale. */
-const HOLD_LINE = '​';
-
-const INLINE: React.CSSProperties = {
-  display: 'inline-block',
-  verticalAlign: 'middle',
-};
 
 /**
  * The card's loading shape, built from the loaded card's own components with
@@ -73,7 +65,7 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
               <Skeleton
                 width="38%"
                 height="1em"
-                containerCustomStyles={INLINE}
+                containerCustomStyles={SKELETON_INLINE}
               />
               {HOLD_LINE}
             </TileValue>
@@ -81,7 +73,7 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
               <Skeleton
                 width="52%"
                 height="1em"
-                containerCustomStyles={INLINE}
+                containerCustomStyles={SKELETON_INLINE}
               />
               {HOLD_LINE}
             </TileSub>
@@ -98,7 +90,11 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
           <LegendItem key={segment.key}>
             <LegendDot $color={feeSegmentColor(segment.key, theme)} />
             {segment.label}{' '}
-            <Skeleton width={64} height="1em" containerCustomStyles={INLINE} />
+            <Skeleton
+              width={64}
+              height="1em"
+              containerCustomStyles={SKELETON_INLINE}
+            />
           </LegendItem>
         ))}
       </LegendRow>

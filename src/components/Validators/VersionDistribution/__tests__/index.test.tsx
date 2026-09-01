@@ -320,4 +320,51 @@ describe('VersionDistribution', () => {
     fireEvent.click(screen.getByText(/\+2 other versions/));
     expect(screen.getByText('Show less')).toBeInTheDocument();
   });
+
+  const collapsible: VersionStat[] = Array.from({ length: 5 }, (_, i) => ({
+    version: `v1.0.${4 - i}`,
+    count: 1,
+    percent: 20,
+    isLatest: i === 0,
+    isUnknown: false,
+    stake: 1,
+    stakePercent: 20,
+  }));
+
+  const renderCollapsed = (selectedVersion?: string) =>
+    renderWithTheme(
+      <VersionDistribution
+        stats={collapsible}
+        latestVersion="v1.0.4"
+        loading={false}
+        heartbeatAvailable
+        validatorsAvailable
+        mode="nodes"
+        onModeChange={jest.fn()}
+        selectedVersion={selectedVersion}
+        onSelectVersion={jest.fn()}
+      />,
+    );
+
+  /* The sort puts Unknown last, so the largest non-latest bucket is the first
+     one collapsing hides. Filtering on it then left no row marked and no way
+     to clear it without opening "other versions" first. */
+  it('keeps the filtered version on screen while collapsed', () => {
+    renderCollapsed('v1.0.0');
+
+    expect(screen.getAllByText('v1.0.0').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /v1\.0\.0/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  /* The inverse: pulling the selected row forward must not also reveal the
+     rest, or the collapse buys nothing. */
+  it('still hides the versions that are not filtered on', () => {
+    renderCollapsed('v1.0.0');
+
+    expect(screen.queryByText('v1.0.1')).toBeNull();
+    expect(screen.getByText(/other version/)).toBeInTheDocument();
+  });
 });

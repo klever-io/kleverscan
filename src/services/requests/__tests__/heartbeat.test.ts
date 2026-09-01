@@ -47,6 +47,24 @@ describe('compareSemver', () => {
   it('compares pre-release suffixes lexicographically when bases match', () => {
     expect(compareSemver('v1.7.21-rc2', 'v1.7.21-rc1')).toBeGreaterThan(0);
   });
+
+  /* The comparator has to stay total. A node reporting a build tag rather than
+     a version normalises to a non-numeric string, and `Number` turned every
+     comparison against it into NaN. */
+  it('never answers NaN for a version that is not a number', () => {
+    ['dev', 'unknown', '', 'v1.x.0'].forEach(odd => {
+      expect(Number.isNaN(compareSemver('v1.7.21', odd))).toBe(false);
+      expect(Number.isNaN(compareSemver(odd, 'v1.7.21'))).toBe(false);
+    });
+  });
+
+  /* And the consequence that made it matter: `NaN > 0` is false, so a
+     non-numeric value reaching `latestVersion` first could never be displaced
+     and every node then rendered as out of date. */
+  it('sorts a non-numeric version below a real one', () => {
+    expect(compareSemver('v1.7.21', 'dev')).toBeGreaterThan(0);
+    expect(compareSemver('dev', 'v1.7.21')).toBeLessThan(0);
+  });
 });
 
 describe('resolveValidatorVersion', () => {
@@ -72,19 +90,15 @@ describe('resolveValidatorVersion', () => {
 describe('latestVersionAmongValidators', () => {
   it('returns empty string when no validators match heartbeat', () => {
     expect(
-      latestVersionAmongValidators(
-        [{ blsPublicKey: 'x' }],
-        { other: 'v1.7.20' },
-      ),
+      latestVersionAmongValidators([{ blsPublicKey: 'x' }], {
+        other: 'v1.7.20',
+      }),
     ).toBe('');
   });
 
   it('ignores peers that are not in the validator list', () => {
     const latest = latestVersionAmongValidators(
-      [
-        { blsPublicKey: 'bls-a' },
-        { blsPublicKey: 'bls-b' },
-      ],
+      [{ blsPublicKey: 'bls-a' }, { blsPublicKey: 'bls-b' }],
       {
         'bls-a': 'v1.7.20',
         'bls-b': 'v1.7.15',

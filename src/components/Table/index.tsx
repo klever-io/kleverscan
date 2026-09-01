@@ -120,6 +120,15 @@ export interface ITable<TCard = Record<string, never>> {
    * CSS, which JS cannot see.
    */
   cardBreakpoint?: number;
+  /**
+   * False while the caller cannot answer `request` yet, for a filter it
+   * resolves client-side against a second query. The table then holds its
+   * loading rows instead of running the request: answering unfiltered painted
+   * a full page of rows, and an unfiltered record count, under a filtered URL
+   * for as long as that second query took (measured 393ms to 579ms, and 1.6s
+   * on a throttled connection).
+   */
+  requestReady?: boolean;
 }
 
 /** Floor for a loading bar, so a narrow column gets a placeholder rather than
@@ -157,6 +166,7 @@ const Table = <TCard,>({
   singleLineSkeleton = false,
   rightAlignedSkeletonColumns = [],
   cardBreakpoint,
+  requestReady = true,
 }: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -224,8 +234,14 @@ const Table = <TCard,>({
         ? 10_000
         : 0,
 
+    enabled: requestReady,
+
     ...onErrorHandler(),
   });
+
+  /* `enabled: false` reports isLoading false, not true, so without this the
+     held state would fall through to the empty state instead of the rows. */
+  const pending = isLoading || !requestReady;
 
   const props: TableRowProps = {
     pathname: router.pathname,
@@ -335,7 +351,7 @@ const Table = <TCard,>({
           {/* The header stays while fetching: dropping it made the table lose
               its height and snap back once the rows arrived. */}
           {!showCards &&
-            (isLoading || (response?.items && response.items.length !== 0)) && (
+            (pending || (response?.items && response.items.length !== 0)) && (
               <TableRow data-testid="table-header">
                 {header?.map((item, index) => (
                   <HeaderItem
@@ -368,7 +384,7 @@ const Table = <TCard,>({
               </TableRow>
             )}
 
-          {isLoading && (
+          {pending && (
             <>
               {Array(limit)
                 .fill(limit)
@@ -484,6 +500,7 @@ const Table = <TCard,>({
             })}
 
           {!isFetching &&
+            requestReady &&
             (!response?.items || response?.items?.length === 0) && (
               <TableEmptyData>
                 <RetryContainer onClick={() => refetch()} $loading={isFetching}>

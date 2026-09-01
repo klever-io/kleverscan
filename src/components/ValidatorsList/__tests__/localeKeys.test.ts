@@ -1,5 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import {
+  bundleFor,
+  flattenBundle,
+  present,
+  readKeys,
+  subtreeKeys,
+} from '@/utils/localeKeys';
+import { LIST_STATES } from '../summaryFigures';
 
 /**
  * Binds the keys this page asks for to the shipped bundles. Every `t()` on the
@@ -7,49 +15,10 @@ import path from 'path';
  * the JSON renders correctly in English and stays invisible: the page looks
  * right while the namespace is empty, and only a translator ever finds out.
  *
- * Both locales, not just `en`, which is the half the blocks equivalent checks.
- * A key present in `en` and absent from `pt-BR` is the same silent failure with
- * a narrower audience, and this page ships 88 keys in each.
+ * Both locales, not just `en`. A key present in `en` and absent from `pt-BR` is
+ * the same silent failure with a narrower audience.
  */
 const LOCALES = ['en', 'pt-BR'] as const;
-
-const readKeys = (file: string, namespace: string): string[] => {
-  const source = fs.readFileSync(path.join(process.cwd(), file), 'utf8');
-  // Both shapes in use: `t('ns:Key')` at the call site, and `i18nKey: 'ns:Key'`
-  // in the column table, which the heading hook feeds to `t`.
-  const patterns = [
-    new RegExp(`t\\(\\s*'${namespace}:([\\w.]+)'`, 'g'),
-    new RegExp(`i18nKey:\\s*'${namespace}:([\\w.]+)'`, 'g'),
-  ];
-  return patterns.flatMap(pattern =>
-    [...source.matchAll(pattern)].map(match => match[1]),
-  );
-};
-
-const lookup = (bundle: unknown, key: string): unknown =>
-  key
-    .split('.')
-    .reduce<unknown>(
-      (node, part) =>
-        node && typeof node === 'object'
-          ? (node as Record<string, unknown>)[part]
-          : undefined,
-      bundle,
-    );
-
-const bundleFor = (locale: string, namespace: string): unknown =>
-  JSON.parse(
-    fs.readFileSync(
-      path.join(
-        process.cwd(),
-        'public',
-        'locales',
-        locale,
-        `${namespace}.json`,
-      ),
-      'utf8',
-    ),
-  );
 
 const sources = [
   ['src/components/ValidatorsList/Filters.tsx', 'validators'],
@@ -63,18 +32,11 @@ const sources = [
   ['src/pages/validators/index.tsx', 'validators'],
 ] as const;
 
-/** A pluralised key exists as `_one`/`_other` rather than on its own, which is
- *  how i18next stores it. */
-const present = (bundle: unknown, key: string): boolean =>
-  typeof lookup(bundle, key) === 'string' ||
-  (typeof lookup(bundle, `${key}_one`) === 'string' &&
-    typeof lookup(bundle, `${key}_other`) === 'string');
-
 describe('validators list locale keys', () => {
   it.each(sources)(
     '%s asks for keys that exist in %s.json',
     (file, namespace) => {
-      const keys = readKeys(file, namespace);
+      const { keys } = readKeys(file, namespace);
       // Guards the regex itself: a rename that stops it matching would make
       // every assertion below pass by never running.
       expect(keys.length).toBeGreaterThan(0);
@@ -88,6 +50,42 @@ describe('validators list locale keys', () => {
       });
     },
   );
+
+  /* A key built from a template literal carries no tail in the source, so the
+     sweep above cannot see it at all. Its prefix must at least resolve to a
+     populated subtree in both bundles. */
+  it.each(sources)(
+    '%s resolves its dynamic prefixes in %s.json',
+    (file, ns) => {
+      const { prefixes } = readKeys(file, ns);
+
+      prefixes.forEach(prefix => {
+        LOCALES.forEach(locale => {
+          expect({ file, prefix, locale, keys: [] }).not.toEqual({
+            file,
+            prefix,
+            locale,
+            keys: subtreeKeys(bundleFor(locale, ns), prefix),
+          });
+        });
+      });
+    },
+  );
+
+  /* The members a prefix must carry, which no scraper can read off the source.
+     `States` is the set the composition legend, the loading placeholder and the
+     row badge all index into, and it is the one that went unguarded: deleting
+     `States.jailed` from both bundles left the whole suite green. */
+  it('ships every list state the page can index into', () => {
+    const expected = [...LIST_STATES, 'other'].sort();
+
+    LOCALES.forEach(locale => {
+      expect({
+        locale,
+        states: subtreeKeys(bundleFor(locale, 'validators'), 'States').sort(),
+      }).toEqual({ locale, states: expected });
+    });
+  });
 
   /* The distribution card was the last untranslated surface on this page, so
      it gets its own assertion rather than relying on the sweep above to keep
@@ -106,18 +104,8 @@ describe('validators list locale keys', () => {
   });
 
   it('keeps both bundles on the same key set', () => {
-    const flatten = (node: unknown, prefix = ''): string[] =>
-      node && typeof node === 'object'
-        ? Object.entries(node as Record<string, unknown>).flatMap(
-            ([key, value]) =>
-              value && typeof value === 'object'
-                ? flatten(value, `${prefix}${key}.`)
-                : [`${prefix}${key}`],
-          )
-        : [];
-
     const [en, ptBR] = LOCALES.map(locale =>
-      flatten(bundleFor(locale, 'validators')).sort(),
+      flattenBundle(bundleFor(locale, 'validators')).sort(),
     );
 
     expect(ptBR).toEqual(en);

@@ -72,39 +72,20 @@ export const listComposition = (
     });
 };
 
-export interface IStakeFigures {
-  totalStaked: number;
-  /** 0..100 of the network total, or undefined when the network total is
-   *  unusable rather than a misleading 0. */
-  shareOfNetwork?: number;
-}
-
 /**
- * What this set holds, and how much of the network that is.
+ * What this set holds.
  *
- * `shareOfNetwork` is 100 percent whenever the set is the whole validator
- * list, because `networkTotalStake` IS the sum of every validator's stake
- * (verified against mainnet: both are 3414365636957119 to the digit). It is
- * kept for callers that pass a subset, and the summary shows the per-state
- * stake share instead, which actually varies.
+ * No share of the network beside it: `networkTotalStake` IS the sum of every
+ * validator's stake (verified against mainnet, both 3414365636957119 to the
+ * digit), so for the only caller that share reads 100 percent always. The card
+ * shows the per-state stake share instead, which does vary.
  */
-export const stakeFigures = (
-  validators: IValidator[],
-  networkTotalStake: number,
-): IStakeFigures => {
-  const totalStaked = validators.reduce(
+export const sumStaked = (validators: IValidator[]): number =>
+  validators.reduce(
     (sum, validator) =>
       sum + (Number.isFinite(validator.staked) ? validator.staked : 0),
     0,
   );
-  if (!Number.isFinite(networkTotalStake) || networkTotalStake <= 0) {
-    return { totalStaked };
-  }
-  return {
-    totalStaked,
-    shareOfNetwork: Math.min((totalStaked / networkTotalStake) * 100, 100),
-  };
-};
 
 export interface IBlockResult {
   produced: number;
@@ -189,20 +170,17 @@ export interface INodeFigures {
   active: number;
   /** Nodes with a heartbeat that are not in the validator list. */
   observers: number;
-  /** 0..100 across every node, or undefined when no node reported any time. */
-  uptime?: number;
 }
 
 /**
- * Heartbeat-derived node counts. The card prints active over total and the
- * observer count; `uptime` is computed and tested but not shown, because a
- * node reports it since its own last restart. Measured on mainnet 2026-08-31:
- * 214 heartbeats, 212 active, 70 observers, 97,33 percent uptime.
+ * Heartbeat-derived node counts. Measured on mainnet 2026-08-31: 214
+ * heartbeats, 212 active, 70 observers.
  *
- * `observers` is counted from the keys rather than from `peerType`, and the
- * two do not agree: `peerType === 'observer'` gives 86, because the node has
- * no jailed or inactive state and files those 16 validators as observers too.
- * Counting them here would report a validator as a non-validator.
+ * `observers` is counted from the keys rather than from the node's `peerType`,
+ * and the two do not agree: `peerType === 'observer'` gives 86, because the
+ * node has no jailed or inactive state and files those 16 validators as
+ * observers too. Counting them here would report a validator as a
+ * non-validator.
  */
 export const nodeFigures = (
   entries: HeartbeatEntry[],
@@ -216,27 +194,15 @@ export const nodeFigures = (
 
   let active = 0;
   let observers = 0;
-  let up = 0;
-  let down = 0;
 
   entries.forEach(entry => {
     if (entry.isActive) active += 1;
     if (entry.publicKey && !validatorKeys.has(entry.publicKey.toLowerCase())) {
       observers += 1;
     }
-    if (Number.isFinite(entry.totalUpTimeSec)) up += entry.totalUpTimeSec ?? 0;
-    if (Number.isFinite(entry.totalDownTimeSec)) {
-      down += entry.totalDownTimeSec ?? 0;
-    }
   });
 
-  const measured = up + down;
-  return {
-    total: entries.length,
-    active,
-    observers,
-    uptime: measured > 0 ? (up / measured) * 100 : undefined,
-  };
+  return { total: entries.length, active, observers };
 };
 
 /**

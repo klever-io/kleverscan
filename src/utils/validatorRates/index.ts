@@ -50,3 +50,12 @@ export const validatorRates = (delegation: {
     totalFailure: leaderFailure + signedFailure,
   };
 };
+
+/** Rating arrives as 0..10.000.000 and commission in basis points. Both are
+ *  declared required on `IValidator` but can be missing from a response, and
+ *  the raw arithmetic then printed "NaN%" in the row and in the card. */
+export const ratingPercent = (rating: number): number =>
+  Number.isFinite(rating) ? (rating * 100) / 10_000_000 : 0;
+
+export const commissionPercent = (commission: number): number =>
+  Number.isFinite(commission) ? commission / 100 : 0;

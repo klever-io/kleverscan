@@ -78,5 +78,25 @@
     "inactive": "Inactive",
     "jailed": "Jailed",
     "other": "Other"
+  },
+  "Distribution": {
+    "Title": "Version Distribution",
+    "Newest": "Newest",
+    "OnLatestNodes": "{{percent}}% of nodes on latest",
+    "OnLatestStake": "{{percent}}% of stake on latest",
+    "ModeNodes": "Nodes",
+    "ModeStake": "Stake",
+    "MetricLabel": "Distribution metric",
+    "SummaryLabel": "Validator network summary",
+    "BarLabel": "Version distribution bar",
+    "ListLabel": "Version distribution",
+    "FilterBy": "Filter by {{version}}",
+    "ShowLess": "Show less",
+    "OtherVersions_one": "+{{count}} other version",
+    "OtherVersions_other": "+{{count}} other versions",
+    "NodeCount_one": "{{count}} node",
+    "NodeCount_other": "{{count}} nodes",
+    "HeartbeatFailed": "Could not load node versions. Please try refreshing the page.",
+    "ValidatorsFailed": "Could not load the full validator list for version stats. Please try refreshing the page."
   }
 }

@@ -42,6 +42,51 @@ jest.mock('react-dom', () => {
   };
 });
 
+/**
+ * Resolves against the real `en` bundle rather than echoing keys back, so
+ * every assertion below keeps checking the words a reader actually sees, and a
+ * key that never lands in the JSON fails here instead of rendering its own
+ * name at the user.
+ */
+jest.mock('next-i18next', () => {
+  const bundle = jest.requireActual(
+    '../../../../../public/locales/en/validators.json',
+  );
+
+  const lookup = (key: string): string | undefined =>
+    key
+      .replace(/^validators:/, '')
+      .split('.')
+      .reduce<unknown>(
+        (node, part) =>
+          node && typeof node === 'object'
+            ? (node as Record<string, unknown>)[part]
+            : undefined,
+        bundle,
+      ) as string | undefined;
+
+  return {
+    useTranslation: () => ({
+      t: (key: string, options?: Record<string, unknown>) => {
+        const count = options?.count;
+        const resolved =
+          count === undefined
+            ? lookup(key)
+            : (lookup(`${key}_${count === 1 ? 'one' : 'other'}`) ??
+              lookup(key));
+        if (resolved === undefined) {
+          throw new Error(`missing translation key: ${key}`);
+        }
+        return Object.entries(options ?? {}).reduce(
+          (text, [name, value]) =>
+            text.replace(new RegExp(`{{${name}}}`, 'g'), String(value)),
+          resolved,
+        );
+      },
+    }),
+  };
+});
+
 import VersionDistribution from '../index';
 
 const renderWithTheme = (ui: React.ReactElement) =>

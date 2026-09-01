@@ -78,5 +78,25 @@
     "inactive": "Inativo",
     "jailed": "Penalizado",
     "other": "Outro"
+  },
+  "Distribution": {
+    "Title": "Distribuição de versões",
+    "Newest": "Mais recente",
+    "OnLatestNodes": "{{percent}}% dos nós na mais recente",
+    "OnLatestStake": "{{percent}}% do stake na mais recente",
+    "ModeNodes": "Nós",
+    "ModeStake": "Stake",
+    "MetricLabel": "Métrica de distribuição",
+    "SummaryLabel": "Resumo da rede de validadores",
+    "BarLabel": "Barra de distribuição de versões",
+    "ListLabel": "Distribuição de versões",
+    "FilterBy": "Filtrar por {{version}}",
+    "ShowLess": "Mostrar menos",
+    "OtherVersions_one": "+{{count}} outra versão",
+    "OtherVersions_other": "+{{count}} outras versões",
+    "NodeCount_one": "{{count}} nó",
+    "NodeCount_other": "{{count}} nós",
+    "HeartbeatFailed": "Não foi possível carregar as versões dos nós. Tente atualizar a página.",
+    "ValidatorsFailed": "Não foi possível carregar a lista completa de validadores para as estatísticas de versão. Tente atualizar a página."
   }
 }

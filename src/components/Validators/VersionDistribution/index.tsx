@@ -1,4 +1,5 @@
 import Skeleton from '@/components/Skeleton';
+import { useTranslation } from 'next-i18next';
 import { VersionStat } from '@/services/requests/heartbeat';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -43,6 +44,16 @@ export interface VersionDistributionProps {
   onSelectVersion: (version: string | undefined) => void;
 }
 
+/** Occupies a text line without painting one, so a loading slot keeps the
+ *  exact line box its value will have. Same pair the summary loading cards
+ *  use. */
+const HOLD_LINE = '\u200b';
+
+const INLINE: React.CSSProperties = {
+  display: 'inline-block',
+  verticalAlign: 'middle',
+};
+
 const COLLAPSE_THRESHOLD = 4;
 const INITIAL_VISIBLE = 3;
 
@@ -65,6 +76,7 @@ const VersionDistribution: React.FC<
   selectedVersion,
   onSelectVersion,
 }) => {
+  const { t } = useTranslation(['validators']);
   const [expanded, setExpanded] = useState(false);
 
   const latestStat = useMemo(() => stats.find(s => s.isLatest), [stats]);
@@ -96,7 +108,7 @@ const VersionDistribution: React.FC<
     if (mode === 'stake') {
       return `${formatAmount(stat.stake / 10 ** KLV_PRECISION)} KLV`;
     }
-    return `${stat.count} node${stat.count === 1 ? '' : 's'}`;
+    return t('validators:Distribution.NodeCount', { count: stat.count });
   };
 
   const formatPercent = (stat: VersionStat) => {
@@ -109,30 +121,28 @@ const VersionDistribution: React.FC<
 
   const distributionBody = () => {
     if (loading) {
+      /* Two shapes because the loaded body has two: the 8px bar and the 30px
+         row of version chips. Four placeholders (14 + 8 + 32 + 32) stood the
+         card at 205px against the loaded 134, so it shrank 71px the moment the
+         figures landed and took the table below it up with it. Measured at
+         1440; both states are 134px now. */
       return (
         <>
-          <Skeleton width="40%" height={14} />
           <Skeleton width="100%" height={8} />
-          <Skeleton width="100%" height={32} />
-          <Skeleton width="100%" height={32} />
+          <Skeleton width="100%" height={30} />
         </>
       );
     }
 
     if (heartbeatFailed) {
       return (
-        <EmptyText>
-          Could not load node versions. Please try refreshing the page.
-        </EmptyText>
+        <EmptyText>{t('validators:Distribution.HeartbeatFailed')}</EmptyText>
       );
     }
 
     if (validatorsFailed) {
       return (
-        <EmptyText>
-          Could not load the full validator list for version stats. Please try
-          refreshing the page.
-        </EmptyText>
+        <EmptyText>{t('validators:Distribution.ValidatorsFailed')}</EmptyText>
       );
     }
 
@@ -142,7 +152,10 @@ const VersionDistribution: React.FC<
 
     return (
       <>
-        <StackedBar role="img" aria-label="Version distribution bar">
+        <StackedBar
+          role="img"
+          aria-label={t('validators:Distribution.BarLabel')}
+        >
           {stats.map(stat => (
             <BarSegment
               key={stat.version}
@@ -153,14 +166,16 @@ const VersionDistribution: React.FC<
           ))}
         </StackedBar>
 
-        <VersionList aria-label="Version distribution">
+        <VersionList aria-label={t('validators:Distribution.ListLabel')}>
           {visibleStats.map(stat => (
             <li key={stat.version}>
               <VersionRow
                 type="button"
                 $selected={selectedVersion === stat.version}
                 aria-pressed={selectedVersion === stat.version}
-                title={`Filter by ${stat.version}`}
+                title={t('validators:Distribution.FilterBy', {
+                  version: stat.version,
+                })}
                 onClick={() => handleRowClick(stat.version)}
               >
                 <VersionMeta>
@@ -179,12 +194,14 @@ const VersionDistribution: React.FC<
 
         {hiddenCount > 0 && !expanded && (
           <ExpandButton type="button" onClick={() => setExpanded(true)}>
-            +{hiddenCount} other version{hiddenCount === 1 ? '' : 's'}
+            {t('validators:Distribution.OtherVersions', {
+              count: hiddenCount,
+            })}
           </ExpandButton>
         )}
         {expanded && stats.length > COLLAPSE_THRESHOLD && (
           <ExpandButton type="button" onClick={() => setExpanded(false)}>
-            Show less
+            {t('validators:Distribution.ShowLess')}
           </ExpandButton>
         )}
       </>
@@ -197,14 +214,24 @@ const VersionDistribution: React.FC<
         <CardTop>
           <TitleBlock>
             <CardTitle>
-              <strong>Version Distribution</strong>
+              <strong>{t('validators:Distribution.Title')}</strong>
             </CardTitle>
 
-            <StatsStrip aria-label="Validator network summary">
+            <StatsStrip aria-label={t('validators:Distribution.SummaryLabel')}>
               <StatItem>
-                <StatLabel>Newest</StatLabel>
+                <StatLabel>{t('validators:Distribution.Newest')}</StatLabel>
                 {loading && !latestVersion ? (
-                  <Skeleton width={80} height={16} />
+                  /* Through StatValue, not beside it: a bare Skeleton carries
+                     its own line box and stood the header 2px taller than the
+                     loaded one. */
+                  <StatValue>
+                    {HOLD_LINE}
+                    <Skeleton
+                      width={80}
+                      height={14}
+                      containerCustomStyles={INLINE}
+                    />
+                  </StatValue>
                 ) : (
                   <StatValue title={latestVersion}>
                     {latestVersion ?? '—'}
@@ -217,15 +244,25 @@ const VersionDistribution: React.FC<
                     describes, so pinning it to nodes would print two
                     disagreeing "on latest" figures the moment you pick Stake. */}
                 {loading && latestStat === undefined ? (
-                  <Skeleton width={64} height={16} />
+                  <StatValue>
+                    {HOLD_LINE}
+                    <Skeleton
+                      width={64}
+                      height={14}
+                      containerCustomStyles={INLINE}
+                    />
+                  </StatValue>
                 ) : latestStat !== undefined ? (
                   <StatValue
                     $accent={onLatestPercent >= 50}
                     data-testid="on-latest-callout"
                   >
-                    {`${onLatestPercent.toFixed(1)}% of ${
-                      mode === 'stake' ? 'stake' : 'nodes'
-                    } on latest`}
+                    {t(
+                      mode === 'stake'
+                        ? 'validators:Distribution.OnLatestStake'
+                        : 'validators:Distribution.OnLatestNodes',
+                      { percent: onLatestPercent.toFixed(1) },
+                    )}
                   </StatValue>
                 ) : (
                   <StatValue>—</StatValue>
@@ -235,14 +272,17 @@ const VersionDistribution: React.FC<
           </TitleBlock>
 
           {!heartbeatFailed && !validatorsFailed && (
-            <ModeToggle role="group" aria-label="Distribution metric">
+            <ModeToggle
+              role="group"
+              aria-label={t('validators:Distribution.MetricLabel')}
+            >
               <ModeButton
                 type="button"
                 $active={mode === 'nodes'}
                 aria-pressed={mode === 'nodes'}
                 onClick={() => onModeChange('nodes')}
               >
-                Nodes
+                {t('validators:Distribution.ModeNodes')}
               </ModeButton>
               <ModeButton
                 type="button"
@@ -250,7 +290,7 @@ const VersionDistribution: React.FC<
                 aria-pressed={mode === 'stake'}
                 onClick={() => onModeChange('stake')}
               >
-                Stake
+                {t('validators:Distribution.ModeStake')}
               </ModeButton>
             </ModeToggle>
           )}

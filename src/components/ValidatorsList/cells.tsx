@@ -39,6 +39,9 @@ export interface IValidatorRowLabels {
   cannotDelegateTooltip: string;
   missedShare: string;
   unknownVersion: string;
+  /** Shown in place of Unknown when the heartbeat itself did not answer. */
+  versionUnavailable: string;
+  versionUnavailableTooltip: string;
   noDelegationLimit: string;
   /** "14.0M of 15.0M KLV delegated", built by the page so it can translate. */
   capacityDetail: (staked: number, maxDelegation: number) => string;
@@ -125,9 +128,15 @@ export const VersionBadge: React.FC<{
   version?: string;
   isLatest: boolean;
   unknownLabel: string;
-}> = ({ version, isLatest, unknownLabel }) => {
+  /** Only where the label stands for an outage rather than for a state the
+   *  chain really has: "Unknown" is a third of mainnet and needs no
+   *  explanation, "Unavailable" does. */
+  unknownTooltip?: string;
+}> = ({ version, isLatest, unknownLabel, unknownTooltip }) => {
   if (!version) {
-    return <AmountMuted>{unknownLabel}</AmountMuted>;
+    const label = <AmountMuted>{unknownLabel}</AmountMuted>;
+    if (!unknownTooltip) return label;
+    return <Tooltip msg={unknownTooltip} focusable Component={() => label} />;
   }
   return (
     <VersionPill $variant={isLatest ? 'success' : 'warning'}>

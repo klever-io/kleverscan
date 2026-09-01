@@ -40,13 +40,16 @@
     "MissedShare": "Proporção de perdidos",
     "UnknownVersion": "Desconhecida",
     "NoDelegationLimit": "Sem limite",
-    "CapacityDetail": "{{staked}} de {{cap}} delegado"
+    "CapacityDetail": "{{staked}} de {{cap}} delegado",
+    "VersionUnavailable": "Indisponível",
+    "VersionUnavailableTooltip": "Não foi possível carregar as versões dos nós"
   },
   "Filters": {
     "Name": "Nome",
     "Version": "Versão",
     "SearchName": "Buscar nome",
-    "SearchVersion": "Buscar versão"
+    "SearchVersion": "Buscar versão",
+    "VersionUnavailable": "Não foi possível carregar as versões dos nós"
   },
   "Summary": {
     "Label": "Estatísticas da rede de validadores",
@@ -65,7 +68,8 @@
     "NoData": "Indisponível",
     "ElectedHolds": "Eleitos detêm {{share}} da delegação",
     "BlocksProduced": "Blocos produzidos",
-    "SuccessRate": "{{rate}} de taxa de sucesso"
+    "SuccessRate": "{{rate}} de taxa de sucesso",
+    "CompositionUnavailable": "Não foi possível carregar a composição dos validadores. Tente atualizar a página."
   },
   "States": {
     "elected": "Eleito",

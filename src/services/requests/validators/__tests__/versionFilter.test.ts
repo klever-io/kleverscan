@@ -1,5 +1,6 @@
 import { IValidator } from '@/types/index';
 import {
+  canFilterByVersion,
   DEFAULT_PAGE_LIMIT,
   filterByName,
   filterByVersion,
@@ -185,5 +186,57 @@ describe('versionFilteredPage', () => {
       'Alpha',
       'Alpine',
     ]);
+  });
+});
+
+/**
+ * The guard that keeps an outage from reading as a result. Both halves of the
+ * join have to be there, and the reverse case matters as much as the happy
+ * one: a filter that stayed off after recovery would leave the page ignoring
+ * the URL it was opened with.
+ */
+describe('canFilterByVersion', () => {
+  const both = { heartbeatAvailable: true, validatorsAvailable: true };
+
+  it('applies the filter when both halves of the join answered', () => {
+    expect(canFilterByVersion({ version: 'v1.7.21', ...both })).toBe(true);
+  });
+
+  it('does not apply it when the heartbeat is down', () => {
+    expect(
+      canFilterByVersion({
+        version: 'v1.7.21',
+        heartbeatAvailable: false,
+        validatorsAvailable: true,
+      }),
+    ).toBe(false);
+  });
+
+  it('does not apply it when the validator list is down', () => {
+    expect(
+      canFilterByVersion({
+        version: 'v1.7.21',
+        heartbeatAvailable: true,
+        validatorsAvailable: false,
+      }),
+    ).toBe(false);
+  });
+
+  it('has nothing to apply without a version', () => {
+    expect(canFilterByVersion({ version: undefined, ...both })).toBe(false);
+    expect(canFilterByVersion({ version: '', ...both })).toBe(false);
+  });
+
+  /* The bucket the empty map produces. `?version=Unknown` with the heartbeat
+     down would otherwise filter every row against an empty join and answer a
+     successful empty page. */
+  it('does not apply the Unknown bucket while the heartbeat is down', () => {
+    expect(
+      canFilterByVersion({
+        version: 'Unknown',
+        heartbeatAvailable: false,
+        validatorsAvailable: true,
+      }),
+    ).toBe(false);
   });
 });

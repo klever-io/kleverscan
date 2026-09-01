@@ -40,13 +40,16 @@
     "MissedShare": "Missed share",
     "UnknownVersion": "Unknown",
     "NoDelegationLimit": "No limit",
-    "CapacityDetail": "{{staked}} of {{cap}} delegated"
+    "CapacityDetail": "{{staked}} of {{cap}} delegated",
+    "VersionUnavailable": "Unavailable",
+    "VersionUnavailableTooltip": "Node versions could not be loaded"
   },
   "Filters": {
     "Name": "Name",
     "Version": "Version",
     "SearchName": "Search name",
-    "SearchVersion": "Search version"
+    "SearchVersion": "Search version",
+    "VersionUnavailable": "Node versions could not be loaded"
   },
   "Summary": {
     "Label": "Validator network statistics",
@@ -65,7 +68,8 @@
     "NoData": "Not available",
     "ElectedHolds": "Elected hold {{share}} of the stake",
     "BlocksProduced": "Blocks produced",
-    "SuccessRate": "{{rate}} success rate"
+    "SuccessRate": "{{rate}} success rate",
+    "CompositionUnavailable": "Could not load the validator composition. Please try refreshing the page."
   },
   "States": {
     "elected": "Elected",

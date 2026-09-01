@@ -23,6 +23,13 @@ const ValidatorsFilters: React.FC = () => {
   const { t } = useTranslation(['validators']);
   const { data, isLoading } = useValidatorSources();
 
+  /* The version of a validator is a join of the list against the heartbeat, so
+     with either half missing the dropdown has nothing to offer: an empty map
+     still yields the "Unknown" bucket, and picking it wrote `?version=Unknown`
+     and drove the table down the empty-success path. The name filter stays
+     open, because names come from the list half alone. */
+  const versionResolvable = data.heartbeatAvailable && data.validatorsAvailable;
+
   const versions = buildVersionStats(data.validators, data.versionMap, '').map(
     stat => stat.version,
   );
@@ -57,14 +64,17 @@ const ValidatorsFilters: React.FC = () => {
     {
       title: t('validators:Filters.Version'),
       testId: 'validator-version',
-      placeholder: t('validators:Filters.SearchVersion'),
-      data: versions,
+      placeholder: versionResolvable
+        ? t('validators:Filters.SearchVersion')
+        : t('validators:Filters.VersionUnavailable'),
+      data: versionResolvable ? versions : [],
       onClick: selected => patch('version', selected),
       current:
         typeof router.query.version === 'string'
           ? router.query.version
           : undefined,
       loading: isLoading,
+      disabledInput: !isLoading && !versionResolvable,
     },
   ];
 

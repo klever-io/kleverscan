@@ -161,18 +161,32 @@ describe('ValidatorsSummary', () => {
     expect(card().textContent).not.toContain('0 / 0');
   });
 
-  it('holds the bar and legend space when the list failed', () => {
-    // The card is 158px with the bar and 109 without, and the version card and
-    // the table sit under it, so dropping the space moved the page 78px the
-    // moment a recovery poll landed.
+  /* Two branches, and the pair is the point: this slot used to hold a loading
+     skeleton for both, so a failed list shimmered while the tiles above it
+     already read "Not available", and the recovery poll gives up after ten
+     attempts, so it shimmered for the life of the tab. */
+  it('names the failure instead of shimmering when the list failed', () => {
     mockSources.mockReturnValue(
       sources({ validators: [], validatorsAvailable: false }),
     );
     renderSummary();
 
-    // One entry per chain state, so the placeholder wraps onto the same number
-    // of lines the real legend does.
+    expect(card().querySelectorAll('[data-testid="skeleton"]').length).toBe(0);
+    expect(card().textContent).toContain('CompositionUnavailable');
+  });
+
+  it('still holds the space for a list that answered with no validators', () => {
+    // The card is 158px with the bar and 109 without, and the version card and
+    // the table sit under it, so dropping the space moved the page 78px the
+    // moment a recovery poll landed. One legend entry per chain state, so the
+    // placeholder wraps onto the same number of lines the real legend does.
+    mockSources.mockReturnValue(
+      sources({ validators: [], validatorsAvailable: true }),
+    );
+    renderSummary();
+
     expect(card().querySelectorAll('[data-testid="skeleton"]').length).toBe(6);
+    expect(card().textContent).not.toContain('CompositionUnavailable');
   });
 
   it('renders the loading shape while the sources are on their way', () => {

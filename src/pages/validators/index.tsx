@@ -26,7 +26,10 @@ import {
   latestVersionAmongValidators,
 } from '@/services/requests/heartbeat';
 import { validatorsTableRequest } from '@/services/requests/validators';
-import { versionFilteredPage } from '@/services/requests/validators/versionFilter';
+import {
+  canFilterByVersion,
+  versionFilteredPage,
+} from '@/services/requests/validators/versionFilter';
 import { Container, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
 import { IPaginatedResponse, IRowSection, IValidator } from '@/types/index';
@@ -63,6 +66,8 @@ const Validators: React.FC<PropsWithChildren> = () => {
     cannotDelegateTooltip: t('validators:List.CannotDelegateTooltip'),
     missedShare: t('validators:List.MissedShare'),
     unknownVersion: t('validators:List.UnknownVersion'),
+    versionUnavailable: t('validators:List.VersionUnavailable'),
+    versionUnavailableTooltip: t('validators:List.VersionUnavailableTooltip'),
     noDelegationLimit: t('validators:List.NoDelegationLimit'),
     capacityDetail: (staked, cap) =>
       t('validators:List.CapacityDetail', {
@@ -96,8 +101,17 @@ const Validators: React.FC<PropsWithChildren> = () => {
     limit: number,
   ): Promise<IPaginatedResponse> => {
     // The version filter has no server-side counterpart, so it is resolved
-    // against the heartbeat join the shared query already holds.
-    if (selectedVersion) {
+    // against the heartbeat join the shared query already holds. With either
+    // half of that join down the filter is dropped rather than answered: the
+    // unfiltered list is a true answer where an empty filtered page is not,
+    // and the version card above already names the outage.
+    if (
+      canFilterByVersion({
+        version: selectedVersion,
+        heartbeatAvailable: sources.heartbeatAvailable,
+        validatorsAvailable: sources.validatorsAvailable,
+      })
+    ) {
       /* No guard holding this pending until the join lands. That was tried and
          measured: react-query keeps the first promise a key produces, so a
          never-settling one leaves the table on ten skeleton rows for the whole
@@ -130,6 +144,7 @@ const Validators: React.FC<PropsWithChildren> = () => {
       validatorRowSections(validator, {
         versionMap: sources.versionMap,
         latestVersion,
+        heartbeatAvailable: sources.heartbeatAvailable,
         labels,
       }),
     dataName: 'validators',
@@ -138,7 +153,11 @@ const Validators: React.FC<PropsWithChildren> = () => {
     MobileCard: ValidatorsMobileCard,
     // Once here, not per card: ten cards resolving the join themselves would
     // each subscribe to the same shared query.
-    mobileCardProps: { versionMap: sources.versionMap, latestVersion },
+    mobileCardProps: {
+      versionMap: sources.versionMap,
+      latestVersion,
+      heartbeatAvailable: sources.heartbeatAvailable,
+    },
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
     // Same source as the wrapper's media queries, so the loading rows and the

@@ -23,6 +23,9 @@ import { StatusBadge, VersionBadge } from './cells';
 export interface IValidatorsMobileCardExtras {
   versionMap: Record<string, string>;
   latestVersion?: string;
+  /** Same reason as on the desktop row: with the heartbeat down every version
+   *  resolves to Unknown, which is also a real state here. */
+  heartbeatAvailable: boolean;
 }
 
 export interface IValidatorsMobileCardProps
@@ -46,6 +49,7 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
   index,
   versionMap,
   latestVersion,
+  heartbeatAvailable,
 }) => {
   const { t } = useTranslation(['validators']);
   const {
@@ -130,7 +134,16 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
         <VersionBadge
           version={version}
           isLatest={!!version && version === latestVersion}
-          unknownLabel={t('validators:List.UnknownVersion')}
+          unknownLabel={t(
+            heartbeatAvailable
+              ? 'validators:List.UnknownVersion'
+              : 'validators:List.VersionUnavailable',
+          )}
+          unknownTooltip={
+            heartbeatAvailable
+              ? undefined
+              : t('validators:List.VersionUnavailableTooltip')
+          }
         />
       </MobileMetaRow>
     </MobileListCard>

@@ -194,9 +194,10 @@ export interface INodeFigures {
 }
 
 /**
- * What the node itself reports, none of which the page reads today. Measured
- * on mainnet 2026-08-31: 214 heartbeats, 212 active, 70 observers, 97,33
- * percent uptime.
+ * Heartbeat-derived node counts. The card prints active over total and the
+ * observer count; `uptime` is computed and tested but not shown, because a
+ * node reports it since its own last restart. Measured on mainnet 2026-08-31:
+ * 214 heartbeats, 212 active, 70 observers, 97,33 percent uptime.
  *
  * `observers` is counted from the keys rather than from `peerType`, and the
  * two do not agree: `peerType === 'observer'` gives 86, because the node has

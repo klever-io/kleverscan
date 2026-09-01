@@ -148,6 +148,22 @@ export const VersionPill = styled(BadgePill)`
   font-family: inherit;
 `;
 
+/**
+ * The composition slot when its source failed.
+ *
+ * 49px because that is what the bar and its legend occupy: the loaded card
+ * measures 158px with them and 109 without, and the version card and the table
+ * sit under it, so a slot that collapses moves the page when a poll recovers.
+ */
+export const CompositionNotice = styled.p`
+  display: flex;
+  align-items: center;
+  min-height: 49px;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: ${props => props.theme.darkText};
+`;
+
 /** Left-aligned numerals. The `Amount*` pair flexes to the right edge, which
  *  is correct only in the columns the skin also right-aligns. */
 export const NumericCell = styled.span`

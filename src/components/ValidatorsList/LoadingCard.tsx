@@ -12,6 +12,7 @@ import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { LIST_STATES } from './summaryFigures';
 import {
+  CompositionNotice,
   LegendPlaceholderDot,
   LoadingTileSub,
   ValidatorsSummaryCard,
@@ -49,6 +50,27 @@ const TILE_KEYS = [
  * 109 without, and the version card and the table sit under it, so leaving the
  * space unheld moved the page 78px when a poll recovered mid-session.
  */
+/**
+ * The same slot when the list failed rather than when it is still coming.
+ *
+ * `CompositionPlaceholder` is a loading skeleton, and a failed list took that
+ * branch too, so the bottom of the card shimmered for the life of the tab
+ * while the tiles above it already said "Not available". It holds the same
+ * height, because the version card and the table sit underneath.
+ */
+export const CompositionUnavailable: React.FC = () => {
+  const { t } = useTranslation(['validators']);
+
+  return (
+    <CompositionNotice>
+      {t('validators:Summary.CompositionUnavailable', {
+        defaultValue:
+          'Could not load the validator composition. Please try refreshing the page.',
+      })}
+    </CompositionNotice>
+  );
+};
+
 export const CompositionPlaceholder: React.FC = () => {
   const { t } = useTranslation(['validators']);
 

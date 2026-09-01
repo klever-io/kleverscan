@@ -91,6 +91,29 @@ export const paginateValidators = (
   };
 };
 
+/**
+ * Whether the version filter can be answered at all.
+ *
+ * It has no server-side counterpart: it is resolved against the heartbeat
+ * join, so with either half of that join missing, "no validators on this
+ * version" is not a result, it is an inability to tell. Answering anyway
+ * produced a successful empty page: the table printed "Apparently no data
+ * here" for a deep link like `?version=v1.7.21` while the card above it said
+ * the version load had failed.
+ *
+ * Both halves, not just the heartbeat: the version of a validator is a join of
+ * the list against the map, and a missing list makes every lookup miss.
+ */
+export const canFilterByVersion = ({
+  version,
+  heartbeatAvailable,
+  validatorsAvailable,
+}: {
+  version?: string;
+  heartbeatAvailable: boolean;
+  validatorsAvailable: boolean;
+}): boolean => Boolean(version) && heartbeatAvailable && validatorsAvailable;
+
 /** The whole client-side path in one call, so the page holds none of it. */
 export const versionFilteredPage = (
   validators: IValidator[],

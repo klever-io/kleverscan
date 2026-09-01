@@ -20,6 +20,11 @@ import { NumericCell } from './styles';
 export interface IValidatorRowContext {
   versionMap: Record<string, string>;
   latestVersion?: string;
+  /** False when the heartbeat did not answer. Every version then resolves to
+   *  Unknown, which on this chain is also a real state for about a third of
+   *  the set, so without this flag an outage is indistinguishable from the
+   *  truth. */
+  heartbeatAvailable: boolean;
   labels: IValidatorRowLabels;
 }
 
@@ -54,7 +59,7 @@ export const validatorRowSections = (
     blsPublicKey,
   } = validator;
 
-  const { versionMap, latestVersion, labels } = context;
+  const { versionMap, latestVersion, heartbeatAvailable, labels } = context;
   const resolved = resolveValidatorVersion(blsPublicKey, versionMap);
   const version = resolved === UNKNOWN_VERSION ? undefined : resolved;
 
@@ -88,7 +93,12 @@ export const validatorRowSections = (
       <VersionBadge
         version={version}
         isLatest={!!version && version === latestVersion}
-        unknownLabel={labels.unknownVersion}
+        unknownLabel={
+          heartbeatAvailable ? labels.unknownVersion : labels.versionUnavailable
+        }
+        unknownTooltip={
+          heartbeatAvailable ? undefined : labels.versionUnavailableTooltip
+        }
       />
     ),
     capacity: () => (

@@ -21,6 +21,7 @@ import {
 } from './styles';
 import ValidatorsSummaryLoadingCard, {
   CompositionPlaceholder,
+  CompositionUnavailable,
 } from './LoadingCard';
 import {
   blockResult,
@@ -169,7 +170,16 @@ const ValidatorsSummary: React.FC = () => {
           successfully with zero validators is in its loaded state and used to
           fall between them: measured at 1440 the card was 108.5px against the
           157.5 of every other state, the exact hole this placeholder holds. */}
-      {composition.length === 0 && <CompositionPlaceholder />}
+      {composition.length === 0 &&
+        (validatorsAvailable ? (
+          <CompositionPlaceholder />
+        ) : (
+          /* A failed list used to take the placeholder branch, which is a
+             loading skeleton: the tiles said "Not available" while the bottom
+             of the card kept shimmering, and the recovery poll stops after ten
+             attempts, so it shimmered for the life of the tab. */
+          <CompositionUnavailable />
+        ))}
       {composition.length > 0 && (
         <>
           <DistBar

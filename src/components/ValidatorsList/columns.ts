@@ -42,6 +42,26 @@ export interface IValidatorColumn {
  * 74 validators sit at or above 99,5 percent, 71 below 25 percent, median 86,2.
  * It sits beside Commission because the two together are the delegation story.
  */
+/**
+ * The viewport width from which a validator fits on one row.
+ *
+ * Measured over 50 rows: the row's min-content is 1185px against a content box
+ * of `viewport - 32`, and the page stops scrolling sideways at 1220. 1240
+ * leaves margin, and matches what the transactions row needs, so the two lists
+ * change shape at the same width.
+ *
+ * Below this the list renders as cards. It used to squeeze instead, between
+ * the tablet breakpoint and 1300px, by truncating cells, narrowing the
+ * capacity track and dropping the cell padding to 7px. That squeeze still left
+ * the page 119px too wide at 1026, because nothing bounded the validator name;
+ * `AddressLink` is capped in the wrapper now, and the row is not asked to fit
+ * a viewport it does not fit.
+ *
+ * This lives next to the column list because that is what it measures: a new
+ * column or a wider cell moves it.
+ */
+export const ROW_LAYOUT_MIN_WIDTH = 1240;
+
 export const VALIDATOR_COLUMNS: IValidatorColumn[] = [
   { key: 'rank', header: 'Rank', i18nKey: 'validators:Table.Rank', width: 70 },
   {

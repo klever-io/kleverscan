@@ -2,7 +2,10 @@ import { Validators as Icon } from '@/assets/title-icons';
 import { klvAmount } from '@/components/DataList/format';
 import Title from '@/components/Layout/Title';
 import Table, { ITable } from '@/components/Table';
-import { RIGHT_ALIGNED_COLUMNS } from '@/components/ValidatorsList/columns';
+import {
+  RIGHT_ALIGNED_COLUMNS,
+  ROW_LAYOUT_MIN_WIDTH,
+} from '@/components/ValidatorsList/columns';
 import ValidatorsFilters from '@/components/ValidatorsList/Filters';
 import ValidatorsMobileCard, {
   type IValidatorsMobileCardExtras,
@@ -138,6 +141,9 @@ const Validators: React.FC<PropsWithChildren> = () => {
     mobileCardProps: { versionMap: sources.versionMap, latestVersion },
     singleLineSkeleton: true,
     rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
+    // Same source as the wrapper's media queries, so the loading rows and the
+    // loaded rows cannot end up in different shapes.
+    cardBreakpoint: ROW_LAYOUT_MIN_WIDTH,
     /* Keyed on when the shared query last settled, not on a shape derived from
        one of its halves. Both earlier keys did the latter and each left the
        other half's recovery invisible: on the list it missed a returning

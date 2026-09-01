@@ -1,6 +1,9 @@
 import {
+  AddressLink,
   BadgePill,
   compactFilterRow,
+  MobileListCard,
+  RowActions,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   IdentityCell,
@@ -14,10 +17,11 @@ import {
   HeaderItem,
   MobileCardItem,
   MobileHeader,
+  TableBody,
   TableRow,
 } from '@/components/Table/styles';
 import styled, { css, DefaultTheme } from 'styled-components';
-import { RIGHT_ALIGNED_COLUMNS } from './columns';
+import { RIGHT_ALIGNED_COLUMNS, ROW_LAYOUT_MIN_WIDTH } from './columns';
 
 /* ------------------------------- summary --------------------------------- */
 
@@ -155,9 +159,26 @@ export const NumericCell = styled.span`
 /** `nth-child` is 1-based; the column indexes are not. */
 const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
 
+/** `max-width: N` and `min-width: N` both match at exactly N, and the row
+ *  layout owns N. */
+const BELOW_ROW = `${ROW_LAYOUT_MIN_WIDTH - 0.02}px`;
+
+/** Where the shared table styles switch, below the width this list needs.
+ *  Between the two, the desktop table has to be undone by hand. */
+const SHARED_TABLE_MIN = '1025px';
+
 export const ValidatorsTableWrapper = styled.div`
   ${dataListTableSkin}
   ${compactFilterRow}
+
+  /* The copy and open buttons belong beside the status badge, at every card
+     width. RowActions carries margin-left:auto for the table row it was drawn
+     for, and the skin only zeroes it from the shared breakpoint up, so on a
+     card the pair drifted with the width: 192px past the badge at 480, 717 at
+     1024, then back against it at 1026. */
+  ${MobileListCard} ${RowActions} {
+    margin-left: 0;
+  }
 
   /* The shared Table's mobile loading rows stack a heading over a bar for each
      of the ten columns, which made a loading card 361px against the 149 of a
@@ -166,13 +187,14 @@ export const ValidatorsTableWrapper = styled.div`
      the header renders on desktop only), so this reshapes just them: no
      headings, two bars per row, and a 13px bar, which lands the loading card
      within 3px of the loaded one over ten rows (1565px against 1562). */
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+  @media screen and (max-width: ${BELOW_ROW}) {
     ${TableRow} ${MobileHeader} {
       display: none;
     }
 
     ${TableRow} ${MobileCardItem} {
       grid-column: span 1;
+      min-width: 0;
     }
 
     ${TableRow} [data-testid='skeleton'] {
@@ -180,57 +202,100 @@ export const ValidatorsTableWrapper = styled.div`
     }
   }
 
-  /* The row must never grow past the cards above it: blocks and
-     smart-contracts hold that line, and transactions breaking it is a known
-     defect, not the pattern. Ten nowrap cells put this table's min-content at
-     1194px, so between the tablet breakpoint and 1300px three things give
-     way, each verified live at 1030px (row 1194px -> 996px against a 998px
-     card, page overflow 0): cells may shrink and truncate, the capacity track
-     narrows, and the cell padding drops to 7px. */
-  @media screen and (min-width: ${props =>
-      props.theme.breakpoints.tablet}) and (max-width: 1300px) {
+  /* Between the shared breakpoint and this list's own, the rows are cards and
+     the shared stylesheet still lays the surface out as a table. A styled
+     component's own media query is not reachable from outside it, so it is
+     undone here.
+
+     The TableBody rule is not cosmetic: display:table wraps each
+     MobileListCard in an anonymous cell, which puts all ten of them side by
+     side on a single line. */
+  @media screen and (min-width: ${SHARED_TABLE_MIN}) and (max-width: ${BELOW_ROW}) {
+    ${TableBody} {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0;
+      border: none;
+      background-image: none;
+    }
+
     ${TableRow} {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      padding: 16px;
+      border-radius: 16px;
+      border: solid 1px
+        ${props =>
+          props.theme.dark ? props.theme.darkGray : props.theme.black10};
+      background-color: ${props => props.theme.white};
+    }
+
+    /* Through TableRow to clear the skin's own :first-child and :last-child
+       cell padding, which matches on class count alone. */
+    ${TableRow} ${MobileCardItem} {
+      display: flex;
+      flex-direction: column;
+      width: auto;
+      max-width: none;
+      height: auto;
+      padding: 0;
+      border-bottom: none;
+      font-size: 0.75rem;
+    }
+
+    ${TableRow} ${MobileCardItem} a,
+    ${TableRow} ${MobileCardItem} span {
+      height: auto;
       min-width: 0;
-    }
-
-    ${TableRow} > div {
-      overflow: hidden;
-    }
-
-    ${IdentityCell} {
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    ${IdentityCell} a {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      min-width: 0;
-    }
-
-    ${ShareTrack} {
-      width: 90px;
-    }
-
-    ${MobileCardItem} {
-      padding: 8px 7px;
-    }
-
-    ${MobileCardItem}:first-child {
-      padding-left: 14px;
-    }
-
-    ${MobileCardItem}:last-child {
-      padding-right: 14px;
-    }
-
-    ${HeaderItem} {
-      padding-left: 7px;
-      padding-right: 7px;
+      white-space: normal;
     }
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    /* 8px of side padding rather than the skin's 12, and 12 rather than 16 on
+       the outer edges, the same as the transactions row: ten columns is more
+       than the skin's spacing was drawn for, and it spent 248px of the row on
+       padding. This spends 168, which is the difference between a row that
+       needs a 1297px viewport and one that needs 1217. */
+    ${MobileCardItem} {
+      padding: 8px;
+    }
+
+    ${MobileCardItem}:first-child {
+      padding-left: 12px;
+    }
+
+    ${MobileCardItem}:last-child {
+      padding-right: 12px;
+    }
+
+    ${HeaderItem} {
+      padding: 12px 8px;
+    }
+
+    ${HeaderItem}:first-child {
+      padding-left: 12px;
+    }
+
+    ${HeaderItem}:last-child {
+      padding-right: 12px;
+    }
+
+    /* Whoever runs a validator chooses its name, so this column has no
+       maximum of its own and one long name would widen the row past the
+       breakpoint that was measured for it. Same treatment as the transactions
+       To column: the longest name on mainnet renders at 219px (26 characters,
+       "PRESIDENT2002-The-Countess") and the address it falls back to at 194,
+       so 220 holds every one of them unclipped and bounds the rest. */
+    ${IdentityCell} ${AddressLink} {
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     /* One row height across every data-list table on the site. */
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};
@@ -253,12 +318,23 @@ export const ValidatorsTableWrapper = styled.div`
       text-underline-offset: 0.2rem;
     }
 
+    /* text-align does not reach the items of a flex container, and the cell
+       rules make every span in a cell one. Missed wraps its figure in a
+       Tooltip, whose own wrapper is that flex container: the figure sat at the
+       left of a right-aligned column, 30px short of where Produced beside it
+       ends. The second selector aims at the wrapper rather than at Missed, so
+       a tooltip added to another of these columns cannot repeat it. */
     ${rightAligned
       .map(
         position => `
     ${MobileCardItem}:nth-child(${position}),
     ${HeaderItem}:nth-child(${position}) {
       text-align: right;
+    }
+
+    ${MobileCardItem}:nth-child(${position}) > span,
+    ${MobileCardItem}:nth-child(${position}) > div {
+      justify-content: flex-end;
     }`,
       )
       .join('')}

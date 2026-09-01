@@ -136,7 +136,11 @@ export const VersionBadge: React.FC<{
   if (!version) {
     const label = <AmountMuted>{unknownLabel}</AmountMuted>;
     if (!unknownTooltip) return label;
-    return <Tooltip msg={unknownTooltip} focusable Component={() => label} />;
+    return (
+      <Tooltip msg={unknownTooltip} focusable>
+        {label}
+      </Tooltip>
+    );
   }
   return (
     <VersionPill $variant={isLatest ? 'success' : 'warning'}>

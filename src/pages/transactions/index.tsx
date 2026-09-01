@@ -26,10 +26,10 @@ import {
   valueDirection,
 } from '@/components/TransactionsList/rowDetails';
 import TransactionsSummary from '@/components/TransactionsList/Summary';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import {
   ContractMark,
   DirectionStatusBadge,
-  TransactionsTableWrapper,
 } from '@/components/TransactionsList/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
@@ -496,7 +496,9 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 150,
+      // Follows ContractName's own box, which holds a 16-character address at
+      // 160px; 150 here left the column hint disagreeing with its content.
+      width: 160,
     },
     inOut: {
       element: props => (
@@ -585,9 +587,7 @@ const Transactions: React.FC<PropsWithChildren> = () => {
           onto `address` before the request goes out. */}
       {listsWholeChain(router) && <TransactionsSummary />}
 
-      <TransactionsTableWrapper>
-        <Table {...tableProps} />
-      </TransactionsTableWrapper>
+      <TransactionsTable {...tableProps} />
     </Container>
   );
 };

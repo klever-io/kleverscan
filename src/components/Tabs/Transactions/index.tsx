@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
-import { TransactionsTableWrapper } from '@/components/TransactionsList/styles';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import { useTransactionRowSections } from '@/pages/transactions';
 import { IInnerTableProps } from '@/types/index';
@@ -31,11 +31,7 @@ const Transactions: React.FC<PropsWithChildren<ITransactionsProps>> = props => {
     singleLineSkeleton: true,
   };
 
-  return (
-    <TransactionsTableWrapper>
-      <Table {...tableProps} />
-    </TransactionsTableWrapper>
-  );
+  return <TransactionsTable {...tableProps} />;
 };
 
 export default Transactions;

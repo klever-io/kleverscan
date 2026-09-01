@@ -15,8 +15,12 @@ import {
 } from '@/components/DataList/styles';
 import SummaryLoading from '@/components/DataList/SummaryLoading';
 import {
+  FloatContainer,
+  HeaderItem,
   MobileCardItem,
   MobileHeader,
+  TableBody,
+  TableControls,
   TableRow,
 } from '@/components/Table/styles';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
@@ -31,11 +35,22 @@ import styled, { css } from 'styled-components';
  */
 const BELOW_ROW_LAYOUT = '767.98px';
 
-/** Same reason one breakpoint up: dataListTableSkin switches to the desktop
- *  table at min-width 1025, and a max-width 1025 rule here matched at the same
- *  width, so 1025 drew the stacked filter grid above a desktop table with the
- *  page-size controls 118px lower than at 1026. */
-const BELOW_TABLE_LAYOUT = '1024.98px';
+/** Where the shared table styles switch, below the width this list needs.
+ *  Between the two, this file has to undo them by hand. */
+const SHARED_TABLE_MIN = '1025px';
+
+interface IRowLayoutWidth {
+  /** The viewport width from which this list's row fits, from
+   *  `rowLayoutMinWidth`; it differs by one column between the variants. */
+  $rowLayoutMin: number;
+}
+
+/** Same reason as BELOW_ROW_LAYOUT one breakpoint up: `max-width: N` and
+ *  `min-width: N` both match at exactly N, and the row layout owns N. */
+const belowRow = (props: IRowLayoutWidth): string =>
+  `${props.$rowLayoutMin - 0.02}px`;
+
+const fromRow = (props: IRowLayoutWidth): string => `${props.$rowLayoutMin}px`;
 
 /**
  * The contract count inside the multi-contract badge. A `b`, not a span:
@@ -86,22 +101,26 @@ export const DirectionStatusBadge = styled.span<{ $variant: BadgeVariant }>`
 /**
  * The shared data-list skin plus what the single-line transactions table
  * needs on top of it: the 60px row with one 20px content line, the badge
- * carve-outs, and the link affordances. No overflow container on purpose:
- * a contained scroll was measured to clip the hover dropdowns on the bottom
- * rows, hide columns without any affordance, and silence the sticky header,
- * while wide data past its cap still pushed the page sideways. On desktop
- * widths the table does not always fit below roughly 1170px; there the page
- * scrolls horizontally like the app's other wide tables, and every popover,
- * key control and the sticky header keep working.
+ * carve-outs, the link affordances, and the two layouts either side of
+ * ROW_LAYOUT_MIN_WIDTH.
+ *
+ * No overflow container on purpose: a contained scroll was measured to clip
+ * the hover dropdowns on the bottom rows, hide columns without any
+ * affordance, and silence the sticky header. The row is not made to fit a
+ * narrow viewport either; it is simply not used on one, which is what keeps
+ * the page from scrolling sideways at any width.
  */
-export const TransactionsTableWrapper = styled.div`
+export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
+  ${dataListTableSkin}
+
+  /* ---------------------------- the card band ----------------------------- */
+
   /* The shared Table's mobile loading rows keep a heading over a bar for every
      column, which made the loading row 398px wide inside a 358px screen at
      390px (24px of page overflow) and the card far taller than a loaded one.
-     Loading rows are the only place TableRow exists below the tablet width
-     here: loaded rows are MobileListCards and the header renders on desktop
-     only. */
-  @media screen and (max-width: ${BELOW_TABLE_LAYOUT}) {
+     Loading rows are the only place TableRow exists in this band: loaded rows
+     are MobileListCards and the header renders on the row layout only. */
+  @media screen and (max-width: ${belowRow}) {
     /* minmax(0, 1fr), not the shared repeat(2, 1fr): an auto minimum lets a
        wide cell push the track, and the loading row came out 398px inside a
        358px screen at 390. */
@@ -124,6 +143,56 @@ export const TransactionsTableWrapper = styled.div`
     }
   }
 
+  /* Between the shared breakpoint and this list's own, the rows are cards and
+     the shared stylesheet still lays the surface out as a table. A styled
+     component's own media query is not reachable from outside it, so it is
+     undone here.
+
+     The TableBody rule is not cosmetic: display:table wraps each
+     MobileListCard in an anonymous cell, which puts all ten of them side by
+     side on a single line. */
+  @media screen and (min-width: ${SHARED_TABLE_MIN}) and (max-width: ${belowRow}) {
+    ${TableBody} {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0;
+      border: none;
+      background-image: none;
+    }
+
+    ${TableRow} {
+      display: grid;
+      gap: 4px;
+      padding: 16px;
+      border-radius: 16px;
+      border: solid 1px
+        ${props =>
+          props.theme.dark ? props.theme.darkGray : props.theme.black10};
+      background-color: ${props => props.theme.white};
+    }
+
+    /* Through TableRow to clear the skin's own :first-child and :last-child
+       cell padding, which matches on class count alone. */
+    ${TableRow} ${MobileCardItem} {
+      display: flex;
+      flex-direction: column;
+      width: auto;
+      max-width: none;
+      height: auto;
+      padding: 0;
+      border-bottom: none;
+      font-size: 0.75rem;
+    }
+
+    ${TableRow} ${MobileCardItem} a,
+    ${TableRow} ${MobileCardItem} span {
+      height: auto;
+      min-width: 0;
+      white-space: normal;
+    }
+  }
+
   /* The card header holds a hash, two badges, a timestamp and two buttons on
      one nowrap line. Below the mobile width that is 15px more than it has, and
      the hash is the element that gives: measured at 390 and 480px, it was
@@ -135,33 +204,118 @@ export const TransactionsTableWrapper = styled.div`
     }
   }
 
-  ${dataListTableSkin}
+  /* --------------------- filter bar and page-size controls ----------------- */
 
-  /* Four filters as a 2x2 grid below the tablet width, where the shared bar
-     stacks them as four full-width rows. Two 13rem controls plus the gap need
-     roughly 480px, so below that the stack returns. The pair pages with one or
-     two filters run the compact one-row layout instead; four in a row is what
-     this grid replaces vertically. */
-  @media screen and (max-width: ${BELOW_TABLE_LAYOUT}) {
+  /* Four filters need 878px and the page-size controls 265, which with the
+     16px gap between them fit side by side from a 1191px viewport up. Below
+     that the shared bar wraps them into each other; here they part instead,
+     the filters as a 2x2 block on a full-width row and the controls on their
+     own row underneath.
+
+     The controls keep one line at every width: 161px of pager plus the 88px
+     of refresh and export is 265, which fits inside the 288px content box a
+     320px screen leaves. nowrap says so rather than leaving it to luck. */
+  @media screen and (max-width: ${belowRow}) {
+    ${FloatContainer} {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
     ${FilterContainer} {
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
 
+    /* Each control fills its half rather than sitting at 13rem inside it: the
+       shared Filter caps itself at fit-content from the tablet width up, which
+       left a "Coin" dropdown 208px wide against a 578px column. */
     ${FilterContainer} > div {
-      width: auto;
+      width: 100%;
+      max-width: none;
       min-width: 0;
+    }
+
+    ${TableControls} {
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      margin-left: auto;
     }
   }
 
+  /* Two 13rem controls plus their gap need roughly 480px; below that the 2x2
+     becomes a stack. */
   @media screen and (max-width: 480px) {
     ${FilterContainer} {
       grid-template-columns: 1fr;
     }
   }
 
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+  /* Selecting Contract = Buy adds a fifth filter, and five of them are 1098px
+     against a 1280px content box, so they can never share a row with the
+     controls whatever the viewport. Read off the DOM rather than passed as a
+     prop: the bar decides for itself how many filters it renders. */
+  @media screen and (min-width: ${fromRow}) {
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5)) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5))
+      ${FilterContainer} {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5))
+      ${FilterContainer}
+      > div {
+      width: 100%;
+      max-width: none;
+      min-width: 0;
+    }
+
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5))
+      ${TableControls} {
+      justify-content: flex-end;
+    }
+  }
+
+  /* ----------------------------- the row band ------------------------------ */
+
+  @media screen and (min-width: ${fromRow}) {
+    /* 8px of side padding rather than the skin's 12, and 12 rather than 16 on
+       the two outer edges. Nine columns is more than any other list here
+       carries, and the skin's spacing spent 224px of the row on padding
+       against 1045px of text; this spends 152. The 72px it frees is what lets
+       the row fit a 1280px laptop instead of asking for 1360. The header takes
+       the same values or the columns stop lining up. */
+    ${MobileCardItem} {
+      padding: 8px;
+    }
+
+    ${MobileCardItem}:first-child {
+      padding-left: 12px;
+    }
+
+    ${MobileCardItem}:last-child {
+      padding-right: 12px;
+    }
+
+    ${HeaderItem} {
+      padding: 12px 8px;
+    }
+
+    ${HeaderItem}:first-child {
+      padding-left: 12px;
+    }
+
+    ${HeaderItem}:last-child {
+      padding-right: 12px;
+    }
+
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};
       /* Inherited by the anonymous text of the amount sections, which the
@@ -269,8 +423,11 @@ export const PageSummaryLoading = styled(SummaryLoading)`
  * than ellipsises and grows to fit whatever it is given. Measured at a 1280px
  * viewport: a 200 character name widened the page to 3017px, and even a name
  * capped at 33 characters reached 1400px, so bounding the text alone does not
- * hold the layout. The cap here matches the column's own 150px, which is what
- * the truncated address it replaces was sized for.
+ * hold the layout.
+ *
+ * 160px because that is what the box actually holds: a 16-character truncated
+ * bech32 address renders at 160px, and the 150 this used to carry cut its last
+ * character off in seven of ten rows, at every width from 1100 to 1920.
  */
 export const ContractName = styled.span`
   ${inCard('inline-block')}
@@ -280,8 +437,8 @@ export const ContractName = styled.span`
        readable, and a box that grows on arrival drags every column with it.
        Measured before this was fixed: all nine columns changed width when the
        names resolved, moving the row under the reader's pointer. */
-    min-width: 150px;
-    max-width: 150px;
+    min-width: 160px;
+    max-width: 160px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -382,11 +539,17 @@ export const CardRow = styled.div`
   gap: 8px;
   min-width: 0;
 
-  /* Only phones keep the label-left value-right spread; from tablet width
-     the card spans the page and space-between would put half a screen of
-     gutter between a label and its value. */
+  /* Phones keep the label-left value-right spread. In the lane grid the label
+     goes above its value instead: side by side inside one lane, a label and an
+     address want 236px (100 for "Contract Address", 128 for the address, 8 of
+     gap) where a lane is 214px at a 1000px viewport and 189 at 900, and it was
+     the address that gave. Measured before this changed: five values clipped
+     at 1000, six at 900, thirty at 820. Stacked, the address has the whole
+     lane and clips at none of them. */
   @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
   }
 `;
 

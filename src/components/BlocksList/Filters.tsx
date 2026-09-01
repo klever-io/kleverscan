@@ -1,5 +1,5 @@
 import DateFilter from '@/components/DateFilter';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
+import { CompactFilterBar } from '@/components/DataList/styles';
 import React from 'react';
 
 /**
@@ -8,9 +8,9 @@ import React from 'react';
  * `block/list` documents and what `blockListCall` forwards.
  */
 const BlocksFilters: React.FC = () => (
-  <FilterContainer>
+  <CompactFilterBar>
     <DateFilter />
-  </FilterContainer>
+  </CompactFilterBar>
 );
 
 export default BlocksFilters;

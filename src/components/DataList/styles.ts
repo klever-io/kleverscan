@@ -1,13 +1,19 @@
 import {
+  ExportContainer,
+  FloatContainer,
   HeaderItem,
+  LimitContainer,
   MobileCardItem,
   TableBody,
+  TableControls,
   TableEmptyData,
   TableGradientBorder,
   TableRow,
 } from '@/components/Table/styles';
 import Link from 'next/link';
 import { mix, transparentize } from 'polished';
+import { Content as FilterContent } from '@/components/Filter/styles';
+import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import styled, { css, DefaultTheme, keyframes } from 'styled-components';
 
 /**
@@ -422,7 +428,10 @@ export const TilesGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 24px;
 
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+  /* 767.98, not 768: a max-width and a min-width rule on the same value both
+     match at that width, and the pages that switch their own layout there
+     ended up with a two-column tile grid that exists at no other width. */
+  @media screen and (max-width: 767.98px) {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
@@ -543,6 +552,102 @@ export const LegendDot = styled.span<{ $color: string }>`
   border-radius: 50%;
   flex-shrink: 0;
   background-color: ${props => props.$color};
+`;
+
+/* --------------------------- compact filter row --------------------------- */
+
+/**
+ * A filter bar of at most two dropdowns beside the page-size controls, on one
+ * row for as long as they fit.
+ *
+ * The shared FilterContainer stacks below the tablet breakpoint: each filter
+ * full-width, controls on a row of their own. That suits the pages with four
+ * filters; for one or two it wastes two rows on three small controls
+ * (decided on /validators, 2026-08-31, then rolled out to the other short
+ * bars). Each filter keeps the 13rem every filter measures on desktop; on
+ * mobile the pair spreads over the full width at half each.
+ */
+export const CompactFilterBar = styled(FilterContainer)`
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    flex-direction: row;
+    width: auto;
+
+    > div {
+      width: auto;
+      flex: 0 0 13rem;
+    }
+  }
+
+  /* On mobile a PAIR takes the whole width, half each, and the page-size
+     controls drop to the row below. The base bar's 13rem minimum has to go
+     with it: two of those overflow a 390px screen. Read off the DOM instead of
+     a prop so a page that gains or loses a filter cannot get it wrong; a lone
+     filter keeps its 13rem and stays beside the controls. */
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    &:has(> div + div) {
+      width: 100%;
+
+      > div {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      /* The minimum has to reach the dropdown itself: Filter's own Content
+         carries a 12rem minimum, so at 320px the pair kept 168px each inside
+         139px wrappers and pushed the page sideways by 13px, measured. */
+      ${FilterContent} {
+        min-width: 0;
+      }
+    }
+  }
+
+  /* Where even a lone filter no longer fits beside the page-size controls:
+     182px for the filter, 214 for the pills and the button, the 16px gap and
+     the container's padding come to 444, so 443 is the first width that wraps.
+     It takes the whole row there rather than leaving the dead space beside
+     it. */
+  @media (max-width: 443px) {
+    width: 100%;
+
+    > div {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+`;
+
+/** The wrapper-side half of the same decision: keeps the shared
+ *  FloatContainer a flex row below the tablet breakpoint, where it otherwise
+ *  turns into a grid that parks the controls under the filter bar. */
+export const compactFilterRow = css`
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    ${FloatContainer} {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      flex-wrap: wrap;
+    }
+
+    /* nowrap so the refresh button stays beside the page-size pills: the
+       wrapping row always had a width where the pills still fit and the button
+       alone dropped under them. Same fix as /smart-contracts. */
+    ${TableControls} {
+      margin-left: auto;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Both controls carry a 10px bottom margin below this width, put there for
+       the stacked layout this row replaces. With align-items on the ends it
+       lifted the pills 10px above the filter bottoms, measured on all three
+       short-bar pages; leaving it on the button alone hung it 10px above the
+       pills. */
+    ${LimitContainer},
+    ${ExportContainer} {
+      margin-bottom: 0;
+    }
+  }
 `;
 
 /* ------------------------------ mobile card ------------------------------ */

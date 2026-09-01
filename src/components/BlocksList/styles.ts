@@ -1,11 +1,17 @@
 import {
+  CompactFilterBar,
+  compactFilterRow,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   SummaryCard,
   Tile,
   TilesGrid,
 } from '@/components/DataList/styles';
-import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
+import {
+  HeaderItem,
+  MobileCardItem,
+  TableControls,
+} from '@/components/Table/styles';
 import styled, { css, DefaultTheme } from 'styled-components';
 import { RIGHT_ALIGNED_COLUMNS } from './columns';
 
@@ -114,6 +120,42 @@ const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
 
 export const BlocksTableWrapper = styled.div`
   ${dataListTableSkin}
+  ${compactFilterRow}
+
+  /* Below this width the three controls do not fit on one line at all: the
+     switch, the pills and the button measure 355px against the 328 a 360px
+     screen leaves, which pushed the whole page sideways (measured: 11px of
+     document overflow at 360, 51 at 320). The shared row forbids wrapping so
+     the refresh button can never leave the pills; here the switch takes a line
+     of its own instead, which keeps that rule intact. */
+  @media screen and (max-width: 374px) {
+    ${TableControls} {
+      flex-wrap: wrap;
+      /* The shared row also pins flex-shrink to 0; without lifting that the
+         box stays at its 355px max-content and the wrap changes nothing. */
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    ${TableControls} > *:first-child {
+      flex-basis: 100%;
+    }
+  }
+
+  /* The auto-update toggle rides along with the page-size controls here, so
+     the row runs out at 585px rather than the 444 the shared rule assumes:
+     measured, 182px filter, 355 controls, the 16px gap and the padding. Below
+     that the lone date filter takes the row instead of leaving dead space. */
+  @media screen and (max-width: 584px) {
+    ${CompactFilterBar} {
+      width: 100%;
+
+      > div {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
+  }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     /* One row height across every data-list table on the site. */
@@ -169,11 +211,8 @@ export const AutoUpdateContainer = styled.div`
   color: ${props => props.theme.black};
   font-size: 0.9rem;
 
-  /* The bottom margin LimitContainer carries below this width; the block
-     aligns its children on their bottom edge, so without it the switch sits
-     10px under the page-size buttons. Ends at the buttons' baseline, which is
-     also why the label needs no extra offset above that width. */
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    margin-bottom: 10px;
-  }
+  /* No offset of its own: it mirrored the 10px bottom margin LimitContainer
+     used to carry below the tablet width, which compactFilterRow now zeroes.
+     Keeping the mirror after the original left this switch floating 10px
+     above the pills, measured on every width from 600 to 1024. */
 `;

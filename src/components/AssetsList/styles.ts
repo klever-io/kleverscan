@@ -1,4 +1,5 @@
 import {
+  AssetName,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   inCard,
@@ -253,6 +254,19 @@ export const AssetsTableWrapper = styled.div`
   }
 
   @media screen and (min-width: ${ROW_LAYOUT_MIN_WIDTH}px) {
+    /* Whoever issues an asset chooses its name, so this column has no maximum
+       of its own. AssetName carries max-width:100%, which resolves against a
+       shrink-to-fit table cell and so bounds nothing, and the shared cell rules
+       give it min-width:fit-content, which beats a max-width outright.
+       Measured with a 120-character name before these two lines: the name
+       rendered 1162px wide, the row 2046, and the page scrolled 688px
+       sideways. 240px clears the widest name on chain, 220px over 31
+       characters. */
+    ${AssetName} {
+      min-width: 0;
+      max-width: 240px;
+    }
+
     /* One row height across the whole assets section. */
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};

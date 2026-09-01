@@ -306,6 +306,13 @@ export const ValidatorsTableWrapper = styled.div`
        "PRESIDENT2002-The-Countess") and the address it falls back to at 194,
        so 220 holds every one of them unclipped and bounds the rest. */
     ${IdentityCell} ${AddressLink} {
+      /* min-width beside the max, and it is the load-bearing half: the shared
+         cell rules give every link in a cell min-width:fit-content, and a used
+         min-width beats a max-width, so the cap alone was inert. Measured with
+         a 120-character name before this line existed: the link rendered
+         1008px wide, the row 1953, and the page scrolled 595px sideways, which
+         is the whole failure the cap exists to stop. */
+      min-width: 0;
       max-width: 220px;
       overflow: hidden;
       text-overflow: ellipsis;

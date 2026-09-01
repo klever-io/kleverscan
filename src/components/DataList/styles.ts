@@ -96,14 +96,30 @@ export const VisuallyHidden = styled.span`
      them whole sentences in caps, which VoiceOver spells out. */
   text-transform: none;
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
   clip: rect(0 0 0 0);
-  white-space: nowrap;
-  border: 0;
+
+  /* Doubled class, the same trick inCard uses and for the same reason: the
+     cell rules give every span inside a data-list cell display:flex, a height
+     and min-width:fit-content, and a min-width beats a width. This
+     box therefore grew to the full width of the sentence it hides, measured at
+     482px in the assets rewards column, and being absolutely positioned it
+     took the page with it: 358px of horizontal scroll at a 1440 viewport.
+     Fourteen of the 24 on that page were oversized, and four of the six list
+     pages carried at least one. */
+  && {
+    display: block;
+    width: 1px;
+    min-width: 0;
+    max-width: 1px;
+    height: 1px;
+    min-height: 0;
+    max-height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    white-space: nowrap;
+    border: 0;
+  }
 `;
 
 /* --------------------------------- badges -------------------------------- */

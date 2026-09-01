@@ -5,7 +5,6 @@ import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
   BadgePill,
-  MobileBarRow,
   MobileListCard,
   MobileMetaItem,
   MobileMetaRow,
@@ -21,7 +20,12 @@ import AssetIdentity from '@/components/DataList/AssetIdentity';
 import { IAsset } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { IoIosInfinite } from 'react-icons/io';
-import { MobileCapCaption, RewardsRate, RewardsUnit } from './styles';
+import {
+  MobileCapCaption,
+  MobileCapRow,
+  RewardsRate,
+  RewardsUnit,
+} from './styles';
 import { assetSupplyViews, getCapUsage, getRewardsModel } from './helpers';
 import { ASSET_BADGE_TOOLTIPS, FPR_TOOLTIP } from './badgeTexts';
 
@@ -117,10 +121,10 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
           {formatAmount(circulating / precisionDivisor)} {ticker}
         </strong>
       </MobileTotalRow>
-      <MobileBarRow>
+      <MobileCapRow>
         {cap.hasCap ? (
           <>
-            <ShareTrack $fluid aria-hidden="true">
+            <ShareTrack aria-hidden="true">
               <ShareFill $delay={Math.min(index, 15) * 20}>
                 {cap.usedShare > 0 && (
                   <ShareSegment
@@ -142,7 +146,7 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
             <IoIosInfinite size={14} /> {t('assets:List.UnlimitedSupply')}
           </MobileCapCaption>
         )}
-      </MobileBarRow>
+      </MobileCapRow>
       <MobileMetaRow>
         <MobileMetaItem>
           {t('assets:List.Staked')}{' '}

@@ -17,6 +17,7 @@ import AssetsMobileCard from '@/components/AssetsList/MobileCard';
 import RegistryStrip from '@/components/AssetsList/RegistryStrip';
 import {
   AssetsTableWrapper,
+  ROW_LAYOUT_MIN_WIDTH,
   CapContext,
   RewardsCell,
   RewardsMuted,
@@ -391,6 +392,9 @@ const Assets: React.FC<PropsWithChildren> = () => {
     Filters: AssetsFilters,
     MobileCard: AssetsMobileCard,
     singleLineSkeleton: true,
+    // Same constant the wrapper's media queries read, so the loading rows and
+    // the loaded rows cannot end up in different shapes.
+    cardBreakpoint: ROW_LAYOUT_MIN_WIDTH,
     rightAlignedSkeletonColumns: [1, 2, 4, 5],
   };
 

@@ -170,6 +170,18 @@ export const AssetsTableWrapper = styled.div`
     margin-left: 0;
   }
 
+  /* On a phone the pair sits at the card's right edge, the same place on every
+     card. Beside the identity it tracked the name's width, which varies per
+     row: measured at 360 the icons landed anywhere from 107px to 212px in, so
+     scanning a column of cards the buttons never sat still. Above this width
+     the card is wide enough for them to stay next to the identity, which is
+     where they belong when there is room. */
+  @media screen and (max-width: 767.98px) {
+    ${MobileListCard} ${RowActions} {
+      margin-left: auto;
+    }
+  }
+
   /* The cap bar shares the Circulating line only where that line has room for
      it. A phone card is about 300px wide, and the 150px track plus its caption
      left the figure 90px, which broke "10.99 M KFI" across two lines. Below

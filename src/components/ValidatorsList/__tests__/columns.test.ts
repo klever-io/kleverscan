@@ -17,13 +17,27 @@ describe('VALIDATOR_COLUMNS', () => {
     });
   });
 
-  it('leaves exactly one column free to take the remaining width', () => {
-    // On desktop a cell without a width is `fit-content`; more than one of
-    // those and the columns share the slack unpredictably.
+  /* Every column carries a width, and none is left to absorb the remainder.
+     An unhinted column takes whatever the others leave, and that differs
+     between a row of skeleton bars and a row of real values: measured at 1440,
+     the validator column stood at 295px while loading and 320 once loaded, and
+     every heading after it slid up to 56px sideways when the data arrived.
+     Pinned, the loading and loaded headings sit on the same pixel. */
+  it('gives every column a width, leaving no column to absorb the slack', () => {
     const flexible = VALIDATOR_COLUMNS.filter(column => !column.width);
-    expect(flexible.map(column => column.key)).toEqual<ValidatorColumnKey[]>([
-      'validator',
-    ]);
+    expect(flexible.map(column => column.key)).toEqual<ValidatorColumnKey[]>(
+      [],
+    );
+  });
+
+  /* And they have to add up to the row, or `auto` starts redistributing the
+     difference by content again, which is the same defect by another route. */
+  it('adds up to the width the row actually occupies', () => {
+    const total = VALIDATOR_COLUMNS.reduce(
+      (sum, column) => sum + (column.width ?? 0),
+      0,
+    );
+    expect(total).toBe(1278);
   });
 
   it('puts capacity directly after commission', () => {

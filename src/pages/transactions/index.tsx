@@ -357,7 +357,7 @@ export const transactionRowSections = (
       span: 1,
       // Hinted like every other column: the one unhinted column would
       // absorb all of the table's slack and open a gulf behind the hash.
-      width: 190,
+      width: 186,
     },
     type: {
       element: props => (
@@ -381,14 +381,14 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 170,
+      width: 191,
     },
     block: {
       element: props => (
         <ExplorerLink type="block" value={String(blockNum || 0)} compact />
       ),
       span: 1,
-      width: 95,
+      width: 98,
     },
     age: {
       element: props => (
@@ -401,7 +401,7 @@ export const transactionRowSections = (
         />
       ),
       span: 1,
-      width: 110,
+      width: 114,
     },
     from: {
       element: props => (
@@ -425,7 +425,7 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 140,
+      width: 182,
     },
     direction: {
       element: props => {
@@ -451,7 +451,7 @@ export const transactionRowSections = (
         );
       },
       span: 1,
-      width: 36,
+      width: 48,
     },
     to: {
       element: props => (
@@ -498,7 +498,7 @@ export const transactionRowSections = (
       span: 1,
       // Follows ContractName's own box, which holds a 16-character address at
       // 160px; 150 here left the column hint disagreeing with its content.
-      width: 160,
+      width: 205,
     },
     inOut: {
       element: props => (
@@ -521,7 +521,7 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      width: 130,
+      width: 150,
     },
     fee: {
       element: props => (
@@ -530,7 +530,7 @@ export const transactionRowSections = (
         </span>
       ),
       span: 1,
-      width: 100,
+      width: 104,
     },
   };
 

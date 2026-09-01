@@ -191,6 +191,18 @@ export const ValidatorsTableWrapper = styled.div`
     margin-left: 0;
   }
 
+  /* On a phone the pair sits at the card's right edge, the same place on every
+     card. Beside the identity it tracked the name's width, which varies per
+     row: measured at 360 the icons landed anywhere from 107px to 212px in, so
+     scanning a column of cards the buttons never sat still. Above this width
+     the card is wide enough for them to stay next to the identity, which is
+     where they belong when there is room. */
+  @media screen and (max-width: 767.98px) {
+    ${MobileListCard} ${RowActions} {
+      margin-left: auto;
+    }
+  }
+
   /* The shared Table's mobile loading rows stack a heading over a bar for each
      of the ten columns, which made a loading card 361px against the 149 of a
      loaded one, measured at 390px. Loading rows are the only place TableRow

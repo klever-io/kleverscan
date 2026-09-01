@@ -45,12 +45,6 @@ const TILE_KEYS = [
 ] as const;
 
 /**
- * The bar and its legend, in the two states that have neither: still loading,
- * and loaded from a source that failed. The loaded card is 158px with them and
- * 109 without, and the version card and the table sit under it, so leaving the
- * space unheld moved the page 78px when a poll recovered mid-session.
- */
-/**
  * The same slot when the list failed rather than when it is still coming.
  *
  * `CompositionPlaceholder` is a loading skeleton, and a failed list took that
@@ -71,6 +65,14 @@ export const CompositionUnavailable: React.FC = () => {
   );
 };
 
+/**
+ * The bar and its legend while they are still on their way, and for a list
+ * that answered with no validators at all. A list that FAILED gets
+ * `CompositionUnavailable` above instead, so this shape never stands for an
+ * outage. The loaded card is 158px with the bar and legend and 109 without,
+ * and the version card and the table sit under it, so leaving the space unheld
+ * moved the page 78px when a poll recovered mid-session.
+ */
 export const CompositionPlaceholder: React.FC = () => {
   const { t } = useTranslation(['validators']);
 

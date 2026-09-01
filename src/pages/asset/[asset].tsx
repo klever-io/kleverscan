@@ -1,7 +1,7 @@
 import { AssetSummary } from '@/components/Asset/AssetSummary';
 import { AssetTabs } from '@/components/Asset/AssetTabs';
 import Tabs, { ITabs } from '@/components/NewTabs';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
 import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
 import TransactionsTable from '@/components/TransactionsList/Table';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';

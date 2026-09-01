@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react';
 import { NonceDetails } from '@/components/Asset/NFTDetails';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
 import TransactionsTable from '@/components/TransactionsList/Table';
 import {
   CardContent,

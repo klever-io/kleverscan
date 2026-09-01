@@ -33,9 +33,6 @@ export const ROW_LAYOUT_MIN_WIDTH = 1240;
  *  layout owns N. */
 const BELOW_ROW = `${ROW_LAYOUT_MIN_WIDTH - 0.02}px`;
 
-/** Where the shared table styles switch, below the width this list needs. */
-const SHARED_TABLE_MIN = '1025px';
-
 /* ------------------------------ supply cells ----------------------------- */
 
 export const SupplyCell = styled.div`
@@ -212,7 +209,8 @@ export const AssetsTableWrapper = styled.div`
     }
   }
 
-  @media screen and (min-width: ${SHARED_TABLE_MIN}) and (max-width: ${BELOW_ROW}) {
+  @media screen and (min-width: ${props =>
+      props.theme.breakpoints.tablet}) and (max-width: ${BELOW_ROW}) {
     ${TableBody} {
       display: flex;
       flex-direction: column;

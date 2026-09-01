@@ -7,7 +7,6 @@ import {
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   IdentityCell,
-  ShareTrack,
   SummaryCard,
   Tile,
   TilesGrid,
@@ -179,10 +178,6 @@ const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
  *  layout owns N. */
 const BELOW_ROW = `${ROW_LAYOUT_MIN_WIDTH - 0.02}px`;
 
-/** Where the shared table styles switch, below the width this list needs.
- *  Between the two, the desktop table has to be undone by hand. */
-const SHARED_TABLE_MIN = '1025px';
-
 export const ValidatorsTableWrapper = styled.div`
   ${dataListTableSkin}
   ${compactFilterRow}
@@ -226,7 +221,8 @@ export const ValidatorsTableWrapper = styled.div`
      The TableBody rule is not cosmetic: display:table wraps each
      MobileListCard in an anonymous cell, which puts all ten of them side by
      side on a single line. */
-  @media screen and (min-width: ${SHARED_TABLE_MIN}) and (max-width: ${BELOW_ROW}) {
+  @media screen and (min-width: ${props =>
+      props.theme.breakpoints.tablet}) and (max-width: ${BELOW_ROW}) {
     ${TableBody} {
       display: flex;
       flex-direction: column;
@@ -312,6 +308,11 @@ export const ValidatorsTableWrapper = styled.div`
          a 120-character name before this line existed: the link rendered
          1008px wide, the row 1953, and the page scrolled 595px sideways, which
          is the whole failure the cap exists to stop. */
+      /* display too: the shared cell rules make every link in a cell a flex
+         box, and text-overflow only acts on the inline content of a block
+         container, so the name hard-clipped mid-character with no ellipsis
+         even once the width held. */
+      display: block;
       min-width: 0;
       max-width: 220px;
       overflow: hidden;

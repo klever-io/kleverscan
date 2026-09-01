@@ -52,8 +52,15 @@ interface IFakeQuery {
   removeEventListener: (type: string, listener: () => void) => void;
 }
 
-const queries: IFakeQuery[] = [];
+/* Keyed by media string and reused, the way the browser behaves: the hook
+   reads the query during render as well as subscribing to it, so a fake that
+   minted a fresh object per call would answer from one instance and be flipped
+   on another. */
+const queries = new Map<string, IFakeQuery>();
 const matchMedia = jest.fn((media: string) => {
+  const existing = queries.get(media);
+  if (existing) return existing as unknown as MediaQueryList;
+
   const query: IFakeQuery = {
     media,
     matches: false,
@@ -61,14 +68,22 @@ const matchMedia = jest.fn((media: string) => {
     addEventListener: (_type, listener) => query.listeners.add(listener),
     removeEventListener: (_type, listener) => query.listeners.delete(listener),
   };
-  queries.push(query);
+  queries.set(media, query);
   return query as unknown as MediaQueryList;
 });
 
+const queryFor = (breakpoint: number): IFakeQuery => {
+  const media = `(max-width: ${breakpoint - 0.02}px)`;
+  const existing = queries.get(media);
+  if (existing) return existing;
+  matchMedia(media);
+  return queries.get(media) as IFakeQuery;
+};
+
 /** Moves the viewport across the threshold the way the browser does: flip the
  *  stored answer, then fire the change the hook subscribed to. */
-const crossThreshold = (matches: boolean): void => {
-  const query = queries[queries.length - 1];
+const crossThreshold = (breakpoint: number, matches: boolean): void => {
+  const query = queryFor(breakpoint);
   query.matches = matches;
   act(() => {
     query.listeners.forEach(listener => listener());
@@ -83,7 +98,7 @@ const answer = (): string => screen.getByTestId('answer').textContent ?? '';
 
 describe('useBelowWidth', () => {
   beforeEach(() => {
-    queries.length = 0;
+    queries.clear();
     matchMedia.mockClear();
     window.matchMedia = matchMedia as unknown as typeof window.matchMedia;
   });
@@ -100,12 +115,24 @@ describe('useBelowWidth', () => {
 
     // `max-width: 1240px` and `min-width: 1240px` both match at exactly 1240,
     // and the row layout owns that width.
-    expect(queries[0].media).toBe('(max-width: 1239.98px)');
+    expect(matchMedia).toHaveBeenCalledWith('(max-width: 1239.98px)');
   });
 
   it('answers true once the viewport is under the breakpoint', () => {
     render(<Probe breakpoint={1240} />);
-    crossThreshold(true);
+    crossThreshold(1240, true);
+
+    expect(answer()).toBe('true');
+  });
+
+  /* The common path, and the one nothing covered: a visitor who loads the page
+     at 1100px never crosses a threshold, so the answer comes entirely from the
+     read at mount. While that read lived in an effect, deleting it left every
+     test here green. */
+  it('answers true when the viewport is already under it at mount', () => {
+    queryFor(1240).matches = true;
+
+    render(<Probe breakpoint={1240} />);
 
     expect(answer()).toBe('true');
   });
@@ -115,15 +142,15 @@ describe('useBelowWidth', () => {
      rest of the session, with no way back short of a reload. */
   it('answers false again once the viewport grows back over it', () => {
     render(<Probe breakpoint={1240} />);
-    crossThreshold(true);
-    crossThreshold(false);
+    crossThreshold(1240, true);
+    crossThreshold(1240, false);
 
     expect(answer()).toBe('false');
   });
 
   it('drops its listener when the component goes away', () => {
     const { unmount } = render(<Probe breakpoint={1240} />);
-    const query = queries[0];
+    const query = queryFor(1240);
     expect(query.listeners.size).toBe(1);
 
     unmount();
@@ -133,11 +160,11 @@ describe('useBelowWidth', () => {
 
   it('drops the old listener when the breakpoint changes', () => {
     const { rerender } = render(<Probe breakpoint={1240} />);
-    const first = queries[0];
+    const first = queryFor(1240);
 
     rerender(<Probe breakpoint={1310} />);
 
     expect(first.listeners.size).toBe(0);
-    expect(queries[1].media).toBe('(max-width: 1309.98px)');
+    expect(queryFor(1310).listeners.size).toBe(1);
   });
 });

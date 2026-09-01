@@ -35,10 +35,6 @@ import styled, { css } from 'styled-components';
  */
 const BELOW_ROW_LAYOUT = '767.98px';
 
-/** Where the shared table styles switch, below the width this list needs.
- *  Between the two, this file has to undo them by hand. */
-const SHARED_TABLE_MIN = '1025px';
-
 interface IRowLayoutWidth {
   /** The viewport width from which this list's row fits, from
    *  `rowLayoutMinWidth`; it differs by one column between the variants. */
@@ -151,7 +147,8 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
      The TableBody rule is not cosmetic: display:table wraps each
      MobileListCard in an anonymous cell, which puts all ten of them side by
      side on a single line. */
-  @media screen and (min-width: ${SHARED_TABLE_MIN}) and (max-width: ${belowRow}) {
+  @media screen and (min-width: ${props =>
+      props.theme.breakpoints.tablet}) and (max-width: ${belowRow}) {
     ${TableBody} {
       display: flex;
       flex-direction: column;

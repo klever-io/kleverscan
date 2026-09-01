@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
 import TransactionsTable from '@/components/TransactionsList/Table';

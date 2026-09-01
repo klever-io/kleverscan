@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 /**
  * True while the viewport is narrower than `breakpoint` px.
@@ -7,29 +7,36 @@ import { useEffect, useState } from 'react';
  * is crossed, where a listener on `resize` would re-render every consumer on
  * every intermediate pixel of a window drag.
  *
- * False on the server and on the first client render, which is the order the
- * `useMobile` flags settle in too, so a table that also reads those cannot
- * disagree with itself on the first paint.
+ * Read during render through `useSyncExternalStore`, not from state seeded in
+ * an effect. As state it restarted at false on every mount, while the
+ * `useMobile` flags it sits beside are already correct there, because their
+ * provider lives above the page. React Query serves cached rows synchronously
+ * on a client-side navigation, so between the shared tablet breakpoint and
+ * this one that cost a painted frame of the full table at a width that cannot
+ * hold it: the exact horizontal overflow the breakpoint exists to prevent.
+ *
+ * The server snapshot stays false, so SSR and hydration agree; only later
+ * mounts read the real value on their first render.
  */
 export const useBelowWidth = (breakpoint?: number): boolean => {
-  const [below, setBelow] = useState(false);
+  // 0.02 under the breakpoint, not the breakpoint itself: `max-width: N` and
+  // `min-width: N` both match at exactly N, and the CSS that lays the row out
+  // uses the min-width half.
+  const query = breakpoint ? `(max-width: ${breakpoint - 0.02}px)` : undefined;
 
-  useEffect(() => {
-    if (!breakpoint) {
-      setBelow(false);
-      return;
-    }
+  const subscribe = useCallback(
+    (onStoreChange: () => void) => {
+      if (!query) return () => undefined;
+      const media = window.matchMedia(query);
+      media.addEventListener('change', onStoreChange);
+      return () => media.removeEventListener('change', onStoreChange);
+    },
+    [query],
+  );
 
-    // 0.02 under the breakpoint, not the breakpoint itself: `max-width: N` and
-    // `min-width: N` both match at exactly N, and the CSS that lays the row
-    // out uses the min-width half.
-    const query = window.matchMedia(`(max-width: ${breakpoint - 0.02}px)`);
-    const update = (): void => setBelow(query.matches);
-
-    update();
-    query.addEventListener('change', update);
-    return () => query.removeEventListener('change', update);
-  }, [breakpoint]);
-
-  return below;
+  return useSyncExternalStore(
+    subscribe,
+    () => (query ? window.matchMedia(query).matches : false),
+    () => false,
+  );
 };

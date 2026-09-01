@@ -1,4 +1,4 @@
-import { bundleFor, present, readKeys } from '@/utils/localeKeys';
+import { bundleFor, present, readKeys, subtreeKeys } from '@/utils/localeKeys';
 
 /**
  * Binds the keys the summary asks for to the shipped bundle. Every `t()` here
@@ -31,4 +31,20 @@ describe('blocks list locale keys', () => {
       expect(keys.filter(key => !present(bundle, key))).toEqual([]);
     },
   );
+
+  /* A key built from a template literal carries no tail in the source, so the
+     scrape above cannot see it; its prefix must at least resolve to a
+     populated subtree. No blocks source uses the form today, which is exactly
+     when the guard is cheapest to keep in place. */
+  it.each(sources)('%s resolves its dynamic prefixes', (file, namespace) => {
+    const { prefixes } = readKeys(file, namespace);
+
+    prefixes.forEach(prefix => {
+      expect({ file, prefix, keys: [] }).not.toEqual({
+        file,
+        prefix,
+        keys: subtreeKeys(bundleFor('en', namespace), prefix),
+      });
+    });
+  });
 });

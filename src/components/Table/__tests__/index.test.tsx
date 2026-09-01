@@ -119,6 +119,7 @@ const makeProps = (
     smaller?: boolean;
     cardBreakpoint?: number;
     MobileCard?: ITable['MobileCard'];
+    requestReady?: boolean;
   } = {},
 ): ITable => ({
   type: 'accounts',
@@ -140,6 +141,7 @@ const makeProps = (
   smaller: options.smaller,
   cardBreakpoint: options.cardBreakpoint,
   MobileCard: options.MobileCard,
+  requestReady: options.requestReady,
 });
 
 const renderTable = (ui: React.ReactElement) => {
@@ -286,5 +288,64 @@ describe('Table cardBreakpoint', () => {
     expect(await screen.findByTestId('stateful-cell')).toBeInTheDocument();
     expect(screen.queryByTestId('mobile-card')).toBeNull();
     expect(matchMedia).not.toHaveBeenCalled();
+  });
+});
+
+describe('Table requestReady', () => {
+  /* The deep-link hold: a version-filtered URL cannot be answered before the
+     join settles, and answering anyway painted the unfiltered list with
+     unfiltered pager totals under a filtered URL. */
+  it('holds the loading rows and fires no request while not ready', async () => {
+    const request = jest.fn(async () => makeResponse([{ id: 1 }]));
+    renderTable(<Table {...makeProps(request, { requestReady: false })} />);
+
+    expect(await screen.findAllByTestId('skeleton')).not.toHaveLength(0);
+    expect(screen.queryByTestId('table-empty')).toBeNull();
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  /* refetch() fetches even a disabled query once it has data, so the manual
+     triggers carry their own guard. The scenario: a table that answered once
+     and then went on hold (the version filter's join dropped away). */
+  it('keeps the refresh icon from piercing the hold', async () => {
+    const request = jest.fn(async () => makeResponse([{ id: 1 }]));
+    const client = new QueryClient();
+    const wrap = (ready: boolean) => (
+      <QueryClientProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <Table
+            {...makeProps(request, { requestReady: ready })}
+            showLimit={true}
+          />
+        </ThemeProvider>
+      </QueryClientProvider>
+    );
+    const view = render(wrap(true));
+    await screen.findByTestId('stateful-cell');
+    const before = request.mock.calls.length;
+
+    view.rerender(wrap(false));
+    // The reload glyph specifically: the back-to-top arrow is also an svg and
+    // sits later in the DOM, so a last-svg pick clicks the wrong control.
+    const reload = view.container.querySelector(
+      '[class*="IoReloadSharpWrapper"] svg',
+    ) as SVGElement;
+    fireEvent.click(reload);
+    await new Promise(resolve => setTimeout(resolve, 20));
+
+    expect(request.mock.calls.length).toBe(before);
+  });
+
+  it('runs the request once ready and swaps the rows in', async () => {
+    const request = jest.fn(async () => makeResponse([{ id: 1 }]));
+    const { rerenderTable } = renderTable(
+      <Table {...makeProps(request, { requestReady: false })} />,
+    );
+    expect(request).not.toHaveBeenCalled();
+
+    rerenderTable(<Table {...makeProps(request, { requestReady: true })} />);
+
+    await screen.findByTestId('stateful-cell');
+    expect(request).toHaveBeenCalled();
   });
 });

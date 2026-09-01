@@ -13,6 +13,7 @@ import {
 import Link from 'next/link';
 import { mix, transparentize } from 'polished';
 import { Content as FilterContent } from '@/components/Filter/styles';
+import { ToolTipSpan } from '@/components/Tooltip/styles';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import styled, {
   css,
@@ -878,10 +879,10 @@ export const dataListTableSkin = css`
  * Four summary tiles stay on one row down to `from` px, where the shared grid
  * otherwise drops to a hard two columns below the mobile breakpoint and the
  * 2x2 wastes half the card. `from` is per card, set by its longest label plus
- * the 3x16px of gaps, 48 of card padding and 32 of page padding: measured 117px
- * on /validators (Open for delegation) and 94px on /assets (NFT collections).
- * auto-fit is avoided on purpose: it lands on three columns first and leaves
- * the fourth tile orphaned on its own row.
+ * the 3x16px of gaps, 48 of card padding and 32 of page padding: measured
+ * 117px on /validators (Open for delegation), its one consumer. auto-fit is
+ * avoided on purpose: it lands on three columns first and leaves the fourth
+ * tile orphaned on its own row.
  */
 export const holdFourTiles = (from: number) => css`
   @media screen and (min-width: ${from}px) and (max-width: ${props =>
@@ -909,10 +910,43 @@ export const holdTiles = (columns: number) => css`
 `;
 
 /** The asset id as a tag rather than loose text beside the name: the ticker
- *  is the handle people know an asset by, so it reads as a badge. */
+ *  is the handle people know an asset by, so it reads as a badge. It keeps
+ *  whole under pressure: BadgePill carries min-width: 0, and without these a
+ *  tight card header shrank the pill to 26px and wrapped the id at its hyphen
+ *  onto two cramped lines (measured at 320). */
 export const TickerBadge = styled(BadgePill)`
   font-family: 'Fira Mono', monospace;
   letter-spacing: 0;
+
+  && {
+    flex-shrink: 0;
+    min-width: fit-content;
+    white-space: nowrap;
+  }
+`;
+
+/**
+ * The card header rules the assets and pools cards share: buttons at the right
+ * edge at every width (beside the identity they tracked the name's width, so
+ * scanning a column of cards they never sat still), tooltip wrappers flexed so
+ * a badge pill rides level instead of 2px below its neighbours (measured), and
+ * the name as the one element that gives way while the id badge keeps whole.
+ */
+export const assetCardHeaderRules = css`
+  ${MobileListCard} ${RowActions} {
+    margin-left: auto;
+  }
+
+  ${MobileListCard} ${ToolTipSpan},
+  ${MobileListCard} ${ToolTipSpan} > div {
+    display: flex;
+    align-items: center;
+  }
+
+  ${MobileListCard} ${AssetName} {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
 `;
 
 /* --------------------------- shared row layout ---------------------------- */

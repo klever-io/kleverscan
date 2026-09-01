@@ -62,6 +62,10 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
   index,
 }) => {
   const { t } = useTranslation(['transactions']);
+  // A separately bound t: getAge/formatDate ask for bare `Date.*` keys, which
+  // resolve against the FIRST bound namespace only, so handing them the
+  // transactions-bound t rendered raw keys (the #708 ledger fix, done right).
+  const { t: commonT } = useTranslation('common');
   const router = useRouter();
   const {
     hash,
@@ -152,6 +156,7 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
             {
               formatDate(timestamp || Date.now(), {
                 showElapsedTime: true,
+                t: commonT,
               }).split(' (')[0]
             }
             <TimeExact>{` (${formatDate(timestamp || Date.now())})`}</TimeExact>

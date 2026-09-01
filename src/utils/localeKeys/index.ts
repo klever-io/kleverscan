@@ -1,3 +1,6 @@
+/* Jest-only: this module reads the filesystem, so importing it from app code
+   turns into a client-bundle build failure. Nothing enforces that (eslint is a
+   repo-wide no-op), which is why it says so here. */
 import fs from 'fs';
 import path from 'path';
 

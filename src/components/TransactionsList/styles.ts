@@ -199,8 +199,12 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
     position: relative;
   }
 
+  /* rem, not px: the corner's occupants are text-sized, so a text-only scale
+     (root font bumped, viewport unchanged) grew the group past a px reserve
+     and into the badges (measured 179px against 160 at 2x). Zoom was already
+     fine, it re-engages the media bands. 18.5rem is the measured 296px. */
   ${MobileListCard} ${MobileTopRow} {
-    padding-right: 296px;
+    padding-right: 18.5rem;
   }
 
   ${MobileListCard} ${CardHashLink} {
@@ -229,12 +233,13 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
     position: absolute;
     top: 8px;
     right: 14px;
-    height: 32px;
+    height: 2rem;
   }
 
   @media screen and (max-width: ${BELOW_ROW_LAYOUT}) {
     ${MobileListCard} ${MobileTopRow} {
-      padding-right: 160px;
+      /* The measured 160px: the exact date is hidden here. */
+      padding-right: 10rem;
     }
   }
 

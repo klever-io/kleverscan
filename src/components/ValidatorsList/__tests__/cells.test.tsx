@@ -43,7 +43,13 @@ jest.mock('react-dom', () => {
 import theme from '@/styles/theme';
 import { IValidator } from '@/types/index';
 import { ThemeProvider } from 'styled-components';
-import { CapacityCell, VersionBadge } from '../cells';
+import {
+  CapacityCell,
+  statusVariant,
+  ValidatorIdentity,
+  MissedCell,
+  VersionBadge,
+} from '../cells';
 import { validatorRowSections, IValidatorRowContext } from '../rows';
 import { VALIDATOR_COLUMNS } from '../columns';
 
@@ -65,6 +71,7 @@ const labels = {
   versionUnavailable: 'Unavailable',
   versionUnavailableReason: 'Node versions could not be loaded',
   noDelegationLimit: 'No limit',
+  statusLabel: (status: string) => status,
   capacityDetail: () => 'detail',
 } as unknown as IValidatorRowContext['labels'];
 
@@ -80,6 +87,8 @@ const validator = {
   status: 'elected',
   totalProduced: 10,
   totalMissed: 1,
+  blocksProduced: 9,
+  blocksMissed: 1,
   canDelegate: true,
   selfStake: 10,
   cumulativeStaked: 1,
@@ -285,5 +294,65 @@ describe('CapacityCell', () => {
     drawCapacity(500, 0);
 
     expect(screen.getByText('No limit')).toBeInTheDocument();
+  });
+});
+
+describe('statusVariant', () => {
+  it.each([
+    ['elected', 'success'],
+    ['eligible', 'accent'],
+    ['waiting', 'contract'],
+    ['jailed', 'danger'],
+    ['inactive', 'warning'],
+    ['something-new', 'neutral'],
+  ])('maps %s to %s', (state, variant) => {
+    expect(statusVariant(state)).toBe(variant);
+  });
+});
+
+describe('ValidatorIdentity', () => {
+  const identityFor = (canDelegate: boolean) =>
+    ({ ...validator, canDelegate }) as IValidator;
+
+  it('states acceptance for a delegating validator', () => {
+    draw(<ValidatorIdentity validator={identityFor(true)} labels={labels} />);
+
+    expect(screen.getByText('Open')).toBeInTheDocument();
+    expect(screen.queryByText('Closed')).toBeNull();
+  });
+
+  it('states refusal for one that does not delegate', () => {
+    draw(<ValidatorIdentity validator={identityFor(false)} labels={labels} />);
+
+    expect(screen.getByText('Closed')).toBeInTheDocument();
+    expect(screen.queryByText('Open')).toBeNull();
+  });
+});
+
+describe('MissedCell', () => {
+  /* Zero attempts is unknown, not flawless: a share out of nothing would read
+     as 0.00% missed. */
+  it('prints the placeholder share when nothing was attempted', () => {
+    draw(
+      <MissedCell
+        totalMissed={0}
+        totalProduced={0}
+        shareLabel="Missed share"
+      />,
+    );
+
+    expect(screen.getByText(/, Missed share: - -%/)).toBeInTheDocument();
+  });
+
+  it('prints the share of attempts, not of successes', () => {
+    draw(
+      <MissedCell
+        totalMissed={25}
+        totalProduced={75}
+        shareLabel="Missed share"
+      />,
+    );
+
+    expect(screen.getByText(/, Missed share: 25.00%/)).toBeInTheDocument();
   });
 });

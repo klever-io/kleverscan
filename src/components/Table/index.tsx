@@ -243,6 +243,14 @@ const Table = <TCard,>({
      held state would fall through to the empty state instead of the rows. */
   const pending = isLoading || !requestReady;
 
+  /* Manual triggers pierce `enabled`: react-query's refetch() fetches a
+     disabled query too, so the refresh icon, the page-size pills and the
+     page-change effect all ran the request inside the hold window and painted
+     what the hold exists to prevent. */
+  const refetchWhenReady = (): void => {
+    if (requestReady) refetch();
+  };
+
   const props: TableRowProps = {
     pathname: router.pathname,
     haveData: response?.items?.length,
@@ -264,7 +272,7 @@ const Table = <TCard,>({
     if (page !== 1 && intervalController) {
       intervalController(0);
     }
-    refetch();
+    refetchWhenReady();
   }, [page]);
 
   useEffect(() => {
@@ -305,7 +313,7 @@ const Table = <TCard,>({
                           },
                           router,
                         );
-                        refetch();
+                        refetchWhenReady();
                       }}
                       active={value === limit}
                     >
@@ -320,7 +328,7 @@ const Table = <TCard,>({
                   msg="Refresh"
                   Component={() => (
                     <IoReloadSharpWrapper $loading={isFetching}>
-                      <IoReloadSharp size={22} onClick={() => refetch()} />
+                      <IoReloadSharp size={22} onClick={refetchWhenReady} />
                     </IoReloadSharpWrapper>
                   )}
                 />

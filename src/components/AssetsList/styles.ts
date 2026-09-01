@@ -1,8 +1,7 @@
 import { ROW_LAYOUT_MIN_WIDTH, belowWidth } from '@/components/DataList/layout';
 import {
-  AssetIdLine,
+  assetCardHeaderRules,
   AssetName,
-  BadgePill,
   compactFilterRow,
   holdTiles,
   SummaryCard,
@@ -14,7 +13,6 @@ import {
   MobileTotalRow,
   RowActions,
 } from '@/components/DataList/styles';
-import { ToolTipSpan } from '@/components/Tooltip/styles';
 import {
   HeaderItem,
   MobileCardItem,
@@ -100,34 +98,6 @@ export const RewardsMuted = styled.span`
 `;
 
 /* ------------------------------ registry strip --------------------------- */
-
-/**
- * The card header rules the assets and pools cards share: buttons at the right
- * edge at every width (beside the identity they tracked the name's width, so
- * scanning a column of cards they never sat still), tooltip wrappers flexed so
- * a badge pill rides level instead of 2px below its neighbours (measured), and
- * the name as the one element that gives way while the id badge keeps whole.
- */
-export const assetCardHeaderRules = css`
-  ${MobileListCard} ${RowActions} {
-    margin-left: auto;
-  }
-
-  ${MobileListCard} ${ToolTipSpan},
-  ${MobileListCard} ${ToolTipSpan} > div {
-    display: flex;
-    align-items: center;
-  }
-
-  ${MobileListCard} ${AssetName} {
-    flex: 0 1 auto;
-    min-width: 0;
-  }
-
-  ${MobileListCard} ${AssetIdLine} {
-    flex-shrink: 0;
-  }
-`;
 
 /** The bar reads at every width: its segments are percentages and the legend
  *  wraps, so the old phone-width display:none only lost information. */

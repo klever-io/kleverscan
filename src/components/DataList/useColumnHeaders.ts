@@ -18,7 +18,12 @@ export interface IColumnHeading {
 export const useColumnHeaders = (
   columns: readonly IColumnHeading[],
 ): string[] => {
-  const { t } = useTranslation([columns[0]?.i18nKey.split(':')[0] ?? 'common']);
+  // Every namespace the keys carry, not just the first column's: a key on an
+  // unloaded namespace falls back to English silently.
+  const namespaces = Array.from(
+    new Set(columns.map(column => column.i18nKey.split(':')[0])),
+  );
+  const { t } = useTranslation(namespaces.length ? namespaces : ['common']);
   return columns.map(column =>
     t(column.i18nKey, { defaultValue: column.header }),
   );

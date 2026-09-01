@@ -2,15 +2,15 @@ export const UNKNOWN_VERSION = 'Unknown';
 
 /**
  * One node as `/node/heartbeatstatus` reports it, narrowed to what this app
- * reads. The endpoint sends twelve fields; the six left out (peerType,
- * totalUpTimeSec, totalDownTimeSec, maxInactiveTime, nonce, numInstances) have
- * no consumer, and naming them only made them look wired up.
+ * reads: the seven fields left out have no consumer, and naming them only made
+ * them look wired up. Everything is optional because the array is republished
+ * from unvalidated JSON (the parse guard below only gates the version map),
+ * and consumers already treat it that way.
  */
 export interface HeartbeatEntry {
-  publicKey: string;
-  versionNumber: string;
-  isActive: boolean;
-  timestamp: string;
+  publicKey?: string;
+  versionNumber?: string;
+  isActive?: boolean;
   /** Set on all 214 mainnet nodes, where `identity` is empty on all of them. */
   nodeDisplayName?: string;
   identity?: string;

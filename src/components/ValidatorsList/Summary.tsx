@@ -36,12 +36,9 @@ import { useValidatorSources } from './useValidatorSources';
 const pct = (value: number, digits = 1): string => `${value.toFixed(digits)}%`;
 
 /**
- * What the page already fetches and used to throw away.
- *
- * Every figure here comes from the two calls the version distribution needed
- * anyway, so the card costs no extra request: four of them from the validator
- * list, three from the node heartbeat whose nine unread fields this is the
- * first consumer of.
+ * What the page already fetches and used to throw away: every figure comes
+ * from the two calls the version distribution needed anyway, so the card
+ * costs no extra request.
  */
 const ValidatorsSummary: React.FC = () => {
   const { t } = useTranslation(['validators']);

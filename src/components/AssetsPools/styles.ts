@@ -1,5 +1,5 @@
-import { assetCardHeaderRules } from '@/components/AssetsList/styles';
 import {
+  assetCardHeaderRules,
   compactFilterRow,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,

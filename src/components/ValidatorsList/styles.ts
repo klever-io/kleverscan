@@ -195,6 +195,25 @@ export const ValidatorsTableWrapper = styled.div`
     margin-left: 0;
   }
 
+  /* The name is the one element that gives way. Pills and buttons carry
+     min-width: 0 through the shared badge rules, so under width pressure THEY
+     absorbed the deficit: at 320 the two pills overlapped into unreadable
+     text and the buttons crushed to 8px (measured). The address truncates
+     instead; the full value stays on its title. */
+  ${MobileListCard} ${AddressLink} {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  ${MobileListCard} ${BadgePill},
+  ${MobileListCard} ${DelegateSlot},
+  ${MobileListCard} ${RowActions} {
+    flex-shrink: 0;
+  }
+
   /* The shared loading rows stack a heading over a bar per column, 361px per
      card against the 149 of a loaded one at 390. Loading rows are the only
      TableRow below the tablet width here, so this reshapes just them; the

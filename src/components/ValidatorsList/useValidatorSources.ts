@@ -1,12 +1,8 @@
 import {
   fetchHeartbeatStatus,
   HeartbeatEntry,
-  HeartbeatStatus,
 } from '@/services/requests/heartbeat';
-import {
-  fetchAllValidators,
-  IAllValidators,
-} from '@/services/requests/validators';
+import { fetchAllValidators } from '@/services/requests/validators';
 import { IValidator } from '@/types/index';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -68,15 +64,21 @@ export const useValidatorSources = (
   const { data, isLoading, dataUpdatedAt } = useQuery({
     queryKey: VALIDATOR_SOURCES_KEY,
     queryFn: async (): Promise<IValidatorSources> => {
-      const previous = queryClient.getQueryData<IValidatorSources>(
+      const state = queryClient.getQueryState<IValidatorSources>(
         VALIDATOR_SOURCES_KEY,
       );
+      const previous = state?.data;
 
-      /* Only while recovering: a heartbeat outage used to re-issue all three
-         `validator/list` pages every 30s to retry one `/api/heartbeat` call,
-         27 requests against a testnet rate limit CI shares. A complete
-         previous answer refetches both halves, or the data would freeze. */
-      const recovering = previous !== undefined && !complete(previous);
+      /* Only while recovering, and only while the kept half is younger than
+         the freshness this query promises: a heartbeat outage used to re-issue
+         all three `validator/list` pages every 30s to retry one
+         `/api/heartbeat` call, 27 requests against a testnet rate limit CI
+         shares. Without the age bound the kept half was pinned for the whole
+         outage and then laundered into a fresh five-minute lease the moment
+         the other half recovered. */
+      const fresh =
+        state !== undefined && Date.now() - state.dataUpdatedAt < 5 * 60_000;
+      const recovering = fresh && previous !== undefined && !complete(previous);
       const keepList = recovering && previous.validatorsAvailable;
       const keepHeartbeat = recovering && previous.heartbeatAvailable;
 
@@ -84,10 +86,8 @@ export const useValidatorSources = (
       // the list failing must not cost the heartbeat. Either half missing
       // degrades one figure instead of emptying the card.
       const [listResult, heartbeatResult] = await Promise.allSettled([
-        keepList
-          ? Promise.resolve(undefined)
-          : (fetchAllValidators() as Promise<IAllValidators | undefined>),
-        keepHeartbeat ? Promise.resolve(undefined) : fetchHeartbeatStatus(),
+        keepList ? undefined : fetchAllValidators(),
+        keepHeartbeat ? undefined : fetchHeartbeatStatus(),
       ]);
 
       const list =
@@ -104,10 +104,8 @@ export const useValidatorSources = (
           : (list?.totalRecords ?? 0),
         versionMap: keepHeartbeat
           ? previous.versionMap
-          : ((heartbeat as HeartbeatStatus | undefined)?.versionMap ?? {}),
-        entries: keepHeartbeat
-          ? previous.entries
-          : ((heartbeat as HeartbeatStatus | undefined)?.entries ?? []),
+          : (heartbeat?.versionMap ?? {}),
+        entries: keepHeartbeat ? previous.entries : (heartbeat?.entries ?? []),
         heartbeatAvailable: keepHeartbeat || !!heartbeat,
         validatorsAvailable: keepList || !!list,
       };
@@ -115,8 +113,7 @@ export const useValidatorSources = (
     // A function, not a constant: a half-failed answer caches as a successful
     // one, and a constant would hold that degraded card for the full window.
     staleTime: query => {
-      const cached = query.state.data as IValidatorSources | undefined;
-      return complete(cached) ? 5 * 60_000 : 0;
+      return complete(query.state.data) ? 5 * 60_000 : 0;
     },
 
     // Stale is not a trigger by itself. This query cannot reject (both halves
@@ -130,7 +127,7 @@ export const useValidatorSources = (
     // refetches per cycle, measured.
     refetchInterval: query =>
       poll &&
-      !complete(query.state.data as IValidatorSources | undefined) &&
+      !complete(query.state.data) &&
       query.state.dataUpdateCount < RECOVERY_ATTEMPTS
         ? 30_000
         : false,

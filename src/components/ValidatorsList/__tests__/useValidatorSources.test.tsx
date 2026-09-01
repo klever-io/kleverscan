@@ -81,11 +81,23 @@ const renderSources = (poll = false) => {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(
+  const view = render(
     <QueryClientProvider client={client}>
       <Probe poll={poll} />
     </QueryClientProvider>,
   );
+  return {
+    ...view,
+    /** A fresh observer on the SAME cache, the shape of a route-away-and-back. */
+    rerenderSources: (nextPoll = false) => {
+      view.unmount();
+      render(
+        <QueryClientProvider client={client}>
+          <Probe poll={nextPoll} />
+        </QueryClientProvider>,
+      );
+    },
+  };
 };
 
 const settle = async () =>
@@ -198,6 +210,38 @@ describe('useValidatorSources', () => {
     expect(mockFetchAll.mock.calls.length).toBe(first);
     expect(latest.data.validators).toHaveLength(1);
     expect(latest.data.validatorsAvailable).toBe(true);
+    jest.useRealTimers();
+  });
+
+  /* The bound on the keeping: an answer older than the five-minute freshness
+     this query promises must not be pinned through an outage, or the moment
+     the other half recovers the stale half is laundered into a fresh lease.
+     The polling window itself never exceeds it (30s ticks reset the state's
+     timestamp), so the path that trips it is a reader arriving after the poll
+     budget: that run must refetch BOTH halves, kept one included. */
+  it('re-asks a kept half once it outgrows the freshness window', async () => {
+    jest.useFakeTimers();
+    mockFetchAll.mockResolvedValue(list);
+    mockHeartbeat.mockResolvedValue(undefined);
+
+    const view = renderSources(false);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const first = mockFetchAll.mock.calls.length;
+
+    await act(async () => {
+      jest.advanceTimersByTime(6 * 60_000);
+    });
+    // A new reader on the same cache: staleTime is 0 while incomplete, so the
+    // remount refetches, and the stale kept half must go with it.
+    view.rerenderSources(false);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mockFetchAll.mock.calls.length).toBeGreaterThan(first);
     jest.useRealTimers();
   });
 

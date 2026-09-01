@@ -83,9 +83,10 @@ const ValidatorsFilters: React.FC = () => {
       ...shared,
       title: t('validators:Filters.Version'),
       testId: 'validator-version',
-      placeholder: versionFailed
-        ? t('validators:List.VersionUnavailableReason')
-        : t('validators:Filters.SearchVersion'),
+      // No outage variant here: the placeholder only renders inside the OPEN
+      // panel, and `disabledInput` blocks opening in exactly that state. The
+      // reason reaches the reader through the version card and the row badges.
+      placeholder: t('validators:Filters.SearchVersion'),
       clearLabel: t('validators:Filters.Clear', {
         filter: t('validators:Filters.Version'),
       }),

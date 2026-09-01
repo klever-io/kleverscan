@@ -13,6 +13,7 @@ import {
 import { BadgePill, VisuallyHidden } from '@/components/DataList/styles';
 import { CustomFieldWrapper } from '@/components/Table/styles';
 import {
+  DIRECTION_GLYPHS,
   InOutBadge,
   MultiContractBadge,
   statusVariant,
@@ -64,12 +65,7 @@ import { parseAddress } from '@/utils/parseValues';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { TXType } from '@klever/connect';
 import { GetServerSideProps } from 'next';
-import {
-  MdAccessTime,
-  MdArrowForward,
-  MdOutlineDescription,
-  MdPriorityHigh,
-} from 'react-icons/md';
+import { MdOutlineDescription } from 'react-icons/md';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
@@ -83,13 +79,6 @@ interface IRequestTxQuery {
   address?: string;
 }
 
-/** One glyph per status, so the arrow's color is never the only signal. */
-const DIRECTION_GLYPHS = {
-  success: MdArrowForward,
-  danger: MdPriorityHigh,
-  warning: MdAccessTime,
-  neutral: MdArrowForward,
-} as const;
 export const toAddressSectionElement = (
   toAddress: string,
   chars = 16,

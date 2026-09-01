@@ -337,9 +337,13 @@ describe('Transactions Page', () => {
       cy.get('[data-testid="transaction-link"]')
         .should('have.attr', 'href')
         .and('include', '/transaction/');
-      ['Type', 'From', 'To', 'Block'].forEach(label => {
+      ['From', 'To', 'Block'].forEach(label => {
         cy.contains(label).should('be.visible');
       });
+      // The contract type is a badge in the card header now, not a labelled
+      // line, so it renders its value and no "Type" text. Both branches of it
+      // (single and multi contract) carry this attribute.
+      cy.get('[data-contract-type]').should('be.visible');
     });
   });
 });

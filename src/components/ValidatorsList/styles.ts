@@ -138,18 +138,17 @@ export const VersionPill = styled(BadgePill)`
 `;
 
 /**
- * The delegation badge at the right edge of the card's name row, in the space
- * the name leaves.
- *
- * Below the phone width `RowActions` already carries the auto margin that
- * pushes the group right, and a second one there would split the free space
- * between the two instead of keeping them together.
+ * The delegation badge against the card's right group, left of the copy and
+ * open buttons, which stay outermost like on every other card. This carries
+ * the auto margin; a second one on the buttons would split the free space and
+ * park the badge mid-row.
  */
 export const DelegateSlot = styled.span`
   /* Centred like the row's other children, so its baseline and its bottom edge
      line up with the state badge rather than with the text beside it. */
   display: inline-flex;
   align-items: center;
+  margin-left: auto;
 
   /* The tooltip renders wrapper span plus an inner block div, and the pill
      rides the text baseline of that div's line box, 2px below the state badge
@@ -189,11 +188,11 @@ export const ValidatorsTableWrapper = styled.div`
   ${dataListTableSkin}
   ${compactFilterRow}
 
-  /* At the card's right edge at every width, the same place on every card:
-     beside the identity they tracked the name's width (107px to 212px in at
-     360, measured), so the buttons never sat still. */
+  /* The buttons stay outermost right on every card at every width; the
+     delegation badge before them carries the auto margin that pushes the
+     pair to the edge. */
   ${MobileListCard} ${RowActions} {
-    margin-left: auto;
+    margin-left: 0;
   }
 
   /* The shared loading rows stack a heading over a bar per column, 361px per

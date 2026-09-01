@@ -93,20 +93,6 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
           status={status}
           label={t(`validators:States.${status}`, { defaultValue: status })}
         />
-        <RowActions>
-          <CopyAction
-            value={ownerAddress}
-            label={t('validators:List.CopyAddress')}
-            announcement={t('validators:List.AddressCopied')}
-            large
-          />
-          <ExplorerLink
-            href={`/validator/${ownerAddress}`}
-            label={t('validators:List.OpenValidator')}
-            title={t('validators:List.OpenInNewTab')}
-            large
-          />
-        </RowActions>
         {/* The yes/no a delegator opens this page for, at the row's right edge
             rather than on a line of its own. The capacity line below does not
             answer it: an uncapped validator that refuses delegation still
@@ -127,6 +113,20 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
             )}
           </ExplainedBadge>
         </DelegateSlot>
+        <RowActions>
+          <CopyAction
+            value={ownerAddress}
+            label={t('validators:List.CopyAddress')}
+            announcement={t('validators:List.AddressCopied')}
+            large
+          />
+          <ExplorerLink
+            href={`/validator/${ownerAddress}`}
+            label={t('validators:List.OpenValidator')}
+            title={t('validators:List.OpenInNewTab')}
+            large
+          />
+        </RowActions>
       </MobileTopRow>
 
       <MobileTotalRow>

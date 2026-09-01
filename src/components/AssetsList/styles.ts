@@ -4,8 +4,8 @@ import {
   AssetName,
   BadgePill,
   compactFilterRow,
+  holdTiles,
   SummaryCard,
-  TilesGrid,
   DATA_LIST_ROW_HEIGHT,
   dataListCardBand,
   dataListTableSkin,
@@ -20,28 +20,12 @@ import {
   MobileCardItem,
   TableRow,
 } from '@/components/Table/styles';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const BELOW_ROW = belowWidth(ROW_LAYOUT_MIN_WIDTH);
 
-/** The registry strip's four tiles stay on one row at every width: its labels
- *  wrap by word and its figures are three digits, so even the smallest screen
- *  holds four columns. The gap narrows below the mobile breakpoint to give the
- *  columns back what the 2x2 kept as slack. */
 export const RegistryCard = styled(SummaryCard)`
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    ${TilesGrid} {
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-  }
-`;
-
-/** The asset id as a tag rather than loose text beside the name: the ticker
- *  is the handle people know an asset by, so it reads as a badge. */
-export const TickerBadge = styled(BadgePill)`
-  font-family: 'Fira Mono', monospace;
-  letter-spacing: 0;
+  ${holdTiles(4)}
 `;
 
 /* ------------------------------ supply cells ----------------------------- */
@@ -117,6 +101,34 @@ export const RewardsMuted = styled.span`
 
 /* ------------------------------ registry strip --------------------------- */
 
+/**
+ * The card header rules the assets and pools cards share: buttons at the right
+ * edge at every width (beside the identity they tracked the name's width, so
+ * scanning a column of cards they never sat still), tooltip wrappers flexed so
+ * a badge pill rides level instead of 2px below its neighbours (measured), and
+ * the name as the one element that gives way while the id badge keeps whole.
+ */
+export const assetCardHeaderRules = css`
+  ${MobileListCard} ${RowActions} {
+    margin-left: auto;
+  }
+
+  ${MobileListCard} ${ToolTipSpan},
+  ${MobileListCard} ${ToolTipSpan} > div {
+    display: flex;
+    align-items: center;
+  }
+
+  ${MobileListCard} ${AssetName} {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  ${MobileListCard} ${AssetIdLine} {
+    flex-shrink: 0;
+  }
+`;
+
 /** The bar reads at every width: its segments are percentages and the legend
  *  wraps, so the old phone-width display:none only lost information. */
 export const StripBarArea = styled.div``;
@@ -169,34 +181,7 @@ export const AssetsTableWrapper = styled.div`
   ${dataListTableSkin}
   ${compactFilterRow}
 
-  /* At the card's right edge at every width, the same place on every card:
-     beside the identity they tracked the name's width, so scanning a column of
-     cards the buttons never sat still. Same rule the validator card carries. */
-  ${MobileListCard} ${RowActions} {
-    margin-left: auto;
-  }
-
-  /* The badge tooltips render wrapper span plus inner div, and the pill rides
-     that div's text baseline, a few px below the ticker badge beside it
-     (measured on the validators card first). Flexed, the wrappers hug the pill
-     and the row centres every badge level. */
-  ${MobileListCard} ${ToolTipSpan},
-  ${MobileListCard} ${ToolTipSpan} > div {
-    display: flex;
-    align-items: center;
-  }
-
-  /* The name gives way, the id does not: a flex item's min-width is auto, so
-     without this a long name pushed the inline id and the buttons out of the
-     card instead of truncating. */
-  ${MobileListCard} ${AssetName} {
-    flex: 0 1 auto;
-    min-width: 0;
-  }
-
-  ${MobileListCard} ${AssetIdLine} {
-    flex-shrink: 0;
-  }
+  ${assetCardHeaderRules}
 
   /* The cap bar shares the Circulating line only where that line has room for
      it: on a ~300px phone card the 150px track plus its caption broke

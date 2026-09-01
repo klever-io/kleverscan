@@ -1,10 +1,20 @@
+import { assetCardHeaderRules } from '@/components/AssetsList/styles';
 import {
+  compactFilterRow,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
+  holdTiles,
   inCard,
+  SummaryCard,
 } from '@/components/DataList/styles';
 import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
 import styled from 'styled-components';
+
+/** One section tall at every width: three short tiles hold one row even on
+ *  the smallest screen, per the user's call. */
+export const PoolsSummaryCard = styled(SummaryCard)`
+  ${holdTiles(3)}
+`;
 
 export const RateCell = styled.div`
   width: 100%;
@@ -99,6 +109,8 @@ export const AdminRow = styled(OwnerRow)`
  */
 export const PoolsTableWrapper = styled.div`
   ${dataListTableSkin}
+  ${compactFilterRow}
+  ${assetCardHeaderRules}
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     /* One row height across the whole assets section. */

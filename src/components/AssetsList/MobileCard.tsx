@@ -6,6 +6,7 @@ import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
   AssetName,
   IdentityLink,
+  TickerBadge,
   MobileListCard,
   MobileMetaItem,
   MobileMetaRow,
@@ -22,7 +23,6 @@ import { IAsset } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { IoIosInfinite } from 'react-icons/io';
 import {
-  TickerBadge,
   MobileCapCaption,
   MobileCapRow,
   RewardsRate,

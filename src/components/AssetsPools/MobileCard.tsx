@@ -5,7 +5,8 @@ import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import { exactAmount } from '@/components/DataList/format';
 import {
-  BadgePill,
+  AssetName,
+  IdentityLink,
   MobileListCard,
   MobileMetaItem,
   MobileMetaRow,
@@ -13,7 +14,8 @@ import {
   MobileTotalRow,
   RowActions,
 } from '@/components/DataList/styles';
-import AssetIdentity from '@/components/DataList/AssetIdentity';
+import { TickerBadge } from '@/components/DataList/styles';
+import AssetLogo from '@/components/Logo/AssetLogo';
 import { IAssetPoolRow } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -42,16 +44,25 @@ const PoolsMobileCard: React.FC<IPoolsMobileCardProps> = ({
 
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
+      {/* One line, id included, so the badge and the two action buttons centre
+          on the name instead of floating between two lines: the same header
+          the assets card carries. */}
       <MobileTopRow>
-        <AssetIdentity
+        <IdentityLink
           href={`/asset/${kda}`}
-          testId="pool-link"
-          name={name || kda}
-          assetId={kda}
-          ticker={displayTicker}
-          logo={logo || ''}
-          verified={assetVerified}
-        />
+          data-testid="pool-link"
+          title={name || kda}
+        >
+          <AssetLogo
+            logo={logo || ''}
+            ticker={displayTicker}
+            name={name || kda}
+            verified={assetVerified}
+            size={32}
+          />
+          <AssetName>{name || kda}</AssetName>
+          <TickerBadge $variant="contract">{kda}</TickerBadge>
+        </IdentityLink>
         {!active && (
           <ExplainedBadge variant="warning" msg={t(POOL_DISABLED_TOOLTIP)}>
             {t('assets:Pools.Disabled')}

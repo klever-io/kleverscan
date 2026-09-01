@@ -892,6 +892,29 @@ export const holdFourTiles = (from: number) => css`
   }
 `;
 
+/**
+ * A summary card's tiles on one row at every width. The shared grid drops to a
+ * hard two columns below the mobile breakpoint, which grew these cards a
+ * second section on narrower screens; labels wrap by word and the figures are
+ * short, so even the smallest screen holds the columns. The gap narrows to
+ * give the columns back what the stacking kept as slack.
+ */
+export const holdTiles = (columns: number) => css`
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    ${TilesGrid} {
+      grid-template-columns: repeat(${columns}, 1fr);
+      gap: 12px;
+    }
+  }
+`;
+
+/** The asset id as a tag rather than loose text beside the name: the ticker
+ *  is the handle people know an asset by, so it reads as a badge. */
+export const TickerBadge = styled(BadgePill)`
+  font-family: 'Fira Mono', monospace;
+  letter-spacing: 0;
+`;
+
 /* --------------------------- shared row layout ---------------------------- */
 
 /** Left-aligned numerals. The `Amount*` pair flexes to the right edge, which

@@ -248,15 +248,6 @@ export const RowActions = styled.span`
   }
   gap: 4px;
   margin-left: auto;
-
-  /* Hover-capable pointers only: on a large touch screen there is no hover,
-     so the actions would be invisible yet tappable. */
-  @media screen and (min-width: ${props =>
-      props.theme.breakpoints.tablet}) and (hover: hover) {
-    opacity: 0;
-    transition: opacity 150ms ease-out;
-    ${reducedMotion}
-  }
 `;
 
 /* ------------------------------ identity cells --------------------------- */
@@ -808,6 +799,23 @@ export const dataListTableSkin = css`
 
     ${TableRow}:last-child ${MobileCardItem}:last-child {
       border-bottom-right-radius: 15px;
+    }
+
+    /* Hidden until its row is hovered, on hover-capable pointers only: on a
+       large touch screen there is no hover, so the actions would be invisible
+       yet tappable.
+
+       Carried by the row rather than by the actions themselves. As a rule on
+       RowActions it also caught a card rendered at this width, which happens
+       on a list whose row needs more room than the shared breakpoint gives it,
+       and there is no row there to reveal them again: the copy and open
+       buttons were invisible on every card and stayed that way. */
+    @media (hover: hover) {
+      ${TableRow} ${RowActions} {
+        opacity: 0;
+        transition: opacity 150ms ease-out;
+        ${reducedMotion}
+      }
     }
 
     ${TableRow}:hover ${RowActions},

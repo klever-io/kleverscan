@@ -5,6 +5,7 @@ import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { normalizePageParam, processRowSectionsLayout } from '@/utils/table';
+import { useBelowWidth } from '@/utils/viewport';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
@@ -110,6 +111,15 @@ export interface ITable<TCard = Record<string, never>> {
   /** Column indexes whose loading bar hugs the right edge, matching a skin
    *  that right-aligns those cells; default all-left, as unskinned tables. */
   rightAlignedSkeletonColumns?: number[];
+  /**
+   * Viewport width under which the rows render as `MobileCard` instead of as
+   * table rows, for a table whose row needs more width than the shared tablet
+   * breakpoint gives it. Without it the switch happens at that breakpoint, as
+   * it always did. The caller's stylesheet has to move with it: the loading
+   * rows and the table's own surface still read the shared breakpoint from
+   * CSS, which JS cannot see.
+   */
+  cardBreakpoint?: number;
 }
 
 /** Floor for a loading bar, so a narrow column gets a placeholder rather than
@@ -146,9 +156,13 @@ const Table = <TCard,>({
   mobileCardProps,
   singleLineSkeleton = false,
   rightAlignedSkeletonColumns = [],
+  cardBreakpoint,
 }: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
+  // One answer for every layout decision below, so the header, the loading
+  // rows and the loaded rows cannot each pick a different one.
+  const showCards = useBelowWidth(cardBreakpoint) || isMobile || isTablet;
   const limits = [10, 20, 50];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
@@ -320,8 +334,7 @@ const Table = <TCard,>({
         >
           {/* The header stays while fetching: dropping it made the table lose
               its height and snap back once the rows arrived. */}
-          {!isMobile &&
-            !isTablet &&
+          {!showCards &&
             (isLoading || (response?.items && response.items.length !== 0)) && (
               <TableRow data-testid="table-header">
                 {header?.map((item, index) => (
@@ -365,7 +378,7 @@ const Table = <TCard,>({
                       return (
                         <MobileCardItem
                           isAssets={type === 'assets' || type === 'proposals'}
-                          isRightAligned={isMobile || isTablet}
+                          isRightAligned={showCards}
                           key={String(index2) + String(index)}
                           columnSpan={2}
                           isLastRow={index === limit - 1}
@@ -416,7 +429,7 @@ const Table = <TCard,>({
               let spanCount = 0;
               const isLastRow = index === response?.items?.length - 1;
 
-              if ((isMobile || isTablet) && MobileCard) {
+              if (showCards && MobileCard) {
                 return (
                   <MobileCard
                     key={JSON.stringify(item)}
@@ -443,9 +456,7 @@ const Table = <TCard,>({
                         return (
                           <MobileCardItem
                             isAssets={type === 'assets' || type === 'proposals'}
-                            isRightAligned={
-                              (isMobile || isTablet) && isRightAligned
-                            }
+                            isRightAligned={showCards && isRightAligned}
                             key={String(index2) + String(index)}
                             columnSpan={span}
                             isLastRow={isLastRow}
@@ -456,7 +467,7 @@ const Table = <TCard,>({
                             currentColumn={index2}
                             data-testid={`table-row-${index}`}
                           >
-                            {isMobile || isTablet ? (
+                            {showCards ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
                             {/* Called, not mounted as a component type: the

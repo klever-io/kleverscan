@@ -141,20 +141,22 @@ export const MissedCell: React.FC<{
   totalProduced: number;
   shareLabel: string;
 }> = ({ totalMissed, totalProduced, shareLabel }) => {
-  const pct = totalProduced
-    ? (
-        ((Number.isFinite(totalMissed) ? totalMissed : 0) * 100) /
-        totalProduced
-      ).toFixed(2)
-    : '- -';
+  /* Of the blocks this validator was up for, not of the ones it landed.
+     `totalProduced` counts successes only, so missed over produced is not a
+     share at all: one produced against a hundred missed printed 10000.00%.
+     The same denominator `blockResult.successShare` uses on this page, so the
+     two figures can no longer contradict each other. */
+  const missed = Number.isFinite(totalMissed) ? totalMissed : 0;
+  const attempted =
+    (Number.isFinite(totalProduced) ? totalProduced : 0) + missed;
+  const pct = attempted ? ((missed * 100) / attempted).toFixed(2) : '- -';
+
   return (
     <Tooltip
       msg={`${shareLabel}: ${pct}%`}
       focusable
       Component={() => (
-        <AmountMuted>
-          {(totalMissed ?? 0).toLocaleString(NUMBER_LOCALE)}
-        </AmountMuted>
+        <AmountMuted>{missed.toLocaleString(NUMBER_LOCALE)}</AmountMuted>
       )}
     />
   );

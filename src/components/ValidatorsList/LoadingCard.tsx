@@ -61,7 +61,7 @@ export const CompositionPlaceholder: React.FC = () => {
         {LEGEND_STATES.map(state => (
           <LegendItem key={state}>
             <LegendPlaceholderDot />
-            {t(`validators:States.${state}`)}
+            {t(`validators:States.${state}`, { defaultValue: state })}
             <Skeleton width={22} height={12} containerCustomStyles={INLINE} />
           </LegendItem>
         ))}

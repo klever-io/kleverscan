@@ -105,8 +105,11 @@ export const fetchAllValidators = async (): Promise<{
   return {
     validators,
     // The rows themselves, not the header the API sent: they are the set every
-    // figure on the page is computed from.
-    totalRecords: validators.length || totalRecords,
+    // figure on the page is computed from. Not `||`: a page that answers with
+    // no validators is a length of 0, and falling back to the header there
+    // reports a count beside an empty list, which is the mismatch this page
+    // exists to remove.
+    totalRecords: validators.length,
     // Passed through rather than re-derived: this is the same denominator
     // `parseValidators` divides each row by, so the summary tile and the
     // per-row shares agree by construction.

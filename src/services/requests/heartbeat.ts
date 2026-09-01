@@ -36,7 +36,9 @@ export interface VersionStat {
 
 export const compareSemver = (a: string, b: string): number => {
   const parse = (v: string) => {
-    const clean = v.replace(/^v/, '');
+    // Build metadata carries no precedence, and left in place it corrupted
+    // the number beside it: `21+build.1` parsed as -1 and sorted below 20.
+    const clean = v.replace(/^v/, '').split('+')[0];
     const [main, pre] = clean.split('-');
     /* A segment that is not a number sorts below every real one rather than
        becoming NaN. `Number` made this comparator partial: a node reporting
@@ -58,7 +60,22 @@ export const compareSemver = (a: string, b: string): number => {
   }
   if (!va.pre && vb.pre) return 1;
   if (va.pre && !vb.pre) return -1;
-  return va.pre > vb.pre ? 1 : va.pre < vb.pre ? -1 : 0;
+  // Identifier by identifier, numerically where both sides are numbers:
+  // lexical comparison put rc.10 below rc.2.
+  const pa = va.pre.split('.');
+  const pb = vb.pre.split('.');
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const ia = pa[i];
+    const ib = pb[i];
+    if (ia === ib) continue;
+    if (ia === undefined) return -1;
+    if (ib === undefined) return 1;
+    const na = Number(ia);
+    const nb = Number(ib);
+    if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+    return ia > ib ? 1 : -1;
+  }
+  return 0;
 };
 
 /** Strip build path and git describe suffix from a full node version string. */

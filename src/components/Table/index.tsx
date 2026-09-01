@@ -278,11 +278,14 @@ const Table = <TCard,>({
   useEffect(() => {
     if (interval) {
       const intervalId = setInterval(() => {
-        refetch();
+        refetchWhenReady();
       }, interval);
       return () => clearInterval(intervalId);
     }
-  }, [interval, limit]);
+    /* requestReady in the deps on purpose: the callback closes over it, and
+       without the re-run a hold that arrives after mount kept polling through
+       the stale closure. */
+  }, [interval, limit, requestReady]);
 
   const handleScrollTop = () => {
     window.scrollTo({
@@ -447,7 +450,11 @@ const Table = <TCard,>({
                 ))}
             </>
           )}
-          {response?.items &&
+          {/* Held along with everything else: a hold that arrives AFTER a
+              successful load (the version join dropping away mid-session)
+              otherwise painted these cached rows underneath the skeletons. */}
+          {!pending &&
+            response?.items &&
             response?.items?.length > 0 &&
             response?.items?.map((item: any, index: number) => {
               let spanCount = 0;
@@ -526,6 +533,7 @@ const Table = <TCard,>({
         </BackTopButton>
       </ContainerView>
       {showPagination &&
+        !pending &&
         typeof response?.totalPages === 'number' &&
         response?.totalPages > 1 && (
           <PaginationContainer>

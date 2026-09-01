@@ -65,6 +65,19 @@ describe('compareSemver', () => {
     expect(compareSemver('v1.7.21', 'dev')).toBeGreaterThan(0);
     expect(compareSemver('dev', 'v1.7.21')).toBeLessThan(0);
   });
+
+  // Build metadata carries no precedence; left in place it corrupted the
+  // number beside it and sorted the release below its predecessor.
+  it('ignores build metadata', () => {
+    expect(compareSemver('v1.7.21+build.1', 'v1.7.20')).toBeGreaterThan(0);
+    expect(compareSemver('v1.7.21+build.1', 'v1.7.21')).toBe(0);
+  });
+
+  it('compares numeric prerelease identifiers numerically', () => {
+    expect(compareSemver('v1.0.0-rc.10', 'v1.0.0-rc.2')).toBeGreaterThan(0);
+    expect(compareSemver('v1.0.0-rc.2', 'v1.0.0-rc.10')).toBeLessThan(0);
+    expect(compareSemver('v1.0.0-rc.2', 'v1.0.0-rc.2')).toBe(0);
+  });
 });
 
 describe('resolveValidatorVersion', () => {

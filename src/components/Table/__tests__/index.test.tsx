@@ -1,6 +1,12 @@
 import theme from '@/styles/theme';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import React from 'react';
 import { ThemeProvider } from 'styled-components';
 
@@ -120,6 +126,7 @@ const makeProps = (
     cardBreakpoint?: number;
     MobileCard?: ITable['MobileCard'];
     requestReady?: boolean;
+    interval?: number;
   } = {},
 ): ITable => ({
   type: 'accounts',
@@ -142,6 +149,7 @@ const makeProps = (
   cardBreakpoint: options.cardBreakpoint,
   MobileCard: options.MobileCard,
   requestReady: options.requestReady,
+  interval: options.interval,
 });
 
 const renderTable = (ui: React.ReactElement) => {
@@ -325,6 +333,9 @@ describe('Table requestReady', () => {
     const before = request.mock.calls.length;
 
     view.rerender(wrap(false));
+    // The hold that arrives after a load hides the cached rows too, instead
+    // of painting them underneath the skeletons.
+    expect(screen.queryByTestId('stateful-cell')).toBeNull();
     // The reload glyph specifically: the back-to-top arrow is also an svg and
     // sits later in the DOM, so a last-svg pick clicks the wrong control.
     const reload = view.container.querySelector(
@@ -334,6 +345,23 @@ describe('Table requestReady', () => {
     await new Promise(resolve => setTimeout(resolve, 20));
 
     expect(request.mock.calls.length).toBe(before);
+  });
+
+  it('keeps the interval poll behind the hold too', async () => {
+    jest.useFakeTimers();
+    const request = jest.fn(async () => makeResponse([{ id: 1 }]));
+    renderTable(
+      <Table
+        {...makeProps(request, { requestReady: false, interval: 1_000 })}
+      />,
+    );
+
+    await act(async () => {
+      jest.advanceTimersByTime(3_500);
+    });
+
+    expect(request).not.toHaveBeenCalled();
+    jest.useRealTimers();
   });
 
   it('runs the request once ready and swaps the rows in', async () => {

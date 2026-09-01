@@ -17,6 +17,8 @@ import { summaryFigures } from './summaryFigures';
 import {
   AccountsSummaryCard,
   AccountsSummaryLoading,
+  LabelFull,
+  LabelShort,
   TrendNote,
 } from './styles';
 
@@ -85,7 +87,12 @@ const AccountsSummary: React.FC = () => {
       <TilesGrid>
         {totalRecords !== undefined && (
           <Tile>
-            <TileLabel>{t('common:Cards.Total Accounts')}</TileLabel>
+            <TileLabel>
+              <LabelFull>{t('common:Cards.Total Accounts')}</LabelFull>
+              <LabelShort>
+                {t('accounts:List.TotalShort', { defaultValue: 'Accounts' })}
+              </LabelShort>
+            </TileLabel>
             <TileValueRow>
               {/* Written out, not compacted: the figure a reader may quote. The
                   query is unresolved during SSR; the server renders the skeleton. */}

@@ -57,6 +57,7 @@
   "List": {
     "SummaryAria": "Estatísticas de contas",
     "OnChain": "na rede",
+    "TotalShort": "Contas",
     "New24h": "Novas (24h)",
     "VersusYesterday": "{{change}} em relação a ontem",
     "NewWindow": "Novas ({{days}}d)",

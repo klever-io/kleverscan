@@ -663,8 +663,16 @@ export interface IValidator {
   rating: number;
   selfStake: number;
   status: string;
+  /** Leader successes PLUS consensus signatures. Not a block count: summed
+   *  over the set it lands at roughly 21x the chain height, because every
+   *  block is also signed by the rest of the consensus group. */
   totalProduced: number;
   totalMissed: number;
+  /** Blocks this validator actually produced as leader. Summed over the set
+   *  this tracks the chain height (measured 32.804.821 against a height of
+   *  32.806.707), which is what a block count is supposed to do. */
+  blocksProduced: number;
+  blocksMissed: number;
   canDelegate: boolean;
   commission: number;
   maxDelegation: number;

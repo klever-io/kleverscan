@@ -11,14 +11,13 @@ import {
   EmptyText,
   ExpandButton,
   HeaderStack,
-  LatestCallout,
   ModeButton,
   ModeToggle,
   StackedBar,
-  StatDivider,
   StatItem,
   StatLabel,
   StatsStrip,
+  TitleBlock,
   StatValue,
   VersionBadge,
   VersionList,
@@ -32,7 +31,6 @@ export type DistributionMode = 'nodes' | 'stake';
 export interface VersionDistributionProps {
   stats: VersionStat[];
   latestVersion?: string;
-  totalValidators?: number;
   /** True while validators and/or heartbeat are still loading. */
   loading: boolean;
   /** False when heartbeat finished without usable version data. */
@@ -59,7 +57,6 @@ const VersionDistribution: React.FC<
 > = ({
   stats,
   latestVersion,
-  totalValidators,
   loading,
   heartbeatAvailable,
   validatorsAvailable,
@@ -77,8 +74,6 @@ const VersionDistribution: React.FC<
       ? (latestStat?.stakePercent ?? 0)
       : (latestStat?.percent ?? 0);
 
-  // Strip always shows node-based % on latest (upgrade health at a glance).
-  const onLatestNodesPercent = latestStat?.percent;
   const heartbeatFailed = !loading && !heartbeatAvailable;
   const validatorsFailed = !loading && !validatorsAvailable;
 
@@ -147,13 +142,6 @@ const VersionDistribution: React.FC<
 
     return (
       <>
-        {latestVersion && (
-          <LatestCallout $good={onLatestPercent >= 50}>
-            {onLatestPercent.toFixed(1)}% of{' '}
-            {mode === 'stake' ? 'stake' : 'nodes'} on latest ({latestVersion})
-          </LatestCallout>
-        )}
-
         <StackedBar role="img" aria-label="Version distribution bar">
           {stats.map(stat => (
             <BarSegment
@@ -205,51 +193,47 @@ const VersionDistribution: React.FC<
 
   return (
     <HeaderStack data-testid="version-distribution">
-      <StatsStrip aria-label="Validator network summary">
-        <StatItem>
-          <StatLabel>Total Validators</StatLabel>
-          {loading && totalValidators === undefined ? (
-            <Skeleton width={48} height={22} />
-          ) : (
-            <StatValue>{totalValidators ?? '—'}</StatValue>
-          )}
-        </StatItem>
-
-        <StatDivider aria-hidden />
-
-        <StatItem>
-          <StatLabel>Newest Version</StatLabel>
-          {loading && !latestVersion ? (
-            <Skeleton width={80} height={22} />
-          ) : (
-            <StatValue title={latestVersion}>{latestVersion ?? '—'}</StatValue>
-          )}
-        </StatItem>
-
-        <StatDivider aria-hidden />
-
-        <StatItem>
-          <StatLabel>On Latest</StatLabel>
-          {loading && onLatestNodesPercent === undefined ? (
-            <Skeleton width={64} height={22} />
-          ) : onLatestNodesPercent !== undefined ? (
-            <StatValue
-              $accent={onLatestNodesPercent >= 50}
-              data-testid="on-latest-callout"
-            >
-              {onLatestNodesPercent.toFixed(1)}%
-            </StatValue>
-          ) : (
-            <StatValue>—</StatValue>
-          )}
-        </StatItem>
-      </StatsStrip>
-
       <DistributionCard>
         <CardTop>
-          <CardTitle>
-            <strong>Version Distribution</strong>
-          </CardTitle>
+          <TitleBlock>
+            <CardTitle>
+              <strong>Version Distribution</strong>
+            </CardTitle>
+
+            <StatsStrip aria-label="Validator network summary">
+              <StatItem>
+                <StatLabel>Newest</StatLabel>
+                {loading && !latestVersion ? (
+                  <Skeleton width={80} height={16} />
+                ) : (
+                  <StatValue title={latestVersion}>
+                    {latestVersion ?? '—'}
+                  </StatValue>
+                )}
+              </StatItem>
+
+              <StatItem>
+                {/* Follows the mode: it sits directly above the bar it
+                    describes, so pinning it to nodes would print two
+                    disagreeing "on latest" figures the moment you pick Stake. */}
+                {loading && latestStat === undefined ? (
+                  <Skeleton width={64} height={16} />
+                ) : latestStat !== undefined ? (
+                  <StatValue
+                    $accent={onLatestPercent >= 50}
+                    data-testid="on-latest-callout"
+                  >
+                    {`${onLatestPercent.toFixed(1)}% of ${
+                      mode === 'stake' ? 'stake' : 'nodes'
+                    } on latest`}
+                  </StatValue>
+                ) : (
+                  <StatValue>—</StatValue>
+                )}
+              </StatItem>
+            </StatsStrip>
+          </TitleBlock>
+
           {!heartbeatFailed && !validatorsFailed && (
             <ModeToggle role="group" aria-label="Distribution metric">
               <ModeButton

@@ -40,8 +40,10 @@ import {
   CardStatusCell,
   CardTime,
   CardValue,
-  TimeExact,
+  HeaderBadges,
+  HeaderMeta,
   HeaderStatusPill,
+  TimeExact,
   ToLabel,
 } from './styles';
 
@@ -124,50 +126,59 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
           href={`/transaction/${hash}`}
           data-testid="transaction-link"
         >
-          <Mono>{parseAddress(hash, 16)}</Mono>
+          <Mono>{parseAddress(hash, 14)}</Mono>
         </CardHashLink>
-        {contractType === 'Multi contract' ? (
-          <MultiContractBadge contract={contract} />
-        ) : (
-          <TransactionTypeBadge label={typeLabel} contractType={contractType} />
-        )}
-        <HeaderStatusPill>
-          <TransactionStatusPill status={status} />
-        </HeaderStatusPill>
-        {showDirection && <InOutBadge direction={direction} />}
-        <CardTime title={formatDate(timestamp || Date.now())}>
-          {/* The same expression the desktop column uses, rather than a
+        {/* One group, so a tight header can never strand the status badge on
+            a line without its type badge. */}
+        <HeaderBadges>
+          {contractType === 'Multi contract' ? (
+            <MultiContractBadge contract={contract} />
+          ) : (
+            <TransactionTypeBadge
+              label={typeLabel}
+              contractType={contractType}
+            />
+          )}
+          <HeaderStatusPill>
+            <TransactionStatusPill status={status} />
+          </HeaderStatusPill>
+          {showDirection && <InOutBadge direction={direction} />}
+        </HeaderBadges>
+        <HeaderMeta>
+          <CardTime title={formatDate(timestamp || Date.now())}>
+            {/* The same expression the desktop column uses, rather than a
               hand-built one: formatDate's elapsed form is
               "<n> <unit> ago (<date> UTC)" and both halves come from it. */}
-          {
-            formatDate(timestamp || Date.now(), {
-              showElapsedTime: true,
-            }).split(' (')[0]
-          }
-          <TimeExact>{` (${formatDate(timestamp || Date.now())})`}</TimeExact>
-        </CardTime>
-        <RowActions>
-          <CopyAction
-            value={hash}
-            label={t('transactions:Table.CopyHash', {
-              defaultValue: 'Copy transaction hash',
-            })}
-            announcement={t('transactions:Table.HashCopied', {
-              defaultValue: 'Transaction hash copied to clipboard',
-            })}
-            large
-          />
-          <ExplorerLink
-            href={`/transaction/${hash}`}
-            label={t('transactions:Table.OpenTransaction', {
-              defaultValue: 'Open transaction in a new tab',
-            })}
-            title={t('transactions:Table.OpenInNewTab', {
-              defaultValue: 'Open in a new tab',
-            })}
-            large
-          />
-        </RowActions>
+            {
+              formatDate(timestamp || Date.now(), {
+                showElapsedTime: true,
+              }).split(' (')[0]
+            }
+            <TimeExact>{` (${formatDate(timestamp || Date.now())})`}</TimeExact>
+          </CardTime>
+          <RowActions>
+            <CopyAction
+              value={hash}
+              label={t('transactions:Table.CopyHash', {
+                defaultValue: 'Copy transaction hash',
+              })}
+              announcement={t('transactions:Table.HashCopied', {
+                defaultValue: 'Transaction hash copied to clipboard',
+              })}
+              large
+            />
+            <ExplorerLink
+              href={`/transaction/${hash}`}
+              label={t('transactions:Table.OpenTransaction', {
+                defaultValue: 'Open transaction in a new tab',
+              })}
+              title={t('transactions:Table.OpenInNewTab', {
+                defaultValue: 'Open in a new tab',
+              })}
+              large
+            />
+          </RowActions>
+        </HeaderMeta>
       </MobileTopRow>
       <CardFields>
         <CardRow>

@@ -3,25 +3,10 @@ import {
   UNKNOWN_VERSION,
 } from '@/services/requests/heartbeat';
 import { IPaginatedResponse, IValidator } from '@/types/index';
+import { normalizePageParam } from '@/utils/table';
 
 /** Page size to fall back on when the URL carries something unusable. */
 export const DEFAULT_PAGE_LIMIT = 10;
-
-/**
- * A page or limit that reached us from `router.query`, reduced to a usable
- * integer.
- *
- * `Number.isFinite` first, and deliberately: `Infinity` is the value that got
- * past the equivalent guard on the accounts list (#696). It survives every
- * `> 0` and `Math.max` test, then turns `(page - 1) * limit` into `NaN` and
- * `slice(NaN, NaN)` into an empty page, while the pager beside it still
- * reports the full record count.
- */
-export const usablePageNumber = (value: number, fallback: number): number => {
-  if (!Number.isFinite(value)) return fallback;
-  const floored = Math.floor(value);
-  return floored >= 1 ? floored : fallback;
-};
 
 /** Mirrors the API's own name matching: case-insensitive prefix. */
 export const filterByName = (
@@ -70,10 +55,10 @@ export const paginateValidators = (
   page: number,
   limit: number,
 ): IPaginatedResponse => {
-  const safeLimit = usablePageNumber(limit, DEFAULT_PAGE_LIMIT);
+  const safeLimit = normalizePageParam(limit, DEFAULT_PAGE_LIMIT);
   const totalRecords = validators.length;
   const totalPages = Math.max(1, Math.ceil(totalRecords / safeLimit));
-  const safePage = Math.min(usablePageNumber(page, 1), totalPages);
+  const safePage = normalizePageParam(page, 1, totalPages);
   const start = (safePage - 1) * safeLimit;
 
   return {

@@ -1,10 +1,15 @@
 import { klvAmount, NUMBER_LOCALE } from '@/components/DataList/format';
-import { AmountMuted, AmountPrimary } from '@/components/DataList/styles';
+import {
+  AmountMuted,
+  AmountPrimary,
+  NumericCell,
+} from '@/components/DataList/styles';
 import {
   resolveValidatorVersion,
   UNKNOWN_VERSION,
 } from '@/services/requests/heartbeat';
 import { IRowSection, IValidator } from '@/types/index';
+import { commissionPercent, ratingPercent } from '@/utils/validatorRates';
 import React from 'react';
 import {
   CapacityCell,
@@ -15,7 +20,6 @@ import {
   VersionBadge,
 } from './cells';
 import { VALIDATOR_COLUMNS, ValidatorColumnKey } from './columns';
-import { NumericCell } from './styles';
 
 export interface IValidatorRowContext {
   versionMap: Record<string, string>;
@@ -25,6 +29,10 @@ export interface IValidatorRowContext {
    *  the set, so without this flag an outage is indistinguishable from the
    *  truth. */
   heartbeatAvailable: boolean;
+  /** The shared query has not settled yet. Distinct from the flag above: the
+   *  table's own request lands first, so without this every row reported an
+   *  outage for the few hundred ms in between. */
+  sourcesLoading: boolean;
   labels: IValidatorRowLabels;
 }
 
@@ -59,7 +67,13 @@ export const validatorRowSections = (
     blsPublicKey,
   } = validator;
 
-  const { versionMap, latestVersion, heartbeatAvailable, labels } = context;
+  const {
+    versionMap,
+    latestVersion,
+    heartbeatAvailable,
+    sourcesLoading,
+    labels,
+  } = context;
   const resolved = resolveValidatorVersion(blsPublicKey, versionMap);
   const version = resolved === UNKNOWN_VERSION ? undefined : resolved;
 
@@ -71,12 +85,16 @@ export const validatorRowSections = (
     validator: () => (
       <ValidatorIdentity validator={validator} labels={labels} />
     ),
-    status: () => <StatusBadge status={status} />,
+    status: () => (
+      <StatusBadge status={status} label={labels.statusLabel(status)} />
+    ),
     rating: () => (
-      <AmountMuted>{`${((rating * 100) / 10000000).toFixed(2)}%`}</AmountMuted>
+      <AmountMuted>{`${ratingPercent(rating).toFixed(2)}%`}</AmountMuted>
     ),
     stake: () => <AmountPrimary>{klvAmount(staked)}</AmountPrimary>,
-    commission: () => <AmountMuted>{`${commission / 10 ** 2}%`}</AmountMuted>,
+    commission: () => (
+      <AmountMuted>{`${commissionPercent(commission)}%`}</AmountMuted>
+    ),
     produced: () => (
       <AmountMuted>
         {(totalProduced ?? 0).toLocaleString(NUMBER_LOCALE)}
@@ -92,12 +110,13 @@ export const validatorRowSections = (
     version: () => (
       <VersionBadge
         version={version}
-        isLatest={!!version && version === latestVersion}
+        latestVersion={latestVersion}
+        loading={sourcesLoading}
         unknownLabel={
           heartbeatAvailable ? labels.unknownVersion : labels.versionUnavailable
         }
         unknownTooltip={
-          heartbeatAvailable ? undefined : labels.versionUnavailableTooltip
+          heartbeatAvailable ? undefined : labels.versionUnavailableReason
         }
       />
     ),

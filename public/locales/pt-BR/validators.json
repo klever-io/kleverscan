@@ -42,14 +42,15 @@
     "NoDelegationLimit": "Sem limite",
     "CapacityDetail": "{{staked}} de {{cap}} delegado",
     "VersionUnavailable": "Indisponível",
-    "VersionUnavailableTooltip": "Não foi possível carregar as versões dos nós"
+    "VersionUnavailableReason": "Não foi possível carregar as versões dos nós"
   },
   "Filters": {
     "Name": "Nome",
     "Version": "Versão",
     "SearchName": "Buscar nome",
     "SearchVersion": "Buscar versão",
-    "VersionUnavailable": "Não foi possível carregar as versões dos nós"
+    "NotFound": "Nenhum resultado",
+    "Clear": "Limpar filtro {{filter}}"
   },
   "Summary": {
     "Label": "Estatísticas da rede de validadores",

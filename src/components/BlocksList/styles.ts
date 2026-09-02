@@ -108,11 +108,6 @@ export const UpdatedNote = styled.p`
 
 /* -------------------------------- cells ---------------------------------- */
 
-/** Digits of one width, so a column of them reads as a column. */
-export const NumericCell = styled.span`
-  font-variant-numeric: tabular-nums;
-`;
-
 /* --------------------------- scoped table skin --------------------------- */
 
 /** `nth-child` is 1-based; the column indexes are not. */

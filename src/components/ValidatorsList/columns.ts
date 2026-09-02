@@ -24,44 +24,18 @@ export interface IValidatorColumn {
 
 /**
  * The column layout of the validator list, in one place, so a heading cannot
- * drift from the cell under it.
+ * drift from the cell under it. Single line per row, one datum per column,
+ * the same move as blocks in #701 and smart-contracts in #703.
  *
- * Single line per row, one datum per column. The page stacked two values in
- * four of its seven cells, which measured 83px per row against the 60px every
- * other list here uses. Same move as blocks in #701 and smart-contracts in
- * #703.
+ * `canDelegate` rides along as a badge in the validator cell. `capacity`
+ * replaces "Cumulative Stake", which never held a cumulative figure: how full
+ * a validator's delegation cap is answers the question this page is opened
+ * for, and it spreads (74 validators at or above 99,5 percent, 71 below 25,
+ * median 86,2).
  *
- * `canDelegate` lost its column in that change: it is a yes/no that now rides
- * along as a badge in the validator cell, the way accounts carries its badges.
- *
- * `capacity` replaces the old "Cumulative Stake". That column never held a
- * cumulative figure: `parseValidators` fills it with the validator's own share
- * of network stake, which measured 0,35 percent per row on mainnet and drew a
- * 0,47px fill on a 134px track. How full a validator's delegation cap already
- * is answers the question this page is actually opened for, and it spreads:
- * 74 validators sit at or above 99,5 percent, 71 below 25 percent, median 86,2.
- * It sits beside Commission because the two together are the delegation story.
+ * The row fits from `ROW_LAYOUT_MIN_WIDTH` (measured min-content 1185px plus
+ * margin); a new column or a wider cell moves that measurement.
  */
-/**
- * The viewport width from which a validator fits on one row.
- *
- * Measured over 50 rows: the row's min-content is 1185px against a content box
- * of `viewport - 32`, and the page stops scrolling sideways at 1220. 1240
- * leaves margin, and matches what the transactions row needs, so the two lists
- * change shape at the same width.
- *
- * Below this the list renders as cards. It used to squeeze instead, between
- * the tablet breakpoint and 1300px, by truncating cells, narrowing the
- * capacity track and dropping the cell padding to 7px. That squeeze still left
- * the page 119px too wide at 1026, because nothing bounded the validator name;
- * `AddressLink` is capped in the wrapper now, and the row is not asked to fit
- * a viewport it does not fit.
- *
- * This lives next to the column list because that is what it measures: a new
- * column or a wider cell moves it.
- */
-export const ROW_LAYOUT_MIN_WIDTH = 1240;
-
 export const VALIDATOR_COLUMNS: IValidatorColumn[] = [
   { key: 'rank', header: 'Rank', i18nKey: 'validators:Table.Rank', width: 65 },
   {

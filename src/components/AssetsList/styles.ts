@@ -1,6 +1,12 @@
+import { ROW_LAYOUT_MIN_WIDTH, belowWidth } from '@/components/DataList/layout';
 import {
+  assetCardHeaderRules,
   AssetName,
+  compactFilterRow,
+  holdTiles,
+  SummaryCard,
   DATA_LIST_ROW_HEIGHT,
+  dataListCardBand,
   dataListTableSkin,
   inCard,
   MobileListCard,
@@ -10,28 +16,15 @@ import {
 import {
   HeaderItem,
   MobileCardItem,
-  TableBody,
   TableRow,
 } from '@/components/Table/styles';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-/**
- * The viewport width from which an asset fits on one row.
- *
- * Measured over 50 rows as the widest text each column carries plus its cell
- * padding: 1158px against a content box of `viewport - 32`, so the row needs
- * 1190. 1240 is the number the transactions and validators lists also change
- * shape at, and it leaves room for a longer asset name, which is chosen by
- * whoever issued the asset and is not bounded here.
- *
- * Below this the list renders as cards; it used to keep the table down to the
- * shared tablet breakpoint and push the page 56px sideways at 1026.
- */
-export const ROW_LAYOUT_MIN_WIDTH = 1240;
+const BELOW_ROW = belowWidth(ROW_LAYOUT_MIN_WIDTH);
 
-/** `max-width: N` and `min-width: N` both match at exactly N, and the row
- *  layout owns N. */
-const BELOW_ROW = `${ROW_LAYOUT_MIN_WIDTH - 0.02}px`;
+export const RegistryCard = styled(SummaryCard)`
+  ${holdTiles(4)}
+`;
 
 /* ------------------------------ supply cells ----------------------------- */
 
@@ -106,13 +99,9 @@ export const RewardsMuted = styled.span`
 
 /* ------------------------------ registry strip --------------------------- */
 
-/** The composition bar and legend are desktop-and-tablet only; on phones the
-    strip keeps just its tiles to protect above-the-fold space. */
-export const StripBarArea = styled.div`
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    display: none;
-  }
-`;
+/** The bar reads at every width: its segments are percentages and the legend
+ *  wraps, so the old phone-width display:none only lost information. */
+export const StripBarArea = styled.div``;
 
 /* --------------------------- mobile card pieces -------------------------- */
 
@@ -160,34 +149,17 @@ export const MobileCapCaption = styled.span`
  */
 export const AssetsTableWrapper = styled.div`
   ${dataListTableSkin}
+  ${compactFilterRow}
 
-  /* The copy and open buttons belong beside the asset, at every card width.
-     RowActions carries margin-left:auto for the table row it was drawn for and
-     the skin only zeroes it from the shared breakpoint up, so the pair sat
-     against the card's right edge below 1025 and against the name above it.
-     Same rule the validator card carries, so the two lists behave alike. */
-  ${MobileListCard} ${RowActions} {
-    margin-left: 0;
-  }
-
-  /* On a phone the pair sits at the card's right edge, the same place on every
-     card. Beside the identity it tracked the name's width, which varies per
-     row: measured at 360 the icons landed anywhere from 107px to 212px in, so
-     scanning a column of cards the buttons never sat still. Above this width
-     the card is wide enough for them to stay next to the identity, which is
-     where they belong when there is room. */
-  @media screen and (max-width: 767.98px) {
-    ${MobileListCard} ${RowActions} {
-      margin-left: auto;
-    }
-  }
+  ${assetCardHeaderRules}
 
   /* The cap bar shares the Circulating line only where that line has room for
-     it. A phone card is about 300px wide, and the 150px track plus its caption
-     left the figure 90px, which broke "10.99 M KFI" across two lines. Below
-     the mobile width the bar takes a line of its own again, after the figure,
-     and the card is four rows there instead of three. */
-  @media screen and (max-width: 767.98px) {
+     it: on a ~300px phone card the 150px track plus its caption broke
+     "10.99 M KFI" across two lines. The widest row on the page measures 396px,
+     which a 480 viewport still holds (420 inner), so only below that does the
+     bar take a line of its own; the old 768 cut made every tablet card a row
+     taller for nothing. */
+  @media screen and (max-width: 479.98px) {
     ${MobileTotalRow} {
       flex-wrap: wrap;
     }
@@ -204,62 +176,12 @@ export const AssetsTableWrapper = styled.div`
     }
   }
 
-  /* Between the shared breakpoint and this list's own the rows are cards, and
-     the shared stylesheet still lays the surface out as a table. A styled
-     component's own media query is not reachable from outside it, so it is
-     undone here. The TableBody rule is not cosmetic: display:table wraps each
-     MobileListCard in an anonymous cell and lays them out side by side. */
-  /* The card list must be allowed to be narrower than its widest card. The
-     shared TableBody carries min-width:fit-content for the table it was
-     drawn for, and in card form that pinned the whole column to the widest
-     asset name on the page: 378px against a 328px screen at 360, so a single
-     long name pushed every card sideways. Only visible with enough rows on
-     screen to contain one, which is why 10 rows looked fine and 50 did not. */
-  @media screen and (max-width: ${BELOW_ROW}) {
-    ${TableBody} {
-      min-width: 0;
-    }
-  }
+  ${dataListCardBand(BELOW_ROW)}
 
   @media screen and (min-width: ${props =>
-      props.theme.breakpoints.tablet}) and (max-width: ${BELOW_ROW}) {
-    ${TableBody} {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 0;
-      border: none;
-      background-image: none;
-    }
-
+    props.theme.breakpoints.tablet}) and (max-width: ${BELOW_ROW}) {
     ${TableRow} {
-      display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 4px;
-      padding: 16px;
-      border-radius: 16px;
-      border: solid 1px
-        ${props =>
-          props.theme.dark ? props.theme.darkGray : props.theme.black10};
-      background-color: ${props => props.theme.white};
-    }
-
-    ${TableRow} ${MobileCardItem} {
-      display: flex;
-      flex-direction: column;
-      width: auto;
-      max-width: none;
-      height: auto;
-      padding: 0;
-      border-bottom: none;
-      font-size: 0.75rem;
-    }
-
-    ${TableRow} ${MobileCardItem} a,
-    ${TableRow} ${MobileCardItem} span {
-      height: auto;
-      min-width: 0;
-      white-space: normal;
     }
   }
 

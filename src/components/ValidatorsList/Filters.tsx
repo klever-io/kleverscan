@@ -1,12 +1,12 @@
 import Filter, { IFilter } from '@/components/Filter';
 import { CompactFilterBar } from '@/components/DataList/styles';
-import { buildVersionStats } from '@/services/requests/heartbeat';
 import { setQueryAndRouter } from '@/utils';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useValidatorSources } from './useValidatorSources';
+import { useVersionStats } from './useVersionStats';
 
 /** The value Filter prepends to every list, and what "drop this filter" means. */
 const ALL_VALUE = 'All';
@@ -22,6 +22,7 @@ const ValidatorsFilters: React.FC = () => {
   const router = useRouter();
   const { t } = useTranslation(['validators']);
   const { data, isLoading } = useValidatorSources();
+  const { stats } = useVersionStats();
 
   /* The version of a validator is a join of the list against the heartbeat, so
      with either half missing the dropdown has nothing to offer: an empty map
@@ -30,8 +31,19 @@ const ValidatorsFilters: React.FC = () => {
      open, because names come from the list half alone. */
   const versionResolvable = data.heartbeatAvailable && data.validatorsAvailable;
 
-  const versions = buildVersionStats(data.validators, data.versionMap, '').map(
-    stat => stat.version,
+  /* Settled AND missing, not merely missing: while the query is in flight both
+     flags are false, and gating the placeholder on `versionResolvable` alone
+     had the search box announce an outage on every ordinary page load. */
+  const versionFailed = !isLoading && !versionResolvable;
+
+  const versions = useMemo(() => stats.map(stat => stat.version), [stats]);
+
+  const names = useMemo(
+    () =>
+      data.validators
+        .map(validator => validator.name)
+        .filter((name): name is string => !!name),
+    [data.validators],
   );
 
   const patch = (key: string, selected: string): void => {
@@ -48,25 +60,36 @@ const ValidatorsFilters: React.FC = () => {
     setQueryAndRouter(updated, router);
   };
 
+  const shared = {
+    notFoundLabel: t('validators:Filters.NotFound'),
+  };
+
   const filters: IFilter[] = [
     {
+      ...shared,
       title: t('validators:Filters.Name'),
       testId: 'validator-name',
       placeholder: t('validators:Filters.SearchName'),
-      data: data.validators
-        .map(validator => validator.name)
-        .filter((name): name is string => !!name),
+      clearLabel: t('validators:Filters.Clear', {
+        filter: t('validators:Filters.Name'),
+      }),
+      data: names,
       onClick: selected => patch('name', selected),
       current:
         typeof router.query.name === 'string' ? router.query.name : undefined,
       loading: isLoading,
     },
     {
+      ...shared,
       title: t('validators:Filters.Version'),
       testId: 'validator-version',
-      placeholder: versionResolvable
-        ? t('validators:Filters.SearchVersion')
-        : t('validators:Filters.VersionUnavailable'),
+      // No outage variant here: the placeholder only renders inside the OPEN
+      // panel, and `disabledInput` blocks opening in exactly that state. The
+      // reason reaches the reader through the version card and the row badges.
+      placeholder: t('validators:Filters.SearchVersion'),
+      clearLabel: t('validators:Filters.Clear', {
+        filter: t('validators:Filters.Version'),
+      }),
       data: versionResolvable ? versions : [],
       onClick: selected => patch('version', selected),
       current:
@@ -74,7 +97,7 @@ const ValidatorsFilters: React.FC = () => {
           ? router.query.version
           : undefined,
       loading: isLoading,
-      disabledInput: !isLoading && !versionResolvable,
+      disabledInput: versionFailed,
     },
   ];
 

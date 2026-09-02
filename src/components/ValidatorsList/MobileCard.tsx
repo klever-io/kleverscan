@@ -1,5 +1,6 @@
 import { klvAmount, NUMBER_LOCALE } from '@/components/DataList/format';
 import CopyAction from '@/components/DataList/CopyAction';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
   AddressLink,
@@ -15,10 +16,12 @@ import {
   UNKNOWN_VERSION,
 } from '@/services/requests/heartbeat';
 import { IValidator } from '@/types/index';
+import { commissionPercent, ratingPercent } from '@/utils/validatorRates';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { validatorCapacity } from './capacity';
 import { StatusBadge, VersionBadge } from './cells';
+import { DelegateSlot } from './styles';
 
 export interface IValidatorsMobileCardExtras {
   versionMap: Record<string, string>;
@@ -26,6 +29,9 @@ export interface IValidatorsMobileCardExtras {
   /** Same reason as on the desktop row: with the heartbeat down every version
    *  resolves to Unknown, which is also a real state here. */
   heartbeatAvailable: boolean;
+  /** The shared query has not settled yet, which is not the same as it having
+   *  failed. */
+  sourcesLoading: boolean;
 }
 
 export interface IValidatorsMobileCardProps
@@ -50,6 +56,7 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
   versionMap,
   latestVersion,
   heartbeatAvailable,
+  sourcesLoading,
 }) => {
   const { t } = useTranslation(['validators']);
   const {
@@ -62,6 +69,7 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
     commission,
     maxDelegation,
     rating,
+    canDelegate,
     totalProduced,
     totalMissed,
     blsPublicKey,
@@ -81,7 +89,30 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
         >
           {`${rank}. ${name || parsedAddress}`}
         </AddressLink>
-        <StatusBadge status={status} />
+        <StatusBadge
+          status={status}
+          label={t(`validators:States.${status}`, { defaultValue: status })}
+        />
+        {/* The yes/no a delegator opens this page for, at the row's right edge
+            rather than on a line of its own. The capacity line below does not
+            answer it: an uncapped validator that refuses delegation still
+            prints "No limit". */}
+        <DelegateSlot>
+          <ExplainedBadge
+            msg={t(
+              canDelegate
+                ? 'validators:List.CanDelegateTooltip'
+                : 'validators:List.CannotDelegateTooltip',
+            )}
+            variant={canDelegate ? 'success' : 'neutral'}
+          >
+            {t(
+              canDelegate
+                ? 'validators:List.CanDelegate'
+                : 'validators:List.CannotDelegate',
+            )}
+          </ExplainedBadge>
+        </DelegateSlot>
         <RowActions>
           <CopyAction
             value={ownerAddress}
@@ -114,13 +145,13 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
           }`}
         </MobileMetaItem>
         <MobileMetaItem>
-          {`${t('validators:Table.Commission')} ${commission / 10 ** 2}%`}
+          {`${t('validators:Table.Commission')} ${commissionPercent(commission)}%`}
         </MobileMetaItem>
       </MobileMetaRow>
 
       <MobileMetaRow>
         <MobileMetaItem>
-          {`${t('validators:Table.Rating')} ${((rating * 100) / 10000000).toFixed(2)}%`}
+          {`${t('validators:Table.Rating')} ${ratingPercent(rating).toFixed(2)}%`}
         </MobileMetaItem>
         <MobileMetaItem>
           {`${t('validators:Table.Produced')} ${(totalProduced ?? 0).toLocaleString(NUMBER_LOCALE)}`}
@@ -133,7 +164,8 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
         </MobileMetaItem>
         <VersionBadge
           version={version}
-          isLatest={!!version && version === latestVersion}
+          latestVersion={latestVersion}
+          loading={sourcesLoading}
           unknownLabel={t(
             heartbeatAvailable
               ? 'validators:List.UnknownVersion'
@@ -142,7 +174,7 @@ const ValidatorsMobileCard: React.FC<IValidatorsMobileCardProps> = ({
           unknownTooltip={
             heartbeatAvailable
               ? undefined
-              : t('validators:List.VersionUnavailableTooltip')
+              : t('validators:List.VersionUnavailableReason')
           }
         />
       </MobileMetaRow>

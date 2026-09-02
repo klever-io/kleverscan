@@ -5,21 +5,24 @@ import {
   BadgePill,
   BadgeVariant,
   DATA_LIST_ROW_HEIGHT,
+  dataListCardBand,
+  dataListRowPadding,
   dataListTableSkin,
   focusRing,
+  visuallyHiddenRules,
   inCard,
+  MobileListCard,
   MobileTopRow,
   RowActions,
   SummaryCard,
   TilesGrid,
 } from '@/components/DataList/styles';
-import SummaryLoading from '@/components/DataList/SummaryLoading';
+import { belowWidth } from '@/components/DataList/layout';
 import {
   FloatContainer,
   HeaderItem,
   MobileCardItem,
   MobileHeader,
-  TableBody,
   TableControls,
   TableRow,
 } from '@/components/Table/styles';
@@ -44,7 +47,7 @@ interface IRowLayoutWidth {
 /** Same reason as BELOW_ROW_LAYOUT one breakpoint up: `max-width: N` and
  *  `min-width: N` both match at exactly N, and the row layout owns N. */
 const belowRow = (props: IRowLayoutWidth): string =>
-  `${props.$rowLayoutMin - 0.02}px`;
+  belowWidth(props.$rowLayoutMin);
 
 const fromRow = (props: IRowLayoutWidth): string => `${props.$rowLayoutMin}px`;
 
@@ -106,6 +109,48 @@ export const DirectionStatusBadge = styled.span<{ $variant: BadgeVariant }>`
  * narrow viewport either; it is simply not used on one, which is what keeps
  * the page from scrolling sideways at any width.
  */
+export const CardHashLink = styled(Link)`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  color: ${props => props.theme.black};
+
+  &:focus-visible {
+    outline: 2px solid ${props => props.theme.violet};
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+`;
+
+/** The header badges as one unit: the type badge and its status (and the
+ *  in/out badge on account lists) either share the hash's line or drop
+ *  together, never one without the other. */
+export const HeaderBadges = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+`;
+
+/** The age beside the card's action buttons, as one corner group. */
+export const HeaderMeta = styled.span`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  ${RowActions} {
+    margin-left: 0;
+  }
+`;
+
+export const CardTime = styled.span`
+  font-size: 0.75rem;
+  color: ${props => props.theme.darkText};
+  white-space: nowrap;
+`;
+
 export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
   ${dataListTableSkin}
 
@@ -139,65 +184,62 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
     }
   }
 
-  /* Between the shared breakpoint and this list's own, the rows are cards and
-     the shared stylesheet still lays the surface out as a table. A styled
-     component's own media query is not reachable from outside it, so it is
-     undone here.
+  ${dataListCardBand(belowRow)}
 
-     The TableBody rule is not cosmetic: display:table wraps each
-     MobileListCard in an anonymous cell, which puts all ten of them side by
-     side on a single line. */
-  @media screen and (min-width: ${props =>
-      props.theme.breakpoints.tablet}) and (max-width: ${belowRow}) {
-    ${TableBody} {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 0;
-      border: none;
-      background-image: none;
+  /* The age and the two buttons live in one group in the card's top-right
+     corner, the same spot on every card at every width. In flow they wrapped
+     per card: a wide type badge pushed just the buttons onto a second line
+     hard left while the time stayed up right, so two neighbouring cards put
+     them in different places. Out of flow, the badges are the element that
+     wraps when the header is tight, and the top row reserves the group's
+     widest width per band so nothing slides under it: below the mobile width
+     the exact date is hidden and the group is the short age plus 76px of
+     buttons; above it the date adds ~140px. */
+  ${MobileListCard} {
+    position: relative;
+  }
+
+  /* rem, not px: the corner's occupants are text-sized, so a text-only scale
+     (root font bumped, viewport unchanged) grew the group past a px reserve
+     and into the badges (measured 179px against 160 at 2x). Zoom was already
+     fine, it re-engages the media bands. 18.5rem is the measured 296px. */
+  ${MobileListCard} ${MobileTopRow} {
+    padding-right: 18.5rem;
+  }
+
+  ${MobileListCard} ${CardHashLink} {
+    flex-shrink: 1;
+    min-width: 56px;
+  }
+
+  /* One shape per width, not per card: below this every card puts its badge
+     group on a second line, above it every card holds one line, so no width
+     mixes the two shapes the way content-driven wrapping did. The cut is the
+     floor at which the widest header still fits with the hash shrunk to its
+     56px minimum (smart contract badge, status, the account lists' in/out
+     badge, the reserved corner: 556px of viewport, measured); above it only
+     the hash gives, into its ellipsis. */
+  @media screen and (max-width: 559.98px) {
+    ${MobileListCard} ${MobileTopRow} {
+      flex-wrap: wrap;
     }
 
-    ${TableRow} {
-      display: grid;
-      gap: 4px;
-      padding: 16px;
-      border-radius: 16px;
-      border: solid 1px
-        ${props =>
-          props.theme.dark ? props.theme.darkGray : props.theme.black10};
-      background-color: ${props => props.theme.white};
-    }
-
-    /* Through TableRow to clear the skin's own :first-child and :last-child
-       cell padding, which matches on class count alone. */
-    ${TableRow} ${MobileCardItem} {
-      display: flex;
-      flex-direction: column;
-      width: auto;
-      max-width: none;
-      height: auto;
-      padding: 0;
-      border-bottom: none;
-      font-size: 0.75rem;
-    }
-
-    ${TableRow} ${MobileCardItem} a,
-    ${TableRow} ${MobileCardItem} span {
-      height: auto;
-      min-width: 0;
-      white-space: normal;
+    ${MobileListCard} ${HeaderBadges} {
+      flex-basis: 100%;
     }
   }
 
-  /* The card header holds a hash, two badges, a timestamp and two buttons on
-     one nowrap line. Below the mobile width that is 15px more than it has, and
-     the hash is the element that gives: measured at 390 and 480px, it was
-     clipped to 124 of the 140 it needs. Wrapping drops the time and the
-     buttons instead. */
+  ${MobileListCard} ${HeaderMeta} {
+    position: absolute;
+    top: 8px;
+    right: 14px;
+    height: 2rem;
+  }
+
   @media screen and (max-width: ${BELOW_ROW_LAYOUT}) {
-    ${MobileTopRow} {
-      flex-wrap: wrap;
+    ${MobileListCard} ${MobileTopRow} {
+      /* The measured 160px: the exact date is hidden here. */
+      padding-right: 10rem;
     }
   }
 
@@ -283,35 +325,9 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
   /* ----------------------------- the row band ------------------------------ */
 
   @media screen and (min-width: ${fromRow}) {
-    /* 8px of side padding rather than the skin's 12, and 12 rather than 16 on
-       the two outer edges. Nine columns is more than any other list here
-       carries, and the skin's spacing spent 224px of the row on padding
-       against 1045px of text; this spends 152. The 72px it frees is what lets
-       the row fit a 1280px laptop instead of asking for 1360. The header takes
-       the same values or the columns stop lining up. */
-    ${MobileCardItem} {
-      padding: 8px;
-    }
-
-    ${MobileCardItem}:first-child {
-      padding-left: 12px;
-    }
-
-    ${MobileCardItem}:last-child {
-      padding-right: 12px;
-    }
-
-    ${HeaderItem} {
-      padding: 12px 8px;
-    }
-
-    ${HeaderItem}:first-child {
-      padding-left: 12px;
-    }
-
-    ${HeaderItem}:last-child {
-      padding-right: 12px;
-    }
+    /* The 72px this frees against the skin's own spacing is what lets a
+       nine-column row fit a 1280px laptop instead of asking for 1360. */
+    ${dataListRowPadding}
 
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};
@@ -347,14 +363,16 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
       text-decoration: underline;
       text-underline-offset: 0.2rem;
     }
+  }
 
-    /* Set by TransactionTypeBadge on every badge sharing the hovered
-       contract type. */
-    ${BadgePill}.type-hover-match {
-      outline: 1px dashed
-        ${props => (props.theme.dark ? '#C95ED4' : props.theme.violet)};
-      outline-offset: 1px;
-    }
+  /* Outside the row band on purpose: the hover handler sits on the badge,
+     which the mobile card renders too, so scoping the paint to the row left
+     every width below it sweeping the whole table body on each pointer move
+     and painting nothing. */
+  ${BadgePill}.type-hover-match {
+    outline: 1px dashed
+      ${props => (props.theme.dark ? '#C95ED4' : props.theme.violet)};
+    outline-offset: 1px;
   }
 `;
 
@@ -404,11 +422,6 @@ const threeTilesThenTwo = css`
 `;
 
 export const PageSummaryCard = styled(SummaryCard)`
-  ${pageSummarySpacing}
-  ${threeTilesThenTwo}
-`;
-
-export const PageSummaryLoading = styled(SummaryLoading)`
   ${pageSummarySpacing}
   ${threeTilesThenTwo}
 `;
@@ -558,27 +571,6 @@ export const TimeExact = styled.span`
   }
 `;
 
-/** Pushed to the far end of the header row, with the actions after it: the
- *  actions carry their own auto margin, and two of those would split the free
- *  space and park the time mid-row. */
-export const CardTime = styled.span`
-  margin-left: auto;
-
-  /* Nothing reorders here. An earlier order override sent the time behind the
-     buttons, which put the buttons first on the wrapped line with their own
-     auto margin already zeroed, so they sat hard left under the hash while the
-     time hung at the right: three lines, measured at 390 and 360. Left alone,
-     the time keeps the auto margin on whatever line it lands on and carries
-     the buttons with it. */
-  font-size: 0.75rem;
-  color: ${props => props.theme.darkText};
-  white-space: nowrap;
-
-  & + ${RowActions} {
-    margin-left: 0;
-  }
-`;
-
 export const CardLabel = styled.span`
   flex-shrink: 0;
   font-size: 0.75rem;
@@ -589,15 +581,7 @@ export const CardLabel = styled.span`
  *  hidden text from the width where the glyph lane takes over. */
 export const ToLabel = styled(CardLabel)`
   @media screen and (min-width: ${props => props.theme.breakpoints.mobile}) {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
+    ${visuallyHiddenRules}
   }
 `;
 
@@ -642,20 +626,5 @@ export const CardValue = styled.span`
        values sit next to non-link values in the same color. */
     text-decoration: underline;
     text-underline-offset: 0.2rem;
-  }
-`;
-
-export const CardHashLink = styled(Link)`
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.875rem;
-  color: ${props => props.theme.black};
-
-  &:focus-visible {
-    outline: 2px solid ${props => props.theme.violet};
-    outline-offset: 2px;
-    border-radius: 4px;
   }
 `;

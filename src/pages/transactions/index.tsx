@@ -2,7 +2,7 @@ import { Transactions as Icon } from '@/assets/title-icons';
 import ExplorerLink from '@/components/ExplorerLink';
 import Title from '@/components/Layout/Title';
 import LinkWithDropdown from '@/components/LinkWithDropdown';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import {
   getTransactionColumns,

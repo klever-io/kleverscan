@@ -58,7 +58,6 @@ import { useValidatorSources } from '../useValidatorSources';
 const list = {
   validators: [{ blsPublicKey: 'BLS1', staked: 10 }],
   totalRecords: 1,
-  networkTotalStake: 100,
 };
 
 const heartbeat = {
@@ -82,11 +81,23 @@ const renderSources = (poll = false) => {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return render(
+  const view = render(
     <QueryClientProvider client={client}>
       <Probe poll={poll} />
     </QueryClientProvider>,
   );
+  return {
+    ...view,
+    /** A fresh observer on the SAME cache, the shape of a route-away-and-back. */
+    rerenderSources: (nextPoll = false) => {
+      view.unmount();
+      render(
+        <QueryClientProvider client={client}>
+          <Probe poll={nextPoll} />
+        </QueryClientProvider>,
+      );
+    },
+  };
 };
 
 const settle = async () =>
@@ -98,6 +109,10 @@ describe('useValidatorSources', () => {
     mockHeartbeat.mockReset();
   });
 
+  // Restored here rather than per test: a failing assertion skips a trailing
+  // useRealTimers and hangs every later waitFor in the file.
+  afterEach(() => {});
+
   it('hands both sources over once they resolve', async () => {
     mockFetchAll.mockResolvedValue(list);
     mockHeartbeat.mockResolvedValue(heartbeat);
@@ -106,7 +121,6 @@ describe('useValidatorSources', () => {
     await settle();
 
     expect(latest.data.validators).toHaveLength(1);
-    expect(latest.data.networkTotalStake).toBe(100);
     expect(latest.data.versionMap).toEqual({ bls1: 'v1.7.21' });
     expect(latest.data.entries).toHaveLength(1);
     expect(latest.data.heartbeatAvailable).toBe(true);
@@ -139,7 +153,6 @@ describe('useValidatorSources', () => {
     expect(latest.data.heartbeatAvailable).toBe(true);
     expect(latest.data.validatorsAvailable).toBe(false);
     expect(latest.data.validators).toEqual([]);
-    expect(latest.data.networkTotalStake).toBe(0);
   });
 
   // `fetchHeartbeatStatus` resolves undefined on failure rather than throwing,
@@ -154,7 +167,7 @@ describe('useValidatorSources', () => {
     expect(latest.data.heartbeatAvailable).toBe(false);
   });
 
-  it('keeps asking while one half is still missing', async () => {
+  it('keeps asking the half that is still missing', async () => {
     // The query cannot reject: both halves are settled, so a failed source is
     // a successful answer carrying a fallback and react-query's own retry
     // never fires. Without this interval a transient outage held until the
@@ -167,15 +180,95 @@ describe('useValidatorSources', () => {
     await act(async () => {
       await Promise.resolve();
     });
-    const first = mockFetchAll.mock.calls.length;
+    const first = mockHeartbeat.mock.calls.length;
 
     await act(async () => {
       jest.advanceTimersByTime(31_000);
       await Promise.resolve();
     });
 
+    expect(mockHeartbeat.mock.calls.length).toBeGreaterThan(first);
+  });
+
+  /* The other half of the same tick. `fetchAllValidators` is three
+     `validator/list` requests on mainnet, so re-running it to retry one
+     `/api/heartbeat` call spent 27 requests over the recovery window against a
+     rate limit CI shares. */
+  it('does not re-ask the half that already answered', async () => {
+    jest.useFakeTimers();
+    mockFetchAll.mockResolvedValue(list);
+    mockHeartbeat.mockResolvedValue(undefined);
+
+    renderSources(true);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const first = mockFetchAll.mock.calls.length;
+
+    await act(async () => {
+      jest.advanceTimersByTime(91_000);
+      await Promise.resolve();
+    });
+
+    expect(mockFetchAll.mock.calls).toHaveLength(first);
+    expect(latest.data.validators).toHaveLength(1);
+    expect(latest.data.validatorsAvailable).toBe(true);
+  });
+
+  /* The mirror of the pair above: a list outage must not burn `/api/heartbeat`
+     calls either, and the kept heartbeat has to ride through the recovery
+     ticks instead of dropping to its fallbacks. */
+  it('does not re-ask the heartbeat while the list recovers', async () => {
+    jest.useFakeTimers();
+    mockFetchAll.mockRejectedValue(new Error('proxy down'));
+    mockHeartbeat.mockResolvedValue(heartbeat);
+
+    renderSources(true);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const first = mockHeartbeat.mock.calls.length;
+
+    await act(async () => {
+      jest.advanceTimersByTime(91_000);
+      await Promise.resolve();
+    });
+
+    expect(mockHeartbeat.mock.calls).toHaveLength(first);
+    expect(latest.data.versionMap).toEqual({ bls1: 'v1.7.21' });
+    expect(latest.data.entries).toHaveLength(1);
+    expect(latest.data.heartbeatAvailable).toBe(true);
+  });
+
+  /* The bound on the keeping: an answer older than the five-minute freshness
+     this query promises must not be pinned through an outage, or the moment
+     the other half recovers the stale half is laundered into a fresh lease.
+     The polling window itself never exceeds it (30s ticks reset the state's
+     timestamp), so the path that trips it is a reader arriving after the poll
+     budget: that run must refetch BOTH halves, kept one included. */
+  it('re-asks a kept half once it outgrows the freshness window', async () => {
+    jest.useFakeTimers();
+    mockFetchAll.mockResolvedValue(list);
+    mockHeartbeat.mockResolvedValue(undefined);
+
+    const view = renderSources(false);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const first = mockFetchAll.mock.calls.length;
+
+    await act(async () => {
+      jest.advanceTimersByTime(6 * 60_000);
+    });
+    // A new reader on the same cache: staleTime is 0 while incomplete, so the
+    // remount refetches, and the stale kept half must go with it.
+    view.rerenderSources(false);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
     expect(mockFetchAll.mock.calls.length).toBeGreaterThan(first);
-    jest.useRealTimers();
   });
 
   it('stops asking once both halves have answered', async () => {
@@ -194,8 +287,7 @@ describe('useValidatorSources', () => {
       await Promise.resolve();
     });
 
-    expect(mockFetchAll.mock.calls.length).toBe(first);
-    jest.useRealTimers();
+    expect(mockFetchAll.mock.calls).toHaveLength(first);
   });
 
   it('does not poll for a reader that did not ask for it', async () => {
@@ -214,8 +306,7 @@ describe('useValidatorSources', () => {
       await Promise.resolve();
     });
 
-    expect(mockFetchAll.mock.calls.length).toBe(first);
-    jest.useRealTimers();
+    expect(mockFetchAll.mock.calls).toHaveLength(first);
   });
 
   it('gives up after ten tries rather than polling a dead node forever', async () => {
@@ -241,7 +332,6 @@ describe('useValidatorSources', () => {
     // The mount plus ten polls, and nothing after that.
     expect(mockHeartbeat.mock.calls.length).toBeLessThanOrEqual(11);
     expect(mockHeartbeat.mock.calls.length).toBeGreaterThan(5);
-    jest.useRealTimers();
   });
 
   it('asks each source exactly once for one mount', async () => {

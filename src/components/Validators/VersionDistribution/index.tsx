@@ -1,3 +1,4 @@
+import { HOLD_LINE, SKELETON_INLINE } from '@/components/DataList/loadingText';
 import Skeleton from '@/components/Skeleton';
 import { useTranslation } from 'next-i18next';
 import { VersionStat } from '@/services/requests/heartbeat';
@@ -44,16 +45,6 @@ export interface VersionDistributionProps {
   onSelectVersion: (version: string | undefined) => void;
 }
 
-/** Occupies a text line without painting one, so a loading slot keeps the
- *  exact line box its value will have. Same pair the summary loading cards
- *  use. */
-const HOLD_LINE = '\u200b';
-
-const INLINE: React.CSSProperties = {
-  display: 'inline-block',
-  verticalAlign: 'middle',
-};
-
 const COLLAPSE_THRESHOLD = 4;
 const INITIAL_VISIBLE = 3;
 
@@ -89,10 +80,17 @@ const VersionDistribution: React.FC<
   const heartbeatFailed = !loading && !heartbeatAvailable;
   const validatorsFailed = !loading && !validatorsAvailable;
 
+  /* The selected row is always among the visible ones. Collapsing hides
+     everything past the third, and the sort forces Unknown last, so on mainnet
+     `?version=Unknown` (64 of 209 validators, and the state the card's own row
+     click produces) left no row carrying aria-pressed and no way to see or
+     clear the filter without first opening "other versions". */
   const visibleStats = useMemo(() => {
     if (expanded || stats.length <= COLLAPSE_THRESHOLD) return stats;
-    return stats.slice(0, INITIAL_VISIBLE);
-  }, [expanded, stats]);
+    const head = stats.slice(0, INITIAL_VISIBLE);
+    const selected = stats.find(stat => stat.version === selectedVersion);
+    return selected && !head.includes(selected) ? [...head, selected] : head;
+  }, [expanded, stats, selectedVersion]);
 
   const hiddenCount = Math.max(stats.length - visibleStats.length, 0);
 
@@ -147,7 +145,7 @@ const VersionDistribution: React.FC<
     }
 
     if (stats.length === 0) {
-      return <EmptyText>—</EmptyText>;
+      return <EmptyText>- -</EmptyText>;
     }
 
     return (
@@ -229,12 +227,12 @@ const VersionDistribution: React.FC<
                     <Skeleton
                       width={80}
                       height={14}
-                      containerCustomStyles={INLINE}
+                      containerCustomStyles={SKELETON_INLINE}
                     />
                   </StatValue>
                 ) : (
                   <StatValue title={latestVersion}>
-                    {latestVersion ?? '—'}
+                    {latestVersion ?? '- -'}
                   </StatValue>
                 )}
               </StatItem>
@@ -249,7 +247,7 @@ const VersionDistribution: React.FC<
                     <Skeleton
                       width={64}
                       height={14}
-                      containerCustomStyles={INLINE}
+                      containerCustomStyles={SKELETON_INLINE}
                     />
                   </StatValue>
                 ) : latestStat !== undefined ? (
@@ -265,7 +263,7 @@ const VersionDistribution: React.FC<
                     )}
                   </StatValue>
                 ) : (
-                  <StatValue>—</StatValue>
+                  <StatValue>- -</StatValue>
                 )}
               </StatItem>
             </StatsStrip>

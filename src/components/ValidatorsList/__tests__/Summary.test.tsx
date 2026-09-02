@@ -98,7 +98,7 @@ const sources = (over: Record<string, unknown> = {}) => ({
   data: {
     validators: [validator()],
     entries: [{ publicKey: 'BLS1', versionNumber: 'v1', isActive: true }],
-    networkTotalStake: 10_000_000,
+    versionMap: { bls1: 'v1' },
     totalRecords: 1,
     validatorsAvailable: true,
     heartbeatAvailable: true,

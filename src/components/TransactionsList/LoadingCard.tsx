@@ -1,3 +1,4 @@
+import { HOLD_LINE, SKELETON_INLINE } from '@/components/DataList/loadingText';
 import {
   DistBar,
   LegendItem,
@@ -12,15 +13,6 @@ import Skeleton from '@/components/Skeleton';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { PageSummaryCard } from './styles';
-
-/** Occupies a text line without painting one, so each slot keeps the exact
- *  line box its value will have, at every root font size and in every locale. */
-const HOLD_LINE = '\u200b';
-
-const INLINE: React.CSSProperties = {
-  display: 'inline-block',
-  verticalAlign: 'middle',
-};
 
 /** The breakdown names Transfer, Smart Contract, Claim, Freeze and Other. */
 const LEGEND_SLOTS = [0, 1, 2, 3, 4];
@@ -47,7 +39,11 @@ export const ContractsBarPlaceholder: React.FC = () => (
       {LEGEND_SLOTS.map(slot => (
         <LegendItem key={slot}>
           {HOLD_LINE}
-          <Skeleton width={92} height={12} containerCustomStyles={INLINE} />
+          <Skeleton
+            width={92}
+            height={12}
+            containerCustomStyles={SKELETON_INLINE}
+          />
         </LegendItem>
       ))}
     </LegendRow>
@@ -80,14 +76,18 @@ const TransactionsSummaryLoadingCard: React.FC<{ label: string }> = ({
             </TileLabel>
             <TileValue>
               {HOLD_LINE}
-              <Skeleton width={90} height={20} containerCustomStyles={INLINE} />
+              <Skeleton
+                width={90}
+                height={20}
+                containerCustomStyles={SKELETON_INLINE}
+              />
             </TileValue>
             <TileSub>
               {HOLD_LINE}
               <Skeleton
                 width={110}
                 height={14}
-                containerCustomStyles={INLINE}
+                containerCustomStyles={SKELETON_INLINE}
               />
             </TileSub>
           </Tile>

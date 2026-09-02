@@ -1,36 +1,26 @@
 export const UNKNOWN_VERSION = 'Unknown';
 
 /**
- * One node as `/node/heartbeatstatus` reports it. Every field the endpoint
- * sends, measured against mainnet (214 entries, 2026-08-31): the type used to
- * name four of the twelve and the parser read two, so the node's own view of
- * uptime, liveness and peer role was arriving and being dropped.
+ * One node as `/node/heartbeatstatus` reports it, narrowed to what this app
+ * reads: the seven fields left out have no consumer, and naming them only made
+ * them look wired up. Everything is optional because the array is republished
+ * from unvalidated JSON (the parse guard below only gates the version map),
+ * and consumers already treat it that way.
  */
 export interface HeartbeatEntry {
-  publicKey: string;
-  versionNumber: string;
-  isActive: boolean;
-  timestamp: string;
-  /** `elected` | `eligible` | `waiting` | `observer`. Note the node has no
-   *  `jailed` or `inactive`: both arrive here as `observer`, so this does not
-   *  replace the proxy's `list` field, it adds the observers that field never
-   *  mentions. */
-  peerType?: string;
-  totalUpTimeSec?: number;
-  totalDownTimeSec?: number;
-  maxInactiveTime?: string;
+  publicKey?: string;
+  versionNumber?: string;
+  isActive?: boolean;
   /** Set on all 214 mainnet nodes, where `identity` is empty on all of them. */
   nodeDisplayName?: string;
   identity?: string;
-  nonce?: number;
-  numInstances?: number;
 }
 
 export interface HeartbeatStatus {
   versionMap: Record<string, string>;
   latestVersion: string;
-  /** The raw entries, so callers can read the nine fields the version map
-   *  throws away without asking the node a second time. */
+  /** The raw entries, so callers can read the fields the version map throws
+   *  away without asking the node a second time. */
   entries: HeartbeatEntry[];
 }
 
@@ -46,9 +36,21 @@ export interface VersionStat {
 
 export const compareSemver = (a: string, b: string): number => {
   const parse = (v: string) => {
-    const clean = v.replace(/^v/, '');
+    // Build metadata carries no precedence, and left in place it corrupted
+    // the number beside it: `21+build.1` parsed as -1 and sorted below 20.
+    const clean = v.replace(/^v/, '').split('+')[0];
     const [main, pre] = clean.split('-');
-    return { parts: main.split('.').map(Number), pre: pre ?? '' };
+    /* A segment that is not a number sorts below every real one rather than
+       becoming NaN. `Number` made this comparator partial: a node reporting
+       something like `dev/go1.25/linux` normalises to `dev`, every later
+       comparison against it returned NaN, and `NaN > 0` is false, so the first
+       such string to reach `latestVersion` could never be displaced and every
+       node on the chain rendered as out of date for the whole session. */
+    const parts = main.split('.').map(part => {
+      const parsed = Number(part);
+      return Number.isFinite(parsed) ? parsed : -1;
+    });
+    return { parts, pre: pre ?? '' };
   };
   const va = parse(a);
   const vb = parse(b);
@@ -58,7 +60,22 @@ export const compareSemver = (a: string, b: string): number => {
   }
   if (!va.pre && vb.pre) return 1;
   if (va.pre && !vb.pre) return -1;
-  return va.pre > vb.pre ? 1 : va.pre < vb.pre ? -1 : 0;
+  // Identifier by identifier, numerically where both sides are numbers:
+  // lexical comparison put rc.10 below rc.2.
+  const pa = va.pre.split('.');
+  const pb = vb.pre.split('.');
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const ia = pa[i];
+    const ib = pb[i];
+    if (ia === ib) continue;
+    if (ia === undefined) return -1;
+    if (ib === undefined) return 1;
+    const na = Number(ia);
+    const nb = Number(ib);
+    if (Number.isFinite(na) && Number.isFinite(nb)) return na - nb;
+    return ia > ib ? 1 : -1;
+  }
+  return 0;
 };
 
 /** Strip build path and git describe suffix from a full node version string. */

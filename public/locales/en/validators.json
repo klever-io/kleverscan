@@ -42,14 +42,15 @@
     "NoDelegationLimit": "No limit",
     "CapacityDetail": "{{staked}} of {{cap}} delegated",
     "VersionUnavailable": "Unavailable",
-    "VersionUnavailableTooltip": "Node versions could not be loaded"
+    "VersionUnavailableReason": "Node versions could not be loaded"
   },
   "Filters": {
     "Name": "Name",
     "Version": "Version",
     "SearchName": "Search name",
     "SearchVersion": "Search version",
-    "VersionUnavailable": "Node versions could not be loaded"
+    "NotFound": "No match found",
+    "Clear": "Clear {{filter}} filter"
   },
   "Summary": {
     "Label": "Validator network statistics",

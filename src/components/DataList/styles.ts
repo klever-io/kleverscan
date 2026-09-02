@@ -13,8 +13,14 @@ import {
 import Link from 'next/link';
 import { mix, transparentize } from 'polished';
 import { Content as FilterContent } from '@/components/Filter/styles';
+import { ToolTipSpan } from '@/components/Tooltip/styles';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
-import styled, { css, DefaultTheme, keyframes } from 'styled-components';
+import styled, {
+  css,
+  DefaultTheme,
+  Interpolation,
+  keyframes,
+} from 'styled-components';
 
 /**
  * Shared design-system primitives for the data-list pages (asset holders,
@@ -91,21 +97,15 @@ export const focusRing = css`
   }
 `;
 
-export const VisuallyHidden = styled.span`
-  /* Readers get the rendered text: inheriting the badge's uppercase handed
-     them whole sentences in caps, which VoiceOver spells out. */
-  text-transform: none;
+/* Doubled class, the same trick inCard uses: the cell rules give every span
+   inside a data-list cell display:flex, a height and min-width:fit-content,
+   and a used min-width beats a width. The box grew to the full width of the
+   sentence it hides (482px in the assets rewards column) and, being absolutely
+   positioned, took 358px of horizontal page scroll with it at 1440. */
+export const visuallyHiddenRules = css`
   position: absolute;
   clip: rect(0 0 0 0);
 
-  /* Doubled class, the same trick inCard uses and for the same reason: the
-     cell rules give every span inside a data-list cell display:flex, a height
-     and min-width:fit-content, and a min-width beats a width. This
-     box therefore grew to the full width of the sentence it hides, measured at
-     482px in the assets rewards column, and being absolutely positioned it
-     took the page with it: 358px of horizontal scroll at a 1440 viewport.
-     Fourteen of the 24 on that page were oversized, and four of the six list
-     pages carried at least one. */
   && {
     display: block;
     width: 1px;
@@ -120,6 +120,13 @@ export const VisuallyHidden = styled.span`
     white-space: nowrap;
     border: 0;
   }
+`;
+
+export const VisuallyHidden = styled.span`
+  /* Readers get the rendered text: inheriting the badge's uppercase handed
+     them whole sentences in caps, which VoiceOver spells out. */
+  text-transform: none;
+  ${visuallyHiddenRules}
 `;
 
 /* --------------------------------- badges -------------------------------- */
@@ -621,12 +628,27 @@ export const CompactFilterBar = styled(FilterContainer)`
       min-width: 0;
     }
   }
+
+  /* The third stage: full width, stacked. Half of the row stops holding a
+     selected value below 344px (the current longest version string needs 61px
+     and half a 344 viewport gives its value box exactly that, measured), so
+     from 360 down the pair trades the second column for legible values. */
+  @media (max-width: 359.98px) {
+    flex-direction: column;
+
+    > div {
+      width: 100%;
+      flex: 1 1 auto;
+    }
+  }
 `;
 
 /** The wrapper-side half of the same decision: keeps the shared
  *  FloatContainer a flex row below the tablet breakpoint, where it otherwise
- *  turns into a grid that parks the controls under the filter bar. */
-export const compactFilterRow = css`
+ *  turns into a grid that parks the controls under the filter bar. Split out
+ *  because /smart-contracts needs this half and lays its own controls out as a
+ *  measured grid, which the rules below would overwrite. */
+export const compactFilterFloat = css`
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     ${FloatContainer} {
       display: flex;
@@ -634,7 +656,13 @@ export const compactFilterRow = css`
       align-items: end;
       flex-wrap: wrap;
     }
+  }
+`;
 
+export const compactFilterRow = css`
+  ${compactFilterFloat}
+
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     /* nowrap so the refresh button stays beside the page-size pills: the
        wrapping row always had a width where the pills still fit and the button
        alone dropped under them. Same fix as /smart-contracts. */
@@ -844,5 +872,186 @@ export const dataListTableSkin = css`
         transition: none;
       }
     }
+  }
+`;
+
+/**
+ * Four summary tiles stay on one row down to `from` px, where the shared grid
+ * otherwise drops to a hard two columns below the mobile breakpoint and the
+ * 2x2 wastes half the card. `from` is per card, set by its longest label plus
+ * the 3x16px of gaps, 48 of card padding and 32 of page padding: measured
+ * 117px on /validators (Open for delegation), its one consumer. auto-fit is
+ * avoided on purpose: it lands on three columns first and leaves the fourth
+ * tile orphaned on its own row.
+ */
+export const holdFourTiles = (from: number) => css`
+  @media screen and (min-width: ${from}px) and (max-width: ${props =>
+      props.theme.breakpoints.mobile}) {
+    ${TilesGrid} {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+`;
+
+/**
+ * A summary card's tiles on one row at every width. The shared grid drops to a
+ * hard two columns below the mobile breakpoint, which grew these cards a
+ * second section on narrower screens; labels wrap by word and the figures are
+ * short, so even the smallest screen holds the columns. The gap narrows to
+ * give the columns back what the stacking kept as slack.
+ */
+export const holdTiles = (columns: number) => css`
+  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
+    ${TilesGrid} {
+      grid-template-columns: repeat(${columns}, 1fr);
+      gap: 12px;
+    }
+  }
+`;
+
+/** The asset id as a tag rather than loose text beside the name: the ticker
+ *  is the handle people know an asset by, so it reads as a badge. It keeps
+ *  whole under pressure: BadgePill carries min-width: 0, and without these a
+ *  tight card header shrank the pill to 26px and wrapped the id at its hyphen
+ *  onto two cramped lines (measured at 320). */
+export const TickerBadge = styled(BadgePill)`
+  font-family: 'Fira Mono', monospace;
+  letter-spacing: 0;
+
+  && {
+    flex-shrink: 0;
+    min-width: fit-content;
+    white-space: nowrap;
+  }
+`;
+
+/**
+ * The card header rules the assets and pools cards share: buttons at the right
+ * edge at every width (beside the identity they tracked the name's width, so
+ * scanning a column of cards they never sat still), tooltip wrappers flexed so
+ * a badge pill rides level instead of 2px below its neighbours (measured), and
+ * the name as the one element that gives way while the id badge keeps whole.
+ */
+export const assetCardHeaderRules = css`
+  ${MobileListCard} ${RowActions} {
+    margin-left: auto;
+  }
+
+  ${MobileListCard} ${ToolTipSpan},
+  ${MobileListCard} ${ToolTipSpan} > div {
+    display: flex;
+    align-items: center;
+  }
+
+  ${MobileListCard} ${AssetName} {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+`;
+
+/* --------------------------- shared row layout ---------------------------- */
+
+/** Left-aligned numerals. The `Amount*` pair flexes to the right edge, which
+ *  is correct only in the columns the skin also right-aligns. */
+export const NumericCell = styled.span`
+  font-variant-numeric: tabular-nums;
+`;
+
+/**
+ * Undoes the shared table layout between the tablet breakpoint and a list's own
+ * row width, where the rows are already cards. A styled component's own media
+ * query is not reachable from outside it, so it is undone here.
+ *
+ * Neither TableBody rule is cosmetic: `display: table` wraps each
+ * MobileListCard in an anonymous cell and lays all ten side by side, and
+ * `min-width: fit-content` pins the column to the widest card on the page,
+ * measured at 378px against a 328px screen at 360.
+ *
+ * `belowRow` is the list's own row width minus 0.02px; a list that needs a
+ * fixed card grid adds its own `grid-template-columns`.
+ */
+export const dataListCardBand = <P extends object>(
+  belowRow: Interpolation<P>,
+) => css<P>`
+  @media screen and (max-width: ${belowRow}) {
+    ${TableBody} {
+      min-width: 0;
+    }
+  }
+
+  @media screen and (min-width: ${props =>
+      props.theme.breakpoints.tablet}) and (max-width: ${belowRow}) {
+    ${TableBody} {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 0;
+      border: none;
+      background-image: none;
+    }
+
+    ${TableRow} {
+      display: grid;
+      gap: 4px;
+      padding: 16px;
+      border-radius: 16px;
+      border: solid 1px
+        ${props =>
+          props.theme.dark ? props.theme.darkGray : props.theme.black10};
+      background-color: ${props => props.theme.white};
+    }
+
+    /* Through TableRow to clear the skin's own :first-child and :last-child
+       cell padding, which matches on class count alone. */
+    ${TableRow} ${MobileCardItem} {
+      display: flex;
+      flex-direction: column;
+      width: auto;
+      max-width: none;
+      height: auto;
+      padding: 0;
+      border-bottom: none;
+      font-size: 0.75rem;
+    }
+
+    ${TableRow} ${MobileCardItem} a,
+    ${TableRow} ${MobileCardItem} span {
+      height: auto;
+      min-width: 0;
+      white-space: normal;
+    }
+  }
+`;
+
+/**
+ * 8px of side padding rather than the skin's 12, and 12 rather than 16 on the
+ * outer edges, for the lists that carry nine or ten columns. On validators it
+ * spends 168px of the row on padding instead of 248, which is the difference
+ * between a row that needs a 1297px viewport and one that needs 1217. The
+ * header takes the same values or the columns stop lining up.
+ */
+export const dataListRowPadding = css`
+  ${MobileCardItem} {
+    padding: 8px;
+  }
+
+  ${MobileCardItem}:first-child {
+    padding-left: 12px;
+  }
+
+  ${MobileCardItem}:last-child {
+    padding-right: 12px;
+  }
+
+  ${HeaderItem} {
+    padding: 12px 8px;
+  }
+
+  ${HeaderItem}:first-child {
+    padding-left: 12px;
+  }
+
+  ${HeaderItem}:last-child {
+    padding-right: 12px;
   }
 `;

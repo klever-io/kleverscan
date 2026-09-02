@@ -1,4 +1,5 @@
 import { klvAmount, NUMBER_LOCALE } from '@/components/DataList/format';
+import { HOLD_LINE } from '@/components/DataList/loadingText';
 import {
   DistBar,
   DistSegment,
@@ -13,7 +14,7 @@ import {
 } from '@/components/DataList/styles';
 import { useTheme } from '@/contexts/theme';
 import { useTranslation } from 'next-i18next';
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   stateSegmentColor,
   ValidatorsSummaryCard,
@@ -28,24 +29,37 @@ import {
   delegationRoom,
   listComposition,
   nodeFigures,
-  stakeFigures,
+  sumStaked,
 } from './summaryFigures';
 import { useValidatorSources } from './useValidatorSources';
 
 const pct = (value: number, digits = 1): string => `${value.toFixed(digits)}%`;
 
 /**
- * What the page already fetches and used to throw away.
- *
- * Every figure here comes from the two calls the version distribution needed
- * anyway, so the card costs no extra request: four of them from the validator
- * list, three from the node heartbeat whose nine unread fields this is the
- * first consumer of.
+ * What the page already fetches and used to throw away: every figure comes
+ * from the two calls the version distribution needed anyway, so the card
+ * costs no extra request.
  */
 const ValidatorsSummary: React.FC = () => {
   const { t } = useTranslation(['validators']);
   const { theme } = useTheme();
   const { data, isLoading } = useValidatorSources();
+
+  const { validators, entries, validatorsAvailable, heartbeatAvailable } = data;
+
+  /* Five full passes over the set, so once per settle rather than once per
+     render: the card has no React.memo and the page renders it on every
+     Stake/Nodes toggle, which none of these five depend on. */
+  const figures = useMemo(
+    () => ({
+      composition: listComposition(validators),
+      totalStaked: sumStaked(validators),
+      room: delegationRoom(validators),
+      nodes: nodeFigures(entries, validators),
+      blocks: blockResult(validators),
+    }),
+    [validators, entries],
+  );
 
   const label = t('validators:Summary.Label', {
     defaultValue: 'Validator network statistics',
@@ -53,19 +67,8 @@ const ValidatorsSummary: React.FC = () => {
 
   if (isLoading) return <ValidatorsSummaryLoadingCard label={label} />;
 
-  const {
-    validators,
-    entries,
-    networkTotalStake,
-    validatorsAvailable,
-    heartbeatAvailable,
-  } = data;
-  const composition = listComposition(validators);
+  const { composition, totalStaked, room, nodes, blocks } = figures;
   const elected = composition.find(part => part.state === 'elected');
-  const stake = stakeFigures(validators, networkTotalStake);
-  const room = delegationRoom(validators);
-  const nodes = nodeFigures(entries, validators);
-  const blocks = blockResult(validators);
 
   /* A failed source resolves as a successful empty answer (the hook settles
      both halves rather than rejecting), so without this every tile would state
@@ -73,7 +76,6 @@ const ValidatorsSummary: React.FC = () => {
      from the same two flags. The sub keeps a line box, or the card changes
      height between the two states. */
   const unavailable = t('validators:Summary.NoData');
-  const HOLD_LINE = '\u200b';
   const listed = <T,>(value: T): T | string =>
     validatorsAvailable ? value : unavailable;
   const listedSub = (value: string): string =>
@@ -97,7 +99,7 @@ const ValidatorsSummary: React.FC = () => {
 
         <Tile>
           <TileLabel>{t('validators:Summary.Staked')}</TileLabel>
-          <TileValue>{listed(klvAmount(stake.totalStaked))}</TileValue>
+          <TileValue>{listed(klvAmount(totalStaked))}</TileValue>
           <TileSub>
             {/* Not `shareOfNetwork`: that denominator is the sum of these very
                 rows, so it reads 100% always. The elected set's slice of the
@@ -138,10 +140,9 @@ const ValidatorsSummary: React.FC = () => {
               : unavailable}
           </TileValue>
           <TileSub>
-            {/* No aggregate uptime here on purpose: `totalUpTimeSec` counts
-                from a node's last restart, not its lifetime, so the sum swung
-                from 97,33% to 99,99% within one afternoon on mainnet. The
-                figure is computed and tested, it is just not a network fact. */}
+            {/* No aggregate uptime beside this: a node reports `totalUpTimeSec`
+                since its own last restart, so the sum swung from 97,33% to
+                99,99% within one afternoon on mainnet. */}
             {nodesKnown
               ? t('validators:Summary.Observers', { count: nodes.observers })
               : HOLD_LINE}

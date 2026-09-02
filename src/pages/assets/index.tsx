@@ -15,9 +15,10 @@ import {
 import { hasVoidSupply } from '@/utils/voidSupply';
 import AssetsMobileCard from '@/components/AssetsList/MobileCard';
 import RegistryStrip from '@/components/AssetsList/RegistryStrip';
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
+import { CompactFilterBar } from '@/components/DataList/styles';
 import {
   AssetsTableWrapper,
-  ROW_LAYOUT_MIN_WIDTH,
   CapContext,
   RewardsCell,
   RewardsMuted,
@@ -48,7 +49,6 @@ import Title from '@/components/Layout/Title';
 import AssetIdentity from '@/components/DataList/AssetIdentity';
 import Table, { ITable } from '@/components/Table';
 import Tabs, { ITabs } from '@/components/Tabs';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
 import { Header } from '@/styles/common';
 import { AssetsListContainer } from '@/views/assets';
@@ -122,11 +122,11 @@ const AssetsFilters: React.FC<PropsWithChildren> = () => {
   ];
 
   return (
-    <FilterContainer>
+    <CompactFilterBar>
       {filters.map(filter => (
         <Filter key={filter.title} {...filter} />
       ))}
-    </FilterContainer>
+    </CompactFilterBar>
   );
 };
 

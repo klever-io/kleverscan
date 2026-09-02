@@ -120,6 +120,15 @@ export interface ITable<TCard = Record<string, never>> {
    * CSS, which JS cannot see.
    */
   cardBreakpoint?: number;
+  /**
+   * False while the caller cannot answer `request` yet, for a filter it
+   * resolves client-side against a second query. The table then holds its
+   * loading rows instead of running the request: answering unfiltered painted
+   * a full page of rows, and an unfiltered record count, under a filtered URL
+   * for as long as that second query took (measured 393ms to 579ms, and 1.6s
+   * on a throttled connection).
+   */
+  requestReady?: boolean;
 }
 
 /** Floor for a loading bar, so a narrow column gets a placeholder rather than
@@ -157,6 +166,7 @@ const Table = <TCard,>({
   singleLineSkeleton = false,
   rightAlignedSkeletonColumns = [],
   cardBreakpoint,
+  requestReady = true,
 }: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
@@ -224,8 +234,23 @@ const Table = <TCard,>({
         ? 10_000
         : 0,
 
+    enabled: requestReady,
+
     ...onErrorHandler(),
   });
+
+  /* `enabled: false` reports isLoading false, not true, so without this the
+     held state would fall through to the empty state instead of the rows. */
+  const pending = isLoading || !requestReady;
+
+  /* Manual triggers pierce `enabled`: react-query's refetch() fetches a
+     disabled query too, so the refresh icon and the page-change effect ran
+     the request inside the hold window and painted what the hold exists to
+     prevent. Every manual trigger goes through here, the render-gated retry
+     included, so nothing enforces the hold from a distance. */
+  const refetchWhenReady = (): void => {
+    if (requestReady) refetch();
+  };
 
   const props: TableRowProps = {
     pathname: router.pathname,
@@ -248,17 +273,20 @@ const Table = <TCard,>({
     if (page !== 1 && intervalController) {
       intervalController(0);
     }
-    refetch();
+    refetchWhenReady();
   }, [page]);
 
   useEffect(() => {
     if (interval) {
       const intervalId = setInterval(() => {
-        refetch();
+        refetchWhenReady();
       }, interval);
       return () => clearInterval(intervalId);
     }
-  }, [interval, limit]);
+    /* requestReady in the deps on purpose: the callback closes over it, and
+       without the re-run a hold that arrives after mount kept polling through
+       the stale closure. */
+  }, [interval, limit, requestReady]);
 
   const handleScrollTop = () => {
     window.scrollTo({
@@ -281,6 +309,9 @@ const Table = <TCard,>({
                     <ItemContainer
                       key={value}
                       onClick={() => {
+                        // No refetch: the router write changes the query key,
+                        // and a call from this closure re-requested the old
+                        // limit first (measured: two requests per click).
                         setQueryAndRouter(
                           {
                             ...router.query,
@@ -289,7 +320,6 @@ const Table = <TCard,>({
                           },
                           router,
                         );
-                        refetch();
                       }}
                       active={value === limit}
                     >
@@ -304,7 +334,7 @@ const Table = <TCard,>({
                   msg="Refresh"
                   Component={() => (
                     <IoReloadSharpWrapper $loading={isFetching}>
-                      <IoReloadSharp size={22} onClick={() => refetch()} />
+                      <IoReloadSharp size={22} onClick={refetchWhenReady} />
                     </IoReloadSharpWrapper>
                   )}
                 />
@@ -335,7 +365,7 @@ const Table = <TCard,>({
           {/* The header stays while fetching: dropping it made the table lose
               its height and snap back once the rows arrived. */}
           {!showCards &&
-            (isLoading || (response?.items && response.items.length !== 0)) && (
+            (pending || (response?.items && response.items.length !== 0)) && (
               <TableRow data-testid="table-header">
                 {header?.map((item, index) => (
                   <HeaderItem
@@ -368,7 +398,7 @@ const Table = <TCard,>({
               </TableRow>
             )}
 
-          {isLoading && (
+          {pending && (
             <>
               {Array(limit)
                 .fill(limit)
@@ -423,7 +453,11 @@ const Table = <TCard,>({
                 ))}
             </>
           )}
-          {response?.items &&
+          {/* Held along with everything else: a hold that arrives AFTER a
+              successful load (the version join dropping away mid-session)
+              otherwise painted these cached rows underneath the skeletons. */}
+          {!pending &&
+            response?.items &&
             response?.items?.length > 0 &&
             response?.items?.map((item: any, index: number) => {
               let spanCount = 0;
@@ -484,9 +518,13 @@ const Table = <TCard,>({
             })}
 
           {!isFetching &&
+            requestReady &&
             (!response?.items || response?.items?.length === 0) && (
               <TableEmptyData>
-                <RetryContainer onClick={() => refetch()} $loading={isFetching}>
+                <RetryContainer
+                  onClick={refetchWhenReady}
+                  $loading={isFetching}
+                >
                   <span>Retry</span>
                   <IoReloadSharp size={20} />
                 </RetryContainer>
@@ -501,6 +539,7 @@ const Table = <TCard,>({
         </BackTopButton>
       </ContainerView>
       {showPagination &&
+        !pending &&
         typeof response?.totalPages === 'number' &&
         response?.totalPages > 1 && (
           <PaginationContainer>

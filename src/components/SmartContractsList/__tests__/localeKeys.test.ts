@@ -1,21 +1,13 @@
 import enSmartContracts from '../../../../public/locales/en/smartContracts.json';
 import ptSmartContracts from '../../../../public/locales/pt-BR/smartContracts.json';
+import { bundleFor, lookup, present, readKeys } from '@/utils/localeKeys';
 import { CONTRACT_COLUMNS } from '../columns';
 
-const lookup = (bundle: unknown, path: string): unknown =>
-  path
-    .split('.')
-    .reduce<unknown>(
-      (node, part) =>
-        node && typeof node === 'object'
-          ? (node as Record<string, unknown>)[part]
-          : undefined,
-      bundle,
-    );
-
 /**
- * Every key the page asks for, listed here rather than scraped from the
- * source: a scrape would silently pass the day a `t()` call is renamed.
+ * A hand-list AND a scrape, because they fail differently: the list catches a
+ * bundle key going missing for a call site someone remembered to record, the
+ * scrape catches the call site nobody recorded (a new `t()` on the page is
+ * unguarded by a hand-list until someone extends it).
  */
 const USED_KEYS = [
   'Titles.MostUsed',
@@ -66,6 +58,23 @@ describe('smartContracts locale bundle', () => {
       ...USED_KEYS,
     ].filter(path => typeof lookup(ptSmartContracts, path) !== 'string');
     expect(missing).toEqual([]);
+  });
+
+  const sources = [
+    'src/components/SmartContractsList/Summary.tsx',
+    'src/components/SmartContractsList/MostUsed/index.tsx',
+    'src/components/SmartContractsList/Filters.tsx',
+    'src/components/SmartContractsList/ActiveFilter.tsx',
+    'src/components/SmartContractsList/cells.tsx',
+    'src/components/SmartContractsList/columns.ts',
+  ] as const;
+
+  it.each(sources)('%s asks for keys that exist in the bundle', file => {
+    const { keys } = readKeys(file, 'smartContracts');
+    expect(keys.length).toBeGreaterThan(0);
+
+    const bundle = bundleFor('en', 'smartContracts');
+    expect(keys.filter(key => !present(bundle, key))).toEqual([]);
   });
 
   it('no longer carries the keys of the components this page replaced', () => {

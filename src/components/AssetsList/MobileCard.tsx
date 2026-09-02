@@ -4,7 +4,9 @@ import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
-  BadgePill,
+  AssetName,
+  IdentityLink,
+  TickerBadge,
   MobileListCard,
   MobileMetaItem,
   MobileMetaRow,
@@ -16,7 +18,7 @@ import {
   ShareTrack,
 } from '@/components/DataList/styles';
 import { formatShare } from '@/components/DataList/format';
-import AssetIdentity from '@/components/DataList/AssetIdentity';
+import AssetLogo from '@/components/Logo/AssetLogo';
 import { IAsset } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { IoIosInfinite } from 'react-icons/io';
@@ -67,16 +69,25 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
 
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
+      {/* One line, id included, so the badges and the two action buttons
+          centre on the name instead of floating between two lines, and the
+          card is a row shorter than the stacked identity block made it. */}
       <MobileTopRow>
-        <AssetIdentity
+        <IdentityLink
           href={`/asset/${assetId}`}
-          testId="asset-link"
-          name={name}
-          assetId={assetId}
-          ticker={ticker}
-          logo={logo}
-          verified={verified}
-        />
+          data-testid="asset-link"
+          title={name}
+        >
+          <AssetLogo
+            logo={logo}
+            ticker={ticker}
+            name={name}
+            verified={verified}
+            size={32}
+          />
+          <AssetName>{name}</AssetName>
+          <TickerBadge $variant="contract">{assetId}</TickerBadge>
+        </IdentityLink>
         {assetType === 'NonFungible' && (
           <ExplainedBadge variant="neutral" msg={t(ASSET_BADGE_TOOLTIPS.nft)}>
             {t('assets:List.Nft')}

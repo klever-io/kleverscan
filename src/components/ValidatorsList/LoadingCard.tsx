@@ -1,3 +1,4 @@
+import { HOLD_LINE, SKELETON_INLINE } from '@/components/DataList/loadingText';
 import {
   DistBar,
   LegendItem,
@@ -19,20 +20,19 @@ import {
   WideOnlyTile,
 } from './styles';
 
-/** Occupies a text line without painting one, so each slot keeps the exact
- *  line box its value will have, at every root font size and in every locale. */
-const HOLD_LINE = '\u200b';
-
-const INLINE: React.CSSProperties = {
-  display: 'inline-block',
-  verticalAlign: 'middle',
-};
-
-/** The bar's legend names one state per slice. The placeholder carries the
- *  REAL state names rather than a guessed pixel width, which is the only way
- *  it wraps onto the same number of lines the loaded legend does: a fixed 76px
- *  made the failed card taller than the loaded one at 320 and 480, and 64px
- *  still missed at 480. Same reasoning as the tile labels above. */
+/**
+ * The bar's legend names one state per slice. The placeholder carries the REAL
+ * state names rather than a guessed pixel width, which is the only way it wraps
+ * onto the same number of lines the loaded legend does: a fixed 76px made the
+ * failed card taller than the loaded one at 320 and 480, and 64px still missed.
+ *
+ * It reserves one slot per state `LIST_STATES` names, which is what the list
+ * endpoint returns on mainnet. `listComposition` renders only the states it
+ * actually finds, so on a chain that is missing one (testnet has fewer) the
+ * placeholder reserves a slot too many and the card settles slightly shorter.
+ * Nothing knows the real count before the data lands; taking it from
+ * `LIST_STATES` at least keeps the two from drifting apart.
+ */
 const LEGEND_STATES = LIST_STATES;
 
 /** The fifth is hidden below the mobile breakpoint, exactly as the loaded card
@@ -86,7 +86,11 @@ export const CompositionPlaceholder: React.FC = () => {
           <LegendItem key={state}>
             <LegendPlaceholderDot />
             {t(`validators:States.${state}`, { defaultValue: state })}
-            <Skeleton width={22} height={12} containerCustomStyles={INLINE} />
+            <Skeleton
+              width={22}
+              height={12}
+              containerCustomStyles={SKELETON_INLINE}
+            />
           </LegendItem>
         ))}
       </LegendRow>
@@ -116,14 +120,18 @@ const ValidatorsSummaryLoadingCard: React.FC<{ label: string }> = ({
             <TileLabel>{t(`validators:Summary.${key}`)}</TileLabel>
             <TileValue>
               {HOLD_LINE}
-              <Skeleton width={90} height={20} containerCustomStyles={INLINE} />
+              <Skeleton
+                width={90}
+                height={20}
+                containerCustomStyles={SKELETON_INLINE}
+              />
             </TileValue>
             <LoadingTileSub>
               {HOLD_LINE}
               <Skeleton
                 width={110}
                 height={12}
-                containerCustomStyles={INLINE}
+                containerCustomStyles={SKELETON_INLINE}
               />
             </LoadingTileSub>
           </Tile>
@@ -132,11 +140,19 @@ const ValidatorsSummaryLoadingCard: React.FC<{ label: string }> = ({
           <TileLabel>{t('validators:Summary.BlocksProduced')}</TileLabel>
           <TileValue>
             {HOLD_LINE}
-            <Skeleton width={90} height={20} containerCustomStyles={INLINE} />
+            <Skeleton
+              width={90}
+              height={20}
+              containerCustomStyles={SKELETON_INLINE}
+            />
           </TileValue>
           <LoadingTileSub>
             {HOLD_LINE}
-            <Skeleton width={110} height={12} containerCustomStyles={INLINE} />
+            <Skeleton
+              width={110}
+              height={12}
+              containerCustomStyles={SKELETON_INLINE}
+            />
           </LoadingTileSub>
         </WideOnlyTile>
       </TilesGrid>

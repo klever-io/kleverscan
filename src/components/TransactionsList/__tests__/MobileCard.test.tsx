@@ -36,6 +36,7 @@ const customFields = {
 jest.mock('@/utils/contracts', () => ({
   contractTypes: (contracts: { type?: number }[]) => {
     if (contracts?.length > 1) return 'Multi contract';
+    if (contracts?.[0]?.type === 63) return 'SmartContractType';
     return contracts?.[0]?.type === 0
       ? 'TransferContractType'
       : 'FreezeContractType';
@@ -52,13 +53,15 @@ jest.mock('@/utils/parseValues', () => ({
 // the card asks for that nobody ever added fails the suite here instead of
 // rendering "transactions:Table.Type" at a reader.
 jest.mock('next-i18next', () => {
-  const bundle = jest.requireActual(
-    '../../../../public/locales/en/transactions.json',
-  );
+  const bundles: Record<string, unknown> = {
+    transactions: jest.requireActual(
+      '../../../../public/locales/en/transactions.json',
+    ),
+    common: jest.requireActual('../../../../public/locales/en/common.json'),
+  };
 
-  const translate = (key: string): string => {
-    const path = key.includes(':') ? key.split(':')[1] : key;
-    const value = path
+  const resolve = (bundle: unknown, path: string): unknown =>
+    path
       .split('.')
       .reduce<unknown>(
         (node, part) =>
@@ -67,11 +70,23 @@ jest.mock('next-i18next', () => {
             : undefined,
         bundle,
       );
-    if (typeof value === 'string') return value;
-    throw new Error(`missing transactions locale key: ${key}`);
-  };
 
-  return { useTranslation: () => ({ t: translate }) };
+  /* Namespace-faithful on purpose: a bare key resolves against the FIRST
+     bound namespace only, exactly as react-i18next binds t. The forgiving
+     both-bundles version of this mock is what let a transactions-bound t
+     reach getAge's Date.Time keys and ship raw keys while the suite passed. */
+  return {
+    useTranslation: (ns: string | string[] = 'transactions') => {
+      const first = Array.isArray(ns) ? ns[0] : ns;
+      const translate = (key: string): string => {
+        const [space, path] = key.includes(':') ? key.split(':') : [first, key];
+        const value = resolve(bundles[space], path);
+        if (typeof value === 'string') return value;
+        throw new Error(`missing ${space} locale key: ${key}`);
+      };
+      return { t: translate };
+    },
+  };
 });
 
 // The installed testing-library still calls the removed ReactDOM.render; every
@@ -279,5 +294,25 @@ describe('TransactionsMobileCard', () => {
     }
 
     expect(errors.filter(e => String(e).includes('same key'))).toHaveLength(0);
+  });
+
+  it('routes a contract target to /smart-contract and survives a missing timestamp', () => {
+    renderCard(
+      transfer({
+        timestamp: undefined,
+        contract: [
+          { type: 63, parameter: { address: 'klv1contractcontract' } },
+        ],
+      } as unknown as Partial<ITransaction>),
+    );
+    const card = screen.getByTestId('table-row-3');
+
+    expect(
+      card.querySelector('a[href="/smart-contract/klv1contractcontract"]'),
+    ).not.toBeNull();
+    // The `|| Date.now()` fallbacks: normalizeTimestamp maps an absent
+    // timestamp to 0, so without them the card dates the row 01/01/70 and
+    // ages it in years.
+    expect(card.textContent).not.toMatch(/year|\/70/);
   });
 });

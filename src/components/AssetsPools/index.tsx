@@ -7,12 +7,13 @@ import {
   AmountMuted,
   AmountPrimary,
   BadgePill,
+  CompactFilterBar,
   IdentityCell,
   RowActions,
 } from '@/components/DataList/styles';
 import Filter, { IFilter } from '@/components/Filter';
 import AssetIdentity from '@/components/DataList/AssetIdentity';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
+
 import {
   requestAllAssetsPools,
   requestAssetsPoolsQuery,
@@ -99,9 +100,9 @@ const PoolsFilters: React.FC<PropsWithChildren> = () => {
   };
 
   return (
-    <FilterContainer>
+    <CompactFilterBar>
       <Filter {...filter} />
-    </FilterContainer>
+    </CompactFilterBar>
   );
 };
 

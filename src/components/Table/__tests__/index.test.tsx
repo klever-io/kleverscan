@@ -347,6 +347,32 @@ describe('Table requestReady', () => {
     expect(request.mock.calls.length).toBe(before);
   });
 
+  /* The positive twin: every manual trigger routes through refetchWhenReady
+     now, so a no-op there leaves refresh, pills and paging dead on every list
+     page while the blocked-side tests above stay green. */
+  it('lets the refresh icon refetch once ready', async () => {
+    const request = jest.fn(async () => makeResponse([{ id: 1 }]));
+    const client = new QueryClient();
+    const view = render(
+      <QueryClientProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <Table {...makeProps(request, {})} showLimit={true} />
+        </ThemeProvider>
+      </QueryClientProvider>,
+    );
+    await screen.findByTestId('stateful-cell');
+    const before = request.mock.calls.length;
+
+    const reload = view.container.querySelector(
+      '[class*="IoReloadSharpWrapper"] svg',
+    ) as SVGElement;
+    fireEvent.click(reload);
+
+    await waitFor(() =>
+      expect(request.mock.calls.length).toBeGreaterThan(before),
+    );
+  });
+
   it('keeps the interval poll behind the hold too', async () => {
     jest.useFakeTimers();
     const request = jest.fn(async () => makeResponse([{ id: 1 }]));

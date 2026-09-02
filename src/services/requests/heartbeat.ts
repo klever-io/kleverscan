@@ -19,8 +19,8 @@ export interface HeartbeatEntry {
 export interface HeartbeatStatus {
   versionMap: Record<string, string>;
   latestVersion: string;
-  /** The raw entries, so callers can read the nine fields the version map
-   *  throws away without asking the node a second time. */
+  /** The raw entries, so callers can read the fields the version map throws
+   *  away without asking the node a second time. */
   entries: HeartbeatEntry[];
 }
 

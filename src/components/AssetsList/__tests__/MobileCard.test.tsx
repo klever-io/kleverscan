@@ -102,4 +102,12 @@ describe('AssetsMobileCard', () => {
 
     expect(screen.queryByText('Fee Pool')).toBeNull();
   });
+
+  // The other direction, or the absence check above also passes on a badge
+  // that never renders for anyone.
+  it('shows the pool badge where the asset has one', () => {
+    draw(asset());
+
+    expect(screen.getByText('Fee Pool')).toBeInTheDocument();
+  });
 });

@@ -207,9 +207,35 @@ describe('useValidatorSources', () => {
       await Promise.resolve();
     });
 
-    expect(mockFetchAll.mock.calls.length).toBe(first);
+    expect(mockFetchAll.mock.calls).toHaveLength(first);
     expect(latest.data.validators).toHaveLength(1);
     expect(latest.data.validatorsAvailable).toBe(true);
+    jest.useRealTimers();
+  });
+
+  /* The mirror of the pair above: a list outage must not burn `/api/heartbeat`
+     calls either, and the kept heartbeat has to ride through the recovery
+     ticks instead of dropping to its fallbacks. */
+  it('does not re-ask the heartbeat while the list recovers', async () => {
+    jest.useFakeTimers();
+    mockFetchAll.mockRejectedValue(new Error('proxy down'));
+    mockHeartbeat.mockResolvedValue(heartbeat);
+
+    renderSources(true);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const first = mockHeartbeat.mock.calls.length;
+
+    await act(async () => {
+      jest.advanceTimersByTime(91_000);
+      await Promise.resolve();
+    });
+
+    expect(mockHeartbeat.mock.calls).toHaveLength(first);
+    expect(latest.data.versionMap).toEqual({ bls1: 'v1.7.21' });
+    expect(latest.data.entries).toHaveLength(1);
+    expect(latest.data.heartbeatAvailable).toBe(true);
     jest.useRealTimers();
   });
 
@@ -261,7 +287,7 @@ describe('useValidatorSources', () => {
       await Promise.resolve();
     });
 
-    expect(mockFetchAll.mock.calls.length).toBe(first);
+    expect(mockFetchAll.mock.calls).toHaveLength(first);
     jest.useRealTimers();
   });
 
@@ -281,7 +307,7 @@ describe('useValidatorSources', () => {
       await Promise.resolve();
     });
 
-    expect(mockFetchAll.mock.calls.length).toBe(first);
+    expect(mockFetchAll.mock.calls).toHaveLength(first);
     jest.useRealTimers();
   });
 

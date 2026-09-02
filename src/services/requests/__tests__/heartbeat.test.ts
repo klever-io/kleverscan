@@ -78,6 +78,22 @@ describe('compareSemver', () => {
     expect(compareSemver('v1.0.0-rc.2', 'v1.0.0-rc.10')).toBeLessThan(0);
     expect(compareSemver('v1.0.0-rc.2', 'v1.0.0-rc.2')).toBe(0);
   });
+
+  // SemVer 11.4.4: with equal leading identifiers the shorter list is older.
+  it('sorts a shorter prerelease below its extension', () => {
+    expect(compareSemver('v1.0.0-rc', 'v1.0.0-rc.1')).toBeLessThan(0);
+    expect(compareSemver('v1.0.0-rc.1', 'v1.0.0-rc')).toBeGreaterThan(0);
+  });
+
+  // The rc2 > rc1 case above only ever exercises the winning side.
+  it('orders non-numeric identifiers on the lexical low side too', () => {
+    expect(compareSemver('v1.0.0-alpha', 'v1.0.0-beta')).toBeLessThan(0);
+  });
+
+  it('treats a missing patch segment as zero', () => {
+    expect(compareSemver('v1.7', 'v1.7.1')).toBeLessThan(0);
+    expect(compareSemver('v1.7.0', 'v1.7')).toBe(0);
+  });
 });
 
 describe('resolveValidatorVersion', () => {

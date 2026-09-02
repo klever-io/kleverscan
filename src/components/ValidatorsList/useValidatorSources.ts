@@ -73,9 +73,10 @@ export const useValidatorSources = (
          the freshness this query promises: a heartbeat outage used to re-issue
          all three `validator/list` pages every 30s to retry one
          `/api/heartbeat` call, 27 requests against a testnet rate limit CI
-         shares. Without the age bound the kept half was pinned for the whole
-         outage and then laundered into a fresh five-minute lease the moment
-         the other half recovered. */
+         shares. The age bound cannot fire inside the poll window (every
+         settle resets `dataUpdatedAt`), so within the ten-try budget the kept
+         half rides the whole outage; the bound is for the reader who arrives
+         after that budget, whose refetch re-asks BOTH halves. */
       const fresh =
         state !== undefined && Date.now() - state.dataUpdatedAt < 5 * 60_000;
       const recovering = fresh && previous !== undefined && !complete(previous);

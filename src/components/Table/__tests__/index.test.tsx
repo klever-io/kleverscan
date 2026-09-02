@@ -69,13 +69,17 @@ jest.mock('../ExportButton', () => ({
   default: () => null,
 }));
 
+// One shared object, so a `setQueryAndRouter` write survives to the next
+// render the way a landed route push does.
+const mockRouter = {
+  query: {} as Record<string, string>,
+  pathname: '/test',
+  push: jest.fn(),
+  replace: jest.fn(),
+};
+
 jest.mock('next/router', () => ({
-  useRouter: () => ({
-    query: {},
-    pathname: '/test',
-    push: jest.fn(),
-    replace: jest.fn(),
-  }),
+  useRouter: () => mockRouter,
 }));
 
 jest.mock('@/contexts/mobile', () => ({
@@ -164,6 +168,17 @@ const renderTable = (ui: React.ReactElement) => {
     rerenderTable: (next: React.ReactElement) => view.rerender(wrap(next)),
   };
 };
+
+beforeEach(() => {
+  mockRouter.query = {};
+});
+
+// Restored here rather than at the end of each timer test: a failing
+// assertion skips a trailing useRealTimers and leaves every later waitFor
+// in the file hanging on fake timers.
+afterEach(() => {
+  jest.useRealTimers();
+});
 
 describe('Table row cells', () => {
   it('updates a cell in place across re-renders, keeping DOM node and state', async () => {
@@ -344,7 +359,7 @@ describe('Table requestReady', () => {
     fireEvent.click(reload);
     await new Promise(resolve => setTimeout(resolve, 20));
 
-    expect(request.mock.calls.length).toBe(before);
+    expect(request.mock.calls).toHaveLength(before);
   });
 
   /* The positive twin: every manual trigger routes through refetchWhenReady
@@ -387,7 +402,6 @@ describe('Table requestReady', () => {
     });
 
     expect(request).not.toHaveBeenCalled();
-    jest.useRealTimers();
   });
 
   it('runs the request once ready and swaps the rows in', async () => {
@@ -401,5 +415,47 @@ describe('Table requestReady', () => {
 
     await screen.findByTestId('stateful-cell');
     expect(request).toHaveBeenCalled();
+  });
+});
+
+describe('Table manual triggers', () => {
+  /* The limit lives in the URL, so the router write already changes the
+     query key. A refetch from the click closure fired first, with the old
+     limit, and was superseded before it could paint: request(1, 10) twice,
+     then request(1, 20). The push is a no-op in this suite, so the re-render
+     lands it by hand. */
+  it('issues one request from a page-size pill, at the new limit', async () => {
+    const request = jest.fn(async (_page: number, _limit: number) =>
+      makeResponse([{ id: 1 }]),
+    );
+    const { rerenderTable } = renderTable(
+      <Table {...makeProps(request, {})} showLimit={true} />,
+    );
+    await screen.findByTestId('stateful-cell');
+    const before = request.mock.calls.length;
+
+    fireEvent.click(screen.getByText('20'));
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 20));
+    });
+    rerenderTable(<Table {...makeProps(request, {})} showLimit={true} />);
+
+    await waitFor(() =>
+      expect(request.mock.calls.length).toBeGreaterThan(before),
+    );
+    expect(request.mock.calls.slice(before)).toEqual([[1, 20]]);
+  });
+
+  it('routes the empty-state retry through the readiness guard', async () => {
+    const request = jest.fn(async () => makeResponse([]));
+    renderTable(<Table {...makeProps(request, {})} />);
+    await screen.findByTestId('table-empty');
+    const before = request.mock.calls.length;
+
+    fireEvent.click(screen.getByText('Retry'));
+
+    await waitFor(() =>
+      expect(request.mock.calls.length).toBeGreaterThan(before),
+    );
   });
 });

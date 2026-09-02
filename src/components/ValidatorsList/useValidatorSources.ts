@@ -76,7 +76,10 @@ export const useValidatorSources = (
          shares. The age bound cannot fire inside the poll window (every
          settle resets `dataUpdatedAt`), so within the ten-try budget the kept
          half rides the whole outage; the bound is for the reader who arrives
-         after that budget, whose refetch re-asks BOTH halves. */
+         after that budget, whose refetch re-asks BOTH halves. A reader who
+         keeps re-entering within five minutes renews the lease each time, so
+         a kept half can age past the window while the other stays down:
+         stale, not wrong. */
       const fresh =
         state !== undefined && Date.now() - state.dataUpdatedAt < 5 * 60_000;
       const recovering = fresh && previous !== undefined && !complete(previous);

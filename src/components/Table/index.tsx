@@ -244,9 +244,10 @@ const Table = <TCard,>({
   const pending = isLoading || !requestReady;
 
   /* Manual triggers pierce `enabled`: react-query's refetch() fetches a
-     disabled query too, so the refresh icon, the page-size pills and the
-     page-change effect all ran the request inside the hold window and painted
-     what the hold exists to prevent. */
+     disabled query too, so the refresh icon and the page-change effect ran
+     the request inside the hold window and painted what the hold exists to
+     prevent. Every manual trigger goes through here, the render-gated retry
+     included, so nothing enforces the hold from a distance. */
   const refetchWhenReady = (): void => {
     if (requestReady) refetch();
   };
@@ -308,6 +309,9 @@ const Table = <TCard,>({
                     <ItemContainer
                       key={value}
                       onClick={() => {
+                        // No refetch: the router write changes the query key,
+                        // and a call from this closure re-requested the old
+                        // limit first (measured: two requests per click).
                         setQueryAndRouter(
                           {
                             ...router.query,
@@ -316,7 +320,6 @@ const Table = <TCard,>({
                           },
                           router,
                         );
-                        refetchWhenReady();
                       }}
                       active={value === limit}
                     >
@@ -518,7 +521,10 @@ const Table = <TCard,>({
             requestReady &&
             (!response?.items || response?.items?.length === 0) && (
               <TableEmptyData>
-                <RetryContainer onClick={() => refetch()} $loading={isFetching}>
+                <RetryContainer
+                  onClick={refetchWhenReady}
+                  $loading={isFetching}
+                >
                   <span>Retry</span>
                   <IoReloadSharp size={20} />
                 </RetryContainer>

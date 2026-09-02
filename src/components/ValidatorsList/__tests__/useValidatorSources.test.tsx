@@ -109,6 +109,10 @@ describe('useValidatorSources', () => {
     mockHeartbeat.mockReset();
   });
 
+  // Restored here rather than per test: a failing assertion skips a trailing
+  // useRealTimers and hangs every later waitFor in the file.
+  afterEach(() => {});
+
   it('hands both sources over once they resolve', async () => {
     mockFetchAll.mockResolvedValue(list);
     mockHeartbeat.mockResolvedValue(heartbeat);
@@ -184,7 +188,6 @@ describe('useValidatorSources', () => {
     });
 
     expect(mockHeartbeat.mock.calls.length).toBeGreaterThan(first);
-    jest.useRealTimers();
   });
 
   /* The other half of the same tick. `fetchAllValidators` is three
@@ -210,7 +213,6 @@ describe('useValidatorSources', () => {
     expect(mockFetchAll.mock.calls).toHaveLength(first);
     expect(latest.data.validators).toHaveLength(1);
     expect(latest.data.validatorsAvailable).toBe(true);
-    jest.useRealTimers();
   });
 
   /* The mirror of the pair above: a list outage must not burn `/api/heartbeat`
@@ -236,7 +238,6 @@ describe('useValidatorSources', () => {
     expect(latest.data.versionMap).toEqual({ bls1: 'v1.7.21' });
     expect(latest.data.entries).toHaveLength(1);
     expect(latest.data.heartbeatAvailable).toBe(true);
-    jest.useRealTimers();
   });
 
   /* The bound on the keeping: an answer older than the five-minute freshness
@@ -268,7 +269,6 @@ describe('useValidatorSources', () => {
     });
 
     expect(mockFetchAll.mock.calls.length).toBeGreaterThan(first);
-    jest.useRealTimers();
   });
 
   it('stops asking once both halves have answered', async () => {
@@ -288,7 +288,6 @@ describe('useValidatorSources', () => {
     });
 
     expect(mockFetchAll.mock.calls).toHaveLength(first);
-    jest.useRealTimers();
   });
 
   it('does not poll for a reader that did not ask for it', async () => {
@@ -308,7 +307,6 @@ describe('useValidatorSources', () => {
     });
 
     expect(mockFetchAll.mock.calls).toHaveLength(first);
-    jest.useRealTimers();
   });
 
   it('gives up after ten tries rather than polling a dead node forever', async () => {
@@ -334,7 +332,6 @@ describe('useValidatorSources', () => {
     // The mount plus ten polls, and nothing after that.
     expect(mockHeartbeat.mock.calls.length).toBeLessThanOrEqual(11);
     expect(mockHeartbeat.mock.calls.length).toBeGreaterThan(5);
-    jest.useRealTimers();
   });
 
   it('asks each source exactly once for one mount', async () => {

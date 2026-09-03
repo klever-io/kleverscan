@@ -91,6 +91,75 @@ const answerEach = (
   );
 };
 
+describe('volume and window guards', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('drops the volume when its own route failed', async () => {
+    // Its own tile, not the strip: the counts beside it still answered.
+    answerEach({});
+    mockedGet.mockImplementation(({ route, query }: { route: string; query?: IQuery }) => {
+      if (route === 'block/statistics/24h') return Promise.resolve({ error: 'boom' });
+      if (route === 'transaction/list' && query?.startdate !== undefined) {
+        return Promise.resolve({ pagination: { totalRecords: 8165 } });
+      }
+      return Promise.resolve({ pagination: { totalRecords: 58_500_000 } });
+    });
+
+    const summary = await transactionsSummaryCall();
+
+    expect(summary.volume24h).toBeUndefined();
+    expect(summary.last24h).toBe(8165);
+  });
+
+  it('drops a non-numeric volume instead of rendering it', async () => {
+    // A null reaches klvAmount as `null / 1e6` and prints "0 KLV", a figure
+    // the chain never reported.
+    mockedGet.mockImplementation(({ route }: { route: string }) => {
+      if (route === 'block/statistics/24h') {
+        return Promise.resolve({
+          error: '',
+          data: { block_stats_24h: { totalVolume: null } },
+        });
+      }
+      return Promise.resolve({ pagination: { totalRecords: 1 } });
+    });
+
+    const summary = await transactionsSummaryCall();
+
+    expect(summary.volume24h).toBeUndefined();
+  });
+
+  it('keeps a genuine zero volume, which a quiet day really is', async () => {
+    mockedGet.mockImplementation(({ route }: { route: string }) => {
+      if (route === 'block/statistics/24h') {
+        return Promise.resolve({
+          error: '',
+          data: { block_stats_24h: { totalVolume: 0 } },
+        });
+      }
+      return Promise.resolve({ pagination: { totalRecords: 1 } });
+    });
+
+    const summary = await transactionsSummaryCall();
+
+    expect(summary.volume24h).toBe(0);
+  });
+
+  it('drops a window count that came back non-numeric', async () => {
+    mockedGet.mockImplementation(({ route, query }: { route: string; query?: IQuery }) => {
+      if (route === 'transaction/list' && query?.startdate !== undefined) {
+        return Promise.resolve({ pagination: { totalRecords: null } });
+      }
+      return Promise.resolve({ pagination: { totalRecords: 5 } });
+    });
+
+    const summary = await transactionsSummaryCall();
+
+    expect(summary.last24h).toBeUndefined();
+    expect(summary.previous24h).toBeUndefined();
+  });
+});
+
 describe('transactionsSummaryCall', () => {
   beforeEach(() => jest.clearAllMocks());
 

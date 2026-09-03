@@ -17,10 +17,12 @@ import { PageSummaryCard } from './styles';
 /** The breakdown names Transfer, Smart Contract, Claim, Freeze and Other. */
 const LEGEND_SLOTS = [0, 1, 2, 3, 4];
 
+// `optional` marks the tile the narrow layout drops, matching the loaded
+// card's own marker so the skeleton hides the same one.
 const TILES = [
   { key: 'Last24h', fallback: 'Transactions (24h)' },
   { key: 'Total', fallback: 'Total transactions' },
-  { key: 'MostTransacted', fallback: 'Most transacted' },
+  { key: 'MostTransacted', fallback: 'Most transacted', optional: true },
   { key: 'Volume', fallback: 'Volume (24h)' },
 ] as const;
 
@@ -69,7 +71,10 @@ const TransactionsSummaryLoadingCard: React.FC<{ label: string }> = ({
     <PageSummaryCard aria-label={label} aria-busy="true">
       <TilesGrid>
         {TILES.map(tile => (
-          <Tile key={tile.key}>
+          <Tile
+            key={tile.key}
+            data-optional={'optional' in tile ? 'true' : undefined}
+          >
             <TileLabel>
               {t(`transactions:Summary.${tile.key}`, {
                 defaultValue: tile.fallback,

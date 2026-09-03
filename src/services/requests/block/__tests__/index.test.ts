@@ -383,6 +383,10 @@ describe('blockTotalStatsCall', () => {
 describe('blockYesterdayTransactionsCall', () => {
   const DAY_MS = 24 * 60 * 60 * 1000;
 
+  // A trailing useRealTimers() is skipped when the assertion above it throws,
+  // and every later waitFor in the file then hangs on its timeout.
+  afterEach(() => jest.useRealTimers());
+
   /** Midnight UTC that opened yesterday, the key the bucket carries. */
   const yesterdayKey = (): number => {
     const midnight = new Date();
@@ -391,6 +395,43 @@ describe('blockYesterdayTransactionsCall', () => {
   };
 
   beforeEach(() => jest.clearAllMocks());
+
+  it('matches the millisecond keys the route really answers with', async () => {
+    // Not derived from the same formula as the source, which would pass
+    // whatever unit the route used: these are the keys measured live on
+    // 2026-09-03, 13 digits, midnight UTC. A seconds-valued key would be
+    // 1788307200 and would not match.
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-03T11:00:00Z'));
+
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: {
+        number_by_day: [
+          { key: 1788393600000, doc_count: 2934 },
+          { key: 1788307200000, doc_count: 8275 },
+        ],
+      },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBe(8275);
+
+    jest.useRealTimers();
+  });
+
+  it('finds nothing when the route answers seconds instead of milliseconds', async () => {
+    // The opposite direction: a unit slip must not silently match some other
+    // day, it must answer undefined so the tile is left out.
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-03T11:00:00Z'));
+
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: { number_by_day: [{ key: 1788307200, doc_count: 8275 }] },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
+
+    jest.useRealTimers();
+  });
 
   it('reads the bucket whose key is yesterday', async () => {
     mockedGet.mockResolvedValue({

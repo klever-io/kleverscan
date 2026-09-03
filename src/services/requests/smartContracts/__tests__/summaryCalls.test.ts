@@ -1,5 +1,6 @@
 import api from '@/services/api';
 import {
+  activeContracts24hCall,
   contractActivitySharesCall,
   contractTransactions24hCall,
   smartContractsListCall,
@@ -133,5 +134,46 @@ describe('finite guards on totals', () => {
     expect(query.type).toBe(63);
     expect(query.enddate - query.startdate).toBe(24 * 60 * 60 * 1000);
     expect(query.startdate).toBeGreaterThan(1e12);
+  });
+});
+
+
+describe('activeContracts24hCall', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('reads the active count off the rolling statistics route', async () => {
+    respond({ 'sc/statistics/24h': { error: '', data: { activeContracts: 16 } } });
+
+    await expect(activeContracts24hCall()).resolves.toBe(16);
+    expect(mockedGet.mock.calls[0][0].route).toBe('sc/statistics/24h');
+  });
+
+  it('keeps a genuine zero, which a quiet day really is', async () => {
+    // Distinct from a failure: no contract ran is a fact the tile may state.
+    respond({ 'sc/statistics/24h': { error: '', data: { activeContracts: 0 } } });
+
+    await expect(activeContracts24hCall()).resolves.toBe(0);
+  });
+
+  it('answers undefined on a failure rather than a zero', async () => {
+    respond({ 'sc/statistics/24h': { error: 'boom' } });
+
+    await expect(activeContracts24hCall()).resolves.toBeUndefined();
+  });
+
+  it('drops a non-numeric count instead of passing it on', async () => {
+    // A null survives an `!== undefined` check and would throw on
+    // toLocaleString in the middle of a render.
+    respond({
+      'sc/statistics/24h': { error: '', data: { activeContracts: null } },
+    });
+
+    await expect(activeContracts24hCall()).resolves.toBeUndefined();
+  });
+
+  it('answers undefined when the body carries no statistics at all', async () => {
+    respond({ 'sc/statistics/24h': { error: '', data: {} } });
+
+    await expect(activeContracts24hCall()).resolves.toBeUndefined();
   });
 });

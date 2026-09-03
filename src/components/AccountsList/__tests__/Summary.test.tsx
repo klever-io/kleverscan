@@ -297,4 +297,24 @@ describe('AccountsSummary', () => {
     expect(createdCall).toHaveBeenCalledTimes(1);
     expect(totalCall).toHaveBeenCalledTimes(1);
   });
+
+  it('caches on the wider window alone, when it is the only figure that came', async () => {
+    // Three separate requests, so the 7d tile can answer while the other two
+    // fail. Judging freshness on the other two alone refetched a strip that
+    // had something to show, on every mount.
+    totalCall.mockResolvedValue(undefined);
+    createdCall.mockResolvedValue(undefined);
+    windowCall.mockResolvedValue(184);
+
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
+    renderShared(client).unmount();
+    await waitFor(() => expect(windowCall).toHaveBeenCalledTimes(1));
+
+    renderShared(client);
+    await loaded();
+    expect(windowCall).toHaveBeenCalledTimes(1);
+  });
 });

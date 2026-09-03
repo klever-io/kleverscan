@@ -245,7 +245,20 @@ describe('BlocksSummary', () => {
     expect(card.textContent).toContain('8,275');
     // A share of the day's blocks, capped at one transaction per block: the
     // raw average reads "0.4 per block", which tells a reader less.
-    expect(card.textContent).toContain('of blocks carried one');
+    expect(card.textContent).toContain('of blocks used');
+  });
+
+  it('shows the count without a share when the day produced no blocks', async () => {
+    // A halted chain divides by zero: formatShare answers "--" and the line
+    // would read "-- of blocks used".
+    yesterdayCall.mockResolvedValue({ ...YESTERDAY, totalBlocks: 0 });
+    totalCall.mockResolvedValue(undefined);
+    transactionsCall.mockResolvedValue(0);
+    renderSummary();
+    const card = await screen.findByTestId('blocks-summary');
+
+    expect(card.textContent).not.toContain('of blocks used');
+    expect(card.textContent).not.toContain('--');
   });
 
   it('leaves the transactions tile out when its own request failed', async () => {
@@ -257,7 +270,7 @@ describe('BlocksSummary', () => {
     renderSummary();
     const card = await screen.findByTestId('blocks-summary');
 
-    expect(card.textContent).not.toContain('of blocks carried one');
+    expect(card.textContent).not.toContain('of blocks used');
     expect(card.textContent).toContain('Blocks (yesterday)');
   });
 

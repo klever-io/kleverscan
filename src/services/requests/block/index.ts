@@ -207,7 +207,16 @@ export const blockYesterdayStatsCall = async (): Promise<
   return yesterday;
 };
 
-/** Midnight UTC that opened yesterday, the key its bucket carries. */
+/**
+ * Midnight UTC that opened yesterday, the key its bucket carries.
+ *
+ * Milliseconds, matching the route: measured 2026-09-03 the keys came back as
+ * 1788393600000 and 1788307200000, 13 digits, which is 2026-09-03 and
+ * 2026-09-02 at 00:00 UTC. They come from an Elasticsearch date_histogram,
+ * whose bucket key is epoch milliseconds by definition rather than by the
+ * proxy's choice. Worth pinning because `genesisTimestampCall` below has to
+ * normalise a seconds value, so both units occur in this API.
+ */
 const yesterdayKeyMs = (now: number = Date.now()): number => {
   const midnight = new Date(now);
   midnight.setUTCHours(0, 0, 0, 0);

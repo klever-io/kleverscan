@@ -47,7 +47,7 @@ export interface ITransactionsSummary {
  * `limit: 1` because only `totalRecords` is read; the page of rows is waste.
  */
 const windowCountCall = async (
-  offsetWindows = 0,
+  offsetWindows: number,
   type?: number,
 ): Promise<number | undefined> => {
   const response = await api.get({

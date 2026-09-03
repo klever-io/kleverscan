@@ -43,11 +43,6 @@ const ok = (
 });
 
 const stubAccountsApis = (): void => {
-  cy.intercept('GET', '**/v1.0/address/list/count/**', {
-    statusCode: 200,
-    body: ok({ number_by_day: [{ doc_count: accounts.length }] }),
-  }).as('accountCount');
-
   cy.intercept('GET', '**/v1.0/validator/list*', {
     statusCode: 200,
     body: ok({ validators: [] }, { pagination: { totalRecords: 0 } }),

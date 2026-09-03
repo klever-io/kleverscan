@@ -271,6 +271,15 @@ describe('accountsCreatedInWindow', () => {
 
     await expect(accountsCreatedInWindow(7)).resolves.toBeUndefined();
   });
+
+  it('never asks for an empty range, whatever it is handed', async () => {
+    // Zero would make startdate equal enddate, and the count of an empty
+    // range is 0, which the tile would print as a fact.
+    await accountsCreatedInWindow(0);
+
+    const { query } = argsOf();
+    expect(query.enddate - query.startdate).toBe(DAY_MS);
+  });
 });
 
 /** A page with no pagination block at all, which is what a degraded or

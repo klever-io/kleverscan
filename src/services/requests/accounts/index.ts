@@ -1,11 +1,7 @@
 import api from '@/services/api';
 import { rollingWindow } from '@/services/requests/rollingWindow';
 import { toMilliseconds } from '@/utils/timeFunctions';
-import {
-  IAccount,
-  IPaginatedResponse,
-  IYesterdayResponse,
-} from '@/types/index';
+import { IAccount, IPaginatedResponse } from '@/types/index';
 
 type RouterQuery = Record<string, string | string[] | undefined>;
 
@@ -72,11 +68,15 @@ export const accountsTotalCall = async (): Promise<number | undefined> => {
  * range. `address/list/count/<days>` is not used: its buckets are whole UTC
  * days, so entry 0 is today since midnight and read 4 where the rolling day
  * held 9 (measured 2026-09-03).
+ *
+ * `windows` counts 24-hour windows back from now and must be at least 1;
+ * clamped rather than trusted, because 0 would ask for an empty range and
+ * report "no new accounts" as a fact.
  */
 export const accountsCreatedInWindow = async (
   windows: number,
 ): Promise<number | undefined> => {
-  const { startdate } = rollingWindow(windows - 1);
+  const { startdate } = rollingWindow(Math.max(1, windows) - 1);
   const { enddate } = rollingWindow(0);
   const response = await api.get({
     route: 'address/list',

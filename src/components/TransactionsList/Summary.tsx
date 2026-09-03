@@ -209,7 +209,9 @@ const TransactionsSummary: React.FC = () => {
         )}
 
         {summary.mostTransactedAsset && (
-          <Tile>
+          // Dropped below 451px, where only two tiles fit: the leading asset
+          // is the one figure here a reader can do without.
+          <Tile data-optional="true">
             <TileLabel>
               {t('transactions:Summary.MostTransacted', {
                 defaultValue: 'Most transacted',

@@ -62,13 +62,13 @@ const BlocksSummary: React.FC = () => {
       return { yesterday, total, transactions };
     },
     // A function, not a constant: a failure caches as a successful undefined,
-    // and a constant would hold that for five minutes. Both halves, not
-    // either: with `||` a half-failed answer counted as fresh and the card it
+    // and a constant would hold that for five minutes. Every source, not any
+    // one: with `||` a half-failed answer counted as fresh and the card it
     // degrades survived remounts for the full five minutes.
     staleTime: query =>
       summaryComplete(
         query.state.data as
-          | { yesterday?: unknown; total?: unknown }
+          | { yesterday?: unknown; total?: unknown; transactions?: unknown }
           | undefined,
       )
         ? 5 * 60 * 1000
@@ -76,7 +76,7 @@ const BlocksSummary: React.FC = () => {
     refetchInterval: query =>
       summaryRefetchInterval(
         query.state.data as
-          | { yesterday?: unknown; total?: unknown }
+          | { yesterday?: unknown; total?: unknown; transactions?: unknown }
           | undefined,
       ),
   });
@@ -168,17 +168,23 @@ const BlocksSummary: React.FC = () => {
               })}
             </TileLabel>
             <TileValue>{transactions.toLocaleString(NUMBER_LOCALE)}</TileValue>
-            <TileSub>
-              {/* The share of blocks that carried anything, not transactions
-                  per block: at 8275 over 21599 that average reads "0.4 per
-                  block", which says less than "at most 38.3% of blocks were
-                  used". `count` is avoided because i18next reserves it for
-                  plural selection and interpolates the number unformatted. */}
-              {t('blocks:List.BlocksUsed', {
-                defaultValue: 'up to {{share}} of blocks carried one',
-                share: formatShare(transactions, yesterday.totalBlocks),
-              })}
-            </TileSub>
+            {yesterday.totalBlocks > 0 && (
+              <TileSub>
+                {/* The share of blocks that carried anything, not transactions
+                    per block: at 8275 over 21599 that average reads "0.4 per
+                    block", which says less. Kept to the length of its
+                    neighbours (18 to 21 characters): at 33 it wrapped to two
+                    lines at 390px and grew the card 14px when the figures
+                    landed. Guarded on a non-zero divisor, or formatShare
+                    answers "--" and the line reads "-- of blocks used".
+                    `count` is avoided because i18next reserves it for plural
+                    selection and interpolates the number unformatted. */}
+                {t('blocks:List.BlocksUsed', {
+                  defaultValue: '{{share}} of blocks used',
+                  share: formatShare(transactions, yesterday.totalBlocks),
+                })}
+              </TileSub>
+            )}
           </Tile>
         )}
 

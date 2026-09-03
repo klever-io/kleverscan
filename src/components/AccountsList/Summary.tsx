@@ -50,12 +50,20 @@ const AccountsSummary: React.FC = () => {
     // A function, not a constant, for the reason `badgeQueries` spells out.
     staleTime: query => {
       const cached = query.state.data as
-        | { totalRecords?: number; series?: unknown[] }
+        | {
+            totalRecords?: number;
+            series?: unknown[];
+            windowTotal?: number;
+          }
         | undefined;
       // The series keeps holes, so its length alone is true for a strip of
-      // undefineds; require at least one figure that actually arrived.
+      // undefineds; require at least one figure that actually arrived. All
+      // three sources count: each is its own request, so the wider window can
+      // answer when the other two did not, and a cached strip that holds one
+      // real figure must not be refetched on every mount.
       const answered =
         cached?.totalRecords !== undefined ||
+        cached?.windowTotal !== undefined ||
         !!cached?.series?.some(day => day !== undefined);
       return answered ? 5 * 60 * 1000 : 0;
     },

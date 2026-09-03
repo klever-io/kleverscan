@@ -403,19 +403,22 @@ const pageSummarySpacing = css`
 
 /* Three tiles side by side for as long as the widest holds its label unbroken:
    115px measured, so three of them plus the gaps need a 377px grid and the
-   451px screen that carries one. Below that the third is dropped rather than
-   wrapped onto a row of its own; it is the leading-asset tile, the one figure
-   here a reader can do without. Both rules sit on the loading shape too, or
-   the card re-flows once the figures land. */
+   451px screen that carries one. Below that the leading-asset tile is dropped
+   rather than wrapped onto a row of its own; it is the one figure here a
+   reader can do without. Selected by its own marker rather than by position:
+   every tile is conditional, so with `nth-child(3)` a failed most-transacted
+   request moved the volume tile into that slot and hid a figure that had
+   answered. Both rules sit on the loading shape too, or the card re-flows
+   once the figures land. */
 const threeTilesThenTwo = css`
   @media screen and (max-width: ${BELOW_ROW_LAYOUT}) {
     ${TilesGrid} {
-      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
     }
   }
 
   @media screen and (max-width: 450px) {
-    ${TilesGrid} > *:nth-child(3) {
+    ${TilesGrid} > [data-optional='true'] {
       display: none;
     }
   }

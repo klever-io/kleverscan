@@ -19,7 +19,7 @@
     "TxCount_one": "{{formatted}} tx",
     "TxCount_other": "{{formatted}} txs",
     "TransactionsYesterday": "Transactions (yesterday)",
-    "BlocksUsed": "up to {{share}} of blocks carried one"
+    "BlocksUsed": "{{share}} of blocks used"
   },
   "Table": {
     "Block": "Block",

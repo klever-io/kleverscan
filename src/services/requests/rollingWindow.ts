@@ -20,6 +20,10 @@ export interface IRollingWindow {
 /**
  * The window ending now, or the one before it. `offsetWindows` counts
  * backwards: 0 is the last 24 hours, 1 the 24 hours before that.
+ *
+ * Pass `now` to hold one clock reading across a set of windows. Without it
+ * each call reads the clock again, and a tick between two reads leaves the
+ * figures beside each other measuring ranges that overlap or leave a gap.
  */
 export const rollingWindow = (
   offsetWindows = 0,
@@ -28,3 +32,15 @@ export const rollingWindow = (
   const enddate = now - offsetWindows * ROLLING_WINDOW_MS;
   return { startdate: enddate - ROLLING_WINDOW_MS, enddate };
 };
+
+/**
+ * A window spanning several 24 hour periods back from one moment, for a tile
+ * that reports a wider range than the one beside it.
+ */
+export const rollingWindowSpan = (
+  windows: number,
+  now: number = Date.now(),
+): IRollingWindow => ({
+  startdate: now - Math.max(1, windows) * ROLLING_WINDOW_MS,
+  enddate: now,
+});

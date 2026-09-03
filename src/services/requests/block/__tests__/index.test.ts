@@ -394,7 +394,14 @@ describe('blockYesterdayTransactionsCall', () => {
     return midnight.getTime() - DAY_MS;
   };
 
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Frozen: each fixture computes its keys before the call computes its own,
+    // so a UTC midnight landing between the two would make the call miss the
+    // bucket and fail the run at random. The cases that pin measured keys set
+    // their own time on top of this.
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-03T11:00:00Z'));
+  });
 
   it('matches the millisecond keys the route really answers with', async () => {
     // Not derived from the same formula as the source, which would pass

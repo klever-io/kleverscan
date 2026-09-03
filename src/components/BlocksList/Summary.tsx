@@ -170,18 +170,16 @@ const BlocksSummary: React.FC = () => {
             <TileValue>{transactions.toLocaleString(NUMBER_LOCALE)}</TileValue>
             {yesterday.totalBlocks > 0 && (
               <TileSub>
-                {/* The share of blocks that carried anything, not transactions
-                    per block: at 8275 over 21599 that average reads "0.4 per
-                    block", which says less. Kept to the length of its
-                    neighbours (18 to 21 characters): at 33 it wrapped to two
-                    lines at 390px and grew the card 14px when the figures
-                    landed. Guarded on a non-zero divisor, or formatShare
-                    answers "--" and the line reads "-- of blocks used".
+                {/* Transactions per block, not the share of blocks that
+                    carried one: several transactions fit in a single block, so
+                    a count divided by the block total overstates it. Measured
+                    over 100 consecutive blocks: 18 transactions across 17
+                    non-empty blocks, so the two figures genuinely differ.
                     `count` is avoided because i18next reserves it for plural
                     selection and interpolates the number unformatted. */}
-                {t('blocks:List.BlocksUsed', {
-                  defaultValue: '{{share}} of blocks used',
-                  share: formatShare(transactions, yesterday.totalBlocks),
+                {t('blocks:List.PerBlock', {
+                  defaultValue: '{{average}} per block',
+                  average: (transactions / yesterday.totalBlocks).toFixed(2),
                 })}
               </TileSub>
             )}

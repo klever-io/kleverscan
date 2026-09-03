@@ -1,5 +1,8 @@
 import api from '@/services/api';
-import { rollingWindow } from '@/services/requests/rollingWindow';
+import {
+  rollingWindow,
+  rollingWindowSpan,
+} from '@/services/requests/rollingWindow';
 import { toMilliseconds } from '@/utils/timeFunctions';
 import { IAccount, IPaginatedResponse } from '@/types/index';
 
@@ -76,36 +79,39 @@ export const accountsTotalCall = async (): Promise<number | undefined> => {
 export const accountsCreatedInWindow = async (
   windows: number,
 ): Promise<number | undefined> => {
-  const { startdate } = rollingWindow(Math.max(1, windows) - 1);
-  const { enddate } = rollingWindow(0);
   const response = await api.get({
     route: 'address/list',
-    query: { limit: 1, minify: true, startdate, enddate },
+    query: { limit: 1, minify: true, ...rollingWindowSpan(windows) },
   });
   if (response?.error) return undefined;
   const total = response?.pagination?.totalRecords;
   return Number.isFinite(total) ? total : undefined;
 };
 
-/** The window ending now and the one before it, for the change line. */
+/**
+ * The window ending now and the one before it, for the change line. One clock
+ * reading for both, so the pair cannot overlap or leave a gap between them.
+ */
 export const accountsCreatedCall = async (): Promise<
   (number | undefined)[] | undefined
 > => {
+  const now = Date.now();
   const [today, yesterday] = await Promise.all([
-    accountsCreatedInWindow(1),
-    windowCountCall(1),
+    windowCountCall(0, now),
+    windowCountCall(1, now),
   ]);
   if (today === undefined && yesterday === undefined) return undefined;
   return [today, yesterday];
 };
 
-/** One window, offset back by whole windows. */
+/** One window, offset back by whole windows from the given moment. */
 const windowCountCall = async (
   offsetWindows: number,
+  now?: number,
 ): Promise<number | undefined> => {
   const response = await api.get({
     route: 'address/list',
-    query: { limit: 1, minify: true, ...rollingWindow(offsetWindows) },
+    query: { limit: 1, minify: true, ...rollingWindow(offsetWindows, now) },
   });
   if (response?.error) return undefined;
   const total = response?.pagination?.totalRecords;

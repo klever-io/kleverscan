@@ -1,6 +1,7 @@
 import {
   ROLLING_WINDOW_MS,
   rollingWindow,
+  rollingWindowSpan,
 } from '@/services/requests/rollingWindow';
 
 describe('rollingWindow', () => {
@@ -36,5 +37,33 @@ describe('rollingWindow', () => {
 
   it('does not move on its own between calls with the same clock', () => {
     expect(rollingWindow(0, now)).toEqual(rollingWindow(0, now));
+  });
+});
+
+describe('rollingWindowSpan', () => {
+  const now = 1_788_428_166_129;
+
+  it('spans the number of windows asked for, ending now', () => {
+    const { startdate, enddate } = rollingWindowSpan(7, now);
+
+    expect(enddate).toBe(now);
+    expect(enddate - startdate).toBe(7 * ROLLING_WINDOW_MS);
+  });
+
+  it('never asks for an empty range, whatever it is handed', () => {
+    // Zero would make the two ends equal, and the count of an empty range is
+    // 0, which a tile would print as a fact.
+    expect(
+      rollingWindowSpan(0, now).enddate - rollingWindowSpan(0, now).startdate,
+    ).toBe(ROLLING_WINDOW_MS);
+  });
+
+  it('reads the clock once, so a set of windows cannot drift apart', () => {
+    // Two reads a tick apart leave the figures beside each other measuring
+    // ranges that overlap or leave a gap.
+    const a = rollingWindowSpan(7, now);
+    const b = rollingWindow(0, now);
+
+    expect(a.enddate).toBe(b.enddate);
   });
 });

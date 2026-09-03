@@ -49,13 +49,14 @@ export interface ITransactionsSummary {
 const windowCountCall = async (
   offsetWindows: number,
   type?: number,
+  now?: number,
 ): Promise<number | undefined> => {
   const response = await api.get({
     route: 'transaction/list',
     query: {
       limit: 1,
       minify: true,
-      ...rollingWindow(offsetWindows),
+      ...rollingWindow(offsetWindows, now),
       ...(type === undefined ? {} : { type }),
     },
   });
@@ -143,6 +144,9 @@ export const buildBreakdown = (
  */
 export const transactionsSummaryCall =
   async (): Promise<ITransactionsSummary> => {
+    // One clock reading for the pair, so the two windows meet exactly rather
+    // than overlapping or leaving a gap across a tick.
+    const now = Date.now();
     const [
       last24h,
       previous24h,
@@ -150,8 +154,8 @@ export const transactionsSummaryCall =
       mostTransactedAsset,
       volume24h,
     ] = await Promise.all([
-      windowCountCall(0),
-      windowCountCall(1),
+      windowCountCall(0, undefined, now),
+      windowCountCall(1, undefined, now),
       totalCall(),
       mostTransactedCall(),
       volumeCall(),
@@ -179,8 +183,13 @@ export const transactionsBreakdownCall = async (): Promise<
 > => {
   // Same window as the tiles, so the parts and the total agree. Sharing one
   // definition matters: mixing a rolling total with day-bucket parts drew 66
-  // percent as "Other" when measured on 2026-09-03.
-  return Promise.all(BREAKDOWN_TYPES.map(type => windowCountCall(0, type)));
+  // percent as "Other" when measured on 2026-09-03. One clock reading across
+  // the four, or the parts count against boundaries that differ from each
+  // other by however long the requests take to leave.
+  const now = Date.now();
+  return Promise.all(
+    BREAKDOWN_TYPES.map(type => windowCountCall(0, type, now)),
+  );
 };
 
 /**

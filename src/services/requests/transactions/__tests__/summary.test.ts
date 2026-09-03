@@ -1,5 +1,6 @@
 import api from '@/services/api';
 import {
+  BREAKDOWN_TYPES,
   buildBreakdown,
   summaryVariation,
   totalGrowth,
@@ -90,6 +91,52 @@ const answerEach = (
     },
   );
 };
+
+describe('one clock reading per set', () => {
+  let nowSpy: jest.SpyInstance<number, []>;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // A clock that moves a second on every read. Held still, a per-call read
+    // and a shared one are indistinguishable, so the test would pass either
+    // way; this is what makes it a guard rather than a description.
+    let tick = 1_788_428_166_129;
+    nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => {
+      tick += 1000;
+      return tick;
+    });
+  });
+
+  afterEach(() => nowSpy.mockRestore());
+
+  it('meets the two tile windows exactly, with no gap and no overlap', async () => {
+    // A clock read per call leaves the pair measuring ranges that drift apart
+    // by however long the calls take to leave.
+    answerEach({});
+    await transactionsSummaryCall();
+
+    const windows = mockedGet.mock.calls
+      .map(([args]) => args.query)
+      .filter((q: IQuery) => q?.startdate !== undefined)
+      .sort((a: IQuery, b: IQuery) => (b.enddate ?? 0) - (a.enddate ?? 0));
+
+    expect(windows).toHaveLength(2);
+    expect(windows[1].enddate).toBe(windows[0].startdate);
+  });
+
+  it('counts every breakdown part against the same boundaries', async () => {
+    answerEach({});
+    await transactionsBreakdownCall();
+
+    const bounds = mockedGet.mock.calls
+      .map(([args]) => args.query)
+      .filter((q: IQuery) => q?.type !== undefined)
+      .map((q: IQuery) => `${q.startdate}-${q.enddate}`);
+
+    expect(bounds).toHaveLength(BREAKDOWN_TYPES.length);
+    expect(new Set(bounds).size).toBe(1);
+  });
+});
 
 describe('volume and window guards', () => {
   beforeEach(() => jest.clearAllMocks());

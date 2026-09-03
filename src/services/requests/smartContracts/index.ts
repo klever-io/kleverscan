@@ -220,10 +220,18 @@ const contractTransactions24hCall = async (): Promise<
  * cannot drift apart.
  */
 const activeContracts24hCall = async (): Promise<number | undefined> => {
-  const res = await api.get({ route: 'sc/statistics/24h' });
-  if (res?.error) return undefined;
-  const active = res?.data?.activeContracts;
-  return Number.isFinite(active) ? active : undefined;
+  try {
+    // Caught like every sibling here: api.get resolves its own error object,
+    // but an unreadable body rejects, and the card gathers these with
+    // Promise.all, so one rejection would take the whole strip down.
+    const res = await api.get({ route: 'sc/statistics/24h' });
+    if (res?.error) return undefined;
+    const active = res?.data?.activeContracts;
+    return Number.isFinite(active) ? active : undefined;
+  } catch (error) {
+    console.error(error);
+    return undefined;
+  }
 };
 
 const smartContractBeforeYesterdayTransactionsCall = async (

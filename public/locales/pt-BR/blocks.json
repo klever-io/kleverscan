@@ -19,7 +19,7 @@
     "TxCount_one": "{{formatted}} tx",
     "TxCount_other": "{{formatted}} txs",
     "TransactionsYesterday": "Transações (ontem)",
-    "BlocksUsed": "{{share}} dos blocos usados"
+    "PerBlock": "{{average}} por bloco"
   },
   "Table": {
     "Block": "Bloco",

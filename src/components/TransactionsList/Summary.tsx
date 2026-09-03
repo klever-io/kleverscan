@@ -109,10 +109,13 @@ const TransactionsSummary: React.FC = () => {
   const growth = totalGrowth(summary);
   // Each figure is shown only when its own request answered; a failed part
   // leaves its tile out instead of printing a zero the chain never had.
+  // Every figure the card can draw, so a strip that has one tile to show is
+  // not thrown away for the three that failed.
   const hasFigures =
     summary.last24h !== undefined ||
     summary.totalTransactions !== undefined ||
-    summary.mostTransactedAsset !== undefined;
+    summary.mostTransactedAsset !== undefined ||
+    summary.volume24h !== undefined;
 
   if (!hasFigures) return null;
 

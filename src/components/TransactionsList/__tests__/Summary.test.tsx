@@ -318,6 +318,23 @@ describe('TransactionsSummary', () => {
     expect(loadedMarkers[1].startsWith('narrow:')).toBe(true);
   });
 
+  it('keeps the card for the volume alone, when it is the only figure that came', async () => {
+    // The guard listed the three figures that predated the volume tile, so a
+    // strip with one tile to show was thrown away for the three that failed.
+    summaryCall.mockResolvedValue({
+      last24h: undefined,
+      previous24h: undefined,
+      totalTransactions: undefined,
+      mostTransactedAsset: undefined,
+      volume24h: 41_408_939_000_000,
+    });
+    renderSummary();
+    const loaded = await loadedCard();
+
+    expect(loaded.textContent).toContain('Volume (24h)');
+    expect(loaded.textContent).toContain('41.4 M KLV');
+  });
+
   it('draws no card at all when every figure is missing', async () => {
     summaryCall.mockResolvedValue({});
 

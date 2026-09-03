@@ -24,11 +24,11 @@ describe('transactionSeriesCall', () => {
   });
 
   it('counts a rolling window per point for a period it can afford', async () => {
-    // 1D asks for two points, one for each stretch the chart draws.
-    await transactionSeriesCall(1);
+    // A week asks for fourteen points, seven for each stretch the chart draws.
+    await transactionSeriesCall(7);
 
     const windows = dated();
-    expect(windows).toHaveLength(2);
+    expect(windows).toHaveLength(ROLLING_POINT_LIMIT);
     windows.forEach(window => {
       expect(window.enddate - window.startdate).toBe(DAY_MS);
       // Milliseconds: seconds are not rejected, the route answers the
@@ -95,7 +95,7 @@ describe('transactionSeriesCall', () => {
       ),
     );
 
-    await expect(transactionSeriesCall(1)).resolves.toEqual([]);
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
   it('drops a malformed bucket rather than charting it', async () => {

@@ -22,7 +22,16 @@ import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
-const CHART_TIME_FILTER = [1, 7, 15, 30];
+/**
+ * A period needs at least two points per line to draw one, and a day gives one
+ * per stretch, so 1D used to render a pair of dots and no line. Hourly points
+ * would fix it, but the proxy's histogram only buckets by day or month, and a
+ * request per hour is refused: 48 in parallel answered once and then returned
+ * 10 and 0 on the two runs after it, while testnet, which CI uses, refused 20
+ * of them outright. The card beside the chart already reports the last 24
+ * hours, and now agrees with this chart's own figures.
+ */
+const CHART_TIME_FILTER = [7, 15, 30];
 const TIME_SERIES_CHG_VALUE = {
   inPeriod: 0,
   percent: '',

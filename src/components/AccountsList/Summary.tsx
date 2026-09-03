@@ -8,6 +8,7 @@ import {
 } from '@/components/DataList/styles';
 import {
   accountsCreatedCall,
+  accountsCreatedInWindow,
   accountsTotalCall,
 } from '@/services/requests/accounts';
 import { useQuery } from '@tanstack/react-query';
@@ -24,11 +25,9 @@ import {
 
 import { NUMBER_LOCALE } from '@/components/DataList/format';
 
-/** Days of history fetched. The first entry is the running 24 hours. */
+/** Windows of 24 hours the wider tile covers. */
 const WINDOW_DAYS = 7;
 
-// The series is asked for a week because a seven-day answer opens with the
-// same entry a one-day answer returns: one call covers all three tiles.
 const AccountsSummary: React.FC = () => {
   const { t } = useTranslation(['accounts', 'common']);
   const label = t('accounts:List.SummaryAria', {
@@ -40,12 +39,13 @@ const AccountsSummary: React.FC = () => {
     queryFn: async () => {
       // api.get resolves failures as undefined instead of rejecting: a degraded
       // endpoint costs its own tile, and Promise.all has nothing left to reject.
-      const [totalRecords, series] = await Promise.all([
+      const [totalRecords, series, windowTotal] = await Promise.all([
         accountsTotalCall(),
-        accountsCreatedCall(WINDOW_DAYS),
+        accountsCreatedCall(),
+        accountsCreatedInWindow(WINDOW_DAYS),
       ]);
       // Newest entry first.
-      return { totalRecords, series: series ?? [] };
+      return { totalRecords, series: series ?? [], windowTotal };
     },
     // A function, not a constant, for the reason `badgeQueries` spells out.
     staleTime: query => {
@@ -67,11 +67,11 @@ const AccountsSummary: React.FC = () => {
 
   if (!data) return null;
 
-  const { totalRecords, series } = data;
-  const { today, change, windowTotal, countedDays } = summaryFigures(series);
+  const { totalRecords, series, windowTotal } = data;
+  const { today, change } = summaryFigures(series);
 
-  // `windowTotal` is genuinely a third check: the series keeps holes, so today
-  // can be absent while the rest of the window still carries figures.
+  // `windowTotal` is genuinely a third check: it is its own request, so it can
+  // arrive when the day figure did not.
   if (
     totalRecords === undefined &&
     today === undefined &&
@@ -120,7 +120,7 @@ const AccountsSummary: React.FC = () => {
                     and double digits, where one account moves it ten points. */}
                 <TrendNote>
                   {t('accounts:List.VersusYesterday', {
-                    defaultValue: '{{change}} vs yesterday',
+                    defaultValue: '{{change}} vs previous 24h',
                     change: `${change > 0 ? '+' : ''}${change.toLocaleString(NUMBER_LOCALE)}`,
                   })}
                 </TrendNote>
@@ -141,10 +141,11 @@ const AccountsSummary: React.FC = () => {
               <TileValue>{windowTotal.toLocaleString(NUMBER_LOCALE)}</TileValue>
             </TileValueRow>
             <TileSub>
-              {/* The days actually summed, not the days asked for. Pluralised
-                  through i18next's `count` so one day does not read "across 1 days". */}
+              {/* One counted range, so the days summed are the days asked for.
+                  Pluralised through i18next's `count` so one day does not read
+                  "across 1 days". */}
               {t('accounts:List.AcrossDays', {
-                count: countedDays,
+                count: WINDOW_DAYS,
                 defaultValue_one: 'across {{count}} day',
                 defaultValue_other: 'across {{count}} days',
               })}

@@ -1,4 +1,5 @@
 import api from '@/services/api';
+import { rollingWindow } from '@/services/requests/rollingWindow';
 import {
   HotContracts,
   SmartContractTransactionData,
@@ -179,27 +180,32 @@ const smartContractTotalTransactionsListCall = async (): Promise<
 };
 
 /**
- * Contract transactions in the last 24 hours.
+ * Contract transactions over the rolling 24 hours ending now.
  *
- * The bucket is a rolling window anchored at the request (`countDaysQuery` in
- * the proxy builds `now-1d..now`), not a calendar day, so the "in the last
- * 24 hours" line means exactly that at any time of day.
+ * Counted over an explicit date range rather than off
+ * `transaction/list/count/1`, whose bucket is a whole UTC day: measured
+ * 2026-09-03 that bucket read 1342 where the rolling day held 3059.
+ * `transaction/statistics/24h` is not the answer either, since it ignores
+ * `type` and would report the chain-wide total instead.
  */
 const contractTransactions24hCall = async (): Promise<
   { last24h: number } | undefined
 > => {
   try {
     const res = await api.get({
-      route: 'transaction/list/count/1',
+      route: 'transaction/list',
       query: {
+        limit: 1,
+        minify: true,
         type: 63, // Smart Contract Transactions
+        ...rollingWindow(),
       },
     });
 
     if (!res.error || res.error === '') {
-      const count = res.data?.number_by_day?.[0]?.doc_count;
-      // An empty window still arrives as a bucket with doc_count 0; a missing
-      // bucket on a 200 is a malformed success, not a zero the chain reported.
+      const count = res.pagination?.totalRecords;
+      // A null survives an `!== undefined` check and would throw on
+      // toLocaleString mid-render, so only a finite count travels on.
       return Number.isFinite(count) ? { last24h: count } : undefined;
     }
   } catch (error) {

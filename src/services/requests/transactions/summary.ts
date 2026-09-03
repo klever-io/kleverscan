@@ -1,19 +1,15 @@
 import api from '@/services/api';
+import { rollingWindow } from '@/services/requests/rollingWindow';
 import { ContractsIndex } from '@/types/contracts';
 
 /**
  * The figures above the transactions list.
  *
- * `transaction/list/count/<days>` answers one bucket per rolling 24 hour
- * window ending now, not per calendar day: verified live by calling it twice
- * seconds apart (the bucket keys move with the clock) and by matching its
- * first bucket against a manual `startdate`/`enddate` query over the last 24
- * hours (identical counts). So the first bucket is "the last 24 hours" and
- * the second is the 24 hours before that.
+ * Counted over an explicit rolling window rather than read off
+ * `transaction/list/count/<days>`. That route once answered rolling buckets
+ * but now answers whole UTC days, so its bucket [0] is today since midnight:
+ * measured 2026-09-03 it read 2817 where the rolling day held 8165.
  */
-
-/** Two buckets: the last 24 hours and the 24 hours before it. */
-const SUMMARY_WINDOWS = 2;
 
 /**
  * The contract types the composition bar names, in the order it draws them.
@@ -44,20 +40,26 @@ export interface ITransactionsSummary {
   mostTransactedAsset?: { assetId: string; count: number };
 }
 
-interface ICountBucket {
-  doc_count?: number;
-  key?: number;
-}
-
-const countsCall = async (
+/**
+ * How many transactions fall in one rolling window, optionally of one type.
+ * `limit: 1` because only `totalRecords` is read; the page of rows is waste.
+ */
+const windowCountCall = async (
+  offsetWindows = 0,
   type?: number,
-): Promise<ICountBucket[] | undefined> => {
+): Promise<number | undefined> => {
   const response = await api.get({
-    route: `transaction/list/count/${SUMMARY_WINDOWS}`,
-    ...(type === undefined ? {} : { query: { type } }),
+    route: 'transaction/list',
+    query: {
+      limit: 1,
+      minify: true,
+      ...rollingWindow(offsetWindows),
+      ...(type === undefined ? {} : { type }),
+    },
   });
   if (response?.error) return undefined;
-  return response?.data?.number_by_day ?? [];
+  const total = response?.pagination?.totalRecords;
+  return Number.isFinite(total) ? total : undefined;
 };
 
 const totalCall = async (): Promise<number | undefined> => {
@@ -126,13 +128,17 @@ export const buildBreakdown = (
  */
 export const transactionsSummaryCall =
   async (): Promise<ITransactionsSummary> => {
-    const [buckets, totalTransactions, mostTransactedAsset] = await Promise.all(
-      [countsCall(), totalCall(), mostTransactedCall()],
-    );
+    const [last24h, previous24h, totalTransactions, mostTransactedAsset] =
+      await Promise.all([
+        windowCountCall(0),
+        windowCountCall(1),
+        totalCall(),
+        mostTransactedCall(),
+      ]);
 
     return {
-      last24h: buckets?.[0]?.doc_count,
-      previous24h: buckets?.[1]?.doc_count,
+      last24h,
+      previous24h,
       totalTransactions,
       mostTransactedAsset,
     };
@@ -149,16 +155,10 @@ export const transactionsSummaryCall =
 export const transactionsBreakdownCall = async (): Promise<
   Array<number | undefined>
 > => {
-  const typeBuckets = await Promise.all(
-    BREAKDOWN_TYPES.map(type => countsCall(type)),
-  );
-
-  // countsCall answers undefined for a request that failed and an empty list
-  // for one that succeeded with nothing to report. Read straight off the
-  // bucket both look the same, and a failure would draw as a real zero.
-  return typeBuckets.map(typeBucket =>
-    typeBucket === undefined ? undefined : (typeBucket[0]?.doc_count ?? 0),
-  );
+  // Same window as the tiles, so the parts and the total agree. Sharing one
+  // definition matters: mixing a rolling total with day-bucket parts drew 66
+  // percent as "Other" when measured on 2026-09-03.
+  return Promise.all(BREAKDOWN_TYPES.map(type => windowCountCall(0, type)));
 };
 
 /**

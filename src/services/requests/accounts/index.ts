@@ -1,4 +1,5 @@
 import api from '@/services/api';
+import { rollingWindow } from '@/services/requests/rollingWindow';
 import { toMilliseconds } from '@/utils/timeFunctions';
 import {
   IAccount,
@@ -67,25 +68,48 @@ export const accountsTotalCall = async (): Promise<number | undefined> => {
 };
 
 /**
- * New accounts per day over the last `days` days, newest first: entry 0 is
- * the running 24 hours, entry 1 the day before. A week is asked because
- * `count/7` opened with the entry `count/1` returned (10 in both, mainnet
- * 2026-08-26); if that stops holding, the day figure goes wrong silently.
+ * Accounts created in one rolling window, counted over an explicit date
+ * range. `address/list/count/<days>` is not used: its buckets are whole UTC
+ * days, so entry 0 is today since midnight and read 4 where the rolling day
+ * held 9 (measured 2026-09-03).
  */
-export const accountsCreatedCall = async (
-  days: number,
-): Promise<(number | undefined)[] | undefined> => {
-  const response: IYesterdayResponse = await api.get({
-    // A route segment goes into the URL raw, never through `buildUrlQuery`'s
-    // encoding, so escaped per the #685 convention despite the constant.
-    route: `address/list/count/${encodeURIComponent(String(days))}`,
+export const accountsCreatedInWindow = async (
+  windows: number,
+): Promise<number | undefined> => {
+  const { startdate } = rollingWindow(windows - 1);
+  const { enddate } = rollingWindow(0);
+  const response = await api.get({
+    route: 'address/list',
+    query: { limit: 1, minify: true, startdate, enddate },
   });
   if (response?.error) return undefined;
-  return (response?.data?.number_by_day ?? []).map(day =>
-    // A bad count becomes a hole, not a missing entry: filtering would slide
-    // later days forward, and the caller reads position 1 as yesterday.
-    Number.isFinite(day?.doc_count) ? day.doc_count : undefined,
-  );
+  const total = response?.pagination?.totalRecords;
+  return Number.isFinite(total) ? total : undefined;
+};
+
+/** The window ending now and the one before it, for the change line. */
+export const accountsCreatedCall = async (): Promise<
+  (number | undefined)[] | undefined
+> => {
+  const [today, yesterday] = await Promise.all([
+    accountsCreatedInWindow(1),
+    windowCountCall(1),
+  ]);
+  if (today === undefined && yesterday === undefined) return undefined;
+  return [today, yesterday];
+};
+
+/** One window, offset back by whole windows. */
+const windowCountCall = async (
+  offsetWindows: number,
+): Promise<number | undefined> => {
+  const response = await api.get({
+    route: 'address/list',
+    query: { limit: 1, minify: true, ...rollingWindow(offsetWindows) },
+  });
+  if (response?.error) return undefined;
+  const total = response?.pagination?.totalRecords;
+  return Number.isFinite(total) ? total : undefined;
 };
 
 /* ----------------------------- badge sources ----------------------------- */

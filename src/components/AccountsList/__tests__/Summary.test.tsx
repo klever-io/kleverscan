@@ -95,10 +95,12 @@ jest.mock('react-dom', () => {
 
 const totalCall = jest.fn();
 const createdCall = jest.fn();
+const windowCall = jest.fn();
 
 jest.mock('@/services/requests/accounts', () => ({
   accountsTotalCall: () => totalCall(),
-  accountsCreatedCall: (days: number) => createdCall(days),
+  accountsCreatedCall: () => createdCall(),
+  accountsCreatedInWindow: (windows: number) => windowCall(windows),
 }));
 
 import AccountsSummary from '../Summary';
@@ -145,15 +147,17 @@ describe('AccountsSummary', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     totalCall.mockResolvedValue(176197);
-    createdCall.mockResolvedValue([10, 9, 4, 82, 12, 8, 8]);
+    createdCall.mockResolvedValue([10, 9]);
+    windowCall.mockResolvedValue(133);
   });
 
-  it('asks for a week in one request, not a day in a second one', async () => {
+  it('asks each figure once, and the wider tile for seven windows', async () => {
     renderSummary();
     await loaded();
 
     expect(createdCall).toHaveBeenCalledTimes(1);
-    expect(createdCall).toHaveBeenCalledWith(7);
+    expect(windowCall).toHaveBeenCalledTimes(1);
+    expect(windowCall).toHaveBeenCalledWith(7);
     expect(totalCall).toHaveBeenCalledTimes(1);
   });
 
@@ -163,7 +167,6 @@ describe('AccountsSummary', () => {
 
     expect(card.textContent).toContain('176,197');
     expect(card.textContent).toContain('10');
-    // 10 + 9 + 4 + 82 + 12 + 8 + 8
     expect(card.textContent).toContain('133');
     expect(card.textContent).toContain('across 7 days');
   });
@@ -172,8 +175,9 @@ describe('AccountsSummary', () => {
     renderSummary();
     const card = await loaded();
 
-    // 10 against 9: a percentage would read "+11%" and claim a precision a single account does not support.
-    expect(card.textContent).toContain('+1 vs yesterday');
+    // 10 against 9: a percentage would read "+11%" and claim a precision a
+    // single account does not support.
+    expect(card.textContent).toContain('+1 vs previous 24h');
     expect(card.textContent).not.toContain('%');
   });
 
@@ -182,7 +186,7 @@ describe('AccountsSummary', () => {
     renderSummary();
     const card = await loaded();
 
-    expect(card.textContent).toContain('-5 vs yesterday');
+    expect(card.textContent).toContain('-5 vs previous 24h');
   });
 
   it('says nothing about yesterday when the series has only today', async () => {
@@ -190,13 +194,10 @@ describe('AccountsSummary', () => {
     renderSummary();
     const card = await loaded();
 
-    expect(card.textContent).not.toContain('vs yesterday');
-    // Singular, because "across 1 days" is what a plain interpolation prints.
-    expect(card.textContent).toContain('across 1 day');
-    expect(card.textContent).not.toContain('across 1 days');
+    expect(card.textContent).not.toContain('vs previous 24h');
   });
 
-  it('keeps the day figures when the count request fails', async () => {
+  it('keeps the day figures when the total request fails', async () => {
     totalCall.mockResolvedValue(undefined);
     renderSummary();
     const card = await loaded();
@@ -213,12 +214,23 @@ describe('AccountsSummary', () => {
     const card = await loaded();
 
     expect(card.textContent).toContain('176,197');
-    expect(card.textContent).not.toContain('vs yesterday');
+    expect(card.textContent).not.toContain('vs previous 24h');
+  });
+
+  it('keeps the day tile when only the wider window failed', async () => {
+    // Separate requests, so one gone must not take the others with it.
+    windowCall.mockResolvedValue(undefined);
+    renderSummary();
+    const card = await loaded();
+
+    expect(card.textContent).toContain('10');
+    expect(card.textContent).not.toContain('across 7 days');
   });
 
   it('renders nothing when neither request answers', async () => {
     totalCall.mockResolvedValue(undefined);
     createdCall.mockResolvedValue(undefined);
+    windowCall.mockResolvedValue(undefined);
     const { container } = renderSummary();
 
     // Wait for the skeleton to go, not merely for the testid to be absent: the loading
@@ -229,55 +241,34 @@ describe('AccountsSummary', () => {
     expect(container.textContent).toBe('');
   });
 
-  it('sums only the days that carried a count, and counts those days', async () => {
-    createdCall.mockResolvedValue([5, undefined, 4]);
+  it('says nothing about the previous window when it is a hole', async () => {
+    createdCall.mockResolvedValue([10, undefined]);
     renderSummary();
     const card = await loaded();
 
-    expect(card.textContent).not.toContain('NaN');
-    // Matched as its own element: the total tile's "176,197" contains a 9 and satisfies a substring check.
-    expect(within(card).getByText('9')).toBeTruthy();
-    // Two of the three window days carried a figure; the label describes the summed days.
-    expect(card.textContent).toContain('across 2 days');
-  });
-
-  it('says nothing about yesterday when yesterday is the hole', async () => {
-    createdCall.mockResolvedValue([10, undefined, 4]);
-    renderSummary();
-    const card = await loaded();
-
-    // Compacting the series to [10, 4] would let the day before yesterday report "+6".
-    expect(card.textContent).not.toContain('vs yesterday');
+    expect(card.textContent).not.toContain('vs previous 24h');
     expect(within(card).getByText('10')).toBeTruthy();
+    expect(card.textContent).not.toContain('NaN');
   });
 
-  it('keeps the window tile when today is the hole and the total is gone', async () => {
-    // No count, no figure for today, but the rest of the window answered: the tile still has something to say.
+  it('keeps the window tile when the day figure is a hole and the total is gone', async () => {
     totalCall.mockResolvedValue(undefined);
     createdCall.mockResolvedValue([undefined, 4]);
+    windowCall.mockResolvedValue(184);
     renderSummary();
     const card = await loaded();
 
-    expect(within(card).getByText('4')).toBeTruthy();
-    expect(card.textContent).toContain('across 1 day');
+    expect(within(card).getByText('184')).toBeTruthy();
     expect(card.textContent).not.toContain('New (24h)');
     expect(card.textContent).not.toContain('Total Accounts');
-  });
-
-  it('still reads yesterday from position one when an older day is missing', async () => {
-    createdCall.mockResolvedValue([10, 9, undefined, 4]);
-    renderSummary();
-    const card = await loaded();
-
-    expect(card.textContent).toContain('+1 vs yesterday');
-    expect(card.textContent).toContain('across 3 days');
   });
 
   it('asks again on the next mount when nothing but holes came back', async () => {
     // All-holes is a wholly failed strip the queryFn still files as a success; measured by
     // length alone it pinned for five minutes, gone across client-side navigation until a full reload.
     totalCall.mockResolvedValue(undefined);
-    createdCall.mockResolvedValue([undefined, undefined, undefined]);
+    createdCall.mockResolvedValue([undefined, undefined]);
+    windowCall.mockResolvedValue(undefined);
 
     const client = new QueryClient({
       defaultOptions: { queries: { retry: false } },

@@ -16,12 +16,15 @@ jest.mock('@/services/api', () => ({
 
 const mockedGet = api.get as jest.Mock;
 
-/** Newest bucket first, the order the API answers in. */
-const buckets = [
-  { doc_count: 8447, key: 1787664055000 },
-  { doc_count: 7124, key: 1787577655000 },
-  { doc_count: 6100, key: 1787491255000 },
-];
+/**
+ * The two windows the tiles report: the last 24 hours and the one before it.
+ * Keyed by `offsetWindows`, which is what the request carries now that the
+ * figures come from an explicit date range rather than day buckets.
+ */
+const windowCounts: Record<number, number> = {
+  0: 8447,
+  1: 7124,
+};
 
 /** doc_count per contract type index, for the type-filtered count calls. */
 const typeCounts: Record<number, number> = {
@@ -31,28 +34,57 @@ const typeCounts: Record<number, number> = {
   4: 228, // Freeze
 };
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+interface IQuery {
+  type?: number;
+  startdate?: number;
+  enddate?: number;
+  limit?: number;
+}
+
+/**
+ * Which rolling window a request is asking for, derived from its own dates
+ * rather than from call order: 0 is the window ending now, 1 the one before.
+ * Reading the dates is the point, since sending seconds instead of
+ * milliseconds is the failure this transport can have.
+ */
+const windowOf = (query: IQuery | undefined): number | undefined => {
+  if (query?.startdate === undefined || query?.enddate === undefined)
+    return undefined;
+  const span = query.enddate - query.startdate;
+  if (span !== DAY_MS) return undefined;
+  return Math.round((Date.now() - query.enddate) / DAY_MS);
+};
+
 const answerEach = (
   answers: Partial<{ count: unknown; list: unknown; statistics: unknown }>,
   perType: Record<number, number> = typeCounts,
 ) => {
   mockedGet.mockImplementation(
-    ({ route, query }: { route: string; query?: { type?: number } }) => {
-      if (route.startsWith('transaction/list/count')) {
-        // The breakdown asks the same route once per contract type.
-        if (query?.type !== undefined) {
-          const count = perType[query.type];
-          return Promise.resolve(
-            count === undefined
-              ? { data: { number_by_day: [] } }
-              : { data: { number_by_day: [{ doc_count: count, key: 1 }] } },
-          );
-        }
-        return Promise.resolve(
-          answers.count ?? { data: { number_by_day: [] } },
-        );
-      }
+    ({ route, query }: { route: string; query?: IQuery }) => {
       if (route === 'transaction/statistics') {
         return Promise.resolve(answers.statistics ?? { data: {} });
+      }
+      if (route === 'transaction/list') {
+        const window = windowOf(query);
+        // The all-time total is the one list call carrying no date range.
+        if (window === undefined) {
+          return Promise.resolve(answers.list ?? { pagination: {} });
+        }
+        if (answers.count && typeof answers.count === 'object') {
+          const forced = answers.count as { error?: string };
+          if (forced.error) return Promise.resolve(forced);
+        }
+        if (query?.type !== undefined) {
+          const count = perType[query.type];
+          return Promise.resolve({
+            pagination: { totalRecords: count ?? 0 },
+          });
+        }
+        return Promise.resolve({
+          pagination: { totalRecords: windowCounts[window] ?? 0 },
+        });
       }
       return Promise.resolve(answers.list ?? { pagination: {} });
     },
@@ -64,7 +96,7 @@ describe('transactionsSummaryCall', () => {
 
   it('reads the rolling windows, the total and the top asset', async () => {
     answerEach({
-      count: { data: { number_by_day: buckets } },
+      count: undefined,
       list: { pagination: { totalRecords: 58_500_000 } },
       statistics: {
         data: { most_transacted: [{ key: 'KLV', doc_count: 43_564_012 }] },
@@ -83,7 +115,7 @@ describe('transactionsSummaryCall', () => {
   });
 
   it('breaks the window down by contract type, largest first', async () => {
-    answerEach({ count: { data: { number_by_day: buckets } } });
+    answerEach({});
 
     const breakdown = buildBreakdown(8447, await transactionsBreakdownCall());
 
@@ -98,7 +130,7 @@ describe('transactionsSummaryCall', () => {
   });
 
   it('leaves a type out when it did nothing in the window', async () => {
-    answerEach({ count: { data: { number_by_day: buckets } } }, { 0: 8447 });
+    answerEach({}, { 0: 8447 });
 
     const breakdown = buildBreakdown(8447, await transactionsBreakdownCall());
 
@@ -108,13 +140,7 @@ describe('transactionsSummaryCall', () => {
   it('drops the remainder when the named types already fill the window', async () => {
     // Separate requests can answer moments apart, so the parts can exceed
     // the total; a negative remainder must not reach the bar.
-    answerEach(
-      { count: { data: { number_by_day: [{ doc_count: 100 }] } } },
-      {
-        0: 90,
-        63: 30,
-      },
-    );
+    answerEach({}, { 0: 90, 63: 30 });
 
     const breakdown = buildBreakdown(100, await transactionsBreakdownCall());
 
@@ -166,17 +192,20 @@ describe('transactionsSummaryCall', () => {
     // thirds transfers would draw as two thirds "Other" the one time that
     // single request timed out.
     mockedGet.mockImplementation(
-      ({ route, query }: { route: string; query?: { type?: number } }) => {
-        if (route.startsWith('transaction/list/count')) {
-          if (query?.type === 0) return Promise.resolve({ error: 'timeout' });
-          if (query?.type !== undefined) {
-            return Promise.resolve({
-              data: { number_by_day: [{ doc_count: typeCounts[query.type] }] },
-            });
-          }
-          return Promise.resolve({ data: { number_by_day: buckets } });
+      ({ route, query }: { route: string; query?: IQuery }) => {
+        if (route !== 'transaction/list')
+          return Promise.resolve({ pagination: {} });
+        if (query?.type === 0) return Promise.resolve({ error: 'timeout' });
+        if (query?.type !== undefined) {
+          return Promise.resolve({
+            pagination: { totalRecords: typeCounts[query.type] },
+          });
         }
-        return Promise.resolve({ pagination: {} });
+        const window = windowOf(query);
+        if (window === undefined) return Promise.resolve({ pagination: {} });
+        return Promise.resolve({
+          pagination: { totalRecords: windowCounts[window] ?? 0 },
+        });
       },
     );
 
@@ -189,15 +218,14 @@ describe('transactionsSummaryCall', () => {
   });
 
   it('keeps a genuine zero apart from a failure', async () => {
-    answerEach({
-      count: { data: { number_by_day: [{ doc_count: 0, key: 1 }] } },
-      list: { pagination: { totalRecords: 0 } },
-    });
+    answerEach({ list: { pagination: { totalRecords: 0 } } }, {});
+    windowCounts[0] = 0;
 
     const summary = await transactionsSummaryCall();
 
     expect(summary.last24h).toBe(0);
     expect(summary.totalTransactions).toBe(0);
+    windowCounts[0] = 8447;
   });
 
   it('treats a null total as absent rather than passing it on', async () => {

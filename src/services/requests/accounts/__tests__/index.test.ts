@@ -2,6 +2,7 @@ import api from '@/services/api';
 import {
   accountsCall,
   accountsCreatedCall,
+  accountsCreatedInWindow,
   accountsTotalCall,
   genesisAccountsCall,
   genesisTimestampCall,
@@ -158,82 +159,117 @@ describe('accountsTotalCall', () => {
 });
 
 describe('accountsCreatedCall', () => {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockedGet.mockResolvedValue({
-      data: { number_by_day: [{ doc_count: 10, key: 1 }] },
+      pagination: { totalRecords: 10 },
       error: '',
       code: 'successful',
     });
   });
 
-  it('puts the day count in the route and returns the counts', async () => {
-    await expect(accountsCreatedCall(7)).resolves.toEqual([10]);
+  it('counts an explicit range on address/list, not a day bucket', async () => {
+    await accountsCreatedCall();
 
-    expect(argsOf().route).toBe('address/list/count/7');
+    const { route, query } = argsOf();
+    expect(route).toBe('address/list');
+    expect(query.enddate - query.startdate).toBe(DAY_MS);
   });
 
-  it('answers undefined on a failure, which an empty series does not mean', async () => {
+  it('sends milliseconds, the unit the route reads', async () => {
+    // Seconds are not rejected: the route answers the all-time total instead,
+    // so a unit slip reads as a plausible figure rather than an error.
+    await accountsCreatedCall();
+
+    expect(argsOf().query.startdate).toBeGreaterThan(1e12);
+  });
+
+  it('asks for the window before it as well, without a gap', async () => {
+    await accountsCreatedCall();
+
+    const calls = mockedGet.mock.calls.map(([args]) => args.query);
+    const [current, previous] = calls.sort(
+      (a, b) => b.enddate - a.enddate,
+    );
+    expect(previous.enddate).toBe(current.startdate);
+  });
+
+  it('answers undefined on a failure, which a zero does not mean', async () => {
     mockedGet.mockResolvedValue(apiFailure);
 
-    await expect(accountsCreatedCall(7)).resolves.toBeUndefined();
+    await expect(accountsCreatedCall()).resolves.toBeUndefined();
   });
 
-  it('leaves a hole for a day with no count, keeping the later days in place', async () => {
+  it('keeps a zero as zero, because no new accounts is a real answer', async () => {
     mockedGet.mockResolvedValue({
-      data: { number_by_day: [{ doc_count: 5 }, { key: 2 }, { doc_count: 4 }] },
+      pagination: { totalRecords: 0 },
       error: '',
       code: 'successful',
     });
 
-    // Not [5, 4]: compacting slides day two into position one, which the caller reads as yesterday.
-    await expect(accountsCreatedCall(7)).resolves.toEqual([5, undefined, 4]);
+    await expect(accountsCreatedCall()).resolves.toEqual([0, 0]);
   });
 
-  it('keeps a zero count as zero, because no new accounts is a real answer', async () => {
-    // Found by mutation: a truthiness swap for `Number.isFinite(doc_count)`
-    // survived every test here; it differs only at 0, and 0 is ordinary data.
+  it('treats a non-numeric total as absent rather than passing it on', async () => {
+    // A null survives an `!== undefined` check and would throw on
+    // toLocaleString mid-render, so it must not reach the tile.
     mockedGet.mockResolvedValue({
-      data: { number_by_day: [{ doc_count: 0 }, { doc_count: 4 }] },
+      pagination: { totalRecords: null },
       error: '',
       code: 'successful',
     });
 
-    await expect(accountsCreatedCall(7)).resolves.toEqual([0, 4]);
+    // Both windows absent is nothing to show, which is the same answer a
+    // failure gives: the card leaves the tile out rather than printing a zero.
+    await expect(accountsCreatedCall()).resolves.toBeUndefined();
   });
 
-  it('treats a non-numeric count as a hole rather than passing it on', async () => {
-    mockedGet.mockResolvedValue({
-      data: {
-        number_by_day: [
-          { doc_count: 5 },
-          { doc_count: null },
-          { doc_count: 4 },
-        ],
-      },
-      error: '',
-      code: 'successful',
-    });
-
-    await expect(accountsCreatedCall(7)).resolves.toEqual([5, undefined, 4]);
-  });
-
-  it('treats a body with no day series as an empty series', async () => {
-    // The `?? []` fallback again: empty is a different answer from failed, and
-    // the caller distinguishes them.
-    mockedGet.mockResolvedValue({ data: {}, error: '', code: 'successful' });
-
-    await expect(accountsCreatedCall(7)).resolves.toEqual([]);
-  });
-
-  it('escapes the segment, so a caller cannot extend the path', async () => {
-    // A route segment never reaches buildUrlQuery's encoding: getHost concatenates it as-is.
-    // The cast stands in for a future caller handing this something off the URL.
-    await accountsCreatedCall('1/../../address/list' as unknown as number);
-
-    expect(argsOf().route).toBe(
-      'address/list/count/1%2F..%2F..%2Faddress%2Flist',
+  it('still answers when only the older window is missing', async () => {
+    const DAY = 24 * 60 * 60 * 1000;
+    mockedGet.mockImplementation(({ query }) =>
+      Promise.resolve(
+        Date.now() - query.enddate > DAY / 2
+          ? { error: 'boom' }
+          : { pagination: { totalRecords: 9 }, error: '' },
+      ),
     );
+
+    await expect(accountsCreatedCall()).resolves.toEqual([9, undefined]);
+  });
+});
+
+describe('accountsCreatedInWindow', () => {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockedGet.mockResolvedValue({
+      pagination: { totalRecords: 184 },
+      error: '',
+      code: 'successful',
+    });
+  });
+
+  it('spans the number of windows asked for, as one range', async () => {
+    await accountsCreatedInWindow(7);
+
+    const { query } = argsOf();
+    expect(query.enddate - query.startdate).toBe(7 * DAY_MS);
+  });
+
+  it('spans a single day when asked for one', async () => {
+    await accountsCreatedInWindow(1);
+
+    const { query } = argsOf();
+    expect(query.enddate - query.startdate).toBe(DAY_MS);
+  });
+
+  it('answers undefined on a failure', async () => {
+    mockedGet.mockResolvedValue(apiFailure);
+
+    await expect(accountsCreatedInWindow(7)).resolves.toBeUndefined();
   });
 });
 

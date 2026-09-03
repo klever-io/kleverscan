@@ -13,12 +13,26 @@ jest.mock('@/services/api', () => ({
 
 const mockedGet = api.get as jest.Mock;
 
-/** One response per route, so a test states exactly what each endpoint said. */
+/**
+ * One response per route, so a test states exactly what each endpoint said.
+ * A dated request is keyed `transaction/list?window`, because the 24h count
+ * and the all-time total now share a route and differ only by their range.
+ */
 const respond = (byRoute: Record<string, unknown>) => {
-  mockedGet.mockImplementation(({ route }: { route: string }) =>
-    Promise.resolve(
-      byRoute[route] ?? { error: `unmocked route ${route}`, data: {} },
-    ),
+  mockedGet.mockImplementation(
+    ({
+      route,
+      query,
+    }: {
+      route: string;
+      query?: { startdate?: number; enddate?: number };
+    }) => {
+      const key =
+        query?.startdate !== undefined ? `${route}?window` : route;
+      return Promise.resolve(
+        byRoute[key] ?? { error: `unmocked route ${key}`, data: {} },
+      );
+    },
   );
 };
 
@@ -85,20 +99,39 @@ describe('finite guards on totals', () => {
     await expect(smartContractsListCall()).resolves.toBeUndefined();
   });
 
-  it('keeps a real zero window, drops a missing bucket', async () => {
+  it('keeps a real zero window, drops a malformed count', async () => {
     respond({
-      'transaction/list/count/1': {
+      'transaction/list?window': {
         error: '',
-        data: { number_by_day: [{ doc_count: 0 }] },
+        pagination: { totalRecords: 0 },
       },
     });
     await expect(contractTransactions24hCall()).resolves.toEqual({
       last24h: 0,
     });
 
-    respond({
-      'transaction/list/count/1': { error: '', data: { number_by_day: [] } },
-    });
+    respond({ 'transaction/list?window': { error: '', pagination: {} } });
     await expect(contractTransactions24hCall()).resolves.toBeUndefined();
+  });
+
+  it('counts a rolling day, not the UTC day the bucket route answers', async () => {
+    // The bucket route read 1342 where the rolling day held 3059 on
+    // 2026-09-03, so the window has to be an explicit range in milliseconds.
+    respond({
+      'transaction/list?window': {
+        error: '',
+        pagination: { totalRecords: 3059 },
+      },
+    });
+
+    mockedGet.mockClear();
+    await contractTransactions24hCall();
+
+    expect(mockedGet).toHaveBeenCalledTimes(1);
+    const { route, query } = mockedGet.mock.calls[0][0];
+    expect(route).toBe('transaction/list');
+    expect(query.type).toBe(63);
+    expect(query.enddate - query.startdate).toBe(24 * 60 * 60 * 1000);
+    expect(query.startdate).toBeGreaterThan(1e12);
   });
 });

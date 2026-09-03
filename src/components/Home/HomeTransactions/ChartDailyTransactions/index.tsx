@@ -31,7 +31,10 @@ const TIME_SERIES_CHG_VALUE = {
 
 export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
   const [isLoadingDailyTxs, setIsLoadingDailyTxs] = useState(false);
-  const [filterPeriod, setFilterPeriod] = useState(16);
+  // The period the chart reports, in days, and the same number the buttons
+  // carry. It used to hold the button's value plus one, so every slice ran a
+  // day long: "1D" summed two days, "7D" eight, "1M" thirty-one.
+  const [filterPeriod, setFilterPeriod] = useState(15);
   const [transactionTimeSeriesChgValue, setTransactionTimeSeriesChgValue] =
     useState(TIME_SERIES_CHG_VALUE);
   const [transactionTimeSeries, setTransactionTimeSeries] = useState<
@@ -101,19 +104,30 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
           txPast,
         })) as IDoubleChart[];
 
-        const firstValue = mergedTransactionTimeSeries[0];
-        const lastValue =
-          mergedTransactionTimeSeries[mergedTransactionTimeSeries?.length - 1];
-        const valueDiff = Math.abs(firstValue?.valueNow - lastValue?.valueNow);
+        // The two the legend names: this period against the one before it.
+        // The figure used to be the first day of the current period against
+        // its own last day, divided by a thousand and forced positive, so a
+        // fortnight that ran 49.74 percent above the previous one reported
+        // 0.63 percent (measured 2026-09-03).
         const totalSum = mergedTransactionTimeSeries.reduce(
-          (acc, curr) => (acc += curr?.valueNow ?? 0),
+          (acc, curr) => acc + (curr?.valueNow ?? 0),
+          0,
+        );
+        const previousSum = mergedTransactionTimeSeries.reduce(
+          (acc, curr) => acc + (curr?.valuePast ?? 0),
           0,
         );
 
         setTransactionTimeSeries(mergedTransactionTimeSeries);
         setTransactionTimeSeriesChgValue({
           inPeriod: totalSum,
-          percent: getVariation(valueDiff / 1000),
+          // No baseline is no percentage: against zero every change is
+          // infinite, and getVariation prints "--" for a falsy figure.
+          percent: getVariation(
+            previousSum > 0
+              ? ((totalSum - previousSum) / previousSum) * 100
+              : 0,
+          ),
         });
       } catch (err) {
         console.error(err);
@@ -135,7 +149,7 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
             {toLocaleFixed(transactionTimeSeriesChgValue.inPeriod, 0)}
 
             <TimeSeriesChgValueText>
-              <span>{filterPeriod < 30 ? `${filterPeriod - 1}D` : '1M'}</span>
+              <span>{filterPeriod < 30 ? `${filterPeriod}D` : '1M'}</span>
             </TimeSeriesChgValueText>
           </TimeSeriesChgValue>
           <VariationText
@@ -154,8 +168,8 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
           {CHART_TIME_FILTER.map(item => (
             <ItemTimeFilter
               key={String(item)}
-              onClick={() => setFilterPeriod(item + 1)}
-              selected={!!(filterPeriod === item + 1)}
+              onClick={() => setFilterPeriod(item)}
+              selected={filterPeriod === item}
             >
               {item !== 30 ? `${String(item)}D` : '1M'}
             </ItemTimeFilter>

@@ -23,7 +23,7 @@ export interface IHomeData {
   livePeakTPS: string;
   blocks?: IBlock[];
   metrics: IEpochInfo;
-  newTransactions: number;
+  newTransactions?: number;
   newAccounts?: number;
   totalAccounts?: number;
   transactions: ITransaction[];
@@ -116,8 +116,9 @@ export const HomeDataProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   // One rolling window, not two UTC-day buckets added together: the card
   // labels this figure "/24h", and the sum ran 46 percent high (measured
-  // 2026-09-03, 11,475 against 7,840).
-  const newTransactions = newTransactionsResult.data?.newTransactions ?? 0;
+  // 2026-09-03, 11,475 against 7,840). Undefined travels on rather than
+  // becoming a zero, or a failed request reads as a day with no activity.
+  const newTransactions = newTransactionsResult.data?.newTransactions;
 
   const values: IHomeData = {
     livePeakTPS:

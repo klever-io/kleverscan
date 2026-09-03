@@ -841,18 +841,6 @@ export interface IDataMetrics {
   epochLoadPercent: number;
   remainingTime: string;
 }
-export interface IDataCards {
-  metrics: IDataMetrics;
-  totalAccounts: number;
-  newAccounts: number;
-  totalTransactions: number;
-  newTransactions: number;
-  beforeYesterdayTransactions: number;
-  actualTPS: string;
-  blocks: IBlock[];
-  counterEpoch: number;
-}
-
 export interface ICoinCards {
   coins: ICoinInfo[];
   assetsData: IAssetsData;

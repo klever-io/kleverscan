@@ -108,7 +108,7 @@ const HomeDataCards: React.FC<PropsWithChildren> = () => {
   const {
     livePeakTPS,
     newTransactions,
-    newAccounts = 0,
+    newAccounts,
     totalAccounts,
     totalTransactions,
     loadingCards,
@@ -120,13 +120,20 @@ const HomeDataCards: React.FC<PropsWithChildren> = () => {
       title: t('Total Transactions'),
       value: totalTransactions ?? 0,
       // One window, not two added together: this line is labelled "/24h" below.
-      variation: `+ ${newTransactions.toLocaleString()}`,
+      // Undefined leaves the line out; a failed request is not a quiet day.
+      variation:
+        newTransactions === undefined
+          ? undefined
+          : `+ ${newTransactions.toLocaleString()}`,
     },
     {
       Icon: Accounts,
       title: t('Total Accounts'),
       value: totalAccounts ?? 0,
-      variation: `+ ${newAccounts.toLocaleString()}`,
+      variation:
+        newAccounts === undefined
+          ? undefined
+          : `+ ${newAccounts.toLocaleString()}`,
     },
     {
       title: t('Live/Peak TPS'),

@@ -12,6 +12,7 @@ import { IRowSection } from '@/types/index';
 import { formatDate, formatDateWithSeconds } from '@/utils/formatFunctions';
 import { bandwidthFeeReward } from '@/utils/fees';
 import { parseAddress } from '@/utils/parseValues';
+import { TFunction } from 'next-i18next';
 import React from 'react';
 import { BLOCK_COLUMNS, BlockColumnKey } from './columns';
 
@@ -35,6 +36,7 @@ export const COLUMN_LAYOUT: IRowSection[] = BLOCK_COLUMNS.map(column => ({
 export const blockRowSections = (
   block: IBlock | string,
   epochLabel = 'Epoch',
+  t?: TFunction,
 ): IRowSection[] => {
   // The header-string probe above. Handled explicitly so a future dereference
   // of the argument cannot take the page down while rendering its own header.
@@ -60,7 +62,7 @@ export const blockRowSections = (
   // tooltip is hover-only, so without this a keyboard user on desktop had no
   // way to reach the epoch at all.
   const fullDate = `${formatDateWithSeconds(timestamp)} · ${epochLabel} ${epoch}`;
-  const elapsed = formatDate(timestamp, { showElapsedTime: true }).split(
+  const elapsed = formatDate(timestamp, { showElapsedTime: true, t }).split(
     ' (',
   )[0];
 

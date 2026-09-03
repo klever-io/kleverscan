@@ -66,7 +66,7 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { TXType } from '@klever/connect';
 import { GetServerSideProps } from 'next';
 import { MdOutlineDescription } from 'react-icons/md';
-import { useTranslation } from 'next-i18next';
+import { TFunction, useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
@@ -266,6 +266,7 @@ export const getCustomFields = (
 export const transactionRowSections = (
   props: ITransaction,
   routeState?: { pathname?: string; query?: ParsedUrlQuery },
+  t?: TFunction,
 ): IRowSection[] => {
   const {
     hash,
@@ -329,6 +330,7 @@ export const transactionRowSections = (
   // shows the first half, the tooltip the full date.
   const ageElapsed = formatDate(timestamp || Date.now(), {
     showElapsedTime: true,
+    t,
   }).split(' (')[0];
 
   const emptyCell = (
@@ -550,10 +552,12 @@ export const useTransactionRowSections = (): ((
   props: ITransaction,
 ) => IRowSection[]) => {
   const { pathname, query } = useRouter();
+  const { t: commonT } = useTranslation('common');
 
   return useCallback(
-    (props: ITransaction) => transactionRowSections(props, { pathname, query }),
-    [pathname, query],
+    (props: ITransaction) =>
+      transactionRowSections(props, { pathname, query }, commonT),
+    [pathname, query, commonT],
   );
 };
 

@@ -20,20 +20,18 @@ import { RIGHT_ALIGNED_COLUMNS } from './columns';
 // 1.5rem is the rhythm the old CardContainer had, so the figures land where
 // the cards used to. The loading shape carries the same margin, or the page
 // shifts by 24px once the numbers arrive.
-/* Four tiles hold one row down to here, with the 9rem the corner line needs
-   still reserved beside them; below it they wrap and the line goes with them.
-   Measured on the loaded card with that reservation in place: one row at
-   890px, two at 880px. The .98 is for the same reason the theme's own
-   breakpoints carry it, since max-width: N and min-width: N both match at
-   exactly N. */
-const TILES_ON_ONE_ROW = '890px';
-const TILES_WRAP = '889.98px';
+/* Below this the legend's own items fill the row, leaving no room for the age
+   line beside them. Measured on the loaded card: 258px free at 768px against
+   the 118px the line needs, and 90px free at 600px. */
+const NOTE_FITS_BESIDE_LEGEND = '767.98px';
 
 /* Above this every label fits on one line by itself, so the held pair of lines
    is dropped and the card sits a line shorter. Measured with the labels' own
    wrapping: the longest, "Transaction fees (yesterday)", takes two lines at
-   1060px and one at 1080px. */
-const LABELS_ON_ONE_LINE_MIN = '1079.98px';
+   920px and one at 940px. Moving the age line into the legend row bought that
+   width: as a corner line it reserved 9rem beside the tiles and the same
+   threshold sat at 1080px. */
+const LABELS_ON_ONE_LINE_MIN = '939.98px';
 
 const pageSummarySpacing = css`
   margin-top: 1.5rem;
@@ -58,17 +56,6 @@ export const BlocksSummaryCard = styled(SummaryCard)`
 
   /* Anchors the age line in the top-right corner. */
   position: relative;
-
-  /* Room for that corner line, in rem so browser text zoom scales it along:
-     with a px reservation the note painted through the third tile's label at
-     125 percent text size and beyond (measured, 47px of overlap at 1026px).
-     Applies to the loading card too, which shares this component. Reserved
-     only where the line shows, or the narrow card loses a column to nothing. */
-  @media screen and (min-width: ${TILES_ON_ONE_ROW}) {
-    ${TilesGrid} {
-      padding-right: 9rem;
-    }
-  }
 
   /* Two lines for every label, until all four fit on one. Left to wrap on
      their own they stepped twice on the way down: measured, the two rightmost
@@ -135,19 +122,17 @@ export const UpdatedNote = styled.p`
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 
-  /* The card's top-right corner, out of the flow: as a grid child it claimed a
-     cell whenever the tile count filled the last row, which dropped it to a
-     row of its own and read as centred. The offsets match the card's own 20px
-     padding.
+  /* Last in the legend row and pushed to its end, so it reads against the
+     card's right edge on the same line as the fee totals. In the flow rather
+     than the corner: as an absolute corner line it needed 9rem reserved
+     beside the tiles, which made the tiles line up as four plus a corner and
+     stepped their labels an extra time on the way down.
 
-     Hidden once the tiles wrap, because the corner it sits in then belongs to
-     a tile rather than to empty space, and the line is the one thing on this
-     card a reader can do without. */
-  position: absolute;
-  top: 20px;
-  right: 20px;
+     Dropped once the legend fills the row, because the totals are the figures
+     that have to survive. */
+  margin-left: auto;
 
-  @media screen and (max-width: ${TILES_WRAP}) {
+  @media screen and (max-width: ${NOTE_FITS_BESIDE_LEGEND}) {
     display: none;
   }
 `;

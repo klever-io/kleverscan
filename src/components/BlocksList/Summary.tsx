@@ -207,7 +207,6 @@ const BlocksSummary: React.FC = () => {
 
         {/* Inside the grid so it can anchor to the tiles' own bottom, but
             absolutely positioned, so it never claims a cell. */}
-        <UpdatedAgo at={dataUpdatedAt} />
       </TilesGrid>
 
       {fees && (
@@ -231,6 +230,9 @@ const BlocksSummary: React.FC = () => {
                 {segment.label} <strong>{klvAmount(segment.amount)}</strong>
               </LegendItem>
             ))}
+            {/* Last in the row and pushed to its end, so the tiles above line
+                up as four rather than four plus a corner. */}
+            <UpdatedAgo at={dataUpdatedAt} />
           </LegendRow>
         </>
       )}

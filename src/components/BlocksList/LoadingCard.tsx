@@ -82,7 +82,6 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
             </TileSub>
           </Tile>
         ))}
-        <UpdatedNote aria-hidden="true">{HOLD_LINE}</UpdatedNote>
       </TilesGrid>
 
       <DistBar aria-hidden="true">
@@ -100,6 +99,9 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
             />
           </LegendItem>
         ))}
+        {/* Mirrors the loaded row's own last item, so the legend keeps its
+            height when the figures land. */}
+        <UpdatedNote aria-hidden="true">{HOLD_LINE}</UpdatedNote>
       </LegendRow>
     </BlocksSummaryCard>
   );

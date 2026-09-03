@@ -213,6 +213,19 @@ const contractTransactions24hCall = async (): Promise<
   }
 };
 
+/**
+ * Contracts that ran at least once in the rolling 24 hours, against the 211
+ * ever deployed: 16 of them on 2026-09-03, which is what the tile is for.
+ * Read off the same route the totals come from, so the figure and the window
+ * cannot drift apart.
+ */
+const activeContracts24hCall = async (): Promise<number | undefined> => {
+  const res = await api.get({ route: 'sc/statistics/24h' });
+  if (res?.error) return undefined;
+  const active = res?.data?.activeContracts;
+  return Number.isFinite(active) ? active : undefined;
+};
+
 const smartContractBeforeYesterdayTransactionsCall = async (
   scAddress: string,
 ): Promise<
@@ -261,6 +274,7 @@ const smartContractTransactionDetailsCall = async (
 export {
   contractActivitySharesCall,
   smartContractBeforeYesterdayTransactionsCall,
+  activeContracts24hCall,
   contractTransactions24hCall,
   smartContractsListCall,
   smartContractsStatisticCall,

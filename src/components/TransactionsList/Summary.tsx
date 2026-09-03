@@ -14,7 +14,11 @@ import {
 } from '@/components/DataList/styles';
 // The same percent policy the holders and assets legends use, so the two
 // visually identical legends cannot format the same quantity differently.
-import { formatShare } from '@/components/DataList/format';
+import {
+  exactAmount,
+  formatShare,
+  klvAmount,
+} from '@/components/DataList/format';
 import TransactionsSummaryLoadingCard, {
   ContractsBarPlaceholder,
 } from './LoadingCard';
@@ -27,6 +31,7 @@ import {
   transactionsSummaryCall,
 } from '@/services/requests/transactions/summary';
 import { formatAmount } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
@@ -227,6 +232,30 @@ const TransactionsSummary: React.FC = () => {
                   is not a transaction. Its window is undocumented too. */}
               {t('transactions:Summary.FungibleBasis', {
                 defaultValue: 'Leading fungible asset',
+              })}
+            </TileSub>
+          </Tile>
+        )}
+
+        {summary.volume24h !== undefined && (
+          <Tile>
+            <TileLabel>
+              {t('transactions:Summary.Volume', {
+                defaultValue: 'Volume (24h)',
+              })}
+            </TileLabel>
+            <TileValueRow>
+              {/* Compact headline, exact figure on hover, the way the blocks
+                  card renders its own KLV amounts. */}
+              <TileValue
+                title={`${exactAmount(summary.volume24h, KLV_PRECISION)} KLV`}
+              >
+                {klvAmount(summary.volume24h)}
+              </TileValue>
+            </TileValueRow>
+            <TileSub>
+              {t('transactions:Summary.VolumeBasis', {
+                defaultValue: 'KLV moved, excluding mint and burn',
               })}
             </TileSub>
           </Tile>

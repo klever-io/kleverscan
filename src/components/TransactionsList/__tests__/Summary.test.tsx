@@ -100,6 +100,8 @@ const FULL = {
   previous24h: 8000,
   totalTransactions: 58558891,
   mostTransactedAsset: { assetId: 'KLV', count: 4000 },
+  // 41.4M KLV in the chain's 6-decimal units, the scale measured live.
+  volume24h: 41_408_939_000_000,
 };
 
 /** Raw counts per named type, in the order the bar draws them. */
@@ -156,13 +158,14 @@ describe('TransactionsSummary', () => {
     expect(
       card().querySelectorAll('[data-testid="skeleton"]').length,
     ).toBeGreaterThan(0);
-    // The labels are constants and one of them reads "(24h)", so the card's
+    // The labels are constants and two of them read "(24h)", so the card's
     // whole text is not a figure test and asserting on a label alone can never
-    // fail. Strip the three labels; a digit left over is a leaked figure.
+    // fail. Strip the four labels; a digit left over is a leaked figure.
     const labels = [
       'Transactions (24h)',
       'Total transactions',
       'Most transacted',
+      'Volume (24h)',
     ];
     const withoutLabels = labels.reduce(
       (text, label) => text.split(label).join(''),
@@ -269,6 +272,26 @@ describe('TransactionsSummary', () => {
     ).toBeTruthy();
     expect(summaryCall).toHaveBeenCalled();
     expect(breakdownCall).toHaveBeenCalled();
+  });
+
+  it('compacts the volume and keeps the exact figure on hover', async () => {
+    summaryCall.mockResolvedValue(FULL);
+    renderSummary();
+    const loaded = await loadedCard();
+
+    expect(loaded.textContent).toContain('Volume (24h)');
+    // Compacted in the headline, so the tile stays one line at any width.
+    expect(loaded.textContent).toContain('41.4 M KLV');
+  });
+
+  it('leaves the volume tile out when only that request failed', async () => {
+    summaryCall.mockResolvedValue({ ...FULL, volume24h: undefined });
+    renderSummary();
+    const loaded = await loadedCard();
+
+    expect(loaded.textContent).not.toContain('Volume (24h)');
+    // Its neighbours still have theirs: a failed part costs its own tile.
+    expect(loaded.textContent).toContain('Total transactions');
   });
 
   it('draws no card at all when every figure is missing', async () => {

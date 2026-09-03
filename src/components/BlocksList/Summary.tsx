@@ -20,6 +20,7 @@ import { useTheme } from '@/contexts/theme';
 import {
   blockTotalStatsCall,
   blockYesterdayStatsCall,
+  blockYesterdayTransactionsCall,
 } from '@/services/requests/block';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useQuery } from '@tanstack/react-query';
@@ -53,11 +54,12 @@ const BlocksSummary: React.FC = () => {
       // The two stat calls map every failure to undefined (api.get itself
       // resolves an error object), so a half-failed pair still lands here as
       // data rather than an error.
-      const [yesterday, total] = await Promise.all([
+      const [yesterday, total, transactions] = await Promise.all([
         blockYesterdayStatsCall(),
         blockTotalStatsCall(),
+        blockYesterdayTransactionsCall(),
       ]);
-      return { yesterday, total };
+      return { yesterday, total, transactions };
     },
     // A function, not a constant: a failure caches as a successful undefined,
     // and a constant would hold that for five minutes. Both halves, not
@@ -84,7 +86,7 @@ const BlocksSummary: React.FC = () => {
   }
   if (!data) return null;
 
-  const { yesterday, total } = data;
+  const { yesterday, total, transactions } = data;
   const fees = feeSplit(yesterday);
   // Every tile hangs off `yesterday` (`total` only feeds the sub-lines), so
   // without it the card would render as an empty rectangle holding nothing
@@ -153,6 +155,28 @@ const BlocksSummary: React.FC = () => {
               {t('blocks:List.ShareBurned', {
                 defaultValue: '{{share}} of it burned',
                 share: formatShare(segments[0].amount, fees.total),
+              })}
+            </TileSub>
+          </Tile>
+        )}
+
+        {transactions !== undefined && (
+          <Tile>
+            <TileLabel>
+              {t('blocks:List.TransactionsYesterday', {
+                defaultValue: 'Transactions (yesterday)',
+              })}
+            </TileLabel>
+            <TileValue>{transactions.toLocaleString(NUMBER_LOCALE)}</TileValue>
+            <TileSub>
+              {/* The share of blocks that carried anything, not transactions
+                  per block: at 8275 over 21599 that average reads "0.4 per
+                  block", which says less than "at most 38.3% of blocks were
+                  used". `count` is avoided because i18next reserves it for
+                  plural selection and interpolates the number unformatted. */}
+              {t('blocks:List.BlocksUsed', {
+                defaultValue: 'up to {{share}} of blocks carried one',
+                share: formatShare(transactions, yesterday.totalBlocks),
               })}
             </TileSub>
           </Tile>

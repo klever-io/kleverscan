@@ -6,6 +6,7 @@ import {
   blockTotalStatsCall,
   blockTransactionsCall,
   blockYesterdayStatsCall,
+  blockYesterdayTransactionsCall,
 } from '../index';
 
 jest.mock('react-toastify', () => ({
@@ -375,5 +376,66 @@ describe('blockTotalStatsCall', () => {
     });
 
     await expect(blockTotalStatsCall()).resolves.toBeUndefined();
+  });
+});
+
+
+describe('blockYesterdayTransactionsCall', () => {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+
+  /** Midnight UTC that opened yesterday, the key the bucket carries. */
+  const yesterdayKey = (): number => {
+    const midnight = new Date();
+    midnight.setUTCHours(0, 0, 0, 0);
+    return midnight.getTime() - DAY_MS;
+  };
+
+  beforeEach(() => jest.clearAllMocks());
+
+  it('reads the bucket whose key is yesterday', async () => {
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: {
+        number_by_day: [
+          { key: yesterdayKey() + DAY_MS, doc_count: 2934 },
+          { key: yesterdayKey(), doc_count: 8275 },
+        ],
+      },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBe(8275);
+  });
+
+  it('answers undefined when yesterday is the day that was omitted', async () => {
+    // The route drops a day that carried no data. Read at position 1 the day
+    // before would slide into place and be reported as yesterday.
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: {
+        number_by_day: [
+          { key: yesterdayKey() + DAY_MS, doc_count: 2934 },
+          { key: yesterdayKey() - DAY_MS, doc_count: 7000 },
+        ],
+      },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
+  });
+
+  it('keeps a genuine zero, which a failure does not mean', async () => {
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: { number_by_day: [{ key: yesterdayKey(), doc_count: 0 }] },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBe(0);
+  });
+
+  it('answers undefined on a failure and on a malformed body', async () => {
+    mockedGet.mockResolvedValue({ error: 'boom' });
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
+
+    mockedGet.mockResolvedValue({ error: '', data: {} });
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
   });
 });

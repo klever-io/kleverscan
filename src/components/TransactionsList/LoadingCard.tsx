@@ -21,6 +21,7 @@ const TILES = [
   { key: 'Last24h', fallback: 'Transactions (24h)' },
   { key: 'Total', fallback: 'Total transactions' },
   { key: 'MostTransacted', fallback: 'Most transacted' },
+  { key: 'Volume', fallback: 'Volume (24h)' },
 ] as const;
 
 /**

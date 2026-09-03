@@ -88,12 +88,14 @@ jest.mock('../UpdatedAgo', () => ({
 
 const yesterdayCall = jest.fn();
 const totalCall = jest.fn();
+const transactionsCall = jest.fn();
 
 // Replaced wholesale: the real module also exports blockTransactionsCall,
 // whose import chain Jest cannot transform.
 jest.mock('@/services/requests/block', () => ({
   blockYesterdayStatsCall: () => yesterdayCall(),
   blockTotalStatsCall: () => totalCall(),
+  blockYesterdayTransactionsCall: () => transactionsCall(),
 }));
 
 import BlocksSummary from '../Summary';
@@ -135,12 +137,17 @@ const renderSummary = () =>
 beforeEach(() => {
   yesterdayCall.mockReset();
   totalCall.mockReset();
+  // The transaction count is its own request; default it to an answer so the
+  // tests below state only what they are about.
+  transactionsCall.mockReset();
+  transactionsCall.mockResolvedValue(8275);
 });
 
 describe('BlocksSummary', () => {
   it('holds the card with its real labels while the figures load', () => {
     yesterdayCall.mockReturnValue(new Promise(() => undefined));
     totalCall.mockReturnValue(new Promise(() => undefined));
+    transactionsCall.mockReturnValue(new Promise(() => undefined));
 
     renderSummary();
 
@@ -226,6 +233,32 @@ describe('BlocksSummary', () => {
     expect(screen.getByText('21,597')).toBeTruthy();
     expect(screen.queryByText(/of it burned/)).toBeNull();
     expect(screen.queryByText('Fees burned')).toBeNull();
+  });
+
+  it('shows yesterday\'s transactions and how much of the day they used', async () => {
+    yesterdayCall.mockResolvedValue(YESTERDAY);
+    totalCall.mockResolvedValue(undefined);
+    transactionsCall.mockResolvedValue(8275);
+    renderSummary();
+    const card = await screen.findByTestId('blocks-summary');
+
+    expect(card.textContent).toContain('8,275');
+    // A share of the day's blocks, capped at one transaction per block: the
+    // raw average reads "0.4 per block", which tells a reader less.
+    expect(card.textContent).toContain('of blocks carried one');
+  });
+
+  it('leaves the transactions tile out when its own request failed', async () => {
+    // Its own tile, not the strip: the other figures still have something
+    // to say, the way every tile on this card fails alone.
+    yesterdayCall.mockResolvedValue(YESTERDAY);
+    totalCall.mockResolvedValue(undefined);
+    transactionsCall.mockResolvedValue(undefined);
+    renderSummary();
+    const card = await screen.findByTestId('blocks-summary');
+
+    expect(card.textContent).not.toContain('of blocks carried one');
+    expect(card.textContent).toContain('Blocks (yesterday)');
   });
 
   it('renders nothing when both halves failed', async () => {

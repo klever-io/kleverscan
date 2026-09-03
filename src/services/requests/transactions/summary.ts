@@ -38,6 +38,8 @@ export interface ITransactionsSummary {
   previous24h?: number;
   totalTransactions?: number;
   mostTransactedAsset?: { assetId: string; count: number };
+  /** KLV moved in the window, in the chain's own 6-decimal units. */
+  volume24h?: number;
 }
 
 /**
@@ -72,6 +74,19 @@ const totalCall = async (): Promise<number | undefined> => {
   // A null in the payload survives an `!== undefined` check upstream and
   // would then throw on toLocaleString in the middle of a render.
   return Number.isFinite(total) ? total : undefined;
+};
+
+/**
+ * KLV moved over the rolling day. Read off `block/statistics/24h`, which sums
+ * the transfer receipts and excludes mint and burn (`volumeRangeQuery` in the
+ * proxy), so it is value changing hands rather than supply changing size.
+ * Its own window is the server's; the tiles beside it ask for the same span.
+ */
+const volumeCall = async (): Promise<number | undefined> => {
+  const response = await api.get({ route: 'block/statistics/24h' });
+  if (response?.error) return undefined;
+  const volume = response?.data?.block_stats_24h?.totalVolume;
+  return Number.isFinite(volume) ? volume : undefined;
 };
 
 const mostTransactedCall = async (): Promise<
@@ -128,19 +143,26 @@ export const buildBreakdown = (
  */
 export const transactionsSummaryCall =
   async (): Promise<ITransactionsSummary> => {
-    const [last24h, previous24h, totalTransactions, mostTransactedAsset] =
-      await Promise.all([
-        windowCountCall(0),
-        windowCountCall(1),
-        totalCall(),
-        mostTransactedCall(),
-      ]);
+    const [
+      last24h,
+      previous24h,
+      totalTransactions,
+      mostTransactedAsset,
+      volume24h,
+    ] = await Promise.all([
+      windowCountCall(0),
+      windowCountCall(1),
+      totalCall(),
+      mostTransactedCall(),
+      volumeCall(),
+    ]);
 
     return {
       last24h,
       previous24h,
       totalTransactions,
       mostTransactedAsset,
+      volume24h,
     };
   };
 

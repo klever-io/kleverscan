@@ -17,7 +17,9 @@
     "KAppFees": "kApp fees",
     "AutoUpdate": "Auto update",
     "TxCount_one": "{{formatted}} tx",
-    "TxCount_other": "{{formatted}} txs"
+    "TxCount_other": "{{formatted}} txs",
+    "TransactionsYesterday": "Transactions (yesterday)",
+    "BlocksUsed": "up to {{share}} of blocks carried one"
   },
   "Table": {
     "Block": "Block",

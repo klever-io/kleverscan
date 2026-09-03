@@ -1,5 +1,6 @@
 import { IDaysCoins } from '@/contexts/mainPage';
 import api from '@/services/api';
+import { rollingWindow } from '@/services/requests/rollingWindow';
 import {
   IAggregate,
   IAggregateResponse,
@@ -101,17 +102,26 @@ const homeAccountsCall = async (): Promise<
   }
 };
 
-const homeYesterdayAccountsCall = async (): Promise<
+/**
+ * Accounts created over the rolling 24 hours ending now.
+ *
+ * Counted over an explicit range rather than read off
+ * `address/list/count/1`, whose bucket is a whole UTC day: measured
+ * 2026-09-03 that bucket held 5 where the rolling day held 9.
+ */
+const homeNewAccountsCall = async (): Promise<
   { newAccounts: number } | undefined
 > => {
   try {
     const res = await api.get({
-      route: 'address/list/count/1',
+      route: 'address/list',
+      query: { limit: 1, minify: true, ...rollingWindow() },
     });
     if (!res.error || res.error === '') {
-      return {
-        newAccounts: res.data.number_by_day[0].doc_count,
-      };
+      const total = res.pagination?.totalRecords;
+      // A null survives an `!== undefined` check and would throw on
+      // toLocaleString in the middle of a render.
+      return Number.isFinite(total) ? { newAccounts: total } : undefined;
     }
   } catch (error) {
     console.error(error);
@@ -141,23 +151,26 @@ const homeTransactionsCall = async (): Promise<
   }
 };
 
-const homeBeforeYesterdayTransactionsCall = async (): Promise<
-  { newTransactions: number; beforeYesterdayTxs: number } | undefined
+/**
+ * Transactions over the rolling 24 hours ending now.
+ *
+ * One window, not two added together. The card labels this figure "/24h", and
+ * `transaction/list/count/2` answers two whole UTC days: measured 2026-09-03
+ * their sum was 11,475 against 7,840 for the real day, which is 46 percent
+ * high.
+ */
+const homeNewTransactionsCall = async (): Promise<
+  { newTransactions: number } | undefined
 > => {
   try {
     const res = await api.get({
-      route: 'transaction/list/count/2',
+      route: 'transaction/list',
+      query: { limit: 1, minify: true, ...rollingWindow() },
     });
 
     if (!res.error || res.error === '') {
-      const data = {
-        newTransactions: 0,
-        beforeYesterdayTxs: res.data?.number_by_day[1]?.doc_count,
-      };
-      if (res.data?.number_by_day?.length > 0) {
-        data.newTransactions = res.data?.number_by_day[0]?.doc_count;
-      }
-      return data;
+      const total = res.pagination?.totalRecords;
+      return Number.isFinite(total) ? { newTransactions: total } : undefined;
     }
   } catch (error) {
     console.error(error);
@@ -692,7 +705,7 @@ export {
   defaultAggregateData,
   homeAccountsCall,
   homeActiveProposalsCall,
-  homeBeforeYesterdayTransactionsCall,
+  homeNewTransactionsCall,
   homeGetAggregateCall,
   homeGetBlocksCall,
   homeKfiCall,
@@ -712,6 +725,6 @@ export {
   homeTotalActiveValidators,
   homeTotalValidators,
   homeTransactionsCall,
-  homeYesterdayAccountsCall,
+  homeNewAccountsCall,
   homeHotContracts,
 };

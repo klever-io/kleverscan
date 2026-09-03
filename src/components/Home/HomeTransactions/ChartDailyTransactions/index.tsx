@@ -4,8 +4,7 @@ import { DoubleTxsTooltip } from '@/components/Chart/Tooltips';
 import { ArrowVariation } from '@/components/Home/CoinDataFetcher/CoinCard/styles';
 import { Loader } from '@/components/Loader/styles';
 import { IDoubleChart } from '@/pages/charts';
-import api from '@/services/api';
-import { IDailyTransaction } from '@/types';
+import { transactionSeriesCall } from '@/services/requests/home/transactionSeries';
 import { getVariation } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import {
@@ -49,45 +48,40 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
       try {
         setIsLoadingDailyTxs(true);
 
-        const res = await api.get({
-          route: `transaction/list/count/${filterPeriod * 2}`,
-        });
-        if (res?.error?.length) return;
+        // Rolling windows where the request count allows it, UTC-day buckets
+        // beyond that; the module says which and why.
+        const rawTxList = await transactionSeriesCall(filterPeriod);
+        if (!rawTxList.length) return;
 
-        const rawTxList: IDailyTransaction[] = res?.data?.number_by_day;
-        if (!rawTxList) return;
-
-        const parsedTxList = rawTxList
-          .sort((a, b) => a.key - b.key)
-          .reduce(
-            (acc, transaction) => {
-              if (
-                !transaction ||
-                !transaction.key ||
-                isNaN(transaction.doc_count)
-              )
-                return acc;
-
-              const date = new Date(transaction.key);
-
-              date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-
-              const formattedDate = format(date, 'dd MMM');
-              const [day, month] = formattedDate.split(' ');
-
-              const monthString = commonT(`Date.Months.${month}`);
-
-              const dateString = `${day} ${monthString}`;
-
-              acc.push({
-                date: dateString,
-                value: transaction.doc_count,
-              });
-
+        const parsedTxList = rawTxList.reduce(
+          (acc, transaction) => {
+            if (
+              !transaction ||
+              !transaction.key ||
+              isNaN(transaction.doc_count)
+            )
               return acc;
-            },
-            [] as Array<{ date: string; value: number }>,
-          );
+
+            const date = new Date(transaction.key);
+
+            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+
+            const formattedDate = format(date, 'dd MMM');
+            const [day, month] = formattedDate.split(' ');
+
+            const monthString = commonT(`Date.Months.${month}`);
+
+            const dateString = `${day} ${monthString}`;
+
+            acc.push({
+              date: dateString,
+              value: transaction.doc_count,
+            });
+
+            return acc;
+          },
+          [] as Array<{ date: string; value: number }>,
+        );
 
         const firstSlice = parsedTxList.slice(0, parsedTxList.length / 2);
         const secondSlice = parsedTxList.slice(

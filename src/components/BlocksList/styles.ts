@@ -20,6 +20,15 @@ import { RIGHT_ALIGNED_COLUMNS } from './columns';
 // 1.5rem is the rhythm the old CardContainer had, so the figures land where
 // the cards used to. The loading shape carries the same margin, or the page
 // shifts by 24px once the numbers arrive.
+/* Four tiles hold one row down to here, with the 9rem the corner line needs
+   still reserved beside them; below it they wrap and the line goes with them.
+   Measured on the loaded card with that reservation in place: one row at
+   890px, two at 880px. The .98 is for the same reason the theme's own
+   breakpoints carry it, since max-width: N and min-width: N both match at
+   exactly N. */
+const TILES_ON_ONE_ROW = '890px';
+const TILES_WRAP = '889.98px';
+
 const pageSummarySpacing = css`
   margin-top: 1.5rem;
 `;
@@ -47,21 +56,11 @@ export const BlocksSummaryCard = styled(SummaryCard)`
   /* Room for that corner line, in rem so browser text zoom scales it along:
      with a px reservation the note painted through the third tile's label at
      125 percent text size and beyond (measured, 47px of overlap at 1026px).
-     Applies to the loading card too, which shares this component. */
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+     Applies to the loading card too, which shares this component. Reserved
+     only where the line shows, or the narrow card loses a column to nothing. */
+  @media screen and (min-width: ${TILES_ON_ONE_ROW}) {
     ${TilesGrid} {
       padding-right: 9rem;
-    }
-  }
-
-  /* Narrow screens park the age line in the grid cell the wrapped tiles leave
-     empty. Aligned on the last text baseline, not the cell edge: the tiles hold
-     a 66,5px minimum while their "in total" line ends above it, by an amount
-     that scales with the root font (9px at 390, 2px at 1000), so an edge or a
-     fixed margin misses the line at one width or the other. */
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    ${TilesGrid} {
-      align-items: last baseline;
     }
   }
 `;
@@ -93,19 +92,20 @@ export const UpdatedNote = styled.p`
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 
-  /* Wide screens: the corner, above the single tile row. Narrow ones wrap the
-     tiles into a grid whose last row an even tile count fills exactly, so the
-     line gets a row of its own and reads as centred; it is pinned to the last
-     column and right-aligned there, which is the corner it belongs in whether
-     or not a cell happens to be free. */
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    grid-column: -2;
-    justify-self: end;
+  /* The card's top-right corner, out of the flow: as a grid child it claimed a
+     cell whenever the tile count filled the last row, which dropped it to a
+     row of its own and read as centred. The offsets match the card's own 20px
+     padding.
+
+     Hidden once the tiles wrap, because the corner it sits in then belongs to
+     a tile rather than to empty space, and the line is the one thing on this
+     card a reader can do without. */
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  @media screen and (max-width: ${TILES_WRAP}) {
+    display: none;
   }
 `;
 

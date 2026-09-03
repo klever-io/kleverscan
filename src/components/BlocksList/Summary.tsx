@@ -205,6 +205,8 @@ const BlocksSummary: React.FC = () => {
           )}
         </Tile>
 
+        {/* Inside the grid so it can anchor to the tiles' own bottom, but
+            absolutely positioned, so it never claims a cell. */}
         <UpdatedAgo at={dataUpdatedAt} />
       </TilesGrid>
 

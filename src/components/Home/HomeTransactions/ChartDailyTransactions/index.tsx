@@ -4,6 +4,7 @@ import { DoubleTxsTooltip } from '@/components/Chart/Tooltips';
 import { ArrowVariation } from '@/components/Home/CoinDataFetcher/CoinCard/styles';
 import { Loader } from '@/components/Loader/styles';
 import { IDoubleChart } from '@/pages/charts';
+import { buildChartSeries } from '@/services/requests/home/chartSeries';
 import { transactionSeriesCall } from '@/services/requests/home/transactionSeries';
 import { getVariation } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
@@ -18,7 +19,6 @@ import {
   TransactionEmpty,
   VariationText,
 } from '@/views/home';
-import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
@@ -75,73 +75,21 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
           return;
         }
 
-        const parsedTxList = rawTxList.reduce(
-          (acc, transaction) => {
-            if (
-              !transaction ||
-              !transaction.key ||
-              isNaN(transaction.doc_count)
-            )
-              return acc;
-
-            const date = new Date(transaction.key);
-
-            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-
-            const formattedDate = format(date, 'dd MMM');
-            const [day, month] = formattedDate.split(' ');
-
-            const monthString = commonT(`Date.Months.${month}`);
-
-            const dateString = `${day} ${monthString}`;
-
-            acc.push({
-              date: dateString,
-              value: transaction.doc_count,
-            });
-
-            return acc;
-          },
-          [] as Array<{ date: string; value: number }>,
+        // Parsed and paired outside the effect, where Jest can reach it:
+        // the effect keeps the fetch, the guards and the state.
+        const { pairs, total, previousTotal } = buildChartSeries(
+          rawTxList,
+          month => commonT(`Date.Months.${month}`),
         );
 
-        const firstSlice = parsedTxList.slice(0, parsedTxList.length / 2);
-        const secondSlice = parsedTxList.slice(
-          parsedTxList.length / 2,
-          parsedTxList.length,
-        );
-
-        const mergedTransactionTimeSeries = firstSlice.map((txPast, index) => ({
-          valueNow: secondSlice[index].value as number,
-          dateNow: secondSlice[index].date,
-          txNow: secondSlice[index],
-          valuePast: txPast.value as number,
-          datePast: txPast.date as string,
-          txPast,
-        })) as IDoubleChart[];
-
-        // The two the legend names: this period against the one before it.
-        // The figure used to be the first day of the current period against
-        // its own last day, divided by a thousand and forced positive, so a
-        // fortnight that ran 49.74 percent above the previous one reported
-        // 0.63 percent (measured 2026-09-03).
-        const totalSum = mergedTransactionTimeSeries.reduce(
-          (acc, curr) => acc + (curr?.valueNow ?? 0),
-          0,
-        );
-        const previousSum = mergedTransactionTimeSeries.reduce(
-          (acc, curr) => acc + (curr?.valuePast ?? 0),
-          0,
-        );
-
-        setTransactionTimeSeries(mergedTransactionTimeSeries);
+        setTransactionTimeSeries(pairs as IDoubleChart[]);
         setTransactionTimeSeriesChgValue({
-          inPeriod: totalSum,
+          inPeriod: total,
           // No baseline is no percentage: against zero every change is
           // infinite, and getVariation prints "--" for a falsy figure.
           percent: getVariation(
-            previousSum > 0
-              ? ((totalSum - previousSum) / previousSum) * 100
+            previousTotal > 0
+              ? ((total - previousTotal) / previousTotal) * 100
               : 0,
           ),
         });

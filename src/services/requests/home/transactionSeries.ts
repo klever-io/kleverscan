@@ -36,6 +36,11 @@ const rollingSeries = async (points: number): Promise<ISeriesPoint[]> => {
       return api
         .get({
           route: 'transaction/list',
+          // One attempt: api.get retries three times by default with a fixed
+          // 500ms gap, so a burst that drew a 429 would come back as three
+          // times the requests that caused it. Fourteen is already the
+          // measured ceiling.
+          tries: 1,
           query: { limit: 1, minify: true, ...window },
         })
         .then(response => ({

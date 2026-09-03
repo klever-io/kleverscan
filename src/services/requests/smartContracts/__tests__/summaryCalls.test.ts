@@ -171,6 +171,14 @@ describe('activeContracts24hCall', () => {
     await expect(activeContracts24hCall()).resolves.toBeUndefined();
   });
 
+  it('answers undefined when the request rejects outright', async () => {
+    // The catch exists so one rejection does not take the whole strip down:
+    // the card gathers these with Promise.all.
+    mockedGet.mockRejectedValue(new Error('unreadable body'));
+
+    await expect(activeContracts24hCall()).resolves.toBeUndefined();
+  });
+
   it('answers undefined when the body carries no statistics at all', async () => {
     respond({ 'sc/statistics/24h': { error: '', data: {} } });
 

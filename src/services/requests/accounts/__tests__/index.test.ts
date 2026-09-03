@@ -272,6 +272,17 @@ describe('accountsCreatedInWindow', () => {
     await expect(accountsCreatedInWindow(7)).resolves.toBeUndefined();
   });
 
+  it('drops a non-numeric total rather than passing it on', async () => {
+    // A null survives an `!== undefined` check and would throw on
+    // toLocaleString in the middle of a render.
+    mockedGet.mockResolvedValue({
+      pagination: { totalRecords: null },
+      error: '',
+    });
+
+    await expect(accountsCreatedInWindow(7)).resolves.toBeUndefined();
+  });
+
   it('never asks for an empty range, whatever it is handed', async () => {
     // Zero would make startdate equal enddate, and the count of an empty
     // range is 0, which the tile would print as a fact.

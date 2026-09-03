@@ -100,25 +100,76 @@ describe('ChartDailyTransactions', () => {
     seriesCall.mockReset();
   });
 
-  it('ignores a response the period has moved on from', async () => {
-    // 7D counts fourteen rolling windows and 15D takes one request, so the
-    // slower answer can land last and paint itself over the newer one.
-    let resolveSlow: (value: unknown) => void = () => undefined;
-    seriesCall.mockReturnValueOnce(
-      new Promise(resolve => {
-        resolveSlow = resolve;
-      }),
-    );
+  it('clears a stale figure when the new period answers with nothing', async () => {
+    // The fault is a figure left over from the period before, so the card has
+    // to carry one first: rendering straight into an empty answer has nothing
+    // to leave behind and would pass either way.
+    seriesCall
+      .mockResolvedValueOnce(series(30, 100))
+      .mockResolvedValueOnce([]);
 
-    const { unmount } = renderChart();
+    const { container } = renderChart();
+    await waitFor(() => expect(seriesCall).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(container.textContent).toContain('1,500'));
+
+    screen.getByText('7D').click();
+    await waitFor(() => expect(seriesCall).toHaveBeenCalledTimes(2));
+
+    await waitFor(() => expect(container.textContent).not.toContain('1,500'));
+  });
+
+  it('reports no percentage when the previous stretch was empty', async () => {
+    // Against zero every change is infinite, so getVariation is handed a
+    // falsy figure and prints "--" rather than a number.
+    const series30 = [
+      ...Array.from({ length: 15 }, (_, index) => ({
+        key: 1_788_000_000_000 + index * 24 * 60 * 60 * 1000,
+        doc_count: 0,
+      })),
+      ...Array.from({ length: 15 }, (_, index) => ({
+        key: 1_788_000_000_000 + (index + 15) * 24 * 60 * 60 * 1000,
+        doc_count: 50,
+      })),
+    ];
+    seriesCall.mockResolvedValue(series30);
+
+    const { container } = renderChart();
+
+    // Waited on the call, then on the paint: asserting the text straight away
+    // races the render that follows the resolved promise.
+    await waitFor(() => expect(seriesCall).toHaveBeenCalled());
+    await waitFor(() => expect(container.textContent).toContain('750'));
+    expect(container.textContent).toContain('--%');
+  });
+
+  it('ignores a response the period has moved on from', async () => {
+    // The transition the guard exists for is a period switch, not a teardown:
+    // 7D counts fourteen rolling windows while 15D takes one bucket request,
+    // so the slower answer can land last and paint itself under the newer
+    // label. Unmounting instead proves nothing, because React 19 no longer
+    // warns about a state update on an unmounted component.
+    let resolveSlow: (value: unknown) => void = () => undefined;
+    seriesCall
+      .mockReturnValueOnce(
+        new Promise(resolve => {
+          resolveSlow = resolve;
+        }),
+      )
+      .mockResolvedValueOnce(series(14, 100));
+
+    const { container } = renderChart();
     await waitFor(() => expect(seriesCall).toHaveBeenCalledTimes(1));
 
-    // The effect is torn down before the request settles, which is what a
-    // period switch does.
-    unmount();
-    resolveSlow(series(30, 999));
+    screen.getByText('7D').click();
+    await waitFor(() => expect(seriesCall).toHaveBeenCalledTimes(2));
+    // The 7D answer is in: seven points of 100 in the current stretch.
+    await waitFor(() => expect(container.textContent).toContain('700'));
 
-    // No state update after teardown: React logs an error if one happens.
-    await new Promise(resolve => setTimeout(resolve, 20));
+    // Now the superseded 15D answer arrives, carrying a figure of its own.
+    resolveSlow(series(30, 999));
+    await new Promise(resolve => setTimeout(resolve, 30));
+
+    expect(container.textContent).toContain('700');
+    expect(container.textContent).not.toContain('14,985');
   });
 });

@@ -104,6 +104,19 @@ describe('transactionSeriesCall', () => {
     await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
+  it('answers nothing when the bucket route failed', async () => {
+    mockedGet.mockResolvedValue({ error: 'boom' });
+
+    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
+  });
+
+  it('answers nothing when the body carries no bucket list', async () => {
+    // A malformed success, not a chain with no transactions.
+    mockedGet.mockResolvedValue({ error: '', data: {} });
+
+    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
+  });
+
   it('answers nothing when a bucket is malformed, rather than a short series', async () => {
     // The caller splits the list down the middle, so one dropped bucket makes
     // an odd length that loses its newest point and reports a fortnight from

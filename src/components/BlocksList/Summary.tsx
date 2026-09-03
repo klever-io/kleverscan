@@ -143,7 +143,7 @@ const BlocksSummary: React.FC = () => {
           <Tile>
             <TileLabel>
               {t('blocks:List.TransactionFees', {
-                defaultValue: 'Transaction fees (yesterday)',
+                defaultValue: 'Transaction fees (yesterday)',
               })}
             </TileLabel>
             {/* Compact headline, exact figure on hover: two segments already
@@ -191,7 +191,7 @@ const BlocksSummary: React.FC = () => {
         <Tile>
           <TileLabel>
             {t('blocks:List.TotalBurned', {
-              defaultValue: 'Total burned (yesterday)',
+              defaultValue: 'Total burned (yesterday)',
             })}
           </TileLabel>
           <TileValue>{klvAmount(yesterday.totalBurned)}</TileValue>

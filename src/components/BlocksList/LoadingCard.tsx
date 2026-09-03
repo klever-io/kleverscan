@@ -34,12 +34,12 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
   const tiles = [
     t('blocks:List.BlocksYesterday', { defaultValue: 'Blocks (yesterday)' }),
     t('blocks:List.TransactionFees', {
-      defaultValue: 'Transaction fees (yesterday)',
+      defaultValue: 'Transaction fees (yesterday)',
     }),
     t('blocks:List.TransactionsYesterday', {
       defaultValue: 'Transactions (yesterday)',
     }),
-    t('blocks:List.TotalBurned', { defaultValue: 'Total burned (yesterday)' }),
+    t('blocks:List.TotalBurned', { defaultValue: 'Total burned (yesterday)' }),
   ];
   const legend = [
     {

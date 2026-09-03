@@ -29,6 +29,12 @@ import { RIGHT_ALIGNED_COLUMNS } from './columns';
 const TILES_ON_ONE_ROW = '890px';
 const TILES_WRAP = '889.98px';
 
+/* Above this every label fits on one line by itself, so the held pair of lines
+   is dropped and the card sits a line shorter. Measured with the labels' own
+   wrapping: the longest, "Transaction fees (yesterday)", takes two lines at
+   1060px and one at 1080px. */
+const LABELS_ON_ONE_LINE_MIN = '1079.98px';
+
 const pageSummarySpacing = css`
   margin-top: 1.5rem;
 `;
@@ -61,6 +67,43 @@ export const BlocksSummaryCard = styled(SummaryCard)`
   @media screen and (min-width: ${TILES_ON_ONE_ROW}) {
     ${TilesGrid} {
       padding-right: 9rem;
+    }
+  }
+
+  /* Two lines for every label, until all four fit on one. Left to wrap on
+     their own they stepped twice on the way down: measured, the two rightmost
+     went to one line at 840px and back to two at 890px, where the corner
+     line's reservation takes the width back. Holding them together means the
+     row's height changes once, at the width where the longest label
+     ("Transaction fees (yesterday)") stops wrapping, which is 1080px.
+
+     Every label reads "<what> (yesterday)", and the words before the
+     parenthesis are bound with non-breaking spaces in the translations, so
+     the one breakable space is the one in front of it: the window a figure
+     describes is what moves to the second line, never half a name.
+
+     Applies wherever a single line is not enough for all four, which is every
+     width below the one where the longest label stops wrapping. */
+  @media screen and (max-width: ${LABELS_ON_ONE_LINE_MIN}) {
+    ${TilesGrid} > div > span:first-child {
+      display: block;
+      /* Pinned rather than inherited: the label's line-height is normal,
+         which the font decides, so two lines is only a fixed number once the
+         ratio is. In em rather than lh, which Safari only learned in 16.4 and
+         this repo carries no browserslist to fall back on. */
+      line-height: 1.35;
+      min-height: 2.7em;
+      /* Reserving the height is not the same as taking it: only the longest
+         label wrapped on its own, so the other three kept "(yesterday)" up on
+         the first line with empty space below. The words before the
+         parenthesis are bound with non-breaking spaces, so a box just wide
+         enough for the longest of those names, and no wider, breaks at that
+         one space on every label.
+
+         Measured at 11px uppercase: the names run 46 to 115px, and
+         "(yesterday)" is 88px, so 11em (121px) clears the widest name while
+         staying under the two together. */
+      max-width: 11em;
     }
   }
 `;

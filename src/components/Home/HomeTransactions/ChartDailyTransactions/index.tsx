@@ -53,6 +53,12 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
 
   useEffect(() => {
+    // The periods do not settle in the order they were asked for: 7D counts a
+    // rolling window per point, fourteen requests, while 15D and 1M take one.
+    // Switching away from 7D therefore lands the newer answer first and the
+    // older one on top of it, under the newer label.
+    let current = true;
+
     const getTransactionsChartTimeSeries = async () => {
       try {
         setIsLoadingDailyTxs(true);
@@ -60,7 +66,14 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
         // Rolling windows where the request count allows it, UTC-day buckets
         // beyond that; the module says which and why.
         const rawTxList = await transactionSeriesCall(filterPeriod);
-        if (!rawTxList.length) return;
+        if (!current) return;
+        if (!rawTxList.length) {
+          // Cleared, not left alone: returning here kept the previous
+          // period's line and percentage on screen under the new label.
+          setTransactionTimeSeries([]);
+          setTransactionTimeSeriesChgValue(TIME_SERIES_CHG_VALUE);
+          return;
+        }
 
         const parsedTxList = rawTxList.reduce(
           (acc, transaction) => {
@@ -135,11 +148,15 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
       } catch (err) {
         console.error(err);
       } finally {
-        setIsLoadingDailyTxs(false);
+        if (current) setIsLoadingDailyTxs(false);
       }
     };
 
     getTransactionsChartTimeSeries();
+
+    return () => {
+      current = false;
+    };
   }, [filterPeriod]);
 
   return (

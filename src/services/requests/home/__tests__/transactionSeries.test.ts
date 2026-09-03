@@ -73,7 +73,12 @@ describe('transactionSeriesCall', () => {
     // answering 20 (measured 2026-09-03).
     mockedGet.mockResolvedValue({
       error: '',
-      data: { number_by_day: [{ key: 2, doc_count: 5 }, { key: 1, doc_count: 3 }] },
+      data: {
+        number_by_day: Array.from({ length: 30 }, (_, index) => ({
+          key: 30 - index,
+          doc_count: 5,
+        })),
+      },
     });
 
     const series = await transactionSeriesCall(15);
@@ -81,7 +86,8 @@ describe('transactionSeriesCall', () => {
     expect(mockedGet).toHaveBeenCalledTimes(1);
     expect(mockedGet.mock.calls[0][0].route).toBe('transaction/list/count/30');
     // Oldest first, whatever order the route answered in.
-    expect(series.map(point => point.key)).toEqual([1, 2]);
+    expect(series[0].key).toBe(1);
+    expect(series).toHaveLength(30);
   });
 
   it('answers an empty series when one window was refused', async () => {
@@ -98,14 +104,48 @@ describe('transactionSeriesCall', () => {
     await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
-  it('drops a malformed bucket rather than charting it', async () => {
+  it('answers nothing when a bucket is malformed, rather than a short series', async () => {
+    // The caller splits the list down the middle, so one dropped bucket makes
+    // an odd length that loses its newest point and reports a fortnight from
+    // thirteen days.
     mockedGet.mockResolvedValue({
       error: '',
-      data: { number_by_day: [{ key: 1, doc_count: 3 }, { key: null, doc_count: 9 }] },
+      data: {
+        number_by_day: [
+          { key: 1, doc_count: 3 },
+          { key: null, doc_count: 9 },
+        ],
+      },
     });
 
-    await expect(transactionSeriesCall(15)).resolves.toEqual([
-      { key: 1, doc_count: 3 },
-    ]);
+    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
+  });
+
+  it('answers nothing when the route omitted a quiet day', async () => {
+    // Its swagger says quiet days are omitted, so a short answer is a
+    // documented outcome rather than a malformed one.
+    const short = Array.from({ length: 29 }, (_, index) => ({
+      key: index + 1,
+      doc_count: 10,
+    }));
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: { number_by_day: short },
+    });
+
+    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
+  });
+
+  it('keeps a full series, whatever order the route answered in', async () => {
+    const full = Array.from({ length: 30 }, (_, index) => ({
+      key: 30 - index,
+      doc_count: 10,
+    }));
+    mockedGet.mockResolvedValue({ error: '', data: { number_by_day: full } });
+
+    const series = await transactionSeriesCall(15);
+
+    expect(series).toHaveLength(30);
+    expect(series[0].key).toBe(1);
   });
 });

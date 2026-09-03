@@ -65,12 +65,18 @@ const bucketSeries = async (days: number): Promise<ISeriesPoint[]> => {
   const buckets = response?.data?.number_by_day;
   if (!Array.isArray(buckets)) return [];
 
-  return [...buckets]
+  const usable = [...buckets]
     .filter(
       bucket =>
         Number.isFinite(bucket?.key) && Number.isFinite(bucket?.doc_count),
     )
     .sort((a, b) => a.key - b.key);
+
+  // All or nothing: the caller splits this list down the middle, so an odd
+  // length drops its newest point and a short one reports a fortnight's figure
+  // from fewer days. The route omits a day that carried no data, and a
+  // malformed bucket is dropped just above, so neither is hypothetical.
+  return usable.length === days ? usable : [];
 };
 
 /**

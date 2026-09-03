@@ -94,14 +94,17 @@ export const UpdatedNote = styled.p`
   white-space: nowrap;
 
   /* Wide screens: the corner, above the single tile row. Narrow ones wrap the
-     tiles, which leaves the grid cell beside the last tile empty; the line
-     fills it there instead, on the baseline of that tile's "in total" sub. */
+     tiles into a grid whose last row an even tile count fills exactly, so the
+     line gets a row of its own and reads as centred; it is pinned to the last
+     column and right-aligned there, which is the corner it belongs in whether
+     or not a cell happens to be free. */
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     position: absolute;
     top: 20px;
     right: 20px;
   }
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-column: -2;
     justify-self: end;
   }
 `;

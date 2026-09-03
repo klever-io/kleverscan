@@ -294,6 +294,30 @@ describe('TransactionsSummary', () => {
     expect(loaded.textContent).toContain('Total transactions');
   });
 
+  it('marks the same tiles droppable as the loading shape does', async () => {
+    // The narrow layout hides by marker, so a marker the skeleton and the
+    // loaded card disagree on re-flows the row once the figures land.
+    summaryCall.mockResolvedValue(FULL);
+    const { container } = renderSummary();
+
+    const markersOf = (root: ParentNode): string[] =>
+      [...root.querySelectorAll('[data-optional]')].map(
+        el => `${el.getAttribute('data-optional')}:${(el.textContent ?? '').slice(0, 12)}`,
+      );
+
+    const skeletonMarkers = markersOf(container);
+    await loadedCard();
+    const loadedMarkers = markersOf(container);
+
+    expect(skeletonMarkers).toHaveLength(2);
+    expect(loadedMarkers).toHaveLength(2);
+    // Most transacted goes first, the volume figure second.
+    expect(skeletonMarkers[0].startsWith('true:')).toBe(true);
+    expect(skeletonMarkers[1].startsWith('narrow:')).toBe(true);
+    expect(loadedMarkers[0].startsWith('true:')).toBe(true);
+    expect(loadedMarkers[1].startsWith('narrow:')).toBe(true);
+  });
+
   it('draws no card at all when every figure is missing', async () => {
     summaryCall.mockResolvedValue({});
 

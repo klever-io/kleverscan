@@ -240,7 +240,9 @@ const TransactionsSummary: React.FC = () => {
         )}
 
         {summary.volume24h !== undefined && (
-          <Tile>
+          // Dropped below 421px, where only two columns fit and three tiles
+          // would leave one alone on a row of its own.
+          <Tile data-optional="narrow">
             <TileLabel>
               {t('transactions:Summary.Volume', {
                 defaultValue: 'Volume (24h)',

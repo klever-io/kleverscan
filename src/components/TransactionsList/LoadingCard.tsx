@@ -23,7 +23,7 @@ const TILES = [
   { key: 'Last24h', fallback: 'Transactions (24h)' },
   { key: 'Total', fallback: 'Total transactions' },
   { key: 'MostTransacted', fallback: 'Most transacted', optional: true },
-  { key: 'Volume', fallback: 'Volume (24h)' },
+  { key: 'Volume', fallback: 'Volume (24h)', narrow: true },
 ] as const;
 
 /**
@@ -73,7 +73,13 @@ const TransactionsSummaryLoadingCard: React.FC<{ label: string }> = ({
         {TILES.map(tile => (
           <Tile
             key={tile.key}
-            data-optional={'optional' in tile ? 'true' : undefined}
+            data-optional={
+              'optional' in tile
+                ? 'true'
+                : 'narrow' in tile
+                  ? 'narrow'
+                  : undefined
+            }
           >
             <TileLabel>
               {t(`transactions:Summary.${tile.key}`, {

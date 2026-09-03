@@ -38,6 +38,18 @@ import styled, { css } from 'styled-components';
  */
 const BELOW_ROW_LAYOUT = '767.98px';
 
+/* Below this the fourth tile no longer fits beside the other three: 4*105 plus
+   three 16px gaps plus the grid's own 74px of chrome is 542px, so 541.98 is
+   the last width that has to shed a tile. Same `.98` reason as the constant
+   above: `max-width: N` and `min-width: N` both match at exactly N. */
+const FOUR_TILES_MIN = '541.98px';
+
+/* And below this only two columns fit (3*105 + 2*16 + 74 = 421px), where three
+   tiles leave one alone on a row of its own. The second 24h figure goes too,
+   so the row that remains is full. Above this width the card carries three,
+   above FOUR_TILES_MIN all four. */
+const THREE_TILES_MIN = '420.98px';
+
 interface IRowLayoutWidth {
   /** The viewport width from which this list's row fits, from
    *  `rowLayoutMinWidth`; it differs by one column between the variants. */
@@ -401,15 +413,19 @@ const pageSummarySpacing = css`
   margin-top: 1.5rem;
 `;
 
-/* Three tiles side by side for as long as the widest holds its label unbroken:
-   115px measured, so three of them plus the gaps need a 377px grid and the
-   451px screen that carries one. Below that the leading-asset tile is dropped
-   rather than wrapped onto a row of its own; it is the one figure here a
-   reader can do without. Selected by its own marker rather than by position:
-   every tile is conditional, so with `nth-child(3)` a failed most-transacted
-   request moved the volume tile into that slot and hid a figure that had
-   answered. Both rules sit on the loading shape too, or the card re-flows
-   once the figures land. */
+/* All four tiles on one row for as long as they fit, then three, and never one
+   tile alone on a row of its own.
+
+   Measured: the grid sits 74px inside the viewport and gaps are 16px, so four
+   columns at the 105px floor need 4*105 + 3*16 + 74 = 542px. Below that the
+   leading-asset tile is dropped rather than letting the fourth wrap; it is the
+   one figure here a reader can do without, and three tiles then fill the row.
+
+   Dropped by its own marker rather than by position: every tile is
+   conditional, so with `nth-child(3)` a failed most-transacted request moved
+   the volume tile into that slot and hid a figure that had answered. Both
+   rules sit on the loading shape too, or the card re-flows once the figures
+   land. */
 const threeTilesThenTwo = css`
   @media screen and (max-width: ${BELOW_ROW_LAYOUT}) {
     ${TilesGrid} {
@@ -417,8 +433,14 @@ const threeTilesThenTwo = css`
     }
   }
 
-  @media screen and (max-width: 450px) {
+  @media screen and (max-width: ${FOUR_TILES_MIN}) {
     ${TilesGrid} > [data-optional='true'] {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: ${THREE_TILES_MIN}) {
+    ${TilesGrid} > [data-optional='narrow'] {
       display: none;
     }
   }

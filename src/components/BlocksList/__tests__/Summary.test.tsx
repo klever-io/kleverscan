@@ -233,6 +233,11 @@ describe('BlocksSummary', () => {
     expect(screen.getByText('21,597')).toBeTruthy();
     expect(screen.queryByText(/of it burned/)).toBeNull();
     expect(screen.queryByText('Fees burned')).toBeNull();
+    // The age line is the freshness of every tile, not of the fee bar, so it
+    // survives the day that carried no fees. It used to sit inside the fee
+    // block and vanished with it, while the loading card still held a slot
+    // for it.
+    expect(screen.getByTestId('blocks-updated-ago')).toBeTruthy();
   });
 
   it('shows yesterday\'s transactions and how much of the day they used', async () => {

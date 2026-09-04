@@ -216,8 +216,14 @@ const contractTransactions24hCall = async (): Promise<
 /**
  * Contracts that ran at least once in the rolling 24 hours, against the 211
  * ever deployed: 16 of them on 2026-09-03, which is what the tile is for.
- * Read off the same route the totals come from, so the figure and the window
- * cannot drift apart.
+ *
+ * The deployed total comes from a different route (`sc/list`), so the two do
+ * not share a window; this one is rolling on its own account. Measured
+ * 2026-09-04 14:52 UTC: `fromMs` sat at 14:52 the day before, not at
+ * midnight, and the span was 24.0000 hours. Its `totalInvokes` of 1,053 sat
+ * beside 1,057 type-63 transactions counted over a rolling range on
+ * `transaction/list` at the same moment, the difference being the chain
+ * moving between the two reads.
  */
 const activeContracts24hCall = async (): Promise<number | undefined> => {
   try {

@@ -1,5 +1,8 @@
 import api from '@/services/api';
-import { rollingWindow } from '@/services/requests/rollingWindow';
+import {
+  ROLLING_WINDOW_MS,
+  rollingWindow,
+} from '@/services/requests/rollingWindow';
 
 /**
  * The daily series behind the home transactions chart, as `{ key, doc_count }`
@@ -70,18 +73,29 @@ const bucketSeries = async (days: number): Promise<ISeriesPoint[]> => {
   const buckets = response?.data?.number_by_day;
   if (!Array.isArray(buckets)) return [];
 
-  const usable = [...buckets]
-    .filter(
-      bucket =>
-        Number.isFinite(bucket?.key) && Number.isFinite(bucket?.doc_count),
-    )
-    .sort((a, b) => a.key - b.key);
+  const usable = [...buckets].filter(
+    bucket =>
+      Number.isFinite(bucket?.key) && Number.isFinite(bucket?.doc_count),
+  );
+  if (!usable.length) return [];
 
-  // All or nothing: the caller splits this list down the middle, so an odd
-  // length drops its newest point and a short one reports a fortnight's figure
-  // from fewer days. The route omits a day that carried no data, and a
-  // malformed bucket is dropped just above, so neither is hypothetical.
-  return usable.length === days ? usable : [];
+  // Laid onto the day grid rather than passed through as answered. The route
+  // omits a day that carried no data, and the caller splits this list down
+  // the middle, so a missing day would pair every later one against the
+  // wrong counterpart. Refusing the whole series for that turned one quiet
+  // day into a chart that stays empty for the next month; an omitted day is
+  // a known zero, not an unknown, so it is filled in as one.
+  //
+  // A bucket whose key or count was malformed is different: its value cannot
+  // be known, and it is dropped above, which the grid then shows as a zero
+  // as well. That is the one case where a zero is drawn for a day that may
+  // have carried transactions, and it takes a malformed answer to reach it.
+  const byKey = new Map(usable.map(bucket => [bucket.key, bucket.doc_count]));
+  const newest = Math.max(...usable.map(bucket => bucket.key));
+  return Array.from({ length: days }, (_, index) => {
+    const key = newest - (days - 1 - index) * ROLLING_WINDOW_MS;
+    return { key, doc_count: byKey.get(key) ?? 0 };
+  });
 };
 
 /**

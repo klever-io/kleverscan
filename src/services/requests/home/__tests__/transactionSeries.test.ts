@@ -71,11 +71,13 @@ describe('transactionSeriesCall', () => {
   it('falls back to day buckets once the period costs too many requests', async () => {
     // 15D would need 30 requests, and the proxy refused 30 in a burst while
     // answering 20 (measured 2026-09-03).
+    // Keys a day apart, newest first, the way the route answers.
+    const newest = 1_788_393_600_000;
     mockedGet.mockResolvedValue({
       error: '',
       data: {
         number_by_day: Array.from({ length: 30 }, (_, index) => ({
-          key: 30 - index,
+          key: newest - index * DAY_MS,
           doc_count: 5,
         })),
       },
@@ -86,7 +88,7 @@ describe('transactionSeriesCall', () => {
     expect(mockedGet).toHaveBeenCalledTimes(1);
     expect(mockedGet.mock.calls[0][0].route).toBe('transaction/list/count/30');
     // Oldest first, whatever order the route answered in.
-    expect(series[0].key).toBe(1);
+    expect(series[0].key).toBe(newest - 29 * DAY_MS);
     expect(series).toHaveLength(30);
   });
 
@@ -117,41 +119,58 @@ describe('transactionSeriesCall', () => {
     await expect(transactionSeriesCall(15)).resolves.toEqual([]);
   });
 
-  it('answers nothing when a bucket is malformed, rather than a short series', async () => {
-    // The caller splits the list down the middle, so one dropped bucket makes
-    // an odd length that loses its newest point and reports a fortnight from
-    // thirteen days.
-    mockedGet.mockResolvedValue({
-      error: '',
-      data: {
-        number_by_day: [
-          { key: 1, doc_count: 3 },
-          { key: null, doc_count: 9 },
-        ],
-      },
-    });
-
-    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
-  });
-
-  it('answers nothing when the route omitted a quiet day', async () => {
-    // Its swagger says quiet days are omitted, so a short answer is a
-    // documented outcome rather than a malformed one.
-    const short = Array.from({ length: 29 }, (_, index) => ({
-      key: index + 1,
+  it('draws a malformed bucket as zero rather than refusing the series', async () => {
+    // The one case where a zero can stand for a day that carried
+    // transactions: the bucket's value cannot be known, so it is dropped and
+    // the grid shows the gap as zero. Preferred over an empty chart, since a
+    // single malformed answer would otherwise blank a month.
+    const day = 24 * 60 * 60 * 1000;
+    const newest = 1_788_393_600_000;
+    const buckets = Array.from({ length: 30 }, (_, index) => ({
+      key: newest - (29 - index) * day,
       doc_count: 10,
     }));
+    buckets[5] = { key: null as unknown as number, doc_count: 9 };
     mockedGet.mockResolvedValue({
       error: '',
-      data: { number_by_day: short },
+      data: { number_by_day: buckets },
     });
 
-    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
+    const series = await transactionSeriesCall(15);
+
+    expect(series).toHaveLength(30);
+    expect(series[5].doc_count).toBe(0);
+  });
+
+  it('fills a day the route omitted with zero, on the day grid', async () => {
+    // Its swagger says quiet days are omitted. A quiet day is a known zero,
+    // and refusing the whole series for it left the chart empty for as long
+    // as that day stayed inside the window: a month, on 1M.
+    const day = 24 * 60 * 60 * 1000;
+    const newest = 1_788_393_600_000;
+    const withGap = Array.from({ length: 30 }, (_, index) => ({
+      key: newest - (29 - index) * day,
+      doc_count: 10,
+    })).filter((_, index) => index !== 20);
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: { number_by_day: withGap },
+    });
+
+    const series = await transactionSeriesCall(15);
+
+    expect(series).toHaveLength(30);
+    expect(series[20]).toEqual({ key: newest - 9 * day, doc_count: 0 });
+    // Every other day keeps its own figure, on its own key.
+    expect(series[19].doc_count).toBe(10);
+    expect(series[21].doc_count).toBe(10);
+    expect(series[29].key).toBe(newest);
   });
 
   it('keeps a full series, whatever order the route answered in', async () => {
+    const newest = 1_788_393_600_000;
     const full = Array.from({ length: 30 }, (_, index) => ({
-      key: 30 - index,
+      key: newest - index * DAY_MS,
       doc_count: 10,
     }));
     mockedGet.mockResolvedValue({ error: '', data: { number_by_day: full } });
@@ -159,6 +178,7 @@ describe('transactionSeriesCall', () => {
     const series = await transactionSeriesCall(15);
 
     expect(series).toHaveLength(30);
-    expect(series[0].key).toBe(1);
+    expect(series[0].key).toBe(newest - 29 * DAY_MS);
+    expect(series.every(point => point.doc_count === 10)).toBe(true);
   });
 });

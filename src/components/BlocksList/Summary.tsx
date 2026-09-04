@@ -202,38 +202,37 @@ const BlocksSummary: React.FC = () => {
             </TileSub>
           )}
         </Tile>
-
-        {/* Inside the grid so it can anchor to the tiles' own bottom, but
-            absolutely positioned, so it never claims a cell. */}
       </TilesGrid>
 
       {fees && (
-        <>
-          <DistBar role="img" aria-label={barLabel}>
-            {segments.map((segment, index) => (
-              <DistSegment
-                key={segment.key}
-                $color={feeSegmentColor(segment.key, theme)}
-                $delay={index * 60}
-                style={{ width: `${(segment.amount / fees.total) * 100}%` }}
-                title={`${segment.label} · ${exactAmount(segment.amount, KLV_PRECISION)} KLV`}
-                aria-hidden="true"
-              />
-            ))}
-          </DistBar>
-          <LegendRow>
-            {segments.map(segment => (
-              <LegendItem key={segment.key}>
-                <LegendDot $color={feeSegmentColor(segment.key, theme)} />
-                {segment.label} <strong>{klvAmount(segment.amount)}</strong>
-              </LegendItem>
-            ))}
-            {/* Last in the row and pushed to its end, so the tiles above line
-                up as four rather than four plus a corner. */}
-            <UpdatedAgo at={dataUpdatedAt} />
-          </LegendRow>
-        </>
+        <DistBar role="img" aria-label={barLabel}>
+          {segments.map((segment, index) => (
+            <DistSegment
+              key={segment.key}
+              $color={feeSegmentColor(segment.key, theme)}
+              $delay={index * 60}
+              style={{ width: `${(segment.amount / fees.total) * 100}%` }}
+              title={`${segment.label} · ${exactAmount(segment.amount, KLV_PRECISION)} KLV`}
+              aria-hidden="true"
+            />
+          ))}
+        </DistBar>
       )}
+      {/* The row outlives the fee figures: the age line is the freshness of
+          every tile above, so a day that carried no fees keeps it while
+          dropping the bar and its legend. It sits last and pushed to the
+          row's end, so the tiles line up as four rather than four plus a
+          corner. */}
+      <LegendRow>
+        {fees &&
+          segments.map(segment => (
+            <LegendItem key={segment.key}>
+              <LegendDot $color={feeSegmentColor(segment.key, theme)} />
+              {segment.label} <strong>{klvAmount(segment.amount)}</strong>
+            </LegendItem>
+          ))}
+        <UpdatedAgo at={dataUpdatedAt} />
+      </LegendRow>
     </BlocksSummaryCard>
   );
 };

@@ -81,7 +81,12 @@ const totalCall = async (): Promise<number | undefined> => {
  * KLV moved over the rolling day. Read off `block/statistics/24h`, which sums
  * the transfer receipts and excludes mint and burn (`volumeRangeQuery` in the
  * proxy), so it is value changing hands rather than supply changing size.
- * Its own window is the server's; the tiles beside it ask for the same span.
+ *
+ * Its window is the server's, and it is rolling, not a UTC day: measured
+ * 2026-09-04 14:52 UTC, `fromMs` sat at 14:52 the day before and the span
+ * was 24.0000 hours. The same response's `totalTransactions` read 4,291,
+ * identical to a rolling count over `transaction/list` taken at the same
+ * moment, so this tile and the count beside it cover the same span.
  */
 const volumeCall = async (): Promise<number | undefined> => {
   const response = await api.get({ route: 'block/statistics/24h' });

@@ -59,7 +59,7 @@
     "OnChain": "na rede",
     "TotalShort": "Contas",
     "New24h": "Novas (24h)",
-    "VersusYesterday": "{{change}} em relação a ontem",
+    "VersusYesterday": "{{change}} em relação às 24h anteriores",
     "NewWindow": "Novas ({{days}}d)",
     "AcrossDays_one": "em {{count}} dia",
     "AcrossDays_other": "em {{count}} dias",

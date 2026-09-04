@@ -34,9 +34,12 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
   const tiles = [
     t('blocks:List.BlocksYesterday', { defaultValue: 'Blocks (yesterday)' }),
     t('blocks:List.TransactionFees', {
-      defaultValue: 'Transaction fees (yesterday)',
+      defaultValue: 'Transaction fees (yesterday)',
     }),
-    t('blocks:List.TotalBurned', { defaultValue: 'Total burned (yesterday)' }),
+    t('blocks:List.TransactionsYesterday', {
+      defaultValue: 'Transactions (yesterday)',
+    }),
+    t('blocks:List.TotalBurned', { defaultValue: 'Total burned (yesterday)' }),
   ];
   const legend = [
     {
@@ -79,7 +82,6 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
             </TileSub>
           </Tile>
         ))}
-        <UpdatedNote aria-hidden="true">{HOLD_LINE}</UpdatedNote>
       </TilesGrid>
 
       <DistBar aria-hidden="true">
@@ -97,6 +99,9 @@ const BlocksSummaryLoadingCard: React.FC<{ label: string }> = ({ label }) => {
             />
           </LegendItem>
         ))}
+        {/* Mirrors the loaded row's own last item, so the legend keeps its
+            height when the figures land. */}
+        <UpdatedNote aria-hidden="true">{HOLD_LINE}</UpdatedNote>
       </LegendRow>
     </BlocksSummaryCard>
   );

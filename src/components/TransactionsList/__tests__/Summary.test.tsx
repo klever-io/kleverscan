@@ -100,6 +100,8 @@ const FULL = {
   previous24h: 8000,
   totalTransactions: 58558891,
   mostTransactedAsset: { assetId: 'KLV', count: 4000 },
+  // 41.4M KLV in the chain's 6-decimal units, the scale measured live.
+  volume24h: 41_408_939_000_000,
 };
 
 /** Raw counts per named type, in the order the bar draws them. */
@@ -156,13 +158,14 @@ describe('TransactionsSummary', () => {
     expect(
       card().querySelectorAll('[data-testid="skeleton"]').length,
     ).toBeGreaterThan(0);
-    // The labels are constants and one of them reads "(24h)", so the card's
+    // The labels are constants and two of them read "(24h)", so the card's
     // whole text is not a figure test and asserting on a label alone can never
-    // fail. Strip the three labels; a digit left over is a leaked figure.
+    // fail. Strip the four labels; a digit left over is a leaked figure.
     const labels = [
       'Transactions (24h)',
       'Total transactions',
       'Most transacted',
+      'Volume (24h)',
     ];
     const withoutLabels = labels.reduce(
       (text, label) => text.split(label).join(''),
@@ -269,6 +272,67 @@ describe('TransactionsSummary', () => {
     ).toBeTruthy();
     expect(summaryCall).toHaveBeenCalled();
     expect(breakdownCall).toHaveBeenCalled();
+  });
+
+  it('compacts the volume and keeps the exact figure on hover', async () => {
+    summaryCall.mockResolvedValue(FULL);
+    renderSummary();
+    const loaded = await loadedCard();
+
+    expect(loaded.textContent).toContain('Volume (24h)');
+    // Compacted in the headline, so the tile stays one line at any width.
+    expect(loaded.textContent).toContain('41.4 M KLV');
+  });
+
+  it('leaves the volume tile out when only that request failed', async () => {
+    summaryCall.mockResolvedValue({ ...FULL, volume24h: undefined });
+    renderSummary();
+    const loaded = await loadedCard();
+
+    expect(loaded.textContent).not.toContain('Volume (24h)');
+    // Its neighbours still have theirs: a failed part costs its own tile.
+    expect(loaded.textContent).toContain('Total transactions');
+  });
+
+  it('marks the same tiles droppable as the loading shape does', async () => {
+    // The narrow layout hides by marker, so a marker the skeleton and the
+    // loaded card disagree on re-flows the row once the figures land.
+    summaryCall.mockResolvedValue(FULL);
+    const { container } = renderSummary();
+
+    const markersOf = (root: ParentNode): string[] =>
+      [...root.querySelectorAll('[data-optional]')].map(
+        el => `${el.getAttribute('data-optional')}:${(el.textContent ?? '').slice(0, 12)}`,
+      );
+
+    const skeletonMarkers = markersOf(container);
+    await loadedCard();
+    const loadedMarkers = markersOf(container);
+
+    expect(skeletonMarkers).toHaveLength(2);
+    expect(loadedMarkers).toHaveLength(2);
+    // Most transacted goes first, the volume figure second.
+    expect(skeletonMarkers[0].startsWith('true:')).toBe(true);
+    expect(skeletonMarkers[1].startsWith('narrow:')).toBe(true);
+    expect(loadedMarkers[0].startsWith('true:')).toBe(true);
+    expect(loadedMarkers[1].startsWith('narrow:')).toBe(true);
+  });
+
+  it('keeps the card for the volume alone, when it is the only figure that came', async () => {
+    // The guard listed the three figures that predated the volume tile, so a
+    // strip with one tile to show was thrown away for the three that failed.
+    summaryCall.mockResolvedValue({
+      last24h: undefined,
+      previous24h: undefined,
+      totalTransactions: undefined,
+      mostTransactedAsset: undefined,
+      volume24h: 41_408_939_000_000,
+    });
+    renderSummary();
+    const loaded = await loadedCard();
+
+    expect(loaded.textContent).toContain('Volume (24h)');
+    expect(loaded.textContent).toContain('41.4 M KLV');
   });
 
   it('draws no card at all when every figure is missing', async () => {

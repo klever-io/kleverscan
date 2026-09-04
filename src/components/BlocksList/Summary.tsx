@@ -20,6 +20,7 @@ import { useTheme } from '@/contexts/theme';
 import {
   blockTotalStatsCall,
   blockYesterdayStatsCall,
+  blockYesterdayTransactionsCall,
 } from '@/services/requests/block';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useQuery } from '@tanstack/react-query';
@@ -53,20 +54,21 @@ const BlocksSummary: React.FC = () => {
       // The two stat calls map every failure to undefined (api.get itself
       // resolves an error object), so a half-failed pair still lands here as
       // data rather than an error.
-      const [yesterday, total] = await Promise.all([
+      const [yesterday, total, transactions] = await Promise.all([
         blockYesterdayStatsCall(),
         blockTotalStatsCall(),
+        blockYesterdayTransactionsCall(),
       ]);
-      return { yesterday, total };
+      return { yesterday, total, transactions };
     },
     // A function, not a constant: a failure caches as a successful undefined,
-    // and a constant would hold that for five minutes. Both halves, not
-    // either: with `||` a half-failed answer counted as fresh and the card it
+    // and a constant would hold that for five minutes. Every source, not any
+    // one: with `||` a half-failed answer counted as fresh and the card it
     // degrades survived remounts for the full five minutes.
     staleTime: query =>
       summaryComplete(
         query.state.data as
-          | { yesterday?: unknown; total?: unknown }
+          | { yesterday?: unknown; total?: unknown; transactions?: unknown }
           | undefined,
       )
         ? 5 * 60 * 1000
@@ -74,7 +76,7 @@ const BlocksSummary: React.FC = () => {
     refetchInterval: query =>
       summaryRefetchInterval(
         query.state.data as
-          | { yesterday?: unknown; total?: unknown }
+          | { yesterday?: unknown; total?: unknown; transactions?: unknown }
           | undefined,
       ),
   });
@@ -84,7 +86,7 @@ const BlocksSummary: React.FC = () => {
   }
   if (!data) return null;
 
-  const { yesterday, total } = data;
+  const { yesterday, total, transactions } = data;
   const fees = feeSplit(yesterday);
   // Every tile hangs off `yesterday` (`total` only feeds the sub-lines), so
   // without it the card would render as an empty rectangle holding nothing
@@ -141,7 +143,7 @@ const BlocksSummary: React.FC = () => {
           <Tile>
             <TileLabel>
               {t('blocks:List.TransactionFees', {
-                defaultValue: 'Transaction fees (yesterday)',
+                defaultValue: 'Transaction fees (yesterday)',
               })}
             </TileLabel>
             {/* Compact headline, exact figure on hover: two segments already
@@ -158,10 +160,36 @@ const BlocksSummary: React.FC = () => {
           </Tile>
         )}
 
+        {transactions !== undefined && (
+          <Tile>
+            <TileLabel>
+              {t('blocks:List.TransactionsYesterday', {
+                defaultValue: 'Transactions (yesterday)',
+              })}
+            </TileLabel>
+            <TileValue>{transactions.toLocaleString(NUMBER_LOCALE)}</TileValue>
+            {yesterday.totalBlocks > 0 && (
+              <TileSub>
+                {/* Transactions per block, not the share of blocks that
+                    carried one: several transactions fit in a single block, so
+                    a count divided by the block total overstates it. Measured
+                    over 100 consecutive blocks: 18 transactions across 17
+                    non-empty blocks, so the two figures genuinely differ.
+                    `count` is avoided because i18next reserves it for plural
+                    selection and interpolates the number unformatted. */}
+                {t('blocks:List.PerBlock', {
+                  defaultValue: '{{average}} per block',
+                  average: (transactions / yesterday.totalBlocks).toFixed(2),
+                })}
+              </TileSub>
+            )}
+          </Tile>
+        )}
+
         <Tile>
           <TileLabel>
             {t('blocks:List.TotalBurned', {
-              defaultValue: 'Total burned (yesterday)',
+              defaultValue: 'Total burned (yesterday)',
             })}
           </TileLabel>
           <TileValue>{klvAmount(yesterday.totalBurned)}</TileValue>
@@ -174,34 +202,37 @@ const BlocksSummary: React.FC = () => {
             </TileSub>
           )}
         </Tile>
-
-        <UpdatedAgo at={dataUpdatedAt} />
       </TilesGrid>
 
       {fees && (
-        <>
-          <DistBar role="img" aria-label={barLabel}>
-            {segments.map((segment, index) => (
-              <DistSegment
-                key={segment.key}
-                $color={feeSegmentColor(segment.key, theme)}
-                $delay={index * 60}
-                style={{ width: `${(segment.amount / fees.total) * 100}%` }}
-                title={`${segment.label} · ${exactAmount(segment.amount, KLV_PRECISION)} KLV`}
-                aria-hidden="true"
-              />
-            ))}
-          </DistBar>
-          <LegendRow>
-            {segments.map(segment => (
-              <LegendItem key={segment.key}>
-                <LegendDot $color={feeSegmentColor(segment.key, theme)} />
-                {segment.label} <strong>{klvAmount(segment.amount)}</strong>
-              </LegendItem>
-            ))}
-          </LegendRow>
-        </>
+        <DistBar role="img" aria-label={barLabel}>
+          {segments.map((segment, index) => (
+            <DistSegment
+              key={segment.key}
+              $color={feeSegmentColor(segment.key, theme)}
+              $delay={index * 60}
+              style={{ width: `${(segment.amount / fees.total) * 100}%` }}
+              title={`${segment.label} · ${exactAmount(segment.amount, KLV_PRECISION)} KLV`}
+              aria-hidden="true"
+            />
+          ))}
+        </DistBar>
       )}
+      {/* The row outlives the fee figures: the age line is the freshness of
+          every tile above, so a day that carried no fees keeps it while
+          dropping the bar and its legend. It sits last and pushed to the
+          row's end, so the tiles line up as four rather than four plus a
+          corner. */}
+      <LegendRow>
+        {fees &&
+          segments.map(segment => (
+            <LegendItem key={segment.key}>
+              <LegendDot $color={feeSegmentColor(segment.key, theme)} />
+              {segment.label} <strong>{klvAmount(segment.amount)}</strong>
+            </LegendItem>
+          ))}
+        <UpdatedAgo at={dataUpdatedAt} />
+      </LegendRow>
     </BlocksSummaryCard>
   );
 };

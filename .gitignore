@@ -7,6 +7,9 @@
 
 # testing
 /coverage
+# A coverage run pointed elsewhere still leaves generated output behind: one
+# such directory reached a commit at 17,812 lines before this line existed.
+/cov*/
 
 # next.js
 /.next/

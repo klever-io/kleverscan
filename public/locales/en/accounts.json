@@ -59,7 +59,7 @@
     "OnChain": "on chain",
     "TotalShort": "Accounts",
     "New24h": "New (24h)",
-    "VersusYesterday": "{{change}} vs yesterday",
+    "VersusYesterday": "{{change}} vs previous 24h",
     "NewWindow": "New ({{days}}d)",
     "AcrossDays_one": "across {{count}} day",
     "AcrossDays_other": "across {{count}} days",

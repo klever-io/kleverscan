@@ -88,12 +88,14 @@ jest.mock('../UpdatedAgo', () => ({
 
 const yesterdayCall = jest.fn();
 const totalCall = jest.fn();
+const transactionsCall = jest.fn();
 
 // Replaced wholesale: the real module also exports blockTransactionsCall,
 // whose import chain Jest cannot transform.
 jest.mock('@/services/requests/block', () => ({
   blockYesterdayStatsCall: () => yesterdayCall(),
   blockTotalStatsCall: () => totalCall(),
+  blockYesterdayTransactionsCall: () => transactionsCall(),
 }));
 
 import BlocksSummary from '../Summary';
@@ -135,12 +137,17 @@ const renderSummary = () =>
 beforeEach(() => {
   yesterdayCall.mockReset();
   totalCall.mockReset();
+  // The transaction count is its own request; default it to an answer so the
+  // tests below state only what they are about.
+  transactionsCall.mockReset();
+  transactionsCall.mockResolvedValue(8275);
 });
 
 describe('BlocksSummary', () => {
   it('holds the card with its real labels while the figures load', () => {
     yesterdayCall.mockReturnValue(new Promise(() => undefined));
     totalCall.mockReturnValue(new Promise(() => undefined));
+    transactionsCall.mockReturnValue(new Promise(() => undefined));
 
     renderSummary();
 
@@ -226,6 +233,50 @@ describe('BlocksSummary', () => {
     expect(screen.getByText('21,597')).toBeTruthy();
     expect(screen.queryByText(/of it burned/)).toBeNull();
     expect(screen.queryByText('Fees burned')).toBeNull();
+    // The age line is the freshness of every tile, not of the fee bar, so it
+    // survives the day that carried no fees. It used to sit inside the fee
+    // block and vanished with it, while the loading card still held a slot
+    // for it.
+    expect(screen.getByTestId('blocks-updated-ago')).toBeTruthy();
+  });
+
+  it('shows yesterday\'s transactions and how much of the day they used', async () => {
+    yesterdayCall.mockResolvedValue(YESTERDAY);
+    totalCall.mockResolvedValue(undefined);
+    transactionsCall.mockResolvedValue(8275);
+    renderSummary();
+    const card = await screen.findByTestId('blocks-summary');
+
+    expect(card.textContent).toContain('8,275');
+    // A share of the day's blocks, capped at one transaction per block: the
+    // raw average reads "0.4 per block", which tells a reader less.
+    expect(card.textContent).toContain('per block');
+  });
+
+  it('shows the count without a share when the day produced no blocks', async () => {
+    // A halted chain divides by zero: formatShare answers "--" and the line
+    // would read "-- per block".
+    yesterdayCall.mockResolvedValue({ ...YESTERDAY, totalBlocks: 0 });
+    totalCall.mockResolvedValue(undefined);
+    transactionsCall.mockResolvedValue(0);
+    renderSummary();
+    const card = await screen.findByTestId('blocks-summary');
+
+    expect(card.textContent).not.toContain('per block');
+    expect(card.textContent).not.toContain('--');
+  });
+
+  it('leaves the transactions tile out when its own request failed', async () => {
+    // Its own tile, not the strip: the other figures still have something
+    // to say, the way every tile on this card fails alone.
+    yesterdayCall.mockResolvedValue(YESTERDAY);
+    totalCall.mockResolvedValue(undefined);
+    transactionsCall.mockResolvedValue(undefined);
+    renderSummary();
+    const card = await screen.findByTestId('blocks-summary');
+
+    expect(card.textContent).not.toContain('per block');
+    expect(card.textContent).toContain('Blocks (yesterday)');
   });
 
   it('renders nothing when both halves failed', async () => {

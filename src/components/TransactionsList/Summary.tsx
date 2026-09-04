@@ -14,7 +14,11 @@ import {
 } from '@/components/DataList/styles';
 // The same percent policy the holders and assets legends use, so the two
 // visually identical legends cannot format the same quantity differently.
-import { formatShare } from '@/components/DataList/format';
+import {
+  exactAmount,
+  formatShare,
+  klvAmount,
+} from '@/components/DataList/format';
 import TransactionsSummaryLoadingCard, {
   ContractsBarPlaceholder,
 } from './LoadingCard';
@@ -27,6 +31,7 @@ import {
   transactionsSummaryCall,
 } from '@/services/requests/transactions/summary';
 import { formatAmount } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
@@ -104,10 +109,13 @@ const TransactionsSummary: React.FC = () => {
   const growth = totalGrowth(summary);
   // Each figure is shown only when its own request answered; a failed part
   // leaves its tile out instead of printing a zero the chain never had.
+  // Every figure the card can draw, so a strip that has one tile to show is
+  // not thrown away for the three that failed.
   const hasFigures =
     summary.last24h !== undefined ||
     summary.totalTransactions !== undefined ||
-    summary.mostTransactedAsset !== undefined;
+    summary.mostTransactedAsset !== undefined ||
+    summary.volume24h !== undefined;
 
   if (!hasFigures) return null;
 
@@ -204,7 +212,9 @@ const TransactionsSummary: React.FC = () => {
         )}
 
         {summary.mostTransactedAsset && (
-          <Tile>
+          // Dropped below 451px, where only two tiles fit: the leading asset
+          // is the one figure here a reader can do without.
+          <Tile data-optional="true">
             <TileLabel>
               {t('transactions:Summary.MostTransacted', {
                 defaultValue: 'Most transacted',
@@ -227,6 +237,32 @@ const TransactionsSummary: React.FC = () => {
                   is not a transaction. Its window is undocumented too. */}
               {t('transactions:Summary.FungibleBasis', {
                 defaultValue: 'Leading fungible asset',
+              })}
+            </TileSub>
+          </Tile>
+        )}
+
+        {summary.volume24h !== undefined && (
+          // Dropped below 421px, where only two columns fit and three tiles
+          // would leave one alone on a row of its own.
+          <Tile data-optional="narrow">
+            <TileLabel>
+              {t('transactions:Summary.Volume', {
+                defaultValue: 'Volume (24h)',
+              })}
+            </TileLabel>
+            <TileValueRow>
+              {/* Compact headline, exact figure on hover, the way the blocks
+                  card renders its own KLV amounts. */}
+              <TileValue
+                title={`${exactAmount(summary.volume24h, KLV_PRECISION)} KLV`}
+              >
+                {klvAmount(summary.volume24h)}
+              </TileValue>
+            </TileValueRow>
+            <TileSub>
+              {t('transactions:Summary.VolumeBasis', {
+                defaultValue: 'KLV moved, excluding mint and burn',
               })}
             </TileSub>
           </Tile>

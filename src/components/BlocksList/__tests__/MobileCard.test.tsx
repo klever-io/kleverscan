@@ -18,9 +18,18 @@ jest.mock('@/utils/parseValues', () => ({
 // mirrored: a `count` option first tries `<key>_one`/`<key>_other`, which is
 // exactly the mechanism the transaction count relies on.
 jest.mock('next-i18next', () => {
+  const commonActual = jest.requireActual(
+    '../../../../public/locales/en/common.json',
+  );
   const bundles: Record<string, unknown> = {
     blocks: jest.requireActual('../../../../public/locales/en/blocks.json'),
-    common: jest.requireActual('../../../../public/locales/en/common.json'),
+    common: {
+      ...commonActual,
+      Date: {
+        ...commonActual.Date,
+        Elapsed_Time: 'mock-ago',
+      },
+    },
   };
   const lookup = (bundle: unknown, path: string): unknown =>
     path
@@ -181,7 +190,7 @@ describe('BlocksMobileCard', () => {
   it('translates the elapsed age from the common bundle', () => {
     renderCard();
 
-    // The timestamp renders elapsed relative time followed by "ago" from the common bundle.
-    expect(screen.getByText(/ago/)).toBeTruthy();
+    // The timestamp renders elapsed relative time followed by the unique common bundle translation.
+    expect(screen.getByText(/mock-ago/)).toBeTruthy();
   });
 });

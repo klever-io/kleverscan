@@ -91,6 +91,21 @@ describe('buildChartSeries', () => {
     expect(buildChartSeries(series, month).pairs).toEqual([]);
   });
 
+  it('labels hourly points by clock time, the same on both stretches', () => {
+    // Buckets a day apart end at the same minute, so one label names both,
+    // where a day label would repeat 24 times over.
+    const hour = 60 * 60 * 1000;
+    const series = [
+      { key: START, doc_count: 1 },
+      { key: START + 24 * hour, doc_count: 2 },
+    ];
+
+    const { pairs } = buildChartSeries(series, month, { hourly: true });
+
+    expect(pairs[0].datePast).toMatch(/^\d{2}:\d{2}$/);
+    expect(pairs[0].dateNow).toBe(pairs[0].datePast);
+  });
+
   it('renders the month through the translator it was handed', () => {
     const series = [
       { key: START, doc_count: 1 },

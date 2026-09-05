@@ -39,12 +39,20 @@ const EMPTY: IChartSeries = { pairs: [], total: 0, previousTotal: 0 };
 export const buildChartSeries = (
   points: ISeriesPoint[],
   translateMonth: (month: string) => string,
+  options: { hourly?: boolean } = {},
 ): IChartSeries => {
   const parsed = points.reduce((acc, point) => {
     if (!point || !point.key || Number.isNaN(point.doc_count)) return acc;
 
     const date = new Date(point.key);
     date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+
+    // Hourly buckets sit 24 hours apart across the two stretches, so the same
+    // clock time labels both and a day label would repeat 24 times over.
+    if (options.hourly) {
+      acc.push({ date: format(date, 'HH:mm'), value: point.doc_count });
+      return acc;
+    }
 
     const [day, month] = format(date, 'dd MMM').split(' ');
 

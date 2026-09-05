@@ -20,12 +20,9 @@ jest.mock('@/components/InputGlobal', () => ({
   __esModule: true,
   default: () => null,
 }));
-jest.mock('@/components/Chart', () => ({
-  __esModule: true,
-  default: () => null,
-  ChartType: { Line: 'line', DoubleLine: 'doubleLine' },
+jest.mock('@/components/Chart/Tooltips', () => ({
+  DoubleTxsTooltip: () => null,
 }));
-jest.mock('@/components/Chart/Tooltips', () => ({ DoubleTxsTooltip: () => null }));
 
 import theme from '@/styles/theme';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -76,6 +73,17 @@ jest.mock('@/services/requests/home/transactionSeries', () => ({
   transactionSeriesCall: (period: number) => seriesCall(period),
 }));
 
+/** The pairs handed to the chart, which is mocked out and draws nothing. */
+const chartData = jest.fn();
+jest.mock('@/components/Chart', () => ({
+  __esModule: true,
+  default: ({ data }: { data: unknown }) => {
+    chartData(data);
+    return null;
+  },
+  ChartType: { Line: 'line', DoubleLine: 'doubleLine' },
+}));
+
 import { ChartDailyTransactions } from '../index';
 
 /** A series of `points` days, each carrying `perDay` transactions. */
@@ -84,6 +92,16 @@ const series = (points: number, perDay: number) =>
     key: 1_788_000_000_000 + index * 24 * 60 * 60 * 1000,
     doc_count: perDay,
   }));
+
+/** A series of `points` hours, each carrying `perHour` transactions. */
+const hourlySeries = (points: number, perHour: number) =>
+  Array.from({ length: points }, (_, index) => ({
+    key: 1_788_000_000_000 + index * 60 * 60 * 1000,
+    doc_count: perHour,
+  }));
+
+const lastDrawn = () =>
+  chartData.mock.calls.at(-1)?.[0] as { dateNow: string; datePast: string }[];
 
 const renderChart = () =>
   render(
@@ -104,9 +122,7 @@ describe('ChartDailyTransactions', () => {
     // The fault is a figure left over from the period before, so the card has
     // to carry one first: rendering straight into an empty answer has nothing
     // to leave behind and would pass either way.
-    seriesCall
-      .mockResolvedValueOnce(series(30, 100))
-      .mockResolvedValueOnce([]);
+    seriesCall.mockResolvedValueOnce(series(30, 100)).mockResolvedValueOnce([]);
 
     const { container } = renderChart();
     await waitFor(() => expect(seriesCall).toHaveBeenCalledTimes(1));
@@ -116,6 +132,8 @@ describe('ChartDailyTransactions', () => {
     await waitFor(() => expect(seriesCall).toHaveBeenCalledTimes(2));
 
     await waitFor(() => expect(container.textContent).not.toContain('1,500'));
+    // What replaces it is the chart's own empty state, not a blank card.
+    await waitFor(() => expect(container.textContent).toContain('EmptyData'));
   });
 
   it('reports no percentage when the previous stretch was empty', async () => {
@@ -171,5 +189,31 @@ describe('ChartDailyTransactions', () => {
 
     expect(container.textContent).toContain('700');
     expect(container.textContent).not.toContain('14,985');
+  });
+
+  it('draws a day as 24 hourly points labelled by clock time', async () => {
+    // A day gave one point per stretch before, two dots and no line. The
+    // wiring under test is the period the button hands over and the label mode
+    // that follows from it, checked in both directions: a day label on 1D
+    // would repeat 24 times over, a clock label on 15D would name no day.
+    seriesCall
+      .mockResolvedValueOnce(series(30, 100))
+      .mockResolvedValueOnce(hourlySeries(48, 10));
+
+    const { container } = renderChart();
+    await waitFor(() => expect(seriesCall).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(lastDrawn()).toHaveLength(15));
+    expect(lastDrawn()[0].dateNow).not.toMatch(/^\d{2}:\d{2}$/);
+
+    screen.getByText('1D').click();
+    await waitFor(() => expect(seriesCall).toHaveBeenLastCalledWith(1));
+    await waitFor(() => expect(lastDrawn()).toHaveLength(24));
+    expect(container.textContent).not.toContain('EmptyData');
+
+    const [first] = lastDrawn();
+    expect(first.dateNow).toMatch(/^\d{2}:\d{2}$/);
+    // The buckets of the two stretches sit exactly a day apart, so one clock
+    // time names both.
+    expect(first.datePast).toBe(first.dateNow);
   });
 });

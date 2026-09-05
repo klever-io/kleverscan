@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import {
-  ROLLING_POINT_LIMIT,
+  POINTS_PER_STRETCH,
   transactionSeriesCall,
 } from '@/services/requests/home/transactionSeries';
 
@@ -10,175 +10,106 @@ jest.mock('@/services/api', () => ({
 }));
 
 const mockedGet = api.get as jest.Mock;
-const DAY_MS = 24 * 60 * 60 * 1000;
+const HOUR_MS = 60 * 60 * 1000;
 
-const dated = () =>
-  mockedGet.mock.calls
-    .map(([args]) => args.query)
-    .filter(query => query?.startdate !== undefined);
+/** `points` buckets ending now, each `count` wide, oldest first as the route answers. */
+const buckets = (points: number, count: number, widthMs: number) => {
+  const toMs = 1_788_597_852_851;
+  return Array.from({ length: points }, (_, index) => ({
+    fromMs: toMs - (points - index) * widthMs,
+    toMs: toMs - (points - 1 - index) * widthMs,
+    count,
+  }));
+};
+
+const answer = (list: unknown) =>
+  mockedGet.mockResolvedValue({
+    error: '',
+    data: { transaction_series: { buckets: list } },
+  });
 
 describe('transactionSeriesCall', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    mockedGet.mockResolvedValue({ error: '', pagination: { totalRecords: 100 } });
-  });
+  beforeEach(() => jest.clearAllMocks());
 
-  it('counts a rolling window per point for a period it can afford', async () => {
-    // A week asks for fourteen points, seven for each stretch the chart draws.
-    await transactionSeriesCall(7);
+  it('asks for two stretches of days in one request', async () => {
+    answer(buckets(14, 100, 24 * HOUR_MS));
 
-    const windows = dated();
-    expect(windows).toHaveLength(ROLLING_POINT_LIMIT);
-    windows.forEach(window => {
-      expect(window.enddate - window.startdate).toBe(DAY_MS);
-      // Milliseconds: seconds are not rejected, the route answers the
-      // all-time total instead, so a unit slip reads as a plausible figure.
-      expect(window.startdate).toBeGreaterThan(1e12);
-    });
-  });
-
-  it('leaves no gap between consecutive points', async () => {
-    await transactionSeriesCall(7);
-
-    const windows = dated().sort((a, b) => a.enddate - b.enddate);
-    expect(windows).toHaveLength(ROLLING_POINT_LIMIT);
-    windows.slice(1).forEach((window, index) => {
-      expect(window.startdate).toBe(windows[index].enddate);
-    });
-  });
-
-  it('reads one clock for the whole set, so the windows cannot drift', async () => {
-    // A clock read per point would leave each window ending a moment later
-    // than the one before, which is what a moving clock exposes.
-    let tick = 1_788_428_166_129;
-    const spy = jest.spyOn(Date, 'now').mockImplementation(() => {
-      tick += 1000;
-      return tick;
-    });
-
-    await transactionSeriesCall(7);
-
-    const ends = dated().map(window => window.enddate);
-    // Every window ends on the same grid, one day apart, from one reading.
-    const spacing = new Set(
-      ends.sort((a, b) => a - b).slice(1).map((end, i) => end - ends[i]),
-    );
-    expect(spacing).toEqual(new Set([DAY_MS]));
-
-    spy.mockRestore();
-  });
-
-  it('falls back to day buckets once the period costs too many requests', async () => {
-    // 15D would need 30 requests, and the proxy refused 30 in a burst while
-    // answering 20 (measured 2026-09-03).
-    // Keys a day apart, newest first, the way the route answers.
-    const newest = 1_788_393_600_000;
-    mockedGet.mockResolvedValue({
-      error: '',
-      data: {
-        number_by_day: Array.from({ length: 30 }, (_, index) => ({
-          key: newest - index * DAY_MS,
-          doc_count: 5,
-        })),
-      },
-    });
-
-    const series = await transactionSeriesCall(15);
+    const series = await transactionSeriesCall(7);
 
     expect(mockedGet).toHaveBeenCalledTimes(1);
-    expect(mockedGet.mock.calls[0][0].route).toBe('transaction/list/count/30');
-    // Oldest first, whatever order the route answered in.
-    expect(series[0].key).toBe(newest - 29 * DAY_MS);
-    expect(series).toHaveLength(30);
+    expect(mockedGet.mock.calls[0][0]).toEqual({
+      route: 'transaction/statistics/series',
+      query: { interval: '1d', points: 7 * POINTS_PER_STRETCH },
+    });
+    expect(series).toHaveLength(14);
   });
 
-  it('answers an empty series when one window was refused', async () => {
-    // A refused request read as zero would draw as a day with no activity.
-    let call = 0;
-    mockedGet.mockImplementation(() =>
-      Promise.resolve(
-        (call += 1) === 1
-          ? { error: 'rate limited' }
-          : { error: '', pagination: { totalRecords: 100 } },
-      ),
-    );
+  it('draws a day as hourly points, or it would be two dots and no line', async () => {
+    answer(buckets(48, 5, HOUR_MS));
+
+    const series = await transactionSeriesCall(1);
+
+    expect(mockedGet.mock.calls[0][0].query).toEqual({
+      interval: '1h',
+      points: 48,
+    });
+    expect(series).toHaveLength(48);
+  });
+
+  it('keys each point on the end of its bucket, oldest first', async () => {
+    answer(buckets(14, 3, 24 * HOUR_MS));
+
+    const series = await transactionSeriesCall(7);
+
+    expect(series.every(point => point.doc_count === 3)).toBe(true);
+    series.slice(1).forEach((point, index) => {
+      expect(point.key - series[index].key).toBe(24 * HOUR_MS);
+    });
+  });
+
+  it('keeps a quiet bucket as zero, which the route reports rather than omits', async () => {
+    answer(buckets(14, 0, 24 * HOUR_MS));
+
+    const series = await transactionSeriesCall(7);
+
+    expect(series).toHaveLength(14);
+    expect(series.every(point => point.doc_count === 0)).toBe(true);
+  });
+
+  it('answers nothing when the route failed', async () => {
+    mockedGet.mockResolvedValue({ error: 'boom' });
 
     await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
-  it('answers nothing when the bucket route failed', async () => {
-    mockedGet.mockResolvedValue({ error: 'boom' });
+  it('answers nothing when the request rejected outright', async () => {
+    mockedGet.mockRejectedValue(new Error('unreadable body'));
 
-    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
   it('answers nothing when the body carries no bucket list', async () => {
-    // A malformed success, not a chain with no transactions.
     mockedGet.mockResolvedValue({ error: '', data: {} });
 
-    await expect(transactionSeriesCall(15)).resolves.toEqual([]);
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
-  it('draws a malformed bucket as zero rather than refusing the series', async () => {
-    // The one case where a zero can stand for a day that carried
-    // transactions: the bucket's value cannot be known, so it is dropped and
-    // the grid shows the gap as zero. Preferred over an empty chart, since a
-    // single malformed answer would otherwise blank a month.
-    const day = 24 * 60 * 60 * 1000;
-    const newest = 1_788_393_600_000;
-    const buckets = Array.from({ length: 30 }, (_, index) => ({
-      key: newest - (29 - index) * day,
-      doc_count: 10,
-    }));
-    buckets[5] = { key: null as unknown as number, doc_count: 9 };
-    mockedGet.mockResolvedValue({
-      error: '',
-      data: { number_by_day: buckets },
-    });
+  it('refuses a series shorter than it asked for', async () => {
+    // The caller splits the list down the middle, so a short answer would
+    // pair every later point against the wrong counterpart. The route
+    // guarantees the length; this holds the caller to it.
+    answer(buckets(13, 1, 24 * HOUR_MS));
 
-    const series = await transactionSeriesCall(15);
-
-    expect(series).toHaveLength(30);
-    expect(series[5].doc_count).toBe(0);
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
-  it('fills a day the route omitted with zero, on the day grid', async () => {
-    // Its swagger says quiet days are omitted. A quiet day is a known zero,
-    // and refusing the whole series for it left the chart empty for as long
-    // as that day stayed inside the window: a month, on 1M.
-    const day = 24 * 60 * 60 * 1000;
-    const newest = 1_788_393_600_000;
-    const withGap = Array.from({ length: 30 }, (_, index) => ({
-      key: newest - (29 - index) * day,
-      doc_count: 10,
-    })).filter((_, index) => index !== 20);
-    mockedGet.mockResolvedValue({
-      error: '',
-      data: { number_by_day: withGap },
-    });
+  it('refuses a series with a bucket it cannot read', async () => {
+    // A malformed count charted as zero would draw a quiet day the chain
+    // never had, and dropping it would misalign the two stretches.
+    const list = buckets(14, 1, 24 * HOUR_MS);
+    list[5] = { ...list[5], count: undefined as unknown as number };
+    answer(list);
 
-    const series = await transactionSeriesCall(15);
-
-    expect(series).toHaveLength(30);
-    expect(series[20]).toEqual({ key: newest - 9 * day, doc_count: 0 });
-    // Every other day keeps its own figure, on its own key.
-    expect(series[19].doc_count).toBe(10);
-    expect(series[21].doc_count).toBe(10);
-    expect(series[29].key).toBe(newest);
-  });
-
-  it('keeps a full series, whatever order the route answered in', async () => {
-    const newest = 1_788_393_600_000;
-    const full = Array.from({ length: 30 }, (_, index) => ({
-      key: newest - index * DAY_MS,
-      doc_count: 10,
-    }));
-    mockedGet.mockResolvedValue({ error: '', data: { number_by_day: full } });
-
-    const series = await transactionSeriesCall(15);
-
-    expect(series).toHaveLength(30);
-    expect(series[0].key).toBe(newest - 29 * DAY_MS);
-    expect(series.every(point => point.doc_count === 10)).toBe(true);
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 });

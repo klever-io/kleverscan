@@ -113,6 +113,18 @@ describe('transactionSeriesCall', () => {
     await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
 
+  it('refuses a timestamp Date cannot hold', async () => {
+    // Finite, but past the 8.64e15 ms Date can represent (nanoseconds would
+    // do it): every UTC field of it is NaN, and so would the label be. On the
+    // last bucket, so the series still runs in order and nothing but the Date
+    // check can refuse it.
+    const list = buckets(14, 1, 24 * HOUR_MS);
+    list[13] = { ...list[13], toMs: 1e20 };
+    answer(list);
+
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
+  });
+
   it('refuses a series that runs newest first', async () => {
     // Split down the middle, a reversed list draws the previous stretch as
     // the current one and inverts the percentage, with nothing to see.

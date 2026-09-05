@@ -59,9 +59,13 @@ export const transactionSeriesCall = async (
 
     // A malformed bucket cannot be charted as a zero, which would draw as a
     // quiet interval the chain never had, and dropping it would pair every
-    // later point against the wrong counterpart.
+    // later point against the wrong counterpart. Finite is not enough for the
+    // timestamp: past 8.64e15 ms Date is invalid and its label prints NaN.
     const readable = parsed.every(
-      point => Number.isFinite(point.key) && Number.isFinite(point.doc_count),
+      point =>
+        Number.isFinite(point.key) &&
+        Number.isFinite(new Date(point.key ?? NaN).getTime()) &&
+        Number.isFinite(point.doc_count),
     );
     if (!readable) return [];
 

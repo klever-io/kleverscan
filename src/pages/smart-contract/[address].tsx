@@ -215,6 +215,7 @@ const SmartContractInvoke: React.FC = () => {
           return <EmptyState>Loading contract data...</EmptyState>;
         return contractInfo ? (
           <ContractSourceTab
+            key={contractAddress}
             contractAddress={contractAddress}
             contractInfo={contractInfo}
           />

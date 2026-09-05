@@ -176,20 +176,50 @@ const stubSummaryApis = (): void => {
     '4': 228, // Freeze
   };
 
-  cy.intercept('GET', '**/v1.0/transaction/list/count/*', req => {
-    const type = new URL(req.url).searchParams.get('type');
-    const buckets =
+  // The card counts an explicit date range now, not a day bucket: one call
+  // for the window ending now, one for the window before it, and one per
+  // contract type for the composition bar. They are told apart by their own
+  // dates, so this stub reads them rather than counting calls.
+  const DAY_MS = 24 * 60 * 60 * 1000;
+
+  cy.intercept('GET', '**/v1.0/transaction/list?*', req => {
+    const url = new URL(req.url);
+    const startParam = url.searchParams.get('startdate');
+    const endParam = url.searchParams.get('enddate');
+    // Undated requests are the table's own; falling through hands them to the
+    // broad list intercept registered before this one. Checked on the raw
+    // params, because Number('') is 0 and would pass a finite check.
+    if (!startParam || !endParam) return;
+
+    const end = Number(endParam);
+    const type = url.searchParams.get('type');
+    // Offset 0 is the window ending now, 1 the one before it.
+    const offset = Math.round((Date.now() - end) / DAY_MS);
+    const totalRecords =
       type === null
-        ? [
-            { doc_count: 8447, key: 1787664055000 },
-            { doc_count: 7124, key: 1787577655000 },
-          ]
-        : [{ doc_count: countPerType[type] ?? 0, key: 1787664055000 }];
+        ? (({ 0: 8447, 1: 7124 } as Record<number, number>)[offset] ?? 0)
+        : (countPerType[type] ?? 0);
+
     req.reply({
       statusCode: 200,
-      body: { data: { number_by_day: buckets }, error: '', code: 'successful' },
+      body: {
+        data: { transactions: [] },
+        pagination: { totalRecords },
+        error: '',
+        code: 'successful',
+      },
     });
   }).as('txCount');
+
+  // The volume tile reads the chain-wide rolling statistics.
+  cy.intercept('GET', '**/v1.0/block/statistics/24h*', {
+    statusCode: 200,
+    body: {
+      data: { block_stats_24h: { totalVolume: 41_408_939_000_000 } },
+      error: '',
+      code: 'successful',
+    },
+  }).as('txVolume');
 
   cy.intercept('GET', '**/v1.0/transaction/statistics*', {
     statusCode: 200,
@@ -337,9 +367,13 @@ describe('Transactions Page', () => {
       cy.get('[data-testid="transaction-link"]')
         .should('have.attr', 'href')
         .and('include', '/transaction/');
-      ['Type', 'From', 'To', 'Block'].forEach(label => {
+      ['From', 'To', 'Block'].forEach(label => {
         cy.contains(label).should('be.visible');
       });
+      // The contract type is a badge in the card header now, not a labelled
+      // line, so it renders its value and no "Type" text. Both branches of it
+      // (single and multi contract) carry this attribute.
+      cy.get('[data-contract-type]').should('be.visible');
     });
   });
 });
@@ -367,6 +401,9 @@ describe('Transactions Page (desktop)', () => {
     cy.contains('+18.6%').should('be.visible');
     cy.contains('Total transactions').should('be.visible');
     cy.contains('Most transacted').should('be.visible');
+    // The fourth tile: KLV moved over the same window, compacted.
+    cy.contains('Volume (24h)').should('be.visible');
+    cy.contains('41.4 M KLV').should('be.visible');
 
     // The named types, their counts, and the remainder that closes the bar
     // (8447 minus 5747, 1865, 592 and 228). The bar itself carries the

@@ -1,24 +1,18 @@
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
 import { ParsedUrlQuery } from 'querystring';
 
 /**
- * The column layout of the shared transactions table, in one place.
- *
- * It used to be in two: `transactionTableHeaders` gave the headings, and
- * `transactionRowSections` built the cells and spliced an extra one in at
- * index 3 when the list was scoped to an account. Only one of the four call
- * sites widened its heading list to match, so `/transactions?account=…`,
- * `/asset/<id>?account=…` and `/asset/<id>/<nonce>?account=…` rendered five
- * headings above six cells and every column from the fourth onwards sat under
- * the wrong one.
- *
- * Both now come from `getTransactionColumns`, so they cannot disagree: a
- * column is one entry, carrying its key and its heading together.
- *
- * Single-line variant: every datum that used to live on a cell's second line
- * (timestamp, fee, receiver, first custom field) has its own column instead,
- * the Basescan-style layout under comparison against the two-line benchmark
- * (tag benchmark/two-line-rows).
+ * The column layout of the shared transactions table, in one place: headings
+ * and cells used to come from two lists, and only one of the four call sites
+ * widened its heading list when the account scope spliced a cell in, so three
+ * routes rendered five headings above six cells. Two-line benchmark for the
+ * single-line layout: tag benchmark/two-line-rows.
  */
+
+/** The account-scoped list carries an In/Out column the others do not, so it
+ *  needs more than the shared row width: measured 1269px against 1204 for the
+ *  nine-column list. */
+export const ROW_LAYOUT_MIN_WIDTH_WITH_IN_OUT = 1310;
 
 export type TransactionColumnKey =
   | 'hash'
@@ -88,10 +82,7 @@ const ACCOUNT_SCOPED_PATHNAMES = new Set([
 ]);
 
 export interface ITransactionColumnsContext {
-  /**
-   * True when the list is narrowed to one account, which is the only case
-   * where a transaction has a direction worth showing.
-   */
+  /** Narrowed to one account, the only case where a direction means anything. */
   showInOut: boolean;
 }
 
@@ -103,10 +94,13 @@ export const getTransactionColumns = ({
   return columns;
 };
 
-/**
- * Whether this list carries a direction. Both the headings and the cells ask
- * this, so they agree about the column's existence by construction.
- */
+/** The width this list's row needs, which depends on whether it carries the
+ *  In/Out column. */
+export const rowLayoutMinWidth = (showInOut: boolean): number =>
+  showInOut ? ROW_LAYOUT_MIN_WIDTH_WITH_IN_OUT : ROW_LAYOUT_MIN_WIDTH;
+
+/** Both the headings and the cells ask this, so they agree about the
+ *  column's existence by construction. */
 export const showsInOut = (router: {
   pathname?: string;
   query?: ParsedUrlQuery;

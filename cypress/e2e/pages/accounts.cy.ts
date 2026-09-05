@@ -43,13 +43,14 @@ const listResponse = {
   code: 'successful',
 };
 
-const countResponse = {
-  data: {
-    number_by_day: [{ doc_count: 3 }],
-  },
-  error: '',
-  code: 'successful',
-};
+/**
+ * The summary counts an explicit date range now, not a day bucket. Width alone
+ * does not identify a request: the current and the previous 24 hours are both
+ * one day wide, so they are told apart by where the window ENDS. `now` is the
+ * window ending at the request, `previous` the one ending a day earlier, and
+ * the wide tile is the only one spanning more than a day.
+ */
+const WINDOW_COUNTS = { now: 3, previous: 9, wide: 21 };
 
 const detailResponseFor = (index: number) => {
   const account = rawAccounts[index];
@@ -98,10 +99,6 @@ const validatorListResponse = {
 const stubAccountsApis = (): void => {
   // Scope to API version path only so Next.js /account/<address> navigations
   // are not intercepted as JSON.
-  cy.intercept('GET', '**/v1.0/address/list/count/**', {
-    statusCode: 200,
-    body: countResponse,
-  }).as('accountCount');
 
   cy.intercept('GET', '**/v1.0/block/by-nonce/0*', {
     statusCode: 200,
@@ -117,6 +114,42 @@ const stubAccountsApis = (): void => {
     statusCode: 200,
     body: listResponse,
   }).as('accountList');
+
+  // Registered after the broad stub so it wins for its own URLs: the summary
+  // and the table share this route and differ only by the date range. An
+  // undated request falls through to the stub above.
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  cy.intercept('GET', '**/v1.0/address/list?*', req => {
+    const url = new URL(req.url);
+    const startParam = url.searchParams.get('startdate');
+    const endParam = url.searchParams.get('enddate');
+    if (!startParam || !endParam) return;
+
+    // Only the summary's whole-day windows. The genesis-validator filter also
+    // dates its request, but over a 1000ms window, and swallowing that one
+    // emptied the table.
+    const span = Number(endParam) - Number(startParam);
+    if (span % DAY_MS !== 0) return;
+
+    // Whole days back from now: 0 for the window ending at the request.
+    const offset = Math.round((Date.now() - Number(endParam)) / DAY_MS);
+    const totalRecords =
+      span > DAY_MS
+        ? WINDOW_COUNTS.wide
+        : offset === 0
+          ? WINDOW_COUNTS.now
+          : WINDOW_COUNTS.previous;
+
+    req.reply({
+      statusCode: 200,
+      body: {
+        data: { accounts: [] },
+        pagination: { totalRecords },
+        error: '',
+        code: 'successful',
+      },
+    });
+  }).as('accountCount');
 
   rawAccounts.forEach((account, index) => {
     cy.intercept('GET', `**/v1.0/address/${account.address}*`, {
@@ -224,7 +257,7 @@ describe('Accounts Page', () => {
     cy.get('[data-testid="selector"]').should('have.text', 'All');
   });
 
-  it('shows the summary figures, and counts one day as a day', () => {
+  it('shows the summary figures over their own rolling windows', () => {
     cy.wait('@accountCount', { timeout: 15000 });
 
     // The testid, not the aria-label: the loading shape carries the same label, so waiting on the label alone lands on the skeleton's empty tiles.
@@ -233,8 +266,12 @@ describe('Accounts Page', () => {
       .within(() => {
         // totalRecords from the stubbed pagination, anchored so a longer number merely containing these digits cannot satisfy it.
         cy.contains(/^10$/).should('exist');
-        // Anchored, not a substring: `cy.contains('across 1 day')` also matches "across 1 days".
-        cy.contains(/^across 1 day$/).should('exist');
+        // The window tile spans a fixed seven windows now, so the label is
+        // fixed too; it no longer counts the days that happened to answer.
+        cy.contains(/^across 7 days$/).should('exist');
+        // The 24h tile against the window before it: 3 against 9.
+        cy.contains('-6 vs previous 24h').should('exist');
+        // Renamed when the comparison stopped being a calendar day.
         cy.contains('vs yesterday').should('not.exist');
       });
   });

@@ -1,3 +1,4 @@
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import { exactAmount } from '@/components/DataList/format';
@@ -6,12 +7,13 @@ import {
   AmountMuted,
   AmountPrimary,
   BadgePill,
+  CompactFilterBar,
   IdentityCell,
   RowActions,
 } from '@/components/DataList/styles';
 import Filter, { IFilter } from '@/components/Filter';
 import AssetIdentity from '@/components/DataList/AssetIdentity';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
+
 import {
   requestAllAssetsPools,
   requestAssetsPoolsQuery,
@@ -98,9 +100,9 @@ const PoolsFilters: React.FC<PropsWithChildren> = () => {
   };
 
   return (
-    <FilterContainer>
+    <CompactFilterBar>
       <Filter {...filter} />
-    </FilterContainer>
+    </CompactFilterBar>
   );
 };
 
@@ -147,9 +149,9 @@ const AssetsPools: React.FC<PropsWithChildren> = () => {
               verified={assetVerified}
             />
             {!active && (
-              <BadgePill $variant="warning" title={t(POOL_DISABLED_TOOLTIP)}>
+              <ExplainedBadge variant="warning" msg={t(POOL_DISABLED_TOOLTIP)}>
                 {t('assets:Pools.Disabled')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             <RowActions>
               <CopyAction

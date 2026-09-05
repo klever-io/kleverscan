@@ -1,10 +1,10 @@
 import { PropsWithChildren } from 'react';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
 import TransactionsFilters from '@/components/TransactionsFilters';
 import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
-import { TransactionsTableWrapper } from '@/components/TransactionsList/styles';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
-import { transactionRowSections } from '@/pages/transactions';
+import { useTransactionRowSections } from '@/pages/transactions';
 import { IInnerTableProps } from '@/types/index';
 import React from 'react';
 
@@ -19,10 +19,11 @@ const Transactions: React.FC<PropsWithChildren<ITransactionsProps>> = props => {
   // account. It was the only one of the four call sites that did, which is
   // why the other three rendered a heading short.
   const header = useTransactionHeaders();
+  const rowSections = useTransactionRowSections();
 
   const tableProps: ITable = {
     ...transactionTableProps,
-    rowSections: transactionRowSections,
+    rowSections,
     header,
     type: 'transactions',
     Filters: TransactionsFilters,
@@ -30,11 +31,7 @@ const Transactions: React.FC<PropsWithChildren<ITransactionsProps>> = props => {
     singleLineSkeleton: true,
   };
 
-  return (
-    <TransactionsTableWrapper>
-      <Table {...tableProps} />
-    </TransactionsTableWrapper>
-  );
+  return <TransactionsTable {...tableProps} />;
 };
 
 export default Transactions;

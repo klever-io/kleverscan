@@ -52,8 +52,12 @@ import { InOutBadge, TransactionStatusBadge } from '../badges';
  * That makes the mapping observable: In must look like success, Out like
  * pending, and fail must not look like success.
  */
-const classOf = (text: string): string =>
-  (screen.getByText(text) as HTMLElement).className;
+const classOf = (text: string): string => {
+  // The word is visually hidden inside the badge now that the glyph carries
+  // the state, so the styled element is its parent.
+  const label = screen.getByText(text) as HTMLElement;
+  return (label.parentElement as HTMLElement).className;
+};
 
 describe('transaction badges', () => {
   beforeEach(() => {

@@ -26,11 +26,26 @@ import {
   InOutBadge,
   MultiContractBadge,
   TransactionStatusBadge,
+  TransactionStatusPill,
+  TransactionTypeBadge,
 } from './badges';
 import { showsInOut } from './columns';
 import ContractTargetLabel from './ContractTargetLabel';
 import { getTransactionRowDetails, valueDirection } from './rowDetails';
-import { CardHashLink, CardLabel, CardRow, CardValue } from './styles';
+import {
+  CardFields,
+  CardHashLink,
+  CardLabel,
+  CardRow,
+  CardStatusCell,
+  CardTime,
+  CardValue,
+  HeaderBadges,
+  HeaderMeta,
+  HeaderStatusPill,
+  TimeExact,
+  ToLabel,
+} from './styles';
 
 export interface ITransactionsMobileCardProps {
   item: ITransaction;
@@ -47,6 +62,10 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
   index,
 }) => {
   const { t } = useTranslation(['transactions']);
+  // A separately bound t: getAge/formatDate ask for bare `Date.*` keys, which
+  // resolve against the FIRST bound namespace only, so handing them the
+  // transactions-bound t rendered raw keys (the #708 ledger fix, done right).
+  const { t: commonT } = useTranslation('common');
   const router = useRouter();
   const {
     hash,
@@ -111,118 +130,137 @@ const TransactionsMobileCard: React.FC<ITransactionsMobileCardProps> = ({
           href={`/transaction/${hash}`}
           data-testid="transaction-link"
         >
-          <Mono>{parseAddress(hash, 16)}</Mono>
+          <Mono>{parseAddress(hash, 14)}</Mono>
         </CardHashLink>
-        <TransactionStatusBadge status={status} />
-        {showDirection && <InOutBadge direction={direction} />}
-        <RowActions>
-          <CopyAction
-            value={hash}
-            label={t('transactions:Table.CopyHash', {
-              defaultValue: 'Copy transaction hash',
-            })}
-            announcement={t('transactions:Table.HashCopied', {
-              defaultValue: 'Transaction hash copied to clipboard',
-            })}
-            large
-          />
-          <ExplorerLink
-            href={`/transaction/${hash}`}
-            label={t('transactions:Table.OpenTransaction', {
-              defaultValue: 'Open transaction in a new tab',
-            })}
-            title={t('transactions:Table.OpenInNewTab', {
-              defaultValue: 'Open in a new tab',
-            })}
-            large
-          />
-        </RowActions>
-      </MobileTopRow>
-      <CardRow>
-        <CardLabel>
-          {t('transactions:Table.Type', { defaultValue: 'Type' })}
-        </CardLabel>
-        <CardValue>
+        {/* One group, so a tight header can never strand the status badge on
+            a line without its type badge. */}
+        <HeaderBadges>
           {contractType === 'Multi contract' ? (
             <MultiContractBadge contract={contract} />
           ) : (
-            typeLabel
+            <TransactionTypeBadge
+              label={typeLabel}
+              contractType={contractType}
+            />
           )}
-        </CardValue>
-      </CardRow>
-      <CardRow>
-        <CardLabel>
-          {t('transactions:From', { defaultValue: 'From' })}
-        </CardLabel>
-        <CardValue>
-          <Link href={`/account/${sender}`}>
-            <Mono>{parseAddress(sender, 16)}</Mono>
-          </Link>
-        </CardValue>
-      </CardRow>
-      <CardRow>
-        <CardLabel>{t('transactions:To', { defaultValue: 'To' })}</CardLabel>
-        <CardValue>
-          {target ? (
-            <Link
-              href={`${target.isContract ? '/smart-contract' : '/account'}/${
-                target.address
-              }`}
-            >
-              <ContractTargetLabel
-                address={target.address}
-                isContract={target.isContract}
-                truncateTo={16}
-              />
+          <HeaderStatusPill>
+            <TransactionStatusPill status={status} />
+          </HeaderStatusPill>
+          {showDirection && <InOutBadge direction={direction} />}
+        </HeaderBadges>
+        <HeaderMeta>
+          <CardTime title={formatDate(timestamp || Date.now())}>
+            {/* The same expression the desktop column uses, rather than a
+              hand-built one: formatDate's elapsed form is
+              "<n> <unit> ago (<date> UTC)" and both halves come from it. */}
+            {
+              formatDate(timestamp || Date.now(), {
+                showElapsedTime: true,
+                t: commonT,
+              }).split(' (')[0]
+            }
+            <TimeExact>{` (${formatDate(timestamp || Date.now())})`}</TimeExact>
+          </CardTime>
+          <RowActions>
+            <CopyAction
+              value={hash}
+              label={t('transactions:Table.CopyHash', {
+                defaultValue: 'Copy transaction hash',
+              })}
+              announcement={t('transactions:Table.HashCopied', {
+                defaultValue: 'Transaction hash copied to clipboard',
+              })}
+              large
+            />
+            <ExplorerLink
+              href={`/transaction/${hash}`}
+              label={t('transactions:Table.OpenTransaction', {
+                defaultValue: 'Open transaction in a new tab',
+              })}
+              title={t('transactions:Table.OpenInNewTab', {
+                defaultValue: 'Open in a new tab',
+              })}
+              large
+            />
+          </RowActions>
+        </HeaderMeta>
+      </MobileTopRow>
+      <CardFields>
+        <CardRow>
+          <CardLabel>
+            {t('transactions:From', { defaultValue: 'From' })}
+          </CardLabel>
+          <CardValue>
+            <Link href={`/account/${sender}`}>
+              <Mono>{parseAddress(sender, 16)}</Mono>
             </Link>
-          ) : (
-            <>
-              <Mono aria-hidden="true">--</Mono>
-              <VisuallyHidden>
-                {t('transactions:Table.NotApplicable', {
-                  defaultValue: 'Not applicable',
-                })}
-              </VisuallyHidden>
-            </>
-          )}
-        </CardValue>
-      </CardRow>
-      <CardRow>
-        <CardLabel>
-          {t('transactions:Table.BlockFees', { defaultValue: 'Block/Fees' })}
-        </CardLabel>
-        <CardValue>
-          <Link href={`/block/${blockNum || 0}`}>{blockNum || 0}</Link>
-          <MobileMetaItem>
-            {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
-          </MobileMetaItem>
-        </CardValue>
-      </CardRow>
-      {customLabels.map((label, fieldIndex) =>
-        customFields[fieldIndex] ? (
-          // Index in the key too: several sets already name a field "Type",
-          // and a repeated label would silently collapse two rows into one.
-          <CardRow key={`${fieldIndex}-${label}`}>
-            <CardLabel>
-              {label === 'Type'
-                ? // Several label sets (Smart Contract, ITO Trigger) name
-                  // their first field "Type" too; on desktop the column
-                  // headings disambiguate, on one card the same label twice
-                  // with different values reads as a contradiction.
-                  t('transactions:Table.ActionType', {
-                    defaultValue: 'Action type',
-                  })
-                : label}
-            </CardLabel>
-            <CardValue>{customFields[fieldIndex]}</CardValue>
-          </CardRow>
-        ) : null,
-      )}
-      <CardRow>
-        <MobileMetaItem>
-          {formatDate(timestamp || Date.now(), { showElapsedTime: true })}
-        </MobileMetaItem>
-      </CardRow>
+          </CardValue>
+        </CardRow>
+        {/* Between the two addresses, as on the desktop row, so the glyph
+            reads as the direction of the transfer rather than as a property
+            of the hash. */}
+        <CardStatusCell>
+          <TransactionStatusBadge status={status} />
+        </CardStatusCell>
+        <CardRow>
+          <ToLabel>{t('transactions:To', { defaultValue: 'To' })}</ToLabel>
+          <CardValue>
+            {target ? (
+              <Link
+                href={`${target.isContract ? '/smart-contract' : '/account'}/${
+                  target.address
+                }`}
+              >
+                <ContractTargetLabel
+                  address={target.address}
+                  isContract={target.isContract}
+                  truncateTo={16}
+                />
+              </Link>
+            ) : (
+              <>
+                <Mono aria-hidden="true">--</Mono>
+                <VisuallyHidden>
+                  {t('transactions:Table.NotApplicable', {
+                    defaultValue: 'Not applicable',
+                  })}
+                </VisuallyHidden>
+              </>
+            )}
+          </CardValue>
+        </CardRow>
+        <CardRow>
+          <CardLabel>
+            {t('transactions:Table.BlockFees', { defaultValue: 'Block/Fees' })}
+          </CardLabel>
+          <CardValue>
+            <Link href={`/block/${blockNum || 0}`}>{blockNum || 0}</Link>
+            <MobileMetaItem>
+              {formatAmount((kAppFee + bandwidthFee) / 10 ** KLV_PRECISION)} KLV
+            </MobileMetaItem>
+          </CardValue>
+        </CardRow>
+        {customLabels.map((label, fieldIndex) =>
+          customFields[fieldIndex] ? (
+            // Index in the key too: several sets already name a field "Type",
+            // and a repeated label would silently collapse two rows into one.
+            <CardRow key={`${fieldIndex}-${label}`}>
+              <CardLabel>
+                {label === 'Type'
+                  ? // Several label sets (Smart Contract, ITO Trigger) name
+                    // their first field "Type"; beside the contract-type badge
+                    // in the header, a second unqualified type on the same card
+                    // reads as a contradiction.
+                    t('transactions:Table.ActionType', {
+                      defaultValue: 'Action type',
+                    })
+                  : label}
+              </CardLabel>
+              <CardValue>{customFields[fieldIndex]}</CardValue>
+            </CardRow>
+          ) : null,
+        )}
+      </CardFields>
     </MobileListCard>
   );
 };

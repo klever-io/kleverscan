@@ -3,7 +3,14 @@ import Tooltip from '@/components/Tooltip';
 import { ContractsIndex, IContract } from '@/types/contracts';
 import { capitalizeString } from '@/utils/convertString';
 import React from 'react';
-import { BadgeCount } from './styles';
+import {
+  MdAccessTime,
+  MdArrowForward,
+  MdCallMade,
+  MdCallReceived,
+  MdPriorityHigh,
+} from 'react-icons/md';
+import { BadgeCount, DirectionStatusBadge } from './styles';
 
 /**
  * Badge dialect of the transactions table, shared by the desktop rows and
@@ -23,7 +30,40 @@ export const statusVariant = (
 ): 'success' | 'warning' | 'danger' | 'neutral' =>
   STATUS_VARIANT[status?.toLowerCase() ?? ''] ?? 'neutral';
 
+/** One glyph per status, so the color is never the only signal. Lives here
+ *  rather than in the page: the desktop status cell and the card have to read
+ *  the same, and this file is the one both can import. */
+export const DIRECTION_GLYPHS = {
+  success: MdArrowForward,
+  danger: MdPriorityHigh,
+  warning: MdAccessTime,
+  neutral: MdArrowForward,
+} as const;
+
+/**
+ * The status as the same circled glyph the desktop row carries, not a word:
+ * the card header holds the hash, the type badge and the timestamp on one
+ * line, and "SUCCESS" spelled out took 74px of it. The word stays for
+ * assistive tech and as the hover title.
+ */
 export const TransactionStatusBadge: React.FC<{ status?: string }> = ({
+  status,
+}) => {
+  const variant = statusVariant(status);
+  const Glyph = DIRECTION_GLYPHS[variant];
+  const label = capitalizeString(status ?? '');
+
+  return (
+    <DirectionStatusBadge $variant={variant} title={label}>
+      <Glyph size={11} aria-hidden="true" />
+      <VisuallyHidden>{label}</VisuallyHidden>
+    </DirectionStatusBadge>
+  );
+};
+
+/** The same status as a word pill, for the widths where the glyph lane is
+ *  hidden and a lone icon in the header would carry no context. */
+export const TransactionStatusPill: React.FC<{ status?: string }> = ({
   status,
 }) => (
   <BadgePill $variant={statusVariant(status)}>
@@ -31,13 +71,24 @@ export const TransactionStatusBadge: React.FC<{ status?: string }> = ({
   </BadgePill>
 );
 
+/** Same treatment for the direction, which only renders on an account's own
+ *  transaction list. Diagonal arrows, so an incoming transfer cannot be read
+ *  as the status glyph beside it. */
 export const InOutBadge: React.FC<{ direction: 'In' | 'Out' }> = ({
   direction,
-}) => (
-  <BadgePill $variant={direction === 'In' ? 'success' : 'warning'}>
-    {direction}
-  </BadgePill>
-);
+}) => {
+  const Glyph = direction === 'In' ? MdCallReceived : MdCallMade;
+
+  return (
+    <DirectionStatusBadge
+      $variant={direction === 'In' ? 'success' : 'warning'}
+      title={direction}
+    >
+      <Glyph size={11} aria-hidden="true" />
+      <VisuallyHidden>{direction}</VisuallyHidden>
+    </DirectionStatusBadge>
+  );
+};
 
 /**
  * Hovering one type badge marks every badge of the same contract type in the

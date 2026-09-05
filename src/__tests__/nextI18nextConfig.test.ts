@@ -14,7 +14,7 @@ describe('next-i18next config', () => {
 
   const loadConfig = () => {
     jest.resetModules();
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+
     return require(configPath);
   };
 

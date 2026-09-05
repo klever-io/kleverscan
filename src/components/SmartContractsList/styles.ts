@@ -2,6 +2,7 @@ import {
   accentText,
   AddressLink,
   badgeTint,
+  compactFilterFloat,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   focusRing,
@@ -204,11 +205,6 @@ export const DeployerLink = styled(Link)`
   ${focusRing}
 `;
 
-/** Digits of one width, so a column of them reads as a column. */
-export const NumericCell = styled.span`
-  font-variant-numeric: tabular-nums;
-`;
-
 /**
  * The deployer cell: the address, with its contract count beside it. The count
  * is a link when it leads somewhere, and plain text at 1, where filtering
@@ -344,6 +340,7 @@ const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
 
 export const ContractsTableWrapper = styled.div`
   ${dataListTableSkin}
+  ${compactFilterFloat}
 
   /* The active-filter chip is rendered twice and exactly one is visible: in
      the filter bar where that bar is a row, and beside the page-size controls

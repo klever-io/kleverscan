@@ -5,6 +5,7 @@ import { IAsset, IBalance } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { parseAddress } from '@/utils/parseValues';
 import { useTranslation } from 'next-i18next';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import CopyAction from '@/components/DataList/CopyAction';
 import {
   AddressLink,
@@ -73,12 +74,17 @@ const HoldersMobileCard: React.FC<IHoldersMobileCardProps> = ({
           {parseAddress(address, 12)}
         </AddressLink>
         {isVoid && (
-          <BadgePill $variant="void">{t('assets:Overview.Void')}</BadgePill>
+          <ExplainedBadge variant="void" msg={t('assets:Holders.VoidTooltip')}>
+            {t('assets:Overview.Void')}
+          </ExplainedBadge>
         )}
         {isContract && (
-          <BadgePill $variant="contract">
+          <ExplainedBadge
+            variant="contract"
+            msg={t('assets:Holders.ContractTooltip')}
+          >
             {t('assets:Holders.Contract')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         <RowActions>
           <CopyAction

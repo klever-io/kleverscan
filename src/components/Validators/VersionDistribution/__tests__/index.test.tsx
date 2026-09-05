@@ -42,6 +42,51 @@ jest.mock('react-dom', () => {
   };
 });
 
+/**
+ * Resolves against the real `en` bundle rather than echoing keys back, so
+ * every assertion below keeps checking the words a reader actually sees, and a
+ * key that never lands in the JSON fails here instead of rendering its own
+ * name at the user.
+ */
+jest.mock('next-i18next', () => {
+  const bundle = jest.requireActual(
+    '../../../../../public/locales/en/validators.json',
+  );
+
+  const lookup = (key: string): string | undefined =>
+    key
+      .replace(/^validators:/, '')
+      .split('.')
+      .reduce<unknown>(
+        (node, part) =>
+          node && typeof node === 'object'
+            ? (node as Record<string, unknown>)[part]
+            : undefined,
+        bundle,
+      ) as string | undefined;
+
+  return {
+    useTranslation: () => ({
+      t: (key: string, options?: Record<string, unknown>) => {
+        const count = options?.count;
+        const resolved =
+          count === undefined
+            ? lookup(key)
+            : (lookup(`${key}_${count === 1 ? 'one' : 'other'}`) ??
+              lookup(key));
+        if (resolved === undefined) {
+          throw new Error(`missing translation key: ${key}`);
+        }
+        return Object.entries(options ?? {}).reduce(
+          (text, [name, value]) =>
+            text.replace(new RegExp(`{{${name}}}`, 'g'), String(value)),
+          resolved,
+        );
+      },
+    }),
+  };
+});
+
 import VersionDistribution from '../index';
 
 const renderWithTheme = (ui: React.ReactElement) =>
@@ -83,7 +128,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -93,13 +137,32 @@ describe('VersionDistribution', () => {
       />,
     );
 
-    expect(screen.getByText('20')).toBeInTheDocument();
     expect(screen.getAllByText('v1.7.21-rc1').length).toBeGreaterThan(0);
     expect(screen.getByTestId('on-latest-callout')).toHaveTextContent('50.0%');
-    expect(
-      screen.getByText(/50.0% of nodes on latest \(v1.7.21-rc1\)/),
-    ).toBeInTheDocument();
+    // The version itself is printed once, beside "Newest"; repeating it here
+    // was one of three copies of the same string in this block.
+    expect(screen.getByText(/50.0% of nodes on latest/)).toBeInTheDocument();
     expect(screen.getByText('10 nodes')).toBeInTheDocument();
+  });
+
+  // The validator count moved to the page summary, which already carried it as
+  // its first tile. Two elements printing the same number a card apart is what
+  // made this block read as a competing section.
+  it('no longer repeats the validator count the summary owns', () => {
+    renderWithTheme(
+      <VersionDistribution
+        stats={baseStats}
+        latestVersion="v1.7.21-rc1"
+        loading={false}
+        heartbeatAvailable
+        validatorsAvailable
+        mode="nodes"
+        onModeChange={jest.fn()}
+        onSelectVersion={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByText('Total Validators')).not.toBeInTheDocument();
   });
 
   it('shows loading skeletons while loading', () => {
@@ -160,7 +223,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -180,7 +242,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -199,7 +260,6 @@ describe('VersionDistribution', () => {
         <VersionDistribution
           stats={baseStats}
           latestVersion="v1.7.21-rc1"
-          totalValidators={20}
           loading={false}
           heartbeatAvailable
           validatorsAvailable
@@ -220,7 +280,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={baseStats}
         latestVersion="v1.7.21-rc1"
-        totalValidators={20}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -230,9 +289,7 @@ describe('VersionDistribution', () => {
       />,
     );
 
-    expect(
-      screen.getByText(/60.0% of stake on latest \(v1.7.21-rc1\)/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/60.0% of stake on latest/)).toBeInTheDocument();
   });
 
   it('expands when more than the collapse threshold versions exist', () => {
@@ -250,7 +307,6 @@ describe('VersionDistribution', () => {
       <VersionDistribution
         stats={many}
         latestVersion="v1.0.4"
-        totalValidators={5}
         loading={false}
         heartbeatAvailable
         validatorsAvailable
@@ -263,5 +319,52 @@ describe('VersionDistribution', () => {
     expect(screen.getByText(/\+2 other versions/)).toBeInTheDocument();
     fireEvent.click(screen.getByText(/\+2 other versions/));
     expect(screen.getByText('Show less')).toBeInTheDocument();
+  });
+
+  const collapsible: VersionStat[] = Array.from({ length: 5 }, (_, i) => ({
+    version: `v1.0.${4 - i}`,
+    count: 1,
+    percent: 20,
+    isLatest: i === 0,
+    isUnknown: false,
+    stake: 1,
+    stakePercent: 20,
+  }));
+
+  const renderCollapsed = (selectedVersion?: string) =>
+    renderWithTheme(
+      <VersionDistribution
+        stats={collapsible}
+        latestVersion="v1.0.4"
+        loading={false}
+        heartbeatAvailable
+        validatorsAvailable
+        mode="nodes"
+        onModeChange={jest.fn()}
+        selectedVersion={selectedVersion}
+        onSelectVersion={jest.fn()}
+      />,
+    );
+
+  /* The sort puts Unknown last, so the largest non-latest bucket is the first
+     one collapsing hides. Filtering on it then left no row marked and no way
+     to clear it without opening "other versions" first. */
+  it('keeps the filtered version on screen while collapsed', () => {
+    renderCollapsed('v1.0.0');
+
+    expect(screen.getAllByText('v1.0.0').length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /v1\.0\.0/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  /* The inverse: pulling the selected row forward must not also reveal the
+     rest, or the collapse buys nothing. */
+  it('still hides the versions that are not filtered on', () => {
+    renderCollapsed('v1.0.0');
+
+    expect(screen.queryByText('v1.0.1')).toBeNull();
+    expect(screen.getByText(/other version/)).toBeInTheDocument();
   });
 });

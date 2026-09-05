@@ -4,8 +4,8 @@ import { DoubleTxsTooltip } from '@/components/Chart/Tooltips';
 import { ArrowVariation } from '@/components/Home/CoinDataFetcher/CoinCard/styles';
 import { Loader } from '@/components/Loader/styles';
 import { IDoubleChart } from '@/pages/charts';
-import api from '@/services/api';
-import { IDailyTransaction } from '@/types';
+import { buildChartSeries } from '@/services/requests/home/chartSeries';
+import { transactionSeriesCall } from '@/services/requests/home/transactionSeries';
 import { getVariation } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import {
@@ -19,11 +19,19 @@ import {
   TransactionEmpty,
   VariationText,
 } from '@/views/home';
-import { format } from 'date-fns';
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
-const CHART_TIME_FILTER = [1, 7, 15, 30];
+/**
+ * A period needs at least two points per line to draw one, and a day gives one
+ * per stretch, so 1D used to render a pair of dots and no line. Hourly points
+ * would fix it, but the proxy's histogram only buckets by day or month, and a
+ * request per hour is refused: 48 in parallel answered once and then returned
+ * 10 and 0 on the two runs after it, while testnet, which CI uses, refused 20
+ * of them outright. The card beside the chart already reports the last 24
+ * hours, and now agrees with this chart's own figures.
+ */
+const CHART_TIME_FILTER = [7, 15, 30];
 const TIME_SERIES_CHG_VALUE = {
   inPeriod: 0,
   percent: '',
@@ -31,7 +39,10 @@ const TIME_SERIES_CHG_VALUE = {
 
 export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
   const [isLoadingDailyTxs, setIsLoadingDailyTxs] = useState(false);
-  const [filterPeriod, setFilterPeriod] = useState(16);
+  // The period the chart reports, in days, and the same number the buttons
+  // carry. It used to hold the button's value plus one, so every slice ran a
+  // day long: "1D" summed two days, "7D" eight, "1M" thirty-one.
+  const [filterPeriod, setFilterPeriod] = useState(15);
   const [transactionTimeSeriesChgValue, setTransactionTimeSeriesChgValue] =
     useState(TIME_SERIES_CHG_VALUE);
   const [transactionTimeSeries, setTransactionTimeSeries] = useState<
@@ -42,87 +53,58 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
 
   useEffect(() => {
+    // The periods do not settle in the order they were asked for: 7D counts a
+    // rolling window per point, fourteen requests, while 15D and 1M take one.
+    // Switching away from 7D therefore lands the newer answer first and the
+    // older one on top of it, under the newer label.
+    let current = true;
+
     const getTransactionsChartTimeSeries = async () => {
       try {
         setIsLoadingDailyTxs(true);
 
-        const res = await api.get({
-          route: `transaction/list/count/${filterPeriod * 2}`,
-        });
-        if (res?.error?.length) return;
+        // Rolling windows where the request count allows it, UTC-day buckets
+        // beyond that; the module says which and why.
+        const rawTxList = await transactionSeriesCall(filterPeriod);
+        if (!current) return;
+        if (!rawTxList.length) {
+          // Cleared, not left alone: returning here kept the previous
+          // period's line and percentage on screen under the new label.
+          setTransactionTimeSeries([]);
+          setTransactionTimeSeriesChgValue(TIME_SERIES_CHG_VALUE);
+          return;
+        }
 
-        const rawTxList: IDailyTransaction[] = res?.data?.number_by_day;
-        if (!rawTxList) return;
-
-        const parsedTxList = rawTxList
-          .sort((a, b) => a.key - b.key)
-          .reduce(
-            (acc, transaction) => {
-              if (
-                !transaction ||
-                !transaction.key ||
-                isNaN(transaction.doc_count)
-              )
-                return acc;
-
-              const date = new Date(transaction.key);
-
-              date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-
-              const formattedDate = format(date, 'dd MMM');
-              const [day, month] = formattedDate.split(' ');
-
-              const monthString = commonT(`Date.Months.${month}`);
-
-              const dateString = `${day} ${monthString}`;
-
-              acc.push({
-                date: dateString,
-                value: transaction.doc_count,
-              });
-
-              return acc;
-            },
-            [] as Array<{ date: string; value: number }>,
-          );
-
-        const firstSlice = parsedTxList.slice(0, parsedTxList.length / 2);
-        const secondSlice = parsedTxList.slice(
-          parsedTxList.length / 2,
-          parsedTxList.length,
+        // Parsed and paired outside the effect, where Jest can reach it:
+        // the effect keeps the fetch, the guards and the state.
+        const { pairs, total, previousTotal } = buildChartSeries(
+          rawTxList,
+          month => commonT(`Date.Months.${month}`),
         );
 
-        const mergedTransactionTimeSeries = firstSlice.map((txPast, index) => ({
-          valueNow: secondSlice[index].value as number,
-          dateNow: secondSlice[index].date,
-          txNow: secondSlice[index],
-          valuePast: txPast.value as number,
-          datePast: txPast.date as string,
-          txPast,
-        })) as IDoubleChart[];
-
-        const firstValue = mergedTransactionTimeSeries[0];
-        const lastValue =
-          mergedTransactionTimeSeries[mergedTransactionTimeSeries?.length - 1];
-        const valueDiff = Math.abs(firstValue?.valueNow - lastValue?.valueNow);
-        const totalSum = mergedTransactionTimeSeries.reduce(
-          (acc, curr) => (acc += curr?.valueNow ?? 0),
-          0,
-        );
-
-        setTransactionTimeSeries(mergedTransactionTimeSeries);
+        setTransactionTimeSeries(pairs as IDoubleChart[]);
         setTransactionTimeSeriesChgValue({
-          inPeriod: totalSum,
-          percent: getVariation(valueDiff / 1000),
+          inPeriod: total,
+          // No baseline is no percentage: against zero every change is
+          // infinite, and getVariation prints "--" for a falsy figure.
+          percent: getVariation(
+            previousTotal > 0
+              ? ((total - previousTotal) / previousTotal) * 100
+              : 0,
+          ),
         });
       } catch (err) {
         console.error(err);
       } finally {
-        setIsLoadingDailyTxs(false);
+        if (current) setIsLoadingDailyTxs(false);
       }
     };
 
     getTransactionsChartTimeSeries();
+
+    return () => {
+      current = false;
+    };
   }, [filterPeriod]);
 
   return (
@@ -135,7 +117,7 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
             {toLocaleFixed(transactionTimeSeriesChgValue.inPeriod, 0)}
 
             <TimeSeriesChgValueText>
-              <span>{filterPeriod < 30 ? `${filterPeriod - 1}D` : '1M'}</span>
+              <span>{filterPeriod < 30 ? `${filterPeriod}D` : '1M'}</span>
             </TimeSeriesChgValueText>
           </TimeSeriesChgValue>
           <VariationText
@@ -154,8 +136,8 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
           {CHART_TIME_FILTER.map(item => (
             <ItemTimeFilter
               key={String(item)}
-              onClick={() => setFilterPeriod(item + 1)}
-              selected={!!(filterPeriod === item + 1)}
+              onClick={() => setFilterPeriod(item)}
+              selected={filterPeriod === item}
             >
               {item !== 30 ? `${String(item)}D` : '1M'}
             </ItemTimeFilter>

@@ -98,19 +98,36 @@ describe('summaryRefetchInterval', () => {
   const day = { totalBlocks: 1 };
   const totals = { totalBlocks: 2 };
 
-  it('stops polling once both halves are in', () => {
-    expect(summaryRefetchInterval({ yesterday: day, total: totals })).toBe(
-      false,
-    );
+  it('stops polling once every source is in', () => {
+    expect(
+      summaryRefetchInterval({
+        yesterday: day,
+        total: totals,
+        transactions: 8275,
+      }),
+    ).toBe(false);
+  });
+
+  it('stops polling on a genuine zero transaction count', () => {
+    // A quiet day really answers 0. Judged for truthiness this would poll
+    // every 30 seconds forever against a complete answer.
+    expect(
+      summaryRefetchInterval({
+        yesterday: day,
+        total: totals,
+        transactions: 0,
+      }),
+    ).toBe(false);
   });
 
   // The other direction of the same guard: a hole anywhere keeps the retry
   // alive, since the query "succeeded" and nothing else would refetch it.
   it.each([
     ['no answer at all', undefined],
-    ['both halves missing', {}],
-    ['the day figures missing', { total: totals }],
-    ['the totals missing', { yesterday: day }],
+    ['every source missing', {}],
+    ['the day figures missing', { total: totals, transactions: 8275 }],
+    ['the totals missing', { yesterday: day, transactions: 8275 }],
+    ['the transaction count missing', { yesterday: day, total: totals }],
   ])('keeps retrying with %s', (_label, data) => {
     expect(summaryRefetchInterval(data)).toBe(30_000);
   });

@@ -92,6 +92,9 @@ export const buildChartSeries = (
   const past = parsed.slice(0, half);
   const now = parsed.slice(half);
 
+  // Paired by index on the route's contract: `points` buckets of one interval
+  // each, oldest first, so the i-th of each stretch spans the same time. Count
+  // and order are checked at the fetch; the interval itself is not re-measured.
   const pairs = past.map((txPast, index) => ({
     valueNow: now[index].value,
     dateNow: now[index].date,

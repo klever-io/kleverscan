@@ -1,5 +1,22 @@
 import { ISeriesPoint } from '@/services/requests/home/transactionSeries';
-import { format } from 'date-fns';
+
+/** The keys the locale files carry under `Date.Months`, in calendar order. */
+const MONTH_KEYS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const twoDigits = (value: number) => String(value).padStart(2, '0');
 
 /** One plotted point: a formatted date and the count it carries. */
 export interface IChartPoint {
@@ -45,19 +62,20 @@ export const buildChartSeries = (
     if (!point || !point.key || Number.isNaN(point.doc_count)) return acc;
 
     const date = new Date(point.key);
-    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
 
-    // Hourly buckets sit 24 hours apart across the two stretches, so the same
-    // clock time labels both and a day label would repeat 24 times over.
+    // UTC, like every timestamp the explorer prints (formatFunctions reads the
+    // UTC fields too). Hourly buckets sit 24 hours apart across the two
+    // stretches, so one clock time labels both.
     if (options.hourly) {
-      acc.push({ date: format(date, 'HH:mm'), value: point.doc_count });
+      acc.push({
+        date: `${twoDigits(date.getUTCHours())}:${twoDigits(date.getUTCMinutes())}`,
+        value: point.doc_count,
+      });
       return acc;
     }
 
-    const [day, month] = format(date, 'dd MMM').split(' ');
-
     acc.push({
-      date: `${day} ${translateMonth(month)}`,
+      date: `${twoDigits(date.getUTCDate())} ${translateMonth(MONTH_KEYS[date.getUTCMonth()])}`,
       value: point.doc_count,
     });
 

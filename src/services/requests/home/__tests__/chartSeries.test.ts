@@ -106,6 +106,24 @@ describe('buildChartSeries', () => {
     expect(pairs[0].dateNow).toBe(pairs[0].datePast);
   });
 
+  it('labels in UTC, whatever zone the viewer is in', () => {
+    // Every other timestamp the explorer prints is UTC. Half past eleven at
+    // night is already the next day in any zone east of it, which is where a
+    // label from the viewer's clock would name the wrong day and hour.
+    const late = Date.UTC(2026, 7, 20, 23, 30);
+    const series = [
+      { key: late, doc_count: 1 },
+      { key: late + DAY_MS, doc_count: 2 },
+    ];
+
+    const daily = buildChartSeries(series, month);
+    const hourly = buildChartSeries(series, month, { hourly: true });
+
+    expect(daily.pairs[0].datePast).toBe('20 Aug');
+    expect(daily.pairs[0].dateNow).toBe('21 Aug');
+    expect(hourly.pairs[0].datePast).toBe('23:30');
+  });
+
   it('renders the month through the translator it was handed', () => {
     const series = [
       { key: START, doc_count: 1 },

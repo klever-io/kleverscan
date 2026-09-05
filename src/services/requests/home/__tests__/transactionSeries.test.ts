@@ -112,4 +112,20 @@ describe('transactionSeriesCall', () => {
 
     await expect(transactionSeriesCall(7)).resolves.toEqual([]);
   });
+
+  it('refuses a series that runs newest first', async () => {
+    // Split down the middle, a reversed list draws the previous stretch as
+    // the current one and inverts the percentage, with nothing to see.
+    answer([...buckets(14, 1, 24 * HOUR_MS)].reverse());
+
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
+  });
+
+  it('refuses a series with a repeated bucket', async () => {
+    const list = buckets(14, 1, 24 * HOUR_MS);
+    list[6] = { ...list[5] };
+    answer(list);
+
+    await expect(transactionSeriesCall(7)).resolves.toEqual([]);
+  });
 });

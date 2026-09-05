@@ -60,11 +60,19 @@ export const transactionSeriesCall = async (
     // A malformed bucket cannot be charted as a zero, which would draw as a
     // quiet interval the chain never had, and dropping it would pair every
     // later point against the wrong counterpart.
-    return parsed.every(
+    const readable = parsed.every(
       point => Number.isFinite(point.key) && Number.isFinite(point.doc_count),
-    )
-      ? (parsed as ISeriesPoint[])
-      : [];
+    );
+    if (!readable) return [];
+
+    // Oldest first is what the caller splits on: a reversed or repeated bucket
+    // would swap the stretches or pair them off by one, with no visible fault.
+    const series = parsed as ISeriesPoint[];
+    const ordered = series.every(
+      (point, index) => index === 0 || point.key > series[index - 1].key,
+    );
+
+    return ordered ? series : [];
   } catch (error) {
     console.error(error);
     return [];

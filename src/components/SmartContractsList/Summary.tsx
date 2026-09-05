@@ -33,6 +33,7 @@ import {
   ContractsSummaryCard,
   MostUsedTile,
   SummaryContractLink,
+  LegendName,
 } from './styles';
 import {
   segmentColor,
@@ -42,6 +43,7 @@ import {
 } from './summaryFigures';
 import { CONTRACT_SHARES_QUERY } from './sharesQuery';
 
+import { IContractShare } from '@/components/SmartContractsList/summaryFigures';
 /**
  * A quarter of an hour. These are chain-wide totals that move by fractions of
  * a percent between reads, and the page they sit on used to refetch four
@@ -114,6 +116,10 @@ const ContractsSummary: React.FC = () => {
     theme.rose,
   ];
 
+  const identity = (segment: Pick<IContractShare, 'address' | 'name'>) =>
+    segment.name
+      ? safeContractName(segment.name) || segment.address
+      : segment.address;
   const otherLabel = t('smartContracts:List.OtherContracts', {
     defaultValue: 'Other contracts',
   });
@@ -247,16 +253,16 @@ const ContractsSummary: React.FC = () => {
           </DistBar>
           <LegendRow>
             {model.segments.map((segment, index) => (
-              <LegendItem key={segment.address}>
+              <LegendItem key={segment.address} title={identity(segment)}>
                 <LegendDot $color={segmentColor(index, palette)} />
-                {contractLabel(segment, 10)}{' '}
+                <LegendName>{contractLabel(segment, 10)}</LegendName>
                 <strong>{formatShare(segment.count, model.total)}</strong>
               </LegendItem>
             ))}
             {model.other > 0 && (
-              <LegendItem $dimmed>
+              <LegendItem $dimmed title={otherLabel}>
                 <LegendDot $color={theme.blueGray500} />
-                {otherLabel}{' '}
+                <LegendName>{otherLabel}</LegendName>
                 <strong>{formatShare(model.other, model.total)}</strong>
               </LegendItem>
             )}

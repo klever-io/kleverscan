@@ -3,13 +3,7 @@ import Tooltip from '@/components/Tooltip';
 import { ContractsIndex, IContract } from '@/types/contracts';
 import { capitalizeString } from '@/utils/convertString';
 import React from 'react';
-import {
-  MdAccessTime,
-  MdArrowForward,
-  MdCallMade,
-  MdCallReceived,
-  MdPriorityHigh,
-} from 'react-icons/md';
+import { MdAccessTime, MdArrowForward, MdPriorityHigh } from 'react-icons/md';
 import { BadgeCount, DirectionStatusBadge } from './styles';
 
 /**
@@ -72,23 +66,19 @@ export const TransactionStatusPill: React.FC<{ status?: string }> = ({
 );
 
 /** Same treatment for the direction, which only renders on an account's own
- *  transaction list. Diagonal arrows, so an incoming transfer cannot be read
- *  as the status glyph beside it. */
+ *  transaction list. The word, not an arrow: the column already carries a
+ *  green arrow between From and To, and a second pair of arrows beside it
+ *  read as the same signal rather than a different one. */
 export const InOutBadge: React.FC<{ direction: 'In' | 'Out' }> = ({
   direction,
-}) => {
-  const Glyph = direction === 'In' ? MdCallReceived : MdCallMade;
-
-  return (
-    <DirectionStatusBadge
-      $variant={direction === 'In' ? 'success' : 'warning'}
-      title={direction}
-    >
-      <Glyph size={11} aria-hidden="true" />
-      <VisuallyHidden>{direction}</VisuallyHidden>
-    </DirectionStatusBadge>
-  );
-};
+}) => (
+  <BadgePill
+    $variant={direction === 'In' ? 'success' : 'warning'}
+    title={direction}
+  >
+    {direction}
+  </BadgePill>
+);
 
 /**
  * Hovering one type badge marks every badge of the same contract type in the

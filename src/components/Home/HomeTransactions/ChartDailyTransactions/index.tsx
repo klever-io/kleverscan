@@ -5,7 +5,10 @@ import { ArrowVariation } from '@/components/Home/CoinDataFetcher/CoinCard/style
 import { Loader } from '@/components/Loader/styles';
 import { IDoubleChart } from '@/pages/charts';
 import { buildChartSeries } from '@/services/requests/home/chartSeries';
-import { transactionSeriesCall } from '@/services/requests/home/transactionSeries';
+import {
+  isHourly,
+  transactionSeriesCall,
+} from '@/services/requests/home/transactionSeries';
 import { getVariation } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import {
@@ -22,16 +25,10 @@ import {
 import { useTranslation } from 'next-i18next';
 import { useEffect, useState } from 'react';
 
-/**
- * A period needs at least two points per line to draw one, and a day gives one
- * per stretch, so 1D used to render a pair of dots and no line. Hourly points
- * would fix it, but the proxy's histogram only buckets by day or month, and a
- * request per hour is refused: 48 in parallel answered once and then returned
- * 10 and 0 on the two runs after it, while testnet, which CI uses, refused 20
- * of them outright. The card beside the chart already reports the last 24
- * hours, and now agrees with this chart's own figures.
- */
-const CHART_TIME_FILTER = [7, 15, 30];
+// A day is drawn as 24 hourly points per stretch: one point per stretch drew
+// as two dots and no line, which is why 1D was out until the series route
+// could bucket by the hour.
+const CHART_TIME_FILTER = [1, 7, 15, 30];
 const TIME_SERIES_CHG_VALUE = {
   inPeriod: 0,
   percent: '',
@@ -53,18 +50,15 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
 
   useEffect(() => {
-    // The periods do not settle in the order they were asked for: 7D counts a
-    // rolling window per point, fourteen requests, while 15D and 1M take one.
-    // Switching away from 7D therefore lands the newer answer first and the
-    // older one on top of it, under the newer label.
+    // A period switch leaves the previous request in flight, and two requests
+    // can settle in either order, so the answer to a period the reader has
+    // moved on from must not paint itself under the newer label.
     let current = true;
 
     const getTransactionsChartTimeSeries = async () => {
       try {
         setIsLoadingDailyTxs(true);
 
-        // Rolling windows where the request count allows it, UTC-day buckets
-        // beyond that; the module says which and why.
         const rawTxList = await transactionSeriesCall(filterPeriod);
         if (!current) return;
         if (!rawTxList.length) {
@@ -80,6 +74,7 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
         const { pairs, total, previousTotal } = buildChartSeries(
           rawTxList,
           month => commonT(`Date.Months.${month}`),
+          { hourly: isHourly(filterPeriod) },
         );
 
         setTransactionTimeSeries(pairs as IDoubleChart[]);

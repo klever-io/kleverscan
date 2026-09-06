@@ -11,6 +11,7 @@ import {
   LegendRow,
   SummaryCard,
   Tile,
+  TileLabel,
   TilesGrid,
 } from '@/components/DataList/styles';
 import {
@@ -38,6 +39,23 @@ import { RIGHT_ALIGNED_COLUMNS } from './columns';
  */
 const THREE_TILES = '600px';
 const CONTROLS_ONE_ROW = '480px';
+
+/**
+ * The legend's six items (the five busiest contracts and "Other") need 921px
+ * on one row, measured on mainnet. Below tablet width they sit on a grid of
+ * three columns, two below 520px, so the row count is fixed whatever the
+ * names are. The row is the item's line box: 16,5px at 12px, measured.
+ */
+const LEGEND_THREE_COLUMNS_MIN = '519.98px';
+const LEGEND_LINE = '1.03125rem';
+
+/**
+ * Below 390px two tiles beside each other are 115 to 145px wide, where
+ * "Contract transactions" needs two lines from 135px down; they used to stack
+ * there. Both labels take two lines so the values stay level, and a tile holds
+ * the 85px measured at 320px with a two-line label and a two-line sub line.
+ */
+const LABELS_ON_ONE_LINE_MIN = '389.98px';
 
 /* ------------------------------- summary --------------------------------- */
 
@@ -73,20 +91,62 @@ export const ContractsSummaryCard = styled(SummaryCard)`
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
 
-  /* One legend row on every width: below tablet it scrolls sideways instead
-     of wrapping. Wrapping made its height depend on the length of contract
-     names, which no loading shape can predict; measured, the card grew 17px
-     under the reader when the legend landed three rows tall at 390px. */
+  /* A row that wraps by itself makes the card's height depend on contract
+     names, which no loading shape can predict; it used to scroll sideways
+     instead. The grid pins the rows, the loading shape sits on the same grid,
+     and a name wider than its column ends in an ellipsis with the full text
+     as its title. The minimum height covers a chain with fewer contracts. */
   @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
     ${LegendRow} {
-      flex-wrap: nowrap;
-      overflow-x: auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: ${LEGEND_LINE};
+      min-height: calc(2 * ${LEGEND_LINE} + 8px);
     }
 
     ${LegendItem} {
-      flex-shrink: 0;
+      min-width: 0;
+
+      strong {
+        flex-shrink: 0;
+      }
     }
   }
+
+  @media screen and (max-width: ${LEGEND_THREE_COLUMNS_MIN}) {
+    ${LegendRow} {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      min-height: calc(3 * ${LEGEND_LINE} + 16px);
+    }
+  }
+
+  @media screen and (max-width: ${LABELS_ON_ONE_LINE_MIN}) {
+    ${TilesGrid} {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    ${Tile} {
+      min-height: 85px;
+    }
+
+    ${TileLabel} {
+      display: block;
+      /* Pinned, as on /blocks: two lines is only a fixed height once the
+         ratio is. 9em makes "Contracts deployed" break where "Contract
+         transactions" does, so the values under them stay level. */
+      line-height: 1.4;
+      min-height: 2.8em;
+      max-width: 9em;
+    }
+  }
+`;
+
+/** A legend item's name, cut with an ellipsis where its grid column is narrower. */
+export const LegendName = styled.span`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 /**
@@ -100,13 +160,6 @@ export const MostUsedTile = styled(Tile)`
   @media screen and (max-width: ${THREE_TILES}) {
     display: none;
   }
-`;
-
-/** The one-line legend placeholder's row, sharing the legend's own metrics. */
-export const PlaceholderLegendRow = styled.div`
-  display: flex;
-  gap: 16px;
-  margin-top: 8px;
 `;
 
 /**

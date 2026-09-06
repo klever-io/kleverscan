@@ -1,5 +1,22 @@
 import { ISeriesPoint } from '@/services/requests/home/transactionSeries';
-import { format } from 'date-fns';
+
+/** The keys the locale files carry under `Date.Months`, in calendar order. */
+const MONTH_KEYS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+const twoDigits = (value: number) => String(value).padStart(2, '0');
 
 /** One plotted point: a formatted date and the count it carries. */
 export interface IChartPoint {
@@ -39,17 +56,26 @@ const EMPTY: IChartSeries = { pairs: [], total: 0, previousTotal: 0 };
 export const buildChartSeries = (
   points: ISeriesPoint[],
   translateMonth: (month: string) => string,
+  options: { hourly?: boolean } = {},
 ): IChartSeries => {
   const parsed = points.reduce((acc, point) => {
     if (!point || !point.key || Number.isNaN(point.doc_count)) return acc;
 
     const date = new Date(point.key);
-    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
 
-    const [day, month] = format(date, 'dd MMM').split(' ');
+    // UTC, like every timestamp the explorer prints (formatFunctions reads the
+    // UTC fields too). Hourly buckets sit 24 hours apart across the two
+    // stretches, so one clock time labels both.
+    if (options.hourly) {
+      acc.push({
+        date: `${twoDigits(date.getUTCHours())}:${twoDigits(date.getUTCMinutes())}`,
+        value: point.doc_count,
+      });
+      return acc;
+    }
 
     acc.push({
-      date: `${day} ${translateMonth(month)}`,
+      date: `${twoDigits(date.getUTCDate())} ${translateMonth(MONTH_KEYS[date.getUTCMonth()])}`,
       value: point.doc_count,
     });
 
@@ -66,6 +92,9 @@ export const buildChartSeries = (
   const past = parsed.slice(0, half);
   const now = parsed.slice(half);
 
+  // Paired by index on the route's contract: `points` buckets of one interval
+  // each, oldest first, so the i-th of each stretch spans the same time. Count
+  // and order are checked at the fetch; the interval itself is not re-measured.
   const pairs = past.map((txPast, index) => ({
     valueNow: now[index].value,
     dateNow: now[index].date,

@@ -260,4 +260,36 @@ describe('ContractTargetLabel', () => {
 
     expect(screen.getByText(/klv1qq/)).toBeTruthy();
   });
+
+  /**
+   * The clamp and the address, the pair from the two directions of one rule.
+   *
+   * A name has an unknown width that arrives a second late, so it is clamped
+   * or every column moves under the reader. An address is a fixed 19
+   * characters, and the clamp measured 150px against its 159.6px: the browser
+   * ate the last character, so a 62-character address rendered one short of
+   * the identical address in the From column beside it.
+   */
+  const clampOf = (el: Element): string =>
+    getComputedStyle(el as HTMLElement).maxWidth;
+
+  it('clamps the box while it holds a name', async () => {
+    nameCall.mockResolvedValue('Bitcoin.me');
+
+    renderLabel({});
+    const shown = await screen.findByText('Bitcoin.me');
+
+    expect(clampOf(shown)).toBe('160px');
+  });
+
+  it('leaves the box unclamped while it holds an address', async () => {
+    nameCall.mockResolvedValue(null);
+
+    renderLabel({});
+    const shown = await screen.findByText(/klv1qq/);
+    // The Mono span carries the text; the clamp lives on the box around it.
+    const box = shown.closest('span[class*="ContractName"]') ?? shown;
+
+    expect(clampOf(box)).not.toBe('160px');
+  });
 });

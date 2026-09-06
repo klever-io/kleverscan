@@ -31,16 +31,20 @@ const ContractTargetLabel: React.FC<IContractTargetLabelProps> = ({
   const name = useContractName(address, Boolean(isContract));
   const shown = name ? safeContractName(name) : '';
 
-  // Both readings share one fixed box. The name lands about a second after
-  // the row is readable, and a cell that resizes on arrival drags every
-  // column beside it; identical width either way means nothing moves.
+  // The clamp rides on the name only: that is the reading whose width is
+  // unknown until its request lands, and a cell that resizes on arrival drags
+  // every column beside it. The address is a fixed 19 characters and never
+  // resizes, so clamping it only cost it its last character.
   //
   // A name that survives none of the cleaning is not a name; the address is.
   // The title carries the cleaned text plus the address, so the cell is never
   // the only place the counterparty is named, and the characters kept out of
   // the cell cannot reappear in the browser's own tooltip.
   return (
-    <ContractName title={shown ? `${shown} · ${address}` : address}>
+    <ContractName
+      $named={Boolean(shown)}
+      title={shown ? `${shown} · ${address}` : address}
+    >
       {shown || <Mono>{parseAddress(address, truncateTo)}</Mono>}
     </ContractName>
   );

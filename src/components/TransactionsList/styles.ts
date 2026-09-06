@@ -460,22 +460,33 @@ export const PageSummaryCard = styled(SummaryCard)`
  * capped at 33 characters reached 1400px, so bounding the text alone does not
  * hold the layout.
  *
- * 160px because that is what the box actually holds: a 16-character truncated
- * bech32 address renders at 160px, and the 150 this used to carry cut its last
- * character off in seven of ten rows, at every width from 1100 to 1920.
+ * 160px matches the address the cell falls back to, measured at 159.6px, so
+ * the column reads the same whichever of the two a row shows. The clamp itself
+ * applies to the name only: it was cutting the last character off the address
+ * in every row, which needs no clamp because its width never changes.
  */
-export const ContractName = styled.span`
+export const ContractName = styled.span<{ $named?: boolean }>`
   ${inCard('inline-block')}
 
   && {
     /* Same floor as ceiling: the name lands about a second after the row is
        readable, and a box that grows on arrival drags every column with it.
        Measured before this was fixed: all nine columns changed width when the
-       names resolved, moving the row under the reader's pointer. */
-    min-width: 160px;
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+       names resolved, moving the row under the reader's pointer.
+
+       Only a name needs the clamp. The address fallback is a fixed 19
+       characters that never resizes, and at 159.6px it does not fit the 150px
+       this box is given inside the cell: the browser ate its last character,
+       so a 62-character address rendered one short of the one beside it. */
+    ${props =>
+      props.$named
+        ? css`
+            min-width: 160px;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          `
+        : null}
     white-space: nowrap;
     vertical-align: bottom;
   }

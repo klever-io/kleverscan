@@ -104,6 +104,29 @@ beforeEach(() => {
   nameCall.mockReset();
 });
 
+  /**
+   * Every declaration that makes up the clamp, not just its width. The clip
+   * is the whole trio: a ceiling to overflow, `overflow: hidden` to cut what
+   * passes it, and nowrap to keep the text on one line. Asserting max-width
+   * alone let the clip move out of the conditional and stay green.
+   */
+  const clampOf = (el: Element): Record<string, string> => {
+    const style = getComputedStyle(el as HTMLElement);
+    return {
+      minWidth: style.minWidth,
+      maxWidth: style.maxWidth,
+      overflow: style.overflow,
+    };
+  };
+
+  /** The box the clamp lives on, never the Mono span inside it: falling back
+   *  to the inner element would measure the wrong box and pass. */
+  const boxOf = (el: Element): Element => {
+    const box = el.closest('span[class*="ContractName"]');
+    if (!box) throw new Error('ContractName box not found around the label');
+    return box;
+  };
+
 describe('ContractTargetLabel', () => {
   it('shows the contract name once the chain answers with one', async () => {
     nameCall.mockResolvedValue('Bitcoin.me');
@@ -165,9 +188,17 @@ describe('ContractTargetLabel', () => {
   it('falls back to the address for a name that is only whitespace', async () => {
     nameCall.mockResolvedValue('   ');
 
-    renderLabel({});
+    // Settled, not just rendered: before the name lands there is no name to
+    // key the clamp off, so the assertion would hold for a reason that has
+    // nothing to do with the refusal.
+    await renderSettled({});
 
-    expect(await screen.findByText(/klv1qq/)).toBeTruthy();
+    const shown = screen.getByText(/klv1qq/);
+
+    expect(shown).toBeTruthy();
+    // The box follows what is drawn, not whether a name arrived: keyed off
+    // the raw name, whitespace is truthy and would clamp the address.
+    expect(clampOf(boxOf(shown)).maxWidth).not.toBe('160px');
   });
 
   it('strips the bidi override that paints a name backwards', async () => {
@@ -192,6 +223,9 @@ describe('ContractTargetLabel', () => {
 
     expect(screen.getByText(/klv1qq/)).toBeTruthy();
     expect(screen.queryByText(/^klv1fqeupef/)).toBeNull();
+    expect(clampOf(boxOf(screen.getByText(/klv1qq/))).maxWidth).not.toBe(
+      '160px',
+    );
   });
 
   it('refuses a name that is an address with one odd character past the cap', async () => {
@@ -207,6 +241,9 @@ describe('ContractTargetLabel', () => {
 
     expect(screen.getByText(/klv1qq/)).toBeTruthy();
     expect(screen.queryByText(/^klv1fqeupef/)).toBeNull();
+    expect(clampOf(boxOf(screen.getByText(/klv1qq/))).maxWidth).not.toBe(
+      '160px',
+    );
   });
 
   it('refuses one that hides its odd character in a homoglyph', async () => {
@@ -220,6 +257,9 @@ describe('ContractTargetLabel', () => {
 
     expect(screen.getByText(/klv1qq/)).toBeTruthy();
     expect(screen.queryByText(/^klv1fqeupef/)).toBeNull();
+    expect(clampOf(boxOf(screen.getByText(/klv1qq/))).maxWidth).not.toBe(
+      '160px',
+    );
   });
 
   it('strips a Hangul filler, which draws as a blank and is not a space', async () => {
@@ -270,16 +310,19 @@ describe('ContractTargetLabel', () => {
    * ate the last character, so a 62-character address rendered one short of
    * the identical address in the From column beside it.
    */
-  const clampOf = (el: Element): string =>
-    getComputedStyle(el as HTMLElement).maxWidth;
-
   it('clamps the box while it holds a name', async () => {
     nameCall.mockResolvedValue('Bitcoin.me');
 
     renderLabel({});
     const shown = await screen.findByText('Bitcoin.me');
 
-    expect(clampOf(shown)).toBe('160px');
+    // Floor as well as ceiling: without the floor a short name shrinks the
+    // cell, which is the same column shift from the other direction.
+    expect(clampOf(boxOf(shown))).toEqual({
+      minWidth: '160px',
+      maxWidth: '160px',
+      overflow: 'hidden',
+    });
   });
 
   it('leaves the box unclamped while it holds an address', async () => {
@@ -287,9 +330,12 @@ describe('ContractTargetLabel', () => {
 
     renderLabel({});
     const shown = await screen.findByText(/klv1qq/);
-    // The Mono span carries the text; the clamp lives on the box around it.
-    const box = shown.closest('span[class*="ContractName"]') ?? shown;
+    const box = clampOf(boxOf(shown));
 
-    expect(clampOf(box)).not.toBe('160px');
+    expect(box.maxWidth).not.toBe('160px');
+    expect(box.minWidth).not.toBe('160px');
+    // The clip itself, which is what cut the character off. A box that keeps
+    // this while losing the width ships the original bug.
+    expect(box.overflow).not.toBe('hidden');
   });
 });

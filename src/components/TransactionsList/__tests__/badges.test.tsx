@@ -106,9 +106,12 @@ describe('transaction badges', () => {
     // badge or a screen-reader label clipped out of the layout.
     for (const direction of ['In', 'Out']) {
       const label = screen.getByText(direction) as HTMLElement;
+      // The badge, not the word: the glyph version put its arrow BESIDE the
+      // word, so querying the word itself would find no svg either way.
+      const badge = label.parentElement as HTMLElement;
 
       expect(getComputedStyle(label).position).not.toBe('absolute');
-      expect(label.querySelector('svg')).toBeNull();
+      expect(badge.querySelector('svg')).toBeNull();
     }
   });
 

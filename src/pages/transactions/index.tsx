@@ -496,9 +496,9 @@ export const transactionRowSections = (
         </CenteredRow>
       ),
       span: 1,
-      // Holds a 16-character address, measured at 159.6px, plus the contract
-      // mark beside it; 150 here left the column hint disagreeing with its
-      // content.
+      // Holds `parseAddress(..., 16)`, whose 19 glyphs measured 159.6px,
+      // plus the contract mark beside it; 150 here left the column hint
+      // disagreeing with its content.
       width: 205,
     },
     inOut: {

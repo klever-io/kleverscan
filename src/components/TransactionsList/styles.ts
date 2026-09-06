@@ -460,13 +460,16 @@ export const PageSummaryCard = styled(SummaryCard)`
  * capped at 33 characters reached 1400px, so bounding the text alone does not
  * hold the layout.
  *
- * 160px matches the address the cell falls back to, measured at 159.6px, so
- * the column reads the same whichever of the two a row shows. The clamp itself
- * applies to the name only: against a 150px box it cut the last character off
- * the address, measured on all 17 unnamed rows of one account list. The
- * address needs no clamp, because its width never changes.
+ * 160px matches the address the cell falls back to: `parseAddress(..., 16)`
+ * draws 8+8 characters around an ellipsis, and those 19 glyphs measured
+ * 159.6px, so the column reads the same whichever of the two a row shows.
+ *
+ * Names only. The box used to clamp both readings, and at the 150px it
+ * resolved to inside the cell it cut the last character off every unnamed
+ * row: 17 of 17 on one account list. An address drawn at a fixed truncation
+ * has one width and cannot shift the column, so it needs no clamp.
  */
-export const ContractName = styled.span<{ $named?: boolean }>`
+export const ContractName = styled.span<{ $named: boolean }>`
   ${inCard('inline-block')}
 
   && {
@@ -475,10 +478,8 @@ export const ContractName = styled.span<{ $named?: boolean }>`
        Measured before this was fixed: all nine columns changed width when the
        names resolved, moving the row under the reader's pointer.
 
-       Only a name needs the clamp. The address fallback is a fixed 19
-       characters that never resizes, and at 159.6px it does not fit the 150px
-       this box is given inside the cell: the browser ate its last character,
-       so a 62-character address rendered one short of the one beside it. */
+       Only a name needs it: a name's width is unknown until its request
+       lands, an address's is settled by its truncation. */
     ${props =>
       props.$named
         ? css`

@@ -77,8 +77,12 @@ export const InOutBadge: React.FC<{ direction: 'In' | 'Out' }> = ({
   // and Transfer. Named through the hidden sibling rather than aria-label,
   // which the spec prohibits on a bare span, and which would leave the pill's
   // uppercase to be spelled out letter by letter.
+  //
+  // A `b` and not a span, the reason BadgeCount already carries: the shared
+  // cell rules pin every span inside a card to weight 400 and their own line
+  // height, and a child cannot outrank them the way BadgePill's `&&` does.
   <BadgePill $variant={direction === 'In' ? 'success' : 'warning'}>
-    <span aria-hidden="true">{direction}</span>
+    <b aria-hidden="true">{direction}</b>
     <VisuallyHidden>{`Direction: ${direction}`}</VisuallyHidden>
   </BadgePill>
 );

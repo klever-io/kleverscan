@@ -5,7 +5,10 @@ import { ArrowVariation } from '@/components/Home/CoinDataFetcher/CoinCard/style
 import { Loader } from '@/components/Loader/styles';
 import { IDoubleChart } from '@/pages/charts';
 import { buildChartSeries } from '@/services/requests/home/chartSeries';
-import { transactionSeriesCall } from '@/services/requests/home/transactionSeries';
+import {
+  isHourly,
+  transactionSeriesCall,
+} from '@/services/requests/home/transactionSeries';
 import { getVariation } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import {
@@ -47,10 +50,9 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation('transactions');
 
   useEffect(() => {
-    // The periods do not settle in the order they were asked for: 7D counts a
-    // rolling window per point, fourteen requests, while 15D and 1M take one.
-    // Switching away from 7D therefore lands the newer answer first and the
-    // older one on top of it, under the newer label.
+    // A period switch leaves the previous request in flight, and two requests
+    // can settle in either order, so the answer to a period the reader has
+    // moved on from must not paint itself under the newer label.
     let current = true;
 
     const getTransactionsChartTimeSeries = async () => {
@@ -72,7 +74,7 @@ export const ChartDailyTransactions: React.FC<PropsWithChildren> = () => {
         const { pairs, total, previousTotal } = buildChartSeries(
           rawTxList,
           month => commonT(`Date.Months.${month}`),
-          { hourly: filterPeriod === 1 },
+          { hourly: isHourly(filterPeriod) },
         );
 
         setTransactionTimeSeries(pairs as IDoubleChart[]);

@@ -71,6 +71,10 @@ jest.mock('next-i18next', () => ({
 const seriesCall = jest.fn();
 jest.mock('@/services/requests/home/transactionSeries', () => ({
   transactionSeriesCall: (period: number) => seriesCall(period),
+  // The real predicate, not a copy: the point of it is that the request and
+  // the labels cannot disagree about which periods are drawn by the hour.
+  isHourly: jest.requireActual('@/services/requests/home/transactionSeries')
+    .isHourly,
 }));
 
 /** The pairs handed to the chart, which is mocked out and draws nothing. */
@@ -162,10 +166,10 @@ describe('ChartDailyTransactions', () => {
 
   it('ignores a response the period has moved on from', async () => {
     // The transition the guard exists for is a period switch, not a teardown:
-    // 7D counts fourteen rolling windows while 15D takes one bucket request,
-    // so the slower answer can land last and paint itself under the newer
-    // label. Unmounting instead proves nothing, because React 19 no longer
-    // warns about a state update on an unmounted component.
+    // the request the reader moved away from is still in flight, and if it
+    // settles last it paints itself under the newer label. Unmounting instead
+    // proves nothing, because React 19 no longer warns about a state update on
+    // an unmounted component.
     let resolveSlow: (value: unknown) => void = () => undefined;
     seriesCall
       .mockReturnValueOnce(

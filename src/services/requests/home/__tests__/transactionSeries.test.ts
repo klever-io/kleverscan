@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import {
-  POINTS_PER_STRETCH,
+  STRETCHES,
   transactionSeriesCall,
 } from '@/services/requests/home/transactionSeries';
 
@@ -39,7 +39,10 @@ describe('transactionSeriesCall', () => {
     expect(mockedGet).toHaveBeenCalledTimes(1);
     expect(mockedGet.mock.calls[0][0]).toEqual({
       route: 'transaction/statistics/series',
-      query: { interval: '1d', points: 7 * POINTS_PER_STRETCH },
+      // One attempt: where the route is not deployed, three would spin for a
+      // second and a half on an answer that cannot change.
+      tries: 1,
+      query: { interval: '1d', points: 7 * STRETCHES },
     });
     expect(series).toHaveLength(14);
   });
@@ -74,6 +77,18 @@ describe('transactionSeriesCall', () => {
 
     expect(series).toHaveLength(14);
     expect(series.every(point => point.doc_count === 0)).toBe(true);
+  });
+
+  it('does not retry a route that answered an error', async () => {
+    // api.get retries three times by default and sleeps 500ms after every
+    // attempt including the last, so a route that is not deployed yet would
+    // hold the chart on a spinner rather than showing its empty state.
+    mockedGet.mockResolvedValue({ error: 'not found' });
+
+    await transactionSeriesCall(7);
+
+    expect(mockedGet).toHaveBeenCalledTimes(1);
+    expect(mockedGet.mock.calls[0][0].tries).toBe(1);
   });
 
   it('answers nothing when the route failed', async () => {

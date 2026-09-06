@@ -35,9 +35,8 @@ jest.mock('next-i18next', () => {
           typeof value === 'string'
             ? value
             : ((options?.defaultValue as string) ?? key);
-        return template.replace(
-          /\{\{(\w+)\}\}/g,
-          (_m, name: string) => String(options?.[name] ?? ''),
+        return template.replace(/\{\{(\w+)\}\}/g, (_m, name: string) =>
+          String(options?.[name] ?? ''),
         );
       },
     }),
@@ -175,5 +174,42 @@ describe('ContractsSummary', () => {
     const card = await (renderSummary(), loaded());
 
     expect(card.textContent).toContain('3,023 in the last 24 hours');
+  });
+
+  it('names each legend entry and its bar segment the same way', async () => {
+    // The whole legend subtree hangs off a resolved share model, so without
+    // statistics none of it renders and its naming rule goes unexercised.
+    // A named contract, an unnamed one and a remainder large enough for the
+    // "Other" entry, so all three legend shapes are drawn.
+    sharesCall.mockResolvedValue({
+      statistics: [
+        {
+          address: 'klv1namedcontractaddress0000000000000000',
+          name: 'Bitcoin.me',
+          count: 60,
+        },
+        { address: 'klv1unnamedcontractaddress00000000000000', count: 40 },
+      ],
+      allSuccessful: 200,
+    });
+
+    const card = await (renderSummary(), loaded());
+
+    await waitFor(() => expect(card.textContent).toContain('Bitcoin.me'));
+    // The unnamed one falls back to its address, cut to the ten characters
+    // the legend allows.
+    expect(card.textContent).toContain('klv1unname...');
+    expect(card.textContent).toContain('Other contracts');
+
+    // The bar's tooltip and the legend's must agree on what a segment is
+    // called: one rule, applied in both places.
+    const named = Array.from(card.querySelectorAll('[title]')).filter(node =>
+      (node.getAttribute('title') ?? '').startsWith('Bitcoin.me'),
+    );
+    expect(named).toHaveLength(2);
+    expect(named.map(node => node.getAttribute('title'))).toEqual([
+      'Bitcoin.me \u00b7 60',
+      'Bitcoin.me',
+    ]);
   });
 });

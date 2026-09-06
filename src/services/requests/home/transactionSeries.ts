@@ -17,8 +17,15 @@ import api from '@/services/api';
  * unable to tell a short answer from a full one.
  */
 
-/** Buckets the chart draws per period, one for each stretch it compares. */
-export const POINTS_PER_STRETCH = 2;
+/** The chart draws the period asked for beside the one before it. */
+export const STRETCHES = 2;
+
+/**
+ * A day is drawn hour by hour: one point per stretch draws as two dots and no
+ * line. The label mode follows from the same answer, so both sides of the
+ * chart read it here rather than each testing the period for itself.
+ */
+export const isHourly = (period: number): boolean => period === 1;
 
 export interface ISeriesPoint {
   key: number;
@@ -39,12 +46,17 @@ interface ISeriesBucket {
 export const transactionSeriesCall = async (
   period: number,
 ): Promise<ISeriesPoint[]> => {
-  const hourly = period === 1;
-  const points = period * POINTS_PER_STRETCH * (hourly ? 24 : 1);
+  const hourly = isHourly(period);
+  const points = period * STRETCHES * (hourly ? 24 : 1);
 
   try {
     const response = await api.get({
       route: 'transaction/statistics/series',
+      // One attempt. api.get retries three times by default and sleeps 500ms
+      // after every attempt including the last, so where the route is not
+      // deployed yet a period switch would spin for 1,5 seconds before the
+      // empty state appears, for an answer that cannot change.
+      tries: 1,
       query: { interval: hourly ? '1h' : '1d', points },
     });
     if (response?.error) return [];
@@ -63,8 +75,9 @@ export const transactionSeriesCall = async (
     // timestamp: past 8.64e15 ms Date is invalid and its label prints NaN.
     const readable = parsed.every(
       point =>
+        typeof point.key === 'number' &&
         Number.isFinite(point.key) &&
-        Number.isFinite(new Date(point.key ?? NaN).getTime()) &&
+        Number.isFinite(new Date(point.key).getTime()) &&
         Number.isFinite(point.doc_count),
     );
     if (!readable) return [];

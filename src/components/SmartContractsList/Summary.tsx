@@ -36,6 +36,7 @@ import {
   LegendName,
 } from './styles';
 import {
+  IContractShare,
   segmentColor,
   shareBarLabel,
   shareModel,
@@ -43,7 +44,6 @@ import {
 } from './summaryFigures';
 import { CONTRACT_SHARES_QUERY } from './sharesQuery';
 
-import { IContractShare } from '@/components/SmartContractsList/summaryFigures';
 /**
  * A quarter of an hour. These are chain-wide totals that move by fractions of
  * a percent between reads, and the page they sit on used to refetch four
@@ -236,7 +236,7 @@ const ContractsSummary: React.FC = () => {
                 style={{
                   width: `${(segment.count / model.total) * 100}%`,
                 }}
-                title={`${segment.name ? safeContractName(segment.name) || segment.address : segment.address} · ${segment.count.toLocaleString(NUMBER_LOCALE)}`}
+                title={`${identity(segment)} · ${segment.count.toLocaleString(NUMBER_LOCALE)}`}
                 aria-hidden="true"
               />
             ))}

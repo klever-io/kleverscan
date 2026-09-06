@@ -462,8 +462,9 @@ export const PageSummaryCard = styled(SummaryCard)`
  *
  * 160px matches the address the cell falls back to, measured at 159.6px, so
  * the column reads the same whichever of the two a row shows. The clamp itself
- * applies to the name only: it was cutting the last character off the address
- * in every row, which needs no clamp because its width never changes.
+ * applies to the name only: against a 150px box it cut the last character off
+ * the address, measured on all 17 unnamed rows of one account list. The
+ * address needs no clamp, because its width never changes.
  */
 export const ContractName = styled.span<{ $named?: boolean }>`
   ${inCard('inline-block')}

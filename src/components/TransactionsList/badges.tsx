@@ -72,11 +72,14 @@ export const TransactionStatusPill: React.FC<{ status?: string }> = ({
 export const InOutBadge: React.FC<{ direction: 'In' | 'Out' }> = ({
   direction,
 }) => (
-  <BadgePill
-    $variant={direction === 'In' ? 'success' : 'warning'}
-    title={direction}
-  >
-    {direction}
+  // The list is divs, not a table, so nothing ties this cell to its "In/Out"
+  // header: a reader would hear a bare "In" in a row that also says Success
+  // and Transfer. Named through the hidden sibling rather than aria-label,
+  // which the spec prohibits on a bare span, and which would leave the pill's
+  // uppercase to be spelled out letter by letter.
+  <BadgePill $variant={direction === 'In' ? 'success' : 'warning'}>
+    <span aria-hidden="true">{direction}</span>
+    <VisuallyHidden>{`Direction: ${direction}`}</VisuallyHidden>
   </BadgePill>
 );
 

@@ -112,6 +112,25 @@ describe('transaction badges', () => {
     }
   });
 
+  it('names the direction badge, since the list is divs and has no header link', () => {
+    // A reader reaching this cell hears whatever the badge is called. The row
+    // is divs, not a table, so the "In/Out" header names nothing; without a
+    // label the cell is a bare "In" beside "Success" and "Transfer".
+    //
+    // The name rides in the hidden sibling, not aria-label: the spec forbids
+    // naming a bare span, and the pill is uppercase, which a reader may spell
+    // out letter by letter.
+    for (const direction of ['In', 'Out']) {
+      const named = screen.getByText(`Direction: ${direction}`);
+
+      expect(getComputedStyle(named).position).toBe('absolute');
+      expect(named.getAttribute('aria-hidden')).toBeNull();
+      expect(screen.getByText(direction).getAttribute('aria-hidden')).toBe(
+        'true',
+      );
+    }
+  });
+
   it('gives fail its own look, distinct from success and pending', () => {
     expect(classOf('Fail')).not.toBe(classOf('Success'));
     expect(classOf('Fail')).not.toBe(classOf('Pending'));

@@ -1,10 +1,10 @@
 import api from '@/services/api';
-import { toMilliseconds } from '@/utils/timeFunctions';
 import {
-  IAccount,
-  IPaginatedResponse,
-  IYesterdayResponse,
-} from '@/types/index';
+  rollingWindow,
+  rollingWindowSpan,
+} from '@/services/requests/rollingWindow';
+import { toMilliseconds } from '@/utils/timeFunctions';
+import { IAccount, IPaginatedResponse } from '@/types/index';
 
 type RouterQuery = Record<string, string | string[] | undefined>;
 
@@ -67,25 +67,55 @@ export const accountsTotalCall = async (): Promise<number | undefined> => {
 };
 
 /**
- * New accounts per day over the last `days` days, newest first: entry 0 is
- * the running 24 hours, entry 1 the day before. A week is asked because
- * `count/7` opened with the entry `count/1` returned (10 in both, mainnet
- * 2026-08-26); if that stops holding, the day figure goes wrong silently.
+ * Accounts created in one rolling window, counted over an explicit date
+ * range. `address/list/count/<days>` is not used: its buckets are whole UTC
+ * days, so entry 0 is today since midnight and read 4 where the rolling day
+ * held 9 (measured 2026-09-03).
+ *
+ * `windows` counts 24-hour windows back from now and must be at least 1;
+ * clamped rather than trusted, because 0 would ask for an empty range and
+ * report "no new accounts" as a fact.
  */
-export const accountsCreatedCall = async (
-  days: number,
-): Promise<(number | undefined)[] | undefined> => {
-  const response: IYesterdayResponse = await api.get({
-    // A route segment goes into the URL raw, never through `buildUrlQuery`'s
-    // encoding, so escaped per the #685 convention despite the constant.
-    route: `address/list/count/${encodeURIComponent(String(days))}`,
+export const accountsCreatedInWindow = async (
+  windows: number,
+): Promise<number | undefined> => {
+  const response = await api.get({
+    route: 'address/list',
+    query: { limit: 1, minify: true, ...rollingWindowSpan(windows) },
   });
   if (response?.error) return undefined;
-  return (response?.data?.number_by_day ?? []).map(day =>
-    // A bad count becomes a hole, not a missing entry: filtering would slide
-    // later days forward, and the caller reads position 1 as yesterday.
-    Number.isFinite(day?.doc_count) ? day.doc_count : undefined,
-  );
+  const total = response?.pagination?.totalRecords;
+  return Number.isFinite(total) ? total : undefined;
+};
+
+/**
+ * The window ending now and the one before it, for the change line. One clock
+ * reading for both, so the pair cannot overlap or leave a gap between them.
+ */
+export const accountsCreatedCall = async (): Promise<
+  (number | undefined)[] | undefined
+> => {
+  const now = Date.now();
+  const [today, yesterday] = await Promise.all([
+    windowCountCall(0, now),
+    windowCountCall(1, now),
+  ]);
+  if (today === undefined && yesterday === undefined) return undefined;
+  return [today, yesterday];
+};
+
+/** One window, offset back by whole windows from the given moment. */
+const windowCountCall = async (
+  offsetWindows: number,
+  now?: number,
+): Promise<number | undefined> => {
+  const response = await api.get({
+    route: 'address/list',
+    query: { limit: 1, minify: true, ...rollingWindow(offsetWindows, now) },
+  });
+  if (response?.error) return undefined;
+  const total = response?.pagination?.totalRecords;
+  return Number.isFinite(total) ? total : undefined;
 };
 
 /* ----------------------------- badge sources ----------------------------- */

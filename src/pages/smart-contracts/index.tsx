@@ -1,7 +1,10 @@
 import { Accounts as Icon } from '@/assets/title-icons';
 import Title from '@/components/Layout/Title';
 import ActiveFilter from '@/components/SmartContractsList/ActiveFilter';
-import { RIGHT_ALIGNED_COLUMNS } from '@/components/SmartContractsList/columns';
+import {
+  RIGHT_ALIGNED_COLUMNS,
+  CONTRACT_COLUMNS,
+} from '@/components/SmartContractsList/columns';
 import ContractsFilters from '@/components/SmartContractsList/Filters';
 import ContractsMobileCard, {
   type IContractsMobileCardExtras,
@@ -10,7 +13,7 @@ import MostUsed from '@/components/SmartContractsList/MostUsed';
 import { contractRowSections } from '@/components/SmartContractsList/rows';
 import { ContractsTableWrapper } from '@/components/SmartContractsList/styles';
 import ContractsSummary from '@/components/SmartContractsList/Summary';
-import { useContractHeaders } from '@/components/SmartContractsList/useContractHeaders';
+import { useColumnHeaders } from '@/components/DataList/useColumnHeaders';
 import Table, { ITable } from '@/components/Table';
 import { useDeferred } from '@/components/DataList/useDeferred';
 import { smartContractsTableRequest } from '@/services/requests/smartContracts';
@@ -27,7 +30,7 @@ import nextI18nextConfig from '../../../next-i18next.config';
 
 const SmartContracts: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const header = useContractHeaders();
+  const header = useColumnHeaders(CONTRACT_COLUMNS);
   const { t } = useTranslation(['common', 'smartContracts']);
 
   // Once here, not per row: every cell calling this would open its own

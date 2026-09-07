@@ -1,4 +1,6 @@
+import { HOLD_LINE, SKELETON_INLINE } from '@/components/DataList/loadingText';
 import Skeleton from '@/components/Skeleton';
+import { useTranslation } from 'next-i18next';
 import { VersionStat } from '@/services/requests/heartbeat';
 import { formatAmount } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
@@ -11,14 +13,13 @@ import {
   EmptyText,
   ExpandButton,
   HeaderStack,
-  LatestCallout,
   ModeButton,
   ModeToggle,
   StackedBar,
-  StatDivider,
   StatItem,
   StatLabel,
   StatsStrip,
+  TitleBlock,
   StatValue,
   VersionBadge,
   VersionList,
@@ -32,7 +33,6 @@ export type DistributionMode = 'nodes' | 'stake';
 export interface VersionDistributionProps {
   stats: VersionStat[];
   latestVersion?: string;
-  totalValidators?: number;
   /** True while validators and/or heartbeat are still loading. */
   loading: boolean;
   /** False when heartbeat finished without usable version data. */
@@ -59,7 +59,6 @@ const VersionDistribution: React.FC<
 > = ({
   stats,
   latestVersion,
-  totalValidators,
   loading,
   heartbeatAvailable,
   validatorsAvailable,
@@ -68,6 +67,7 @@ const VersionDistribution: React.FC<
   selectedVersion,
   onSelectVersion,
 }) => {
+  const { t } = useTranslation(['validators']);
   const [expanded, setExpanded] = useState(false);
 
   const latestStat = useMemo(() => stats.find(s => s.isLatest), [stats]);
@@ -77,15 +77,20 @@ const VersionDistribution: React.FC<
       ? (latestStat?.stakePercent ?? 0)
       : (latestStat?.percent ?? 0);
 
-  // Strip always shows node-based % on latest (upgrade health at a glance).
-  const onLatestNodesPercent = latestStat?.percent;
   const heartbeatFailed = !loading && !heartbeatAvailable;
   const validatorsFailed = !loading && !validatorsAvailable;
 
+  /* The selected row is always among the visible ones. Collapsing hides
+     everything past the third, and the sort forces Unknown last, so on mainnet
+     `?version=Unknown` (64 of 209 validators, and the state the card's own row
+     click produces) left no row carrying aria-pressed and no way to see or
+     clear the filter without first opening "other versions". */
   const visibleStats = useMemo(() => {
     if (expanded || stats.length <= COLLAPSE_THRESHOLD) return stats;
-    return stats.slice(0, INITIAL_VISIBLE);
-  }, [expanded, stats]);
+    const head = stats.slice(0, INITIAL_VISIBLE);
+    const selected = stats.find(stat => stat.version === selectedVersion);
+    return selected && !head.includes(selected) ? [...head, selected] : head;
+  }, [expanded, stats, selectedVersion]);
 
   const hiddenCount = Math.max(stats.length - visibleStats.length, 0);
 
@@ -101,7 +106,7 @@ const VersionDistribution: React.FC<
     if (mode === 'stake') {
       return `${formatAmount(stat.stake / 10 ** KLV_PRECISION)} KLV`;
     }
-    return `${stat.count} node${stat.count === 1 ? '' : 's'}`;
+    return t('validators:Distribution.NodeCount', { count: stat.count });
   };
 
   const formatPercent = (stat: VersionStat) => {
@@ -114,47 +119,41 @@ const VersionDistribution: React.FC<
 
   const distributionBody = () => {
     if (loading) {
+      /* Two shapes because the loaded body has two: the 8px bar and the 30px
+         row of version chips. Four placeholders (14 + 8 + 32 + 32) stood the
+         card at 205px against the loaded 134, so it shrank 71px the moment the
+         figures landed and took the table below it up with it. Measured at
+         1440; both states are 134px now. */
       return (
         <>
-          <Skeleton width="40%" height={14} />
           <Skeleton width="100%" height={8} />
-          <Skeleton width="100%" height={32} />
-          <Skeleton width="100%" height={32} />
+          <Skeleton width="100%" height={30} />
         </>
       );
     }
 
     if (heartbeatFailed) {
       return (
-        <EmptyText>
-          Could not load node versions. Please try refreshing the page.
-        </EmptyText>
+        <EmptyText>{t('validators:Distribution.HeartbeatFailed')}</EmptyText>
       );
     }
 
     if (validatorsFailed) {
       return (
-        <EmptyText>
-          Could not load the full validator list for version stats. Please try
-          refreshing the page.
-        </EmptyText>
+        <EmptyText>{t('validators:Distribution.ValidatorsFailed')}</EmptyText>
       );
     }
 
     if (stats.length === 0) {
-      return <EmptyText>—</EmptyText>;
+      return <EmptyText>- -</EmptyText>;
     }
 
     return (
       <>
-        {latestVersion && (
-          <LatestCallout $good={onLatestPercent >= 50}>
-            {onLatestPercent.toFixed(1)}% of{' '}
-            {mode === 'stake' ? 'stake' : 'nodes'} on latest ({latestVersion})
-          </LatestCallout>
-        )}
-
-        <StackedBar role="img" aria-label="Version distribution bar">
+        <StackedBar
+          role="img"
+          aria-label={t('validators:Distribution.BarLabel')}
+        >
           {stats.map(stat => (
             <BarSegment
               key={stat.version}
@@ -165,14 +164,16 @@ const VersionDistribution: React.FC<
           ))}
         </StackedBar>
 
-        <VersionList aria-label="Version distribution">
+        <VersionList aria-label={t('validators:Distribution.ListLabel')}>
           {visibleStats.map(stat => (
             <li key={stat.version}>
               <VersionRow
                 type="button"
                 $selected={selectedVersion === stat.version}
                 aria-pressed={selectedVersion === stat.version}
-                title={`Filter by ${stat.version}`}
+                title={t('validators:Distribution.FilterBy', {
+                  version: stat.version,
+                })}
                 onClick={() => handleRowClick(stat.version)}
               >
                 <VersionMeta>
@@ -191,12 +192,14 @@ const VersionDistribution: React.FC<
 
         {hiddenCount > 0 && !expanded && (
           <ExpandButton type="button" onClick={() => setExpanded(true)}>
-            +{hiddenCount} other version{hiddenCount === 1 ? '' : 's'}
+            {t('validators:Distribution.OtherVersions', {
+              count: hiddenCount,
+            })}
           </ExpandButton>
         )}
         {expanded && stats.length > COLLAPSE_THRESHOLD && (
           <ExpandButton type="button" onClick={() => setExpanded(false)}>
-            Show less
+            {t('validators:Distribution.ShowLess')}
           </ExpandButton>
         )}
       </>
@@ -205,60 +208,79 @@ const VersionDistribution: React.FC<
 
   return (
     <HeaderStack data-testid="version-distribution">
-      <StatsStrip aria-label="Validator network summary">
-        <StatItem>
-          <StatLabel>Total Validators</StatLabel>
-          {loading && totalValidators === undefined ? (
-            <Skeleton width={48} height={22} />
-          ) : (
-            <StatValue>{totalValidators ?? '—'}</StatValue>
-          )}
-        </StatItem>
-
-        <StatDivider aria-hidden />
-
-        <StatItem>
-          <StatLabel>Newest Version</StatLabel>
-          {loading && !latestVersion ? (
-            <Skeleton width={80} height={22} />
-          ) : (
-            <StatValue title={latestVersion}>{latestVersion ?? '—'}</StatValue>
-          )}
-        </StatItem>
-
-        <StatDivider aria-hidden />
-
-        <StatItem>
-          <StatLabel>On Latest</StatLabel>
-          {loading && onLatestNodesPercent === undefined ? (
-            <Skeleton width={64} height={22} />
-          ) : onLatestNodesPercent !== undefined ? (
-            <StatValue
-              $accent={onLatestNodesPercent >= 50}
-              data-testid="on-latest-callout"
-            >
-              {onLatestNodesPercent.toFixed(1)}%
-            </StatValue>
-          ) : (
-            <StatValue>—</StatValue>
-          )}
-        </StatItem>
-      </StatsStrip>
-
       <DistributionCard>
         <CardTop>
-          <CardTitle>
-            <strong>Version Distribution</strong>
-          </CardTitle>
+          <TitleBlock>
+            <CardTitle>
+              <strong>{t('validators:Distribution.Title')}</strong>
+            </CardTitle>
+
+            <StatsStrip aria-label={t('validators:Distribution.SummaryLabel')}>
+              <StatItem>
+                <StatLabel>{t('validators:Distribution.Newest')}</StatLabel>
+                {loading && !latestVersion ? (
+                  /* Through StatValue, not beside it: a bare Skeleton carries
+                     its own line box and stood the header 2px taller than the
+                     loaded one. */
+                  <StatValue>
+                    {HOLD_LINE}
+                    <Skeleton
+                      width={80}
+                      height={14}
+                      containerCustomStyles={SKELETON_INLINE}
+                    />
+                  </StatValue>
+                ) : (
+                  <StatValue title={latestVersion}>
+                    {latestVersion ?? '- -'}
+                  </StatValue>
+                )}
+              </StatItem>
+
+              <StatItem>
+                {/* Follows the mode: it sits directly above the bar it
+                    describes, so pinning it to nodes would print two
+                    disagreeing "on latest" figures the moment you pick Stake. */}
+                {loading && latestStat === undefined ? (
+                  <StatValue>
+                    {HOLD_LINE}
+                    <Skeleton
+                      width={64}
+                      height={14}
+                      containerCustomStyles={SKELETON_INLINE}
+                    />
+                  </StatValue>
+                ) : latestStat !== undefined ? (
+                  <StatValue
+                    $accent={onLatestPercent >= 50}
+                    data-testid="on-latest-callout"
+                  >
+                    {t(
+                      mode === 'stake'
+                        ? 'validators:Distribution.OnLatestStake'
+                        : 'validators:Distribution.OnLatestNodes',
+                      { percent: onLatestPercent.toFixed(1) },
+                    )}
+                  </StatValue>
+                ) : (
+                  <StatValue>- -</StatValue>
+                )}
+              </StatItem>
+            </StatsStrip>
+          </TitleBlock>
+
           {!heartbeatFailed && !validatorsFailed && (
-            <ModeToggle role="group" aria-label="Distribution metric">
+            <ModeToggle
+              role="group"
+              aria-label={t('validators:Distribution.MetricLabel')}
+            >
               <ModeButton
                 type="button"
                 $active={mode === 'nodes'}
                 aria-pressed={mode === 'nodes'}
                 onClick={() => onModeChange('nodes')}
               >
-                Nodes
+                {t('validators:Distribution.ModeNodes')}
               </ModeButton>
               <ModeButton
                 type="button"
@@ -266,7 +288,7 @@ const VersionDistribution: React.FC<
                 aria-pressed={mode === 'stake'}
                 onClick={() => onModeChange('stake')}
               >
-                Stake
+                {t('validators:Distribution.ModeStake')}
               </ModeButton>
             </ModeToggle>
           )}

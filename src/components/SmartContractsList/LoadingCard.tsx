@@ -1,11 +1,7 @@
-import { Tile, TilesGrid } from '@/components/DataList/styles';
+import { LegendRow, Tile, TilesGrid } from '@/components/DataList/styles';
 import Skeleton from '@/components/Skeleton';
 import React from 'react';
-import {
-  ContractsSummaryCard,
-  MostUsedTile,
-  PlaceholderLegendRow,
-} from './styles';
+import { ContractsSummaryCard, MostUsedTile } from './styles';
 
 /**
  * Skeleton heights in rem, not px. The root font is 93,75% below 1440px and
@@ -34,11 +30,12 @@ const TILE_LINES = [
 ];
 
 /**
- * The distribution bar and its one-line legend, before the statistics arrive.
- * Its own shape rather than the shared SummaryBarPlaceholder: that one wraps
- * its fixed-width items like a multi-row legend, while this card's legend is
- * a single row on every width (it scrolls on mobile), so the shared shape
- * reserved two rows where one would land.
+ * The distribution bar and its legend, before the statistics arrive. Six
+ * pills, one per legend item (the five busiest contracts and "Other"), on the
+ * card's own legend row, so they take the row's grid at every width and the
+ * two states cannot differ in height. The pill is a rem width rather than a
+ * share of the row, since in a grid cell a percentage would be of the cell,
+ * and bar plus margins make the item's 1,03125rem line box (16,5px at 12px).
  */
 export const FiguresBarPlaceholder: React.FC = () => (
   <>
@@ -47,16 +44,16 @@ export const FiguresBarPlaceholder: React.FC = () => (
       height={8}
       containerCustomStyles={{ marginTop: 16 }}
     />
-    <PlaceholderLegendRow>
-      {Array.from({ length: 4 }, (unused, index) => (
+    <LegendRow>
+      {Array.from({ length: 6 }, (unused, index) => (
         <Skeleton
           key={index}
-          width="12%"
+          width="6.5rem"
           height="0.75rem"
-          containerCustomStyles={{ margin: '0.15625rem 0' }}
+          containerCustomStyles={{ margin: '0.140625rem 0' }}
         />
       ))}
-    </PlaceholderLegendRow>
+    </LegendRow>
   </>
 );
 

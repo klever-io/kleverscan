@@ -75,6 +75,8 @@
     "MostTransacted": "Mais transacionado",
     "OtherTypes": "Outros",
     "Total": "Total de transações",
-    "Up": "alta de {{percent}} em relação às 24 horas anteriores"
+    "Up": "alta de {{percent}} em relação às 24 horas anteriores",
+    "Volume": "Volume (24h)",
+    "VolumeBasis": "KLV movimentado, excluindo emissão e queima"
   }
 }

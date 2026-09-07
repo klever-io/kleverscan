@@ -1,5 +1,5 @@
 import Filter, { IFilter } from '@/components/Filter';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
+import { CompactFilterBar } from '@/components/DataList/styles';
 import ActiveFilter from './ActiveFilter';
 import { setQueryAndRouter } from '@/utils';
 import { useTranslation } from 'next-i18next';
@@ -80,7 +80,7 @@ const ContractsFilters: React.FC = () => {
   ];
 
   return (
-    <FilterContainer>
+    <CompactFilterBar>
       {router.isReady && (
         <>
           {filters.map(filter => (
@@ -89,7 +89,7 @@ const ContractsFilters: React.FC = () => {
           <ActiveFilter />
         </>
       )}
-    </FilterContainer>
+    </CompactFilterBar>
   );
 };
 

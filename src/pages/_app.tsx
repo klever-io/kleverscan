@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback } from 'react';
+import { PropsWithChildren } from 'react';
 import ContextProviders from '@/components/ContextProviders';
 import { appWithTranslation, SSRConfig } from 'next-i18next';
 import App from 'next/app';
@@ -67,17 +67,6 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
 
   const isTargetDate = currentDate >= startDate && currentDate <= endDate;
 
-  const RenderedComponent: React.FC = useCallback(() => {
-    if (isTargetDate) {
-      return <Maintenance />;
-    }
-    return (
-      <LayoutWrapper>
-        <Component {...pageProps} />
-      </LayoutWrapper>
-    );
-  }, [isTargetDate, pageProps]);
-
   return (
     <>
       <Head>
@@ -88,7 +77,16 @@ const MyApp = ({ Component, pageProps, initialDarkTheme }: AppProps) => {
       </Head>
       <InternalThemeProvider initialDarkTheme={initialDarkTheme}>
         <ContextProviders>
-          <RenderedComponent />
+          {/* Rendered inline, not through a component built per render: a new
+              function identity is a new component type, so React tore down the
+              whole tree (layout, page and footers) on every navigation. */}
+          {isTargetDate ? (
+            <Maintenance />
+          ) : (
+            <LayoutWrapper>
+              <Component {...pageProps} />
+            </LayoutWrapper>
+          )}
           <GlobalStyle />
           <NProgress />
         </ContextProviders>

@@ -1,10 +1,12 @@
 import { useTranslation } from 'next-i18next';
 import React from 'react';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/DataList/ExplorerLink';
 import {
-  BadgePill,
-  MobileBarRow,
+  AssetName,
+  IdentityLink,
+  TickerBadge,
   MobileListCard,
   MobileMetaItem,
   MobileMetaRow,
@@ -16,11 +18,16 @@ import {
   ShareTrack,
 } from '@/components/DataList/styles';
 import { formatShare } from '@/components/DataList/format';
-import AssetIdentity from '@/components/DataList/AssetIdentity';
+import AssetLogo from '@/components/Logo/AssetLogo';
 import { IAsset } from '@/types';
 import { formatAmount } from '@/utils/formatFunctions';
 import { IoIosInfinite } from 'react-icons/io';
-import { MobileCapCaption, RewardsRate, RewardsUnit } from './styles';
+import {
+  MobileCapCaption,
+  MobileCapRow,
+  RewardsRate,
+  RewardsUnit,
+} from './styles';
 import { assetSupplyViews, getCapUsage, getRewardsModel } from './helpers';
 import { ASSET_BADGE_TOOLTIPS, FPR_TOOLTIP } from './badgeTexts';
 
@@ -62,35 +69,47 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
 
   return (
     <MobileListCard data-testid={`table-row-${index}`}>
+      {/* One line, id included, so the badges and the two action buttons
+          centre on the name instead of floating between two lines, and the
+          card is a row shorter than the stacked identity block made it. */}
       <MobileTopRow>
-        <AssetIdentity
+        <IdentityLink
           href={`/asset/${assetId}`}
-          testId="asset-link"
-          name={name}
-          assetId={assetId}
-          ticker={ticker}
-          logo={logo}
-          verified={verified}
-        />
+          data-testid="asset-link"
+          title={name}
+        >
+          <AssetLogo
+            logo={logo}
+            ticker={ticker}
+            name={name}
+            verified={verified}
+            size={32}
+          />
+          <AssetName>{name}</AssetName>
+          <TickerBadge $variant="contract">{assetId}</TickerBadge>
+        </IdentityLink>
         {assetType === 'NonFungible' && (
-          <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
+          <ExplainedBadge variant="neutral" msg={t(ASSET_BADGE_TOOLTIPS.nft)}>
             {t('assets:List.Nft')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         {assetType === 'SemiFungible' && (
-          <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
+          <ExplainedBadge variant="neutral" msg={t(ASSET_BADGE_TOOLTIPS.sft)}>
             {t('assets:List.Sft')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         {attributes?.isPaused && (
-          <BadgePill $variant="warning" title={t(ASSET_BADGE_TOOLTIPS.paused)}>
+          <ExplainedBadge
+            variant="warning"
+            msg={t(ASSET_BADGE_TOOLTIPS.paused)}
+          >
             {t('assets:List.Paused')}
-          </BadgePill>
+          </ExplainedBadge>
         )}
         {hasKdaPool && (
-          <BadgePill $variant="accent" title={t(ASSET_BADGE_TOOLTIPS.pool)}>
+          <ExplainedBadge variant="accent" msg={t(ASSET_BADGE_TOOLTIPS.pool)}>
             Fee Pool
-          </BadgePill>
+          </ExplainedBadge>
         )}
         <RowActions>
           <CopyAction
@@ -107,38 +126,42 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
           />
         </RowActions>
       </MobileTopRow>
+      {/* Circulating, its cap bar and the figure on one line: the bar
+          measures the same supply the figure states, and as its own row it
+          left the card four lines tall with the middle of two of them
+          empty. */}
       <MobileTotalRow>
         <MobileMetaItem>{t('assets:List.Circulating')}</MobileMetaItem>
+        <MobileCapRow>
+          {cap.hasCap ? (
+            <>
+              <ShareTrack aria-hidden="true">
+                <ShareFill $delay={Math.min(index, 15) * 20}>
+                  {cap.usedShare > 0 && (
+                    <ShareSegment
+                      $kind="liquid"
+                      style={{ width: `${cap.usedShare * 100}%` }}
+                    />
+                  )}
+                </ShareFill>
+              </ShareTrack>
+              <MobileCapCaption>
+                {t('assets:List.OfCapAmount', {
+                  share: formatShare(capBasis, maxSupply),
+                  max: formatAmount(maxSupply / precisionDivisor),
+                })}
+              </MobileCapCaption>
+            </>
+          ) : (
+            <MobileCapCaption>
+              <IoIosInfinite size={14} /> {t('assets:List.UnlimitedSupply')}
+            </MobileCapCaption>
+          )}
+        </MobileCapRow>
         <strong>
           {formatAmount(circulating / precisionDivisor)} {ticker}
         </strong>
       </MobileTotalRow>
-      <MobileBarRow>
-        {cap.hasCap ? (
-          <>
-            <ShareTrack $fluid aria-hidden="true">
-              <ShareFill $delay={Math.min(index, 15) * 20}>
-                {cap.usedShare > 0 && (
-                  <ShareSegment
-                    $kind="liquid"
-                    style={{ width: `${cap.usedShare * 100}%` }}
-                  />
-                )}
-              </ShareFill>
-            </ShareTrack>
-            <MobileCapCaption>
-              {t('assets:List.OfCapAmount', {
-                share: formatShare(capBasis, maxSupply),
-                max: formatAmount(maxSupply / precisionDivisor),
-              })}
-            </MobileCapCaption>
-          </>
-        ) : (
-          <MobileCapCaption>
-            <IoIosInfinite size={14} /> {t('assets:List.UnlimitedSupply')}
-          </MobileCapCaption>
-        )}
-      </MobileBarRow>
       <MobileMetaRow>
         <MobileMetaItem>
           {t('assets:List.Staked')}{' '}
@@ -160,9 +183,9 @@ const AssetsMobileCard: React.FC<IAssetsMobileCardProps> = ({
             <RewardsUnit>{t('assets:List.Apr')}</RewardsUnit>
           )}
           {rewards.kind === 'fpr' && (
-            <BadgePill $variant="neutral" title={t(FPR_TOOLTIP)}>
+            <ExplainedBadge variant="neutral" msg={t(FPR_TOOLTIP)}>
               FPR
-            </BadgePill>
+            </ExplainedBadge>
           )}
           {rewards.kind === 'none' && t('assets:List.RewardsUnavailable')}
         </MobileMetaItem>

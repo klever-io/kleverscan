@@ -1,9 +1,9 @@
 import { AssetSummary } from '@/components/Asset/AssetSummary';
 import { AssetTabs } from '@/components/Asset/AssetTabs';
 import Tabs, { ITabs } from '@/components/NewTabs';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
 import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
-import { TransactionsTableWrapper } from '@/components/TransactionsList/styles';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import Holders from '@/components/Tabs/Holders';
 import TransactionsFilters from '@/components/TransactionsFilters';
@@ -27,7 +27,7 @@ import React, {
 } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import nextI18nextConfig from '../../../next-i18next.config';
-import { transactionRowSections } from '../transactions';
+import { useTransactionRowSections } from '../transactions';
 
 const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const router = useRouter();
@@ -82,7 +82,9 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
       setQueryAndRouter(initialQueryState, router);
       setSelectedTab((router.query.tab as string) || getTableHeaders()[0]);
     }
-  }, [router.isReady]);
+    // Also keyed on the asset: the page persists across asset-to-asset
+    // navigation now, and a kept Holders tab does not exist on an SFT.
+  }, [router.isReady, router.query.asset]);
 
   const requestTransactions = async (page: number, limit: number) => {
     const newQuery = {
@@ -108,10 +110,12 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     };
   };
 
+  const rowSections = useTransactionRowSections();
+
   const tableProps: ITable = {
     type: 'transactions',
     header: transactionHeaders,
-    rowSections: transactionRowSections,
+    rowSections,
     dataName: 'transactions',
     request: (page, limit) => requestTransactions(page, limit),
     Filters: TransactionsFilters,
@@ -125,11 +129,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
   const renderSelectedTab = (): ReactNode => {
     switch (selectedTab) {
       case `${t('common:Titles.Transactions')}`:
-        return (
-          <TransactionsTableWrapper>
-            <Table {...tableProps} />
-          </TransactionsTableWrapper>
-        );
+        return <TransactionsTable {...tableProps} />;
       case `${t('common:Tabs.Holders')}`:
         if (asset && asset.assetType !== AssetTypeString.SemiFungible) {
           return <Holders asset={asset} />;
@@ -156,6 +156,7 @@ const Asset: React.FC<PropsWithChildren<IAssetPage>> = ({}) => {
     <AssetPageContainer>
       <AssetSummary asset={asset} ITO={ITO} />
       <AssetTabs
+        key={String(router.query.asset)}
         asset={asset}
         ITO={ITO}
         assetPool={assetPool}

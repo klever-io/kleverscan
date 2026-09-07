@@ -109,7 +109,6 @@ const FUNCTION_NAME_LIMIT = 40;
 const readFunctionName = (data?: string[]): string =>
   hexToString(data?.[0] || '')
     .split('@')[0]
-    // eslint-disable-next-line no-control-regex
     .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
     .slice(0, FUNCTION_NAME_LIMIT);
 

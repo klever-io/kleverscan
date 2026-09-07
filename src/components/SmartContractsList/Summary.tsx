@@ -14,6 +14,7 @@ import {
 import { useDeferred } from '@/components/DataList/useDeferred';
 import Skeleton from '@/components/Skeleton';
 import {
+  activeContracts24hCall,
   contractTransactions24hCall,
   smartContractsListCall,
   smartContractTotalTransactionsListCall,
@@ -32,8 +33,10 @@ import {
   ContractsSummaryCard,
   MostUsedTile,
   SummaryContractLink,
+  LegendName,
 } from './styles';
 import {
+  IContractShare,
   segmentColor,
   shareBarLabel,
   shareModel,
@@ -67,12 +70,13 @@ const ContractsSummary: React.FC = () => {
       // Every one of these maps its own failure to undefined, so a half-failed
       // set still lands here as data rather than as an error, and each tile
       // decides on its own whether it has something to say.
-      const [contracts, transactions, windows] = await Promise.all([
+      const [contracts, transactions, windows, active] = await Promise.all([
         smartContractsListCall(),
         smartContractTotalTransactionsListCall(),
         contractTransactions24hCall(),
+        activeContracts24hCall(),
       ]);
-      return { contracts, transactions, windows };
+      return { contracts, transactions, windows, active };
     },
     ...FIGURE_CACHE,
   });
@@ -89,7 +93,7 @@ const ContractsSummary: React.FC = () => {
   }
   if (!data) return null;
 
-  const { contracts, transactions, windows } = data;
+  const { contracts, transactions, windows, active } = data;
   const busiest = topContracts(shares?.statistics);
   const model = shareModel(busiest, shares?.allSuccessful);
   // Each tile appears only when its own request answered; a failed part is
@@ -112,6 +116,10 @@ const ContractsSummary: React.FC = () => {
     theme.rose,
   ];
 
+  const identity = (segment: Pick<IContractShare, 'address' | 'name'>) =>
+    segment.name
+      ? safeContractName(segment.name) || segment.address
+      : segment.address;
   const otherLabel = t('smartContracts:List.OtherContracts', {
     defaultValue: 'Other contracts',
   });
@@ -131,6 +139,16 @@ const ContractsSummary: React.FC = () => {
             <TileValue>
               {contracts.totalContracts.toLocaleString(NUMBER_LOCALE)}
             </TileValue>
+            {active !== undefined && (
+              <TileSub>
+                {/* The share that ran at all: 16 of 211 on 2026-09-03, which
+                    a deployed count alone does not tell a reader. */}
+                {t('smartContracts:List.ActiveLast24h', {
+                  defaultValue: '{{formatted}} active in the last 24h',
+                  formatted: active.toLocaleString(NUMBER_LOCALE),
+                })}
+              </TileSub>
+            )}
           </Tile>
         )}
 
@@ -218,7 +236,7 @@ const ContractsSummary: React.FC = () => {
                 style={{
                   width: `${(segment.count / model.total) * 100}%`,
                 }}
-                title={`${segment.name ? safeContractName(segment.name) || segment.address : segment.address} · ${segment.count.toLocaleString(NUMBER_LOCALE)}`}
+                title={`${identity(segment)} · ${segment.count.toLocaleString(NUMBER_LOCALE)}`}
                 aria-hidden="true"
               />
             ))}
@@ -235,16 +253,16 @@ const ContractsSummary: React.FC = () => {
           </DistBar>
           <LegendRow>
             {model.segments.map((segment, index) => (
-              <LegendItem key={segment.address}>
+              <LegendItem key={segment.address} title={identity(segment)}>
                 <LegendDot $color={segmentColor(index, palette)} />
-                {contractLabel(segment, 10)}{' '}
+                <LegendName>{contractLabel(segment, 10)}</LegendName>
                 <strong>{formatShare(segment.count, model.total)}</strong>
               </LegendItem>
             ))}
             {model.other > 0 && (
-              <LegendItem $dimmed>
+              <LegendItem $dimmed title={otherLabel}>
                 <LegendDot $color={theme.blueGray500} />
-                {otherLabel}{' '}
+                <LegendName>{otherLabel}</LegendName>
                 <strong>{formatShare(model.other, model.total)}</strong>
               </LegendItem>
             )}

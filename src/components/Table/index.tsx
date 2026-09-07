@@ -5,6 +5,7 @@ import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
 import { normalizePageParam, processRowSectionsLayout } from '@/utils/table';
+import { useBelowWidth } from '@/utils/viewport';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
@@ -110,6 +111,24 @@ export interface ITable<TCard = Record<string, never>> {
   /** Column indexes whose loading bar hugs the right edge, matching a skin
    *  that right-aligns those cells; default all-left, as unskinned tables. */
   rightAlignedSkeletonColumns?: number[];
+  /**
+   * Viewport width under which the rows render as `MobileCard` instead of as
+   * table rows, for a table whose row needs more width than the shared tablet
+   * breakpoint gives it. Without it the switch happens at that breakpoint, as
+   * it always did. The caller's stylesheet has to move with it: the loading
+   * rows and the table's own surface still read the shared breakpoint from
+   * CSS, which JS cannot see.
+   */
+  cardBreakpoint?: number;
+  /**
+   * False while the caller cannot answer `request` yet, for a filter it
+   * resolves client-side against a second query. The table then holds its
+   * loading rows instead of running the request: answering unfiltered painted
+   * a full page of rows, and an unfiltered record count, under a filtered URL
+   * for as long as that second query took (measured 393ms to 579ms, and 1.6s
+   * on a throttled connection).
+   */
+  requestReady?: boolean;
 }
 
 /** Floor for a loading bar, so a narrow column gets a placeholder rather than
@@ -146,9 +165,14 @@ const Table = <TCard,>({
   mobileCardProps,
   singleLineSkeleton = false,
   rightAlignedSkeletonColumns = [],
+  cardBreakpoint,
+  requestReady = true,
 }: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
+  // One answer for every layout decision below, so the header, the loading
+  // rows and the loaded rows cannot each pick a different one.
+  const showCards = useBelowWidth(cardBreakpoint) || isMobile || isTablet;
   const limits = [10, 20, 50];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
@@ -210,8 +234,23 @@ const Table = <TCard,>({
         ? 10_000
         : 0,
 
+    enabled: requestReady,
+
     ...onErrorHandler(),
   });
+
+  /* `enabled: false` reports isLoading false, not true, so without this the
+     held state would fall through to the empty state instead of the rows. */
+  const pending = isLoading || !requestReady;
+
+  /* Manual triggers pierce `enabled`: react-query's refetch() fetches a
+     disabled query too, so the refresh icon and the page-change effect ran
+     the request inside the hold window and painted what the hold exists to
+     prevent. Every manual trigger goes through here, the render-gated retry
+     included, so nothing enforces the hold from a distance. */
+  const refetchWhenReady = (): void => {
+    if (requestReady) refetch();
+  };
 
   const props: TableRowProps = {
     pathname: router.pathname,
@@ -234,17 +273,20 @@ const Table = <TCard,>({
     if (page !== 1 && intervalController) {
       intervalController(0);
     }
-    refetch();
+    refetchWhenReady();
   }, [page]);
 
   useEffect(() => {
     if (interval) {
       const intervalId = setInterval(() => {
-        refetch();
+        refetchWhenReady();
       }, interval);
       return () => clearInterval(intervalId);
     }
-  }, [interval, limit]);
+    /* requestReady in the deps on purpose: the callback closes over it, and
+       without the re-run a hold that arrives after mount kept polling through
+       the stale closure. */
+  }, [interval, limit, requestReady]);
 
   const handleScrollTop = () => {
     window.scrollTo({
@@ -267,6 +309,9 @@ const Table = <TCard,>({
                     <ItemContainer
                       key={value}
                       onClick={() => {
+                        // No refetch: the router write changes the query key,
+                        // and a call from this closure re-requested the old
+                        // limit first (measured: two requests per click).
                         setQueryAndRouter(
                           {
                             ...router.query,
@@ -275,7 +320,6 @@ const Table = <TCard,>({
                           },
                           router,
                         );
-                        refetch();
                       }}
                       active={value === limit}
                     >
@@ -290,7 +334,7 @@ const Table = <TCard,>({
                   msg="Refresh"
                   Component={() => (
                     <IoReloadSharpWrapper $loading={isFetching}>
-                      <IoReloadSharp size={22} onClick={() => refetch()} />
+                      <IoReloadSharp size={22} onClick={refetchWhenReady} />
                     </IoReloadSharpWrapper>
                   )}
                 />
@@ -320,9 +364,8 @@ const Table = <TCard,>({
         >
           {/* The header stays while fetching: dropping it made the table lose
               its height and snap back once the rows arrived. */}
-          {!isMobile &&
-            !isTablet &&
-            (isLoading || (response?.items && response.items.length !== 0)) && (
+          {!showCards &&
+            (pending || (response?.items && response.items.length !== 0)) && (
               <TableRow data-testid="table-header">
                 {header?.map((item, index) => (
                   <HeaderItem
@@ -355,7 +398,7 @@ const Table = <TCard,>({
               </TableRow>
             )}
 
-          {isLoading && (
+          {pending && (
             <>
               {Array(limit)
                 .fill(limit)
@@ -365,7 +408,7 @@ const Table = <TCard,>({
                       return (
                         <MobileCardItem
                           isAssets={type === 'assets' || type === 'proposals'}
-                          isRightAligned={isMobile || isTablet}
+                          isRightAligned={showCards}
                           key={String(index2) + String(index)}
                           columnSpan={2}
                           isLastRow={index === limit - 1}
@@ -410,13 +453,17 @@ const Table = <TCard,>({
                 ))}
             </>
           )}
-          {response?.items &&
+          {/* Held along with everything else: a hold that arrives AFTER a
+              successful load (the version join dropping away mid-session)
+              otherwise painted these cached rows underneath the skeletons. */}
+          {!pending &&
+            response?.items &&
             response?.items?.length > 0 &&
             response?.items?.map((item: any, index: number) => {
               let spanCount = 0;
               const isLastRow = index === response?.items?.length - 1;
 
-              if ((isMobile || isTablet) && MobileCard) {
+              if (showCards && MobileCard) {
                 return (
                   <MobileCard
                     key={JSON.stringify(item)}
@@ -443,9 +490,7 @@ const Table = <TCard,>({
                         return (
                           <MobileCardItem
                             isAssets={type === 'assets' || type === 'proposals'}
-                            isRightAligned={
-                              (isMobile || isTablet) && isRightAligned
-                            }
+                            isRightAligned={showCards && isRightAligned}
                             key={String(index2) + String(index)}
                             columnSpan={span}
                             isLastRow={isLastRow}
@@ -456,7 +501,7 @@ const Table = <TCard,>({
                             currentColumn={index2}
                             data-testid={`table-row-${index}`}
                           >
-                            {isMobile || isTablet ? (
+                            {showCards ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
                             {/* Called, not mounted as a component type: the
@@ -473,9 +518,13 @@ const Table = <TCard,>({
             })}
 
           {!isFetching &&
+            requestReady &&
             (!response?.items || response?.items?.length === 0) && (
               <TableEmptyData>
-                <RetryContainer onClick={() => refetch()} $loading={isFetching}>
+                <RetryContainer
+                  onClick={refetchWhenReady}
+                  $loading={isFetching}
+                >
                   <span>Retry</span>
                   <IoReloadSharp size={20} />
                 </RetryContainer>
@@ -490,6 +539,7 @@ const Table = <TCard,>({
         </BackTopButton>
       </ContainerView>
       {showPagination &&
+        !pending &&
         typeof response?.totalPages === 'number' &&
         response?.totalPages > 1 && (
           <PaginationContainer>

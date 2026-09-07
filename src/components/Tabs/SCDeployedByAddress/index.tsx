@@ -6,7 +6,8 @@ import ContractsMobileCard, {
 } from '@/components/SmartContractsList/MobileCard';
 import { contractRowSections } from '@/components/SmartContractsList/rows';
 import { ContractsTableWrapper } from '@/components/SmartContractsList/styles';
-import { useContractHeaders } from '@/components/SmartContractsList/useContractHeaders';
+import { useColumnHeaders } from '@/components/DataList/useColumnHeaders';
+import { CONTRACT_COLUMNS } from '@/components/SmartContractsList/columns';
 import Table, { ITable } from '@/components/Table';
 import { IInnerTableProps } from '@/types';
 import { SmartContractsList } from '@/types/smart-contract';
@@ -26,7 +27,7 @@ interface ISCDeployedByAddress {
 const SCDeployedByAddress: React.FC<
   PropsWithChildren<ISCDeployedByAddress>
 > = ({ smartContractsTableProps }) => {
-  const header = useContractHeaders();
+  const header = useColumnHeaders(CONTRACT_COLUMNS);
   const deferred = useDeferred();
   // This tab narrows by route segment: the request pins the deployer to the
   // account, so every row shares it and a count badge would be a dead end.

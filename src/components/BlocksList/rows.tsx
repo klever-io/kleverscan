@@ -1,5 +1,9 @@
 import { klvAmount, NUMBER_LOCALE } from '@/components/DataList/format';
-import { AmountMuted, AmountPrimary } from '@/components/DataList/styles';
+import {
+  AmountMuted,
+  AmountPrimary,
+  NumericCell,
+} from '@/components/DataList/styles';
 import ExplorerLink from '@/components/ExplorerLink';
 import { CustomFieldWrapper } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
@@ -10,7 +14,6 @@ import { bandwidthFeeReward } from '@/utils/fees';
 import { parseAddress } from '@/utils/parseValues';
 import React from 'react';
 import { BLOCK_COLUMNS, BlockColumnKey } from './columns';
-import { NumericCell } from './styles';
 
 /**
  * Widths and spans with no cell content. The shared Table calls `rowSections`

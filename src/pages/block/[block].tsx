@@ -79,7 +79,10 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
     setSelectedTab((router.query.tab as string) || tableHeaders[0]);
     setSelectedCard((router.query.card as string) || cardHeaders[0]);
     setQueryAndRouter({ ...router.query }, router);
-  }, [router.isReady]);
+    // Also keyed on the block: prev/next keeps the page mounted now, and the
+    // shared Tabs highlight resets on the query change while this state did
+    // not, splitting the highlight from the rendered content.
+  }, [router.isReady, router.query.block]);
 
   const BlockNavigation: React.FC<PropsWithChildren> = () => {
     return (

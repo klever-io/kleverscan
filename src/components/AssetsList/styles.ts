@@ -1,10 +1,30 @@
+import { ROW_LAYOUT_MIN_WIDTH, belowWidth } from '@/components/DataList/layout';
 import {
+  assetCardHeaderRules,
+  AssetName,
+  compactFilterRow,
+  holdTiles,
+  SummaryCard,
   DATA_LIST_ROW_HEIGHT,
+  dataListCardBand,
   dataListTableSkin,
   inCard,
+  MobileListCard,
+  MobileTotalRow,
+  RowActions,
 } from '@/components/DataList/styles';
-import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
-import styled from 'styled-components';
+import {
+  HeaderItem,
+  MobileCardItem,
+  TableRow,
+} from '@/components/Table/styles';
+import styled, { css } from 'styled-components';
+
+const BELOW_ROW = belowWidth(ROW_LAYOUT_MIN_WIDTH);
+
+export const RegistryCard = styled(SummaryCard)`
+  ${holdTiles(4)}
+`;
 
 /* ------------------------------ supply cells ----------------------------- */
 
@@ -79,21 +99,38 @@ export const RewardsMuted = styled.span`
 
 /* ------------------------------ registry strip --------------------------- */
 
-/** The composition bar and legend are desktop-and-tablet only; on phones the
-    strip keeps just its tiles to protect above-the-fold space. */
-export const StripBarArea = styled.div`
-  @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    display: none;
-  }
-`;
+/** The bar reads at every width: its segments are percentages and the legend
+ *  wraps, so the old phone-width display:none only lost information. */
+export const StripBarArea = styled.div``;
 
 /* --------------------------- mobile card pieces -------------------------- */
+
+/**
+ * The cap bar and its caption on one line.
+ *
+ * The bar used to be `$fluid`, so it ran the full width of the card: on a
+ * tablet-width card that is a 700px hairline carrying a single percentage, and
+ * the wider the card the less it looked like a measurement. 150px is exactly
+ * what the same bar occupies in the desktop CapUsed cell, so the card and the
+ * row now state the figure at the same size. It wraps rather than shrinks: at
+ * 360px the pair needs 270px against the 300 the card has, and a bar squeezed
+ * below its track width stops being readable at all.
+ */
+export const MobileCapRow = styled.div`
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  /* Sits right after the Circulating label and lets the figure keep the far
+     end of the line. */
+  margin-right: auto;
+`;
 
 export const MobileCapCaption = styled.span`
   ${inCard('inline-flex')}
   align-items: center;
   gap: 4px;
-  margin-top: 4px;
   font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   color: ${props => props.theme.darkText};
@@ -112,8 +149,56 @@ export const MobileCapCaption = styled.span`
  */
 export const AssetsTableWrapper = styled.div`
   ${dataListTableSkin}
+  ${compactFilterRow}
 
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+  ${assetCardHeaderRules}
+
+  /* The cap bar shares the Circulating line only where that line has room for
+     it: on a ~300px phone card the 150px track plus its caption broke
+     "10.99 M KFI" across two lines. The widest row on the page measures 396px,
+     which a 480 viewport still holds (420 inner), so only below that does the
+     bar take a line of its own; the old 768 cut made every tablet card a row
+     taller for nothing. */
+  @media screen and (max-width: 479.98px) {
+    ${MobileTotalRow} {
+      flex-wrap: wrap;
+    }
+
+    ${MobileTotalRow} > strong {
+      white-space: nowrap;
+    }
+
+    ${MobileCapRow} {
+      order: 1;
+      flex-basis: 100%;
+      margin-right: 0;
+      margin-top: 4px;
+    }
+  }
+
+  ${dataListCardBand(BELOW_ROW)}
+
+  @media screen and (min-width: ${props =>
+    props.theme.breakpoints.tablet}) and (max-width: ${BELOW_ROW}) {
+    ${TableRow} {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media screen and (min-width: ${ROW_LAYOUT_MIN_WIDTH}px) {
+    /* Whoever issues an asset chooses its name, so this column has no maximum
+       of its own. AssetName carries max-width:100%, which resolves against a
+       shrink-to-fit table cell and so bounds nothing, and the shared cell rules
+       give it min-width:fit-content, which beats a max-width outright.
+       Measured with a 120-character name before these two lines: the name
+       rendered 1162px wide, the row 2046, and the page scrolled 688px
+       sideways. 240px clears the widest name on chain, 220px over 31
+       characters. */
+    ${AssetName} {
+      min-width: 0;
+      max-width: 240px;
+    }
+
     /* One row height across the whole assets section. */
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};

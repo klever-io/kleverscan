@@ -156,7 +156,12 @@ describe('fetchAllValidators', () => {
     );
   });
 
-  it('excludes jailed validators from the aggregated set', async () => {
+  // Was 'excludes jailed validators from the aggregated set'. Dropping them
+  // here made this the second source of a number the table already had, and
+  // the two disagreed: 180 against 209 on mainnet, with the visible figure
+  // decided by whichever request answered first. The table lists jailed
+  // validators, so this set has to contain them too.
+  it('keeps jailed validators, so the count matches the rows', async () => {
     mockGet
       .mockResolvedValueOnce(
         makePage(1, 2, 3, [
@@ -173,12 +178,25 @@ describe('fetchAllValidators', () => {
     const result = await fetchAllValidators();
     expect(result.validators.map(v => v.blsPublicKey)).toEqual([
       'bls1',
+      'bls-jailed',
       'bls2',
     ]);
-    expect(result.totalRecords).toBe(2);
-    expect(
-      result.validators.every(v => v.status !== 'jailed'),
-    ).toBe(true);
+    expect(result.totalRecords).toBe(3);
+    expect(result.validators.some(v => v.status === 'jailed')).toBe(true);
+  });
+
+  // The other half of the same guarantee: the number the summary prints is the
+  // length of the set it was computed from, never the API's own header.
+  it('reports a count equal to the rows it returns', async () => {
+    mockGet.mockResolvedValueOnce(
+      makePage(1, 1, 999, [
+        { blsPublicKey: 'bls1', name: 'A', list: 'elected' },
+        { blsPublicKey: 'bls2', name: 'B', list: 'jailed' },
+      ]),
+    );
+
+    const result = await fetchAllValidators();
+    expect(result.totalRecords).toBe(result.validators.length);
   });
 });
 

@@ -70,7 +70,8 @@ const MarketplaceDetails: React.FC<
     serversideMarketplaceResponse.data.assets;
 
   const { data: buyCardsData, isFetching: buyCardsLoading } = useQuery({
-    queryKey: ['buycard', page],
+    // Same reason as the proposal key: the marketplace id decides the result.
+    queryKey: ['buycard', serversideMarketplace.id, page],
     queryFn: () => getBuyCards(serversideMarketplace.id, page),
     enabled: router?.isReady,
   });

@@ -1,4 +1,5 @@
 import { Assets as Icon } from '@/assets/title-icons';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import AssetsPools from '@/components/AssetsPools';
 import {
   APR_CONFIGURED_TOOLTIP,
@@ -14,6 +15,8 @@ import {
 import { hasVoidSupply } from '@/utils/voidSupply';
 import AssetsMobileCard from '@/components/AssetsList/MobileCard';
 import RegistryStrip from '@/components/AssetsList/RegistryStrip';
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
+import { CompactFilterBar } from '@/components/DataList/styles';
 import {
   AssetsTableWrapper,
   CapContext,
@@ -46,7 +49,6 @@ import Title from '@/components/Layout/Title';
 import AssetIdentity from '@/components/DataList/AssetIdentity';
 import Table, { ITable } from '@/components/Table';
 import Tabs, { ITabs } from '@/components/Tabs';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import { requestAssetsQuery } from '@/services/requests/assets';
 import { Header } from '@/styles/common';
 import { AssetsListContainer } from '@/views/assets';
@@ -120,11 +122,11 @@ const AssetsFilters: React.FC<PropsWithChildren> = () => {
   ];
 
   return (
-    <FilterContainer>
+    <CompactFilterBar>
       {filters.map(filter => (
         <Filter key={filter.title} {...filter} />
       ))}
-    </FilterContainer>
+    </CompactFilterBar>
   );
 };
 
@@ -220,27 +222,36 @@ const Assets: React.FC<PropsWithChildren> = () => {
               verified={verified}
             />
             {assetType === 'NonFungible' && (
-              <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.nft)}>
+              <ExplainedBadge
+                variant="neutral"
+                msg={t(ASSET_BADGE_TOOLTIPS.nft)}
+              >
                 {t('assets:List.Nft')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {assetType === 'SemiFungible' && (
-              <BadgePill $variant="neutral" title={t(ASSET_BADGE_TOOLTIPS.sft)}>
+              <ExplainedBadge
+                variant="neutral"
+                msg={t(ASSET_BADGE_TOOLTIPS.sft)}
+              >
                 {t('assets:List.Sft')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {attributes?.isPaused && (
-              <BadgePill
-                $variant="warning"
-                title={t(ASSET_BADGE_TOOLTIPS.paused)}
+              <ExplainedBadge
+                variant="warning"
+                msg={t(ASSET_BADGE_TOOLTIPS.paused)}
               >
                 {t('assets:List.Paused')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {hasKdaPool && (
-              <BadgePill $variant="accent" title={t(ASSET_BADGE_TOOLTIPS.pool)}>
+              <ExplainedBadge
+                variant="accent"
+                msg={t(ASSET_BADGE_TOOLTIPS.pool)}
+              >
                 Fee Pool
-              </BadgePill>
+              </ExplainedBadge>
             )}
             <RowActions>
               <CopyAction
@@ -257,6 +268,10 @@ const Assets: React.FC<PropsWithChildren> = () => {
           </IdentityCell>
         ),
         span: 1,
+        // Pinned like the rest: an unhinted column takes whatever is left, and
+        // what is left differs between a skeleton row and a loaded one, which
+        // moved every heading after it when the data arrived.
+        width: 418,
       },
       {
         element: () =>
@@ -318,7 +333,7 @@ const Assets: React.FC<PropsWithChildren> = () => {
             </ShareCell>
           ),
         span: 1,
-        width: 200,
+        width: 210,
       },
       {
         element: () =>
@@ -357,9 +372,9 @@ const Assets: React.FC<PropsWithChildren> = () => {
               </RewardsMuted>
             )}
             {rewards.kind === 'fpr' && (
-              <BadgePill $variant="neutral" title={t(FPR_TOOLTIP)}>
+              <ExplainedBadge variant="neutral" msg={t(FPR_TOOLTIP)}>
                 FPR
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {rewards.kind === 'none' && (
               <RewardsMuted>{t('assets:List.NotAvailable')}</RewardsMuted>
@@ -381,6 +396,9 @@ const Assets: React.FC<PropsWithChildren> = () => {
     Filters: AssetsFilters,
     MobileCard: AssetsMobileCard,
     singleLineSkeleton: true,
+    // Same constant the wrapper's media queries read, so the loading rows and
+    // the loaded rows cannot end up in different shapes.
+    cardBreakpoint: ROW_LAYOUT_MIN_WIDTH,
     rightAlignedSkeletonColumns: [1, 2, 4, 5],
   };
 

@@ -92,18 +92,27 @@ const Validator: React.FC<PropsWithChildren<IValidatorPage>> = () => {
   const { extensionInstalled, walletAddress } = useExtension();
 
   useEffect(() => {
-    if (router.isReady) {
-      const requestValidator = async () => {
-        const res = await api.get({
-          route: `validator/${encodeURIComponent(String(router.query.hash))}`,
-        });
-        if (!res.error || res.error === '') {
-          setValidator(res.data.validator);
-        }
-      };
-      requestValidator();
-    }
-  }, [router.isReady]);
+    if (!router.isReady) return;
+    let active = true;
+    // Keyed on the hash: the page no longer remounts between validators, so a
+    // mount-only fetch kept showing the previous record under the new URL.
+    // The reset gives the incoming validator its loading state, not A's data.
+    setValidator(null);
+    setImgError(false);
+    const requestValidator = async () => {
+      const res = await api.get({
+        route: `validator/${encodeURIComponent(String(router.query.hash))}`,
+      });
+      if (!active) return;
+      if (!res.error || res.error === '') {
+        setValidator(res.data.validator);
+      }
+    };
+    requestValidator();
+    return () => {
+      active = false;
+    };
+  }, [router.isReady, router.query.hash]);
 
   const handleLogoError = () => {
     setImgError(true);

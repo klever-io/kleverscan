@@ -627,7 +627,9 @@ describe('Filter keyboard operation', () => {
     fireEvent.click(openerElement);
     await screen.findByLabelText('Search Status');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Clear Status filter' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Clear Status filter' }),
+    );
 
     // Without the close, the listbox stayed stranded open behind an opener
     // whose activation is a no-op in typeahead mode.
@@ -692,10 +694,10 @@ describe('Filter keyboard operation', () => {
     expect(onClick).toHaveBeenCalledWith('All');
   });
 
-  // `disabledInput` gates opening the panel, but the clear button sat outside
-  // that gate: a disabled filter could still be reset, and the reset reached
-  // the router through onClick.
-  it('does not clear through a disabled filter', () => {
+  // `disabledInput` gates opening the panel, and the clear button is the way
+  // back out of a filter that can no longer be answered: the opener still
+  // shows its value, so disabling this too left only the URL bar.
+  it('clears through a disabled filter', () => {
     const onClick = jest.fn();
     renderWithTheme(
       <Filter
@@ -708,8 +710,26 @@ describe('Filter keyboard operation', () => {
     );
 
     const clear = screen.getByRole('button', { name: 'Clear Status filter' });
-    expect(clear).toBeDisabled();
+    expect(clear).not.toBeDisabled();
     fireEvent.click(clear);
-    expect(onClick).not.toHaveBeenCalled();
+    expect(onClick).toHaveBeenCalledWith('All');
+  });
+
+  it('still refuses to open a disabled filter after it was cleared', () => {
+    renderWithTheme(
+      <Filter
+        title="Status"
+        data={['Success', 'Fail']}
+        current="Fail"
+        disabledInput
+        onClick={jest.fn()}
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Clear Status filter' }),
+    );
+    fireEvent.click(screen.getByTestId('selector'));
+    expect(screen.queryByLabelText('Search Status')).not.toBeInTheDocument();
   });
 });

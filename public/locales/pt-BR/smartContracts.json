@@ -53,7 +53,8 @@
     "MostUsedLoading": "Carregando as aplicações mais utilizadas",
     "OtherContracts": "Outros contratos",
     "DeployedByShort": "Implantado por",
-    "TransactionsShort": "Tx"
+    "TransactionsShort": "Tx",
+    "ActiveLast24h": "{{formatted}} ativos nas últimas 24h"
   },
   "Filters": {
     "SortBy": "Ordenar por",

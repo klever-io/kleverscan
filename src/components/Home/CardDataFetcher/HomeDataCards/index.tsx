@@ -108,8 +108,7 @@ const HomeDataCards: React.FC<PropsWithChildren> = () => {
   const {
     livePeakTPS,
     newTransactions,
-    beforeYesterdayTransactions,
-    newAccounts = 0,
+    newAccounts,
     totalAccounts,
     totalTransactions,
     loadingCards,
@@ -120,15 +119,21 @@ const HomeDataCards: React.FC<PropsWithChildren> = () => {
       Icon: Transactions,
       title: t('Total Transactions'),
       value: totalTransactions ?? 0,
-      variation: `+ ${(
-        newTransactions + (beforeYesterdayTransactions ?? 0)
-      ).toLocaleString()}`,
+      // One window, not two added together: this line is labelled "/24h" below.
+      // Undefined leaves the line out; a failed request is not a quiet day.
+      variation:
+        newTransactions === undefined
+          ? undefined
+          : `+ ${newTransactions.toLocaleString()}`,
     },
     {
       Icon: Accounts,
       title: t('Total Accounts'),
       value: totalAccounts ?? 0,
-      variation: `+ ${newAccounts === 0 ? '0%' : newAccounts.toLocaleString()}`,
+      variation:
+        newAccounts === undefined
+          ? undefined
+          : `+ ${newAccounts.toLocaleString()}`,
     },
     {
       title: t('Live/Peak TPS'),
@@ -149,7 +154,10 @@ const HomeDataCards: React.FC<PropsWithChildren> = () => {
               <DataCardValue>
                 <p>{value?.toLocaleString()}</p>
               </DataCardValue>
-              {variation && !variation.includes('%') && (
+              {/* Shown whenever the card carries one. A "0%" string used to
+                  stand in for "hide this", so a genuine zero silently dropped
+                  the line instead of reporting a quiet day. */}
+              {variation && (
                 <DataCardLatest positive={variation.includes('+')}>
                   <ArrowData $positive={variation.includes('+')} />
                   <p>{variation}/24h</p>

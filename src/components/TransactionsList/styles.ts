@@ -460,22 +460,35 @@ export const PageSummaryCard = styled(SummaryCard)`
  * capped at 33 characters reached 1400px, so bounding the text alone does not
  * hold the layout.
  *
- * 160px because that is what the box actually holds: a 16-character truncated
- * bech32 address renders at 160px, and the 150 this used to carry cut its last
- * character off in seven of ten rows, at every width from 1100 to 1920.
+ * 160px matches the address the cell falls back to: `parseAddress(..., 16)`
+ * draws 8+8 characters around an ellipsis, and those 19 glyphs measured
+ * 159.6px, so the column reads the same whichever of the two a row shows.
+ *
+ * Names only. The box used to clamp both readings, and at the 150px it
+ * resolved to inside the cell it cut the last character off every unnamed
+ * row: 17 of 17 on one account list. An address drawn at a fixed truncation
+ * has one width and cannot shift the column, so it needs no clamp.
  */
-export const ContractName = styled.span`
+export const ContractName = styled.span<{ $named: boolean }>`
   ${inCard('inline-block')}
 
   && {
     /* Same floor as ceiling: the name lands about a second after the row is
        readable, and a box that grows on arrival drags every column with it.
        Measured before this was fixed: all nine columns changed width when the
-       names resolved, moving the row under the reader's pointer. */
-    min-width: 160px;
-    max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+       names resolved, moving the row under the reader's pointer.
+
+       Only a name needs it: a name's width is unknown until its request
+       lands, an address's is settled by its truncation. */
+    ${props =>
+      props.$named
+        ? css`
+            min-width: 160px;
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          `
+        : null}
     white-space: nowrap;
     vertical-align: bottom;
   }

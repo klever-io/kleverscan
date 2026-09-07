@@ -53,10 +53,12 @@ import { InOutBadge, TransactionStatusBadge } from '../badges';
  * pending, and fail must not look like success.
  */
 const classOf = (text: string): string => {
-  // The word is visually hidden inside the badge now that the glyph carries
-  // the state, so the styled element is its parent.
+  // A status badge hides its word behind a glyph, so the styled element is the
+  // parent; a direction badge is the word itself. Take whichever of the two
+  // actually carries the pill class.
   const label = screen.getByText(text) as HTMLElement;
-  return (label.parentElement as HTMLElement).className;
+  const parent = label.parentElement as HTMLElement;
+  return /Badge|Pill/.test(label.className) ? label.className : parent.className;
 };
 
 describe('transaction badges', () => {
@@ -78,9 +80,58 @@ describe('transaction badges', () => {
     expect(screen.getByText('Fail')).toBeTruthy();
   });
 
-  it('maps success and In to the same look, pending and Out likewise', () => {
-    expect(classOf('In')).toBe(classOf('Success'));
-    expect(classOf('Out')).toBe(classOf('Pending'));
+  it('gives In and Out the colors of success and pending', () => {
+    // The two columns are deliberately different shapes now: status is a
+    // glyph, direction is a word. The colour is the part that still has to
+    // agree, so read it rather than the class.
+    const colorOf = (text: string): string => {
+      const label = screen.getByText(text) as HTMLElement;
+      const badge = /Badge|Pill/.test(label.className)
+        ? label
+        : (label.parentElement as HTMLElement);
+      return getComputedStyle(badge).color;
+    };
+
+    expect(colorOf('In')).toBe(colorOf('Success'));
+    expect(colorOf('Out')).toBe(colorOf('Pending'));
+  });
+
+  it('spells the direction out instead of drawing an arrow', () => {
+    // The row already carries a green arrow between From and To. A second
+    // pair of arrows beside it reads as the same signal repeated.
+    //
+    // The word alone proves nothing: the glyph version kept the same word in a
+    // visually hidden span next to the arrow, so getByText found it either
+    // way. What separates the two shapes is whether that word is the visible
+    // badge or a screen-reader label clipped out of the layout.
+    for (const direction of ['In', 'Out']) {
+      const label = screen.getByText(direction) as HTMLElement;
+      // The badge, not the word: the glyph version put its arrow BESIDE the
+      // word, so querying the word itself would find no svg either way.
+      const badge = label.parentElement as HTMLElement;
+
+      expect(getComputedStyle(label).position).not.toBe('absolute');
+      expect(badge.querySelector('svg')).toBeNull();
+    }
+  });
+
+  it('names the direction badge, since the list is divs and has no header link', () => {
+    // A reader reaching this cell hears whatever the badge is called. The row
+    // is divs, not a table, so the "In/Out" header names nothing; without a
+    // label the cell is a bare "In" beside "Success" and "Transfer".
+    //
+    // The name rides in the hidden sibling, not aria-label: the spec forbids
+    // naming a bare span, and the pill is uppercase, which a reader may spell
+    // out letter by letter.
+    for (const direction of ['In', 'Out']) {
+      const named = screen.getByText(`Direction: ${direction}`);
+
+      expect(getComputedStyle(named).position).toBe('absolute');
+      expect(named.getAttribute('aria-hidden')).toBeNull();
+      expect(screen.getByText(direction).getAttribute('aria-hidden')).toBe(
+        'true',
+      );
+    }
   });
 
   it('gives fail its own look, distinct from success and pending', () => {

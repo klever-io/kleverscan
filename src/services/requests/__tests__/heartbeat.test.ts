@@ -47,6 +47,53 @@ describe('compareSemver', () => {
   it('compares pre-release suffixes lexicographically when bases match', () => {
     expect(compareSemver('v1.7.21-rc2', 'v1.7.21-rc1')).toBeGreaterThan(0);
   });
+
+  /* The comparator has to stay total. A node reporting a build tag rather than
+     a version normalises to a non-numeric string, and `Number` turned every
+     comparison against it into NaN. */
+  it('never answers NaN for a version that is not a number', () => {
+    ['dev', 'unknown', '', 'v1.x.0'].forEach(odd => {
+      expect(Number.isNaN(compareSemver('v1.7.21', odd))).toBe(false);
+      expect(Number.isNaN(compareSemver(odd, 'v1.7.21'))).toBe(false);
+    });
+  });
+
+  /* And the consequence that made it matter: `NaN > 0` is false, so a
+     non-numeric value reaching `latestVersion` first could never be displaced
+     and every node then rendered as out of date. */
+  it('sorts a non-numeric version below a real one', () => {
+    expect(compareSemver('v1.7.21', 'dev')).toBeGreaterThan(0);
+    expect(compareSemver('dev', 'v1.7.21')).toBeLessThan(0);
+  });
+
+  // Build metadata carries no precedence; left in place it corrupted the
+  // number beside it and sorted the release below its predecessor.
+  it('ignores build metadata', () => {
+    expect(compareSemver('v1.7.21+build.1', 'v1.7.20')).toBeGreaterThan(0);
+    expect(compareSemver('v1.7.21+build.1', 'v1.7.21')).toBe(0);
+  });
+
+  it('compares numeric prerelease identifiers numerically', () => {
+    expect(compareSemver('v1.0.0-rc.10', 'v1.0.0-rc.2')).toBeGreaterThan(0);
+    expect(compareSemver('v1.0.0-rc.2', 'v1.0.0-rc.10')).toBeLessThan(0);
+    expect(compareSemver('v1.0.0-rc.2', 'v1.0.0-rc.2')).toBe(0);
+  });
+
+  // SemVer 11.4.4: with equal leading identifiers the shorter list is older.
+  it('sorts a shorter prerelease below its extension', () => {
+    expect(compareSemver('v1.0.0-rc', 'v1.0.0-rc.1')).toBeLessThan(0);
+    expect(compareSemver('v1.0.0-rc.1', 'v1.0.0-rc')).toBeGreaterThan(0);
+  });
+
+  // The rc2 > rc1 case above only ever exercises the winning side.
+  it('orders non-numeric identifiers on the lexical low side too', () => {
+    expect(compareSemver('v1.0.0-alpha', 'v1.0.0-beta')).toBeLessThan(0);
+  });
+
+  it('treats a missing patch segment as zero', () => {
+    expect(compareSemver('v1.7', 'v1.7.1')).toBeLessThan(0);
+    expect(compareSemver('v1.7.0', 'v1.7')).toBe(0);
+  });
 });
 
 describe('resolveValidatorVersion', () => {
@@ -72,19 +119,15 @@ describe('resolveValidatorVersion', () => {
 describe('latestVersionAmongValidators', () => {
   it('returns empty string when no validators match heartbeat', () => {
     expect(
-      latestVersionAmongValidators(
-        [{ blsPublicKey: 'x' }],
-        { other: 'v1.7.20' },
-      ),
+      latestVersionAmongValidators([{ blsPublicKey: 'x' }], {
+        other: 'v1.7.20',
+      }),
     ).toBe('');
   });
 
   it('ignores peers that are not in the validator list', () => {
     const latest = latestVersionAmongValidators(
-      [
-        { blsPublicKey: 'bls-a' },
-        { blsPublicKey: 'bls-b' },
-      ],
+      [{ blsPublicKey: 'bls-a' }, { blsPublicKey: 'bls-b' }],
       {
         'bls-a': 'v1.7.20',
         'bls-b': 'v1.7.15',

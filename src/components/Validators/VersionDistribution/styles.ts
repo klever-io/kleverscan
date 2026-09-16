@@ -1,4 +1,5 @@
 import { DefaultCardStyleWithBorder } from '@/styles/common';
+import { focusRing } from '@/components/DataList/styles';
 import { transparentize } from 'polished';
 import styled, { css } from 'styled-components';
 
@@ -19,7 +20,10 @@ const light = {
 };
 
 export const HeaderStack = styled.section`
-  margin: 1.5rem 0 0.75rem;
+  /* Pulled up under the summary card and given its 24px rhythm back below:
+     this reads as the tail of that card rather than a third bordered block,
+     which is what made it dominate the page. */
+  margin: -0.5rem 0 1.5rem;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -27,68 +31,71 @@ export const HeaderStack = styled.section`
 `;
 
 /** Dense KPI strip: Total · Newest · % on latest */
-export const StatsStrip = styled.div`
-  ${DefaultCardStyleWithBorder}
-
-  width: 100%;
-  padding: 0.85rem 1.25rem;
+/**
+ * Title, facts and the mode toggle on one line.
+ *
+ * The figures used to be a KPI strip with dividers, sized by a card that is no
+ * longer there: two values at the far left, a divider mid-page and half a
+ * screen of nothing after it. They are a caption to the bar below, so they sit
+ * inline with the title instead.
+ */
+/**
+ * Title and its two facts as one block, so the facts tuck under the heading
+ * instead of under the whole row.
+ *
+ * The row's height is set by the 34px mode pills, and the 20,5px title sits
+ * centred in it. Measured, that left 22,7px between the title and the facts:
+ * 6,7px of that centring, 10,4px of the card's column gap and 5,6px of margin.
+ * The room this line needs is beside the pills, not below them.
+ */
+export const TitleBlock = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+`;
+
+export const StatsStrip = styled.div`
+  display: flex;
+  align-items: baseline;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 0;
+  /* Both axes named. A leftover gap declaration from the old strip set the
+     column gap to zero and won on source order, so title, label and figure
+     rendered as one run: "Version DistributionNEWESTv1.7.21-rc268.4%". */
+  gap: 0.2rem 0.75rem;
   color: ${props => props.theme.black};
 `;
 
 export const StatItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-  flex: 1 1 8rem;
-  padding: 0.15rem 0.75rem;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    flex: 1 1 100%;
-    padding: 0.35rem 0;
-  }
-`;
-
-export const StatDivider = styled.div`
-  width: 1px;
-  align-self: stretch;
-  min-height: 2.25rem;
-  background: ${props =>
-    props.theme.dark ? props.theme.black20 : props.theme.black10};
-  flex-shrink: 0;
-
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 100%;
-    height: 1px;
-    min-height: 0;
-  }
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  white-space: nowrap;
 `;
 
 export const StatLabel = styled.span`
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: ${props => (props.theme.dark ? props.theme.darkText : light.label)};
-  line-height: 1.2;
+  letter-spacing: 0.06em;
+  color: ${props => props.theme.darkText};
 `;
 
 export const StatValue = styled.span<{ $accent?: boolean }>`
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-  color: ${props => {
-    if (!props.$accent) return props.theme.black;
-    return props.theme.dark ? props.theme.table.success : light.successAccent;
-  }};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  /* The AA success value, not theme.green: at 0.8125rem this is small text and
+     needs 4.5:1, where the raw token measures 2.37:1 on the white card. The
+     darkened one is 5.30:1, and it is the value the shared badge palette
+     already uses for the same reason. Dark mode keeps the bright token, which
+     is 7.71:1 there. */
+  color: ${props =>
+    props.$accent
+      ? props.theme.dark
+        ? props.theme.green
+        : '#217A50'
+      : props.theme.black};
 `;
 
 export const DistributionCard = styled.div`
@@ -104,20 +111,21 @@ export const DistributionCard = styled.div`
 
 export const CardTop = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 0.5rem 0.75rem;
+  /* Wraps, or the pills run off the card: at 390px the title block and the
+     130px toggle do not fit on one line and "Stake" was clipped by the card
+     edge. Measured, not assumed. */
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
 `;
 
 export const CardTitle = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  font-size: 0.9375rem;
+  color: ${props => props.theme.black};
 
   strong {
     font-weight: 600;
-    font-size: 0.95rem;
   }
 `;
 
@@ -203,53 +211,36 @@ export const BarSegment = styled.div<{
   }};
 `;
 
+/** A wrapping legend, not a stack of full-width rows. Those put a badge at one
+ *  edge and its numbers at the other, which on a wide screen is a hand-span of
+ *  empty space per version. */
 export const VersionList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  flex-wrap: wrap;
+  gap: 6px 10px;
 `;
 
 export const VersionRow = styled.button<{ $selected: boolean }>`
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  width: 100%;
-  min-height: 36px;
-  padding: 0.25rem 0.4rem;
-  border-radius: 8px;
+  gap: 6px;
+  padding: 3px 8px 3px 3px;
   border: 1px solid
-    ${props => {
-      if (!props.$selected) return 'transparent';
-      return props.theme.dark ? props.theme.table.success : light.successAccent;
-    }};
-  background: ${props => {
-    if (!props.$selected) return 'transparent';
-    return props.theme.dark
-      ? transparentize(0.9, props.theme.table.success)
-      : light.selectedBg;
-  }};
-  color: inherit;
+    ${props => (props.$selected ? props.theme.violet : 'transparent')};
+  border-radius: 999px;
+  background-color: ${props =>
+    props.$selected ? transparentize(0.9, props.theme.violet) : 'transparent'};
   cursor: pointer;
-  text-align: left;
-  transition:
-    background 0.15s linear,
-    border-color 0.15s linear;
+  transition: background-color 150ms ease-out;
 
   &:hover {
-    background: ${props =>
-      props.theme.dark ? props.theme.black2 : light.hover};
+    background-color: ${props => transparentize(0.94, props.theme.violet)};
   }
 
-  &:focus-visible {
-    outline: 2px solid
-      ${props =>
-        props.theme.dark ? props.theme.table.success : light.successAccent};
-    outline-offset: 2px;
-  }
+  ${focusRing}
 `;
 
 export const VersionMeta = styled.div`
@@ -310,22 +301,15 @@ export const VersionBadge = styled.span<{
 `;
 
 export const VersionValues = styled.div`
-  display: flex;
-  flex-direction: row;
+  display: inline-flex;
   align-items: baseline;
-  gap: 0.65rem;
-  flex-shrink: 0;
-
-  span {
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
+  gap: 5px;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: ${props => props.theme.black};
 
   small {
-    font-size: 0.75rem;
-    color: ${props => (props.theme.dark ? props.theme.darkText : light.label)};
-    min-width: 3rem;
-    text-align: right;
+    color: ${props => props.theme.darkText};
   }
 `;
 

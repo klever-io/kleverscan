@@ -1,5 +1,9 @@
 import { NUMBER_LOCALE } from '@/components/DataList/format';
-import { AmountMuted, AmountPrimary } from '@/components/DataList/styles';
+import {
+  AmountMuted,
+  AmountPrimary,
+  NumericCell,
+} from '@/components/DataList/styles';
 import { CustomFieldWrapper } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
 import { Mono } from '@/styles/common';
@@ -11,7 +15,6 @@ import Link from 'next/link';
 import React from 'react';
 import { ContractCell, DeployerCell } from './cells';
 import { CONTRACT_COLUMNS, ContractColumnKey } from './columns';
-import { NumericCell } from './styles';
 
 /**
  * Widths and spans with no cell content. The shared Table calls `rowSections`

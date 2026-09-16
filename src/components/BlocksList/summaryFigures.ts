@@ -55,11 +55,16 @@ export const feeSplit = (
   };
 };
 
-/** Both halves in: the one definition staleTime and the retry share, so the
- *  two cannot drift apart with only one of them under test. */
+/** Every source in: the one definition staleTime and the retry share, so the
+ *  two cannot drift apart with only one of them under test. `transactions` is
+ *  compared against undefined rather than for truthiness, because a quiet day
+ *  really does answer 0 and truthiness would poll it forever. */
 export const summaryComplete = (
-  data: { yesterday?: unknown; total?: unknown } | undefined,
-): boolean => Boolean(data?.yesterday && data?.total);
+  data:
+    | { yesterday?: unknown; total?: unknown; transactions?: unknown }
+    | undefined,
+): boolean =>
+  Boolean(data?.yesterday && data?.total) && data?.transactions !== undefined;
 
 /**
  * How often the summary retries while its answer is incomplete. The stat
@@ -68,5 +73,7 @@ export const summaryComplete = (
  * stayed absent until a remount or window focus.
  */
 export const summaryRefetchInterval = (
-  data: { yesterday?: unknown; total?: unknown } | undefined,
+  data:
+    | { yesterday?: unknown; total?: unknown; transactions?: unknown }
+    | undefined,
 ): number | false => (summaryComplete(data) ? false : 30_000);

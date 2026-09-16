@@ -1439,6 +1439,12 @@ export const Claim: React.FC<PropsWithChildren<IIndexedContract>> = ({
   const claimReceipts = findReceipts(filteredReceipts, 17) as
     | IClaimReceipt[]
     | undefined;
+  // Resolved for every receipt at once, at component level. Called inside the
+  // map below it added two hook slots per element, so two claims with a
+  // different receipt count rendered a different number of hooks.
+  const claimPrecisions = usePrecision(
+    (claimReceipts ?? []).map(receipt => receipt?.assetIdReceived || 'KLV'),
+  );
 
   return (
     <>
@@ -1470,12 +1476,11 @@ export const Claim: React.FC<PropsWithChildren<IIndexedContract>> = ({
               </span>
               <FrozenContainer>
                 {claimReceipts.map((claimReceipt, index) => {
-                  const precision = usePrecision(
-                    claimReceipt?.assetIdReceived || 'KLV',
-                  );
+                  const assetId = claimReceipt?.assetIdReceived || 'KLV';
+                  const precision = claimPrecisions[assetId.split('/')[0]] ?? 0;
 
                   return (
-                    <div>
+                    <div key={`${assetId}-${index}`}>
                       {toLocaleFixed(
                         claimReceipt?.amount / 10 ** precision,
                         precision,
@@ -2698,6 +2703,12 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
     parameter?.address ||
     '';
 
+  // Same reason as the claim receipts above: one call at component level, not
+  // one per call value, so the hook count does not track the array length.
+  const callValuePrecisions = usePrecision(
+    (parameter?.callValue || []).map(value => String(value?.asset || 'KLV')),
+  );
+
   return (
     <>
       <Row>
@@ -2727,9 +2738,9 @@ export const SmartContract: React.FC<PropsWithChildren<IIndexedContract>> = ({
             <BalanceContainer>
               <NetworkParamsContainer>
                 {parameter?.callValue?.map(value => {
-                  const assetPrecision = usePrecision(
-                    String(value?.asset || 'KLV'),
-                  );
+                  const assetId = String(value?.asset || 'KLV');
+                  const assetPrecision =
+                    callValuePrecisions[assetId.split('/')[0]] ?? 0;
                   return Object.entries(value).map(([key, val]) => {
                     const formattedValue =
                       key === 'value'

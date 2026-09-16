@@ -448,10 +448,9 @@ const Filter: React.FC<PropsWithChildren<IFilter>> = ({
               clearLabel ?? (title ? `Clear ${title} filter` : 'Clear filter')
             }
             empty={selected === allItem}
-            // `disabledInput` blocks opening the panel, but left this button
-            // live: a disabled filter could still be reset, and the reset ran
-            // onClick, pushing the change through to the router.
-            disabled={disabledInput}
+            /* Live even while `disabledInput` blocks opening the panel: a
+               filter that cannot be answered still shows its current value, so
+               disabling this too left no way out of it but editing the URL. */
             onClick={handleClear}
           >
             <AiOutlineClose />

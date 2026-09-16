@@ -75,6 +75,8 @@
     "MostTransacted": "Most transacted",
     "OtherTypes": "Other",
     "Total": "Total transactions",
-    "Up": "up {{percent}} compared with the previous 24 hours"
+    "Up": "up {{percent}} compared with the previous 24 hours",
+    "Volume": "Volume (24h)",
+    "VolumeBasis": "KLV moved, excluding mint and burn"
   }
 }

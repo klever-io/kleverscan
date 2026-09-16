@@ -1,8 +1,8 @@
 import SummaryLoading from '@/components/DataList/SummaryLoading';
+import { PoolsSummaryCard } from './styles';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import {
-  SummaryCard,
   Tile,
   TileLabel,
   TileSub,
@@ -39,7 +39,7 @@ const PoolsSummary: React.FC = () => {
   const summary = summarizePools(pools);
 
   return (
-    <SummaryCard aria-label={t('assets:Pools.SummaryAria')}>
+    <PoolsSummaryCard aria-label={t('assets:Pools.SummaryAria')}>
       <TilesGrid>
         <Tile>
           <TileLabel>{t('assets:Pools.FeePools')}</TileLabel>
@@ -57,7 +57,7 @@ const PoolsSummary: React.FC = () => {
           <TileSub>{t('assets:Pools.CombinedAcrossPools')}</TileSub>
         </Tile>
       </TilesGrid>
-    </SummaryCard>
+    </PoolsSummaryCard>
   );
 };
 

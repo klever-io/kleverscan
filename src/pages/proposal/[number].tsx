@@ -164,7 +164,9 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
     queryFn: () => dataOverviewCall(),
   });
   const { data: proposal } = useQuery<IParsedProposal | undefined>({
-    queryKey: ['proposalsCall'],
+    // The proposal number belongs in the key: without it, navigating from one
+    // proposal to another reuses the first one's cached record.
+    queryKey: ['proposalsCall', router.query?.number],
     queryFn: () => dataProposalCall(router),
     enabled: !!router.isReady,
   });

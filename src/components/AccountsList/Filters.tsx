@@ -1,5 +1,5 @@
 import Filter, { IFilter } from '@/components/Filter';
-import { FilterContainer } from '@/components/TransactionsFilters/styles';
+import { CompactFilterBar } from '@/components/DataList/styles';
 import { ACCOUNT_FILTERS, isAccountFilter } from '@/services/requests/accounts';
 import { setQueryAndRouter } from '@/utils';
 import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
@@ -51,11 +51,11 @@ const AccountsFilters: React.FC = () => {
   ];
 
   return (
-    <FilterContainer>
+    <CompactFilterBar>
       {filters.map(filter => (
         <Filter key={filter.testId} {...filter} />
       ))}
-    </FilterContainer>
+    </CompactFilterBar>
   );
 };
 

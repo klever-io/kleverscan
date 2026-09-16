@@ -1,4 +1,5 @@
 import { isValidContractAddress } from '@klever/connect';
+import ExplainedBadge from '@/components/DataList/ExplainedBadge';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import api from '@/services/api';
@@ -164,20 +165,20 @@ const Holders: React.FC<IHolders> = ({ asset }) => {
               {parseAddress(address, 20)}
             </AddressLink>
             {isVoid && (
-              <BadgePill
-                $variant="void"
-                title={t('assets:Holders.VoidTooltip')}
+              <ExplainedBadge
+                variant="void"
+                msg={t('assets:Holders.VoidTooltip')}
               >
                 {t('assets:Overview.Void')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             {isContract && (
-              <BadgePill
-                $variant="contract"
-                title={t('assets:Holders.ContractTooltip')}
+              <ExplainedBadge
+                variant="contract"
+                msg={t('assets:Holders.ContractTooltip')}
               >
                 {t('assets:Holders.Contract')}
-              </BadgePill>
+              </ExplainedBadge>
             )}
             <RowActions>
               <CopyAction

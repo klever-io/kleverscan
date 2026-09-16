@@ -25,6 +25,14 @@ const ownerAddressFor = (index: number): string => {
 const blsKeyFor = (index: number): string =>
   `bls${String(index + 1).padStart(2, '0')}${'ab'.repeat(30)}`;
 
+/** Mixed states and one capped validator, so the composition bar, the status
+ *  badges and the capacity cell all exercise more than one branch. */
+const listStateFor = (index: number): string => {
+  if (index === 8) return 'eligible';
+  if (index === 9) return 'jailed';
+  return 'elected';
+};
+
 const rawValidators = Array.from({ length: validatorsAmount }, (_, index) => {
   const ownerAddress = ownerAddressFor(index);
   return {
@@ -35,9 +43,9 @@ const rawValidators = Array.from({ length: validatorsAmount }, (_, index) => {
     totalValidatorSuccessRate: successRate(100 + index, 1),
     rating: 5_000_000,
     selfStake: 100_000_000,
-    list: 'elected',
-    canDelegate: true,
-    maxDelegation: 0,
+    list: listStateFor(index),
+    canDelegate: index !== 9,
+    maxDelegation: index === 0 ? 4_000_000_000_000 : 0,
     commission: 500,
     blsPublicKey: blsKeyFor(index),
   };
@@ -170,6 +178,58 @@ describe('Validators Page', () => {
         expect(hrefs.every(Boolean)).to.eq(true);
         Cypress.env('validatorLinks', hrefs);
       });
+  });
+});
+
+/* Cypress defaults to a 1000px viewport, below the 1240 the row layout needs,
+   so everything above runs against the card layout. This block is the only
+   coverage the column table, the summary tiles and the version filter have. */
+describe('Validators Page at row-layout width', () => {
+  beforeEach(() => {
+    cy.viewport(1400, 900);
+    stubValidatorsApis();
+    cy.visit('/validators');
+    cy.wait('@validatorList', { timeout: 15000 });
+    cy.wait('@heartbeat', { timeout: 15000 });
+  });
+
+  it('renders the column table instead of cards', () => {
+    cy.get('[data-testid="table-header"]', { timeout: 15000 }).should(
+      'be.visible',
+    );
+    cy.get('[data-testid="table-header"]').contains('Capacity');
+    // On the row layout every cell carries its row's testid, so row presence
+    // is asserted by index rather than by element count.
+    cy.get(`[data-testid="table-row-${validatorsAmount - 1}"]`).should('exist');
+  });
+
+  it('fills the summary tiles from the stubbed list', () => {
+    // 8 of the 10 stubs are elected; the legend derives from the same list.
+    cy.contains('[aria-label="Validator network statistics"]', '8 elected', {
+      timeout: 15000,
+    }).should('be.visible');
+    cy.contains('Jailed 1').should('be.visible');
+  });
+
+  it('narrows the table through the version filter and clears it again', () => {
+    // 3 stubs run v1.6.0; the rest v1.7.20.
+    cy.get('[data-testid="filter-validator-version"]')
+      .find('[data-testid="selector"]')
+      .click();
+    cy.get('[data-testid="selector-item"]').contains('v1.6.0').click();
+    cy.location('search', { timeout: 15000 }).should(
+      'include',
+      'version=v1.6.0',
+    );
+    // 3 stubs run v1.6.0: rows 0..2 and nothing further.
+    cy.get('[data-testid="table-row-2"]', { timeout: 15000 }).should('exist');
+    cy.get('[data-testid="table-row-3"]').should('not.exist');
+
+    cy.get('[aria-label="Clear Version filter"]').click();
+    cy.location('search').should('not.include', 'version');
+    cy.get(`[data-testid="table-row-${validatorsAmount - 1}"]`, {
+      timeout: 15000,
+    }).should('exist');
   });
 });
 

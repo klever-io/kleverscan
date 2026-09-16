@@ -14,8 +14,14 @@ import {
 } from '@/components/DataList/styles';
 // The same percent policy the holders and assets legends use, so the two
 // visually identical legends cannot format the same quantity differently.
-import { formatShare } from '@/components/DataList/format';
-import { SummaryBarPlaceholder } from '@/components/DataList/SummaryLoading';
+import {
+  exactAmount,
+  formatShare,
+  klvAmount,
+} from '@/components/DataList/format';
+import TransactionsSummaryLoadingCard, {
+  ContractsBarPlaceholder,
+} from './LoadingCard';
 import {
   ITransactionTypeShare,
   buildBreakdown,
@@ -25,17 +31,13 @@ import {
   transactionsSummaryCall,
 } from '@/services/requests/transactions/summary';
 import { formatAmount } from '@/utils/formatFunctions';
+import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'next-i18next';
 import React from 'react';
 import { useTheme } from 'styled-components';
 import { useDeferred } from '@/components/DataList/useDeferred';
-import {
-  PageSummaryCard,
-  PageSummaryLoading,
-  SummaryAssetLink,
-  TrendValue,
-} from './styles';
+import { PageSummaryCard, SummaryAssetLink, TrendValue } from './styles';
 
 /**
  * A quarter of an hour. These are 24 hour figures, so a fresh reading moves
@@ -91,7 +93,10 @@ const TransactionsSummary: React.FC = () => {
   });
 
   if (!summary) {
-    return <PageSummaryLoading label={label} tiles={3} bar />;
+    // Five: the breakdown names Transfer, Smart Contract, Claim, Freeze and
+    // Other, and three placeholders left the legend a line short of the loaded
+    // one at 390px, measured.
+    return <TransactionsSummaryLoadingCard label={label} />;
   }
 
   /** One color per named type, with the computed remainder muted. */
@@ -104,10 +109,13 @@ const TransactionsSummary: React.FC = () => {
   const growth = totalGrowth(summary);
   // Each figure is shown only when its own request answered; a failed part
   // leaves its tile out instead of printing a zero the chain never had.
+  // Every figure the card can draw, so a strip that has one tile to show is
+  // not thrown away for the three that failed.
   const hasFigures =
     summary.last24h !== undefined ||
     summary.totalTransactions !== undefined ||
-    summary.mostTransactedAsset !== undefined;
+    summary.mostTransactedAsset !== undefined ||
+    summary.volume24h !== undefined;
 
   if (!hasFigures) return null;
 
@@ -204,7 +212,9 @@ const TransactionsSummary: React.FC = () => {
         )}
 
         {summary.mostTransactedAsset && (
-          <Tile>
+          // Dropped below 451px, where only two tiles fit: the leading asset
+          // is the one figure here a reader can do without.
+          <Tile data-optional="true">
             <TileLabel>
               {t('transactions:Summary.MostTransacted', {
                 defaultValue: 'Most transacted',
@@ -231,6 +241,32 @@ const TransactionsSummary: React.FC = () => {
             </TileSub>
           </Tile>
         )}
+
+        {summary.volume24h !== undefined && (
+          // Dropped below 421px, where only two columns fit and three tiles
+          // would leave one alone on a row of its own.
+          <Tile data-optional="narrow">
+            <TileLabel>
+              {t('transactions:Summary.Volume', {
+                defaultValue: 'Volume (24h)',
+              })}
+            </TileLabel>
+            <TileValueRow>
+              {/* Compact headline, exact figure on hover, the way the blocks
+                  card renders its own KLV amounts. */}
+              <TileValue
+                title={`${exactAmount(summary.volume24h, KLV_PRECISION)} KLV`}
+              >
+                {klvAmount(summary.volume24h)}
+              </TileValue>
+            </TileValueRow>
+            <TileSub>
+              {t('transactions:Summary.VolumeBasis', {
+                defaultValue: 'KLV moved, excluding mint and burn',
+              })}
+            </TileSub>
+          </Tile>
+        )}
       </TilesGrid>
 
       {/* Same shape as the assets registry strip, deliberately: tiles, then
@@ -241,7 +277,7 @@ const TransactionsSummary: React.FC = () => {
           drawn once with only the first of them. Holding the bar's space
           until its own request settles keeps that middle state the same
           height as the two around it. */}
-      {breakdownPending && <SummaryBarPlaceholder />}
+      {breakdownPending && <ContractsBarPlaceholder />}
       {!breakdownPending && breakdown.length > 1 && breakdownTotal > 0 && (
         <>
           <DistBar

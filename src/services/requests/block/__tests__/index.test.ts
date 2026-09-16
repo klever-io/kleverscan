@@ -6,6 +6,7 @@ import {
   blockTotalStatsCall,
   blockTransactionsCall,
   blockYesterdayStatsCall,
+  blockYesterdayTransactionsCall,
 } from '../index';
 
 jest.mock('react-toastify', () => ({
@@ -375,5 +376,114 @@ describe('blockTotalStatsCall', () => {
     });
 
     await expect(blockTotalStatsCall()).resolves.toBeUndefined();
+  });
+});
+
+
+describe('blockYesterdayTransactionsCall', () => {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+
+  // A trailing useRealTimers() is skipped when the assertion above it throws,
+  // and every later waitFor in the file then hangs on its timeout.
+  afterEach(() => jest.useRealTimers());
+
+  /** Midnight UTC that opened yesterday, the key the bucket carries. */
+  const yesterdayKey = (): number => {
+    const midnight = new Date();
+    midnight.setUTCHours(0, 0, 0, 0);
+    return midnight.getTime() - DAY_MS;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Frozen: each fixture computes its keys before the call computes its own,
+    // so a UTC midnight landing between the two would make the call miss the
+    // bucket and fail the run at random. The cases that pin measured keys set
+    // their own time on top of this.
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-03T11:00:00Z'));
+  });
+
+  it('matches the millisecond keys the route really answers with', async () => {
+    // Not derived from the same formula as the source, which would pass
+    // whatever unit the route used: these are the keys measured live on
+    // 2026-09-03, 13 digits, midnight UTC. A seconds-valued key would be
+    // 1788307200 and would not match.
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-03T11:00:00Z'));
+
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: {
+        number_by_day: [
+          { key: 1788393600000, doc_count: 2934 },
+          { key: 1788307200000, doc_count: 8275 },
+        ],
+      },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBe(8275);
+
+    jest.useRealTimers();
+  });
+
+  it('finds nothing when the route answers seconds instead of milliseconds', async () => {
+    // The opposite direction: a unit slip must not silently match some other
+    // day, it must answer undefined so the tile is left out.
+    jest.useFakeTimers().setSystemTime(new Date('2026-09-03T11:00:00Z'));
+
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: { number_by_day: [{ key: 1788307200, doc_count: 8275 }] },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
+
+    jest.useRealTimers();
+  });
+
+  it('reads the bucket whose key is yesterday', async () => {
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: {
+        number_by_day: [
+          { key: yesterdayKey() + DAY_MS, doc_count: 2934 },
+          { key: yesterdayKey(), doc_count: 8275 },
+        ],
+      },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBe(8275);
+  });
+
+  it('answers undefined when yesterday is the day that was omitted', async () => {
+    // The route drops a day that carried no data. Read at position 1 the day
+    // before would slide into place and be reported as yesterday.
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: {
+        number_by_day: [
+          { key: yesterdayKey() + DAY_MS, doc_count: 2934 },
+          { key: yesterdayKey() - DAY_MS, doc_count: 7000 },
+        ],
+      },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
+  });
+
+  it('keeps a genuine zero, which a failure does not mean', async () => {
+    mockedGet.mockResolvedValue({
+      error: '',
+      data: { number_by_day: [{ key: yesterdayKey(), doc_count: 0 }] },
+    });
+
+    await expect(blockYesterdayTransactionsCall()).resolves.toBe(0);
+  });
+
+  it('answers undefined on a failure and on a malformed body', async () => {
+    mockedGet.mockResolvedValue({ error: 'boom' });
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
+
+    mockedGet.mockResolvedValue({ error: '', data: {} });
+    await expect(blockYesterdayTransactionsCall()).resolves.toBeUndefined();
   });
 });

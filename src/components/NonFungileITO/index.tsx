@@ -1,5 +1,5 @@
 import { PropsWithChildren } from 'react';
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import { useExtension } from '@/contexts/extension';
 import { Transaction } from '@klever/connect';
 import { useTranslation } from 'next-i18next';

@@ -16,6 +16,7 @@ import { IParsedProposal, IProposalResponse } from '@/types/proposals';
 import { getVotingPowers, validateFormattedVotes } from '..';
 import { KLV_PRECISION } from '../globalVariables';
 import { getProposalNetworkParams } from '../networkFunctions';
+import { validatorRates } from '../validatorRates';
 
 /**
  *  Receives an IAccountAsset[] (which comes from an IAssetsHoldersResponse) and returns a new array of objects only with index, address, balance and rank properties.
@@ -60,12 +61,7 @@ export const parseValidators = (
 ): IValidator[] => {
   return validators.data['validators'].map(
     (delegation: IDelegationsResponse, index: number): IValidator => {
-      const totalProduced =
-        delegation.totalLeaderSuccessRate.numSuccess +
-        delegation.totalValidatorSuccessRate.numSuccess;
-      const totalMissed =
-        delegation.totalLeaderSuccessRate.numFailure +
-        delegation.totalValidatorSuccessRate.numFailure;
+      const rates = validatorRates(delegation);
 
       return {
         ownerAddress: delegation.ownerAddress,
@@ -86,8 +82,10 @@ export const parseValidators = (
         canDelegate: delegation.canDelegate,
         selfStake: delegation.selfStake,
         status: delegation.list,
-        totalProduced,
-        totalMissed,
+        totalProduced: rates.totalSuccess,
+        totalMissed: rates.totalFailure,
+        blocksProduced: rates.leaderSuccess,
+        blocksMissed: rates.leaderFailure,
         commission: delegation.commission,
         maxDelegation: delegation.maxDelegation,
         blsPublicKey: delegation.blsPublicKey,

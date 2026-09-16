@@ -1,11 +1,17 @@
 import {
+  CompactFilterBar,
+  compactFilterRow,
   DATA_LIST_ROW_HEIGHT,
   dataListTableSkin,
   SummaryCard,
   Tile,
   TilesGrid,
 } from '@/components/DataList/styles';
-import { HeaderItem, MobileCardItem } from '@/components/Table/styles';
+import {
+  HeaderItem,
+  MobileCardItem,
+  TableControls,
+} from '@/components/Table/styles';
 import styled, { css, DefaultTheme } from 'styled-components';
 import { RIGHT_ALIGNED_COLUMNS } from './columns';
 
@@ -14,6 +20,19 @@ import { RIGHT_ALIGNED_COLUMNS } from './columns';
 // 1.5rem is the rhythm the old CardContainer had, so the figures land where
 // the cards used to. The loading shape carries the same margin, or the page
 // shifts by 24px once the numbers arrive.
+/* Below this the legend's own items fill the row, leaving no room for the age
+   line beside them. Measured on the loaded card: 258px free at 768px against
+   the 118px the line needs, and 90px free at 600px. */
+const NOTE_FITS_BESIDE_LEGEND = '767.98px';
+
+/* Above this every label fits on one line by itself, so the held pair of lines
+   is dropped and the card sits a line shorter. Measured with the labels' own
+   wrapping: the longest, "Transaction fees (yesterday)", takes two lines at
+   920px and one at 940px. Moving the age line into the legend row bought that
+   width: as a corner line it reserved 9rem beside the tiles and the same
+   threshold sat at 1080px. */
+const LABELS_ON_ONE_LINE_MIN = '939.98px';
+
 const pageSummarySpacing = css`
   margin-top: 1.5rem;
 `;
@@ -38,24 +57,40 @@ export const BlocksSummaryCard = styled(SummaryCard)`
   /* Anchors the age line in the top-right corner. */
   position: relative;
 
-  /* Room for that corner line, in rem so browser text zoom scales it along:
-     with a px reservation the note painted through the third tile's label at
-     125 percent text size and beyond (measured, 47px of overlap at 1026px).
-     Applies to the loading card too, which shares this component. */
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    ${TilesGrid} {
-      padding-right: 9rem;
-    }
-  }
+  /* Two lines for every label, until all four fit on one. Left to wrap on
+     their own they stepped twice on the way down: measured, the two rightmost
+     went to one line at 840px and back to two at 890px, where the corner
+     line's reservation takes the width back. Holding them together means the
+     row's height changes once, at the width where the longest label
+     ("Transaction fees (yesterday)") stops wrapping, which is 1080px.
 
-  /* Narrow screens park the age line in the grid cell the wrapped tiles leave
-     empty. Aligned on the last text baseline, not the cell edge: the tiles hold
-     a 66,5px minimum while their "in total" line ends above it, by an amount
-     that scales with the root font (9px at 390, 2px at 1000), so an edge or a
-     fixed margin misses the line at one width or the other. */
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    ${TilesGrid} {
-      align-items: last baseline;
+     Every label reads "<what> (yesterday)", and the words before the
+     parenthesis are bound with non-breaking spaces in the translations, so
+     the one breakable space is the one in front of it: the window a figure
+     describes is what moves to the second line, never half a name.
+
+     Applies wherever a single line is not enough for all four, which is every
+     width below the one where the longest label stops wrapping. */
+  @media screen and (max-width: ${LABELS_ON_ONE_LINE_MIN}) {
+    ${TilesGrid} > div > span:first-child {
+      display: block;
+      /* Pinned rather than inherited: the label's line-height is normal,
+         which the font decides, so two lines is only a fixed number once the
+         ratio is. In em rather than lh, which Safari only learned in 16.4 and
+         this repo carries no browserslist to fall back on. */
+      line-height: 1.35;
+      min-height: 2.7em;
+      /* Reserving the height is not the same as taking it: only the longest
+         label wrapped on its own, so the other three kept "(yesterday)" up on
+         the first line with empty space below. The words before the
+         parenthesis are bound with non-breaking spaces, so a box just wide
+         enough for the longest of those names, and no wider, breaks at that
+         one space on every label.
+
+         Measured at 11px uppercase: the names run 46 to 115px, and
+         "(yesterday)" is 88px, so 11em (121px) clears the widest name while
+         staying under the two together. */
+      max-width: 11em;
     }
   }
 `;
@@ -87,25 +122,22 @@ export const UpdatedNote = styled.p`
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 
-  /* Wide screens: the corner, above the single tile row. Narrow ones wrap the
-     tiles, which leaves the grid cell beside the last tile empty; the line
-     fills it there instead, on the baseline of that tile's "in total" sub. */
-  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-  }
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    justify-self: end;
+  /* Last in the legend row and pushed to its end, so it reads against the
+     card's right edge on the same line as the fee totals. In the flow rather
+     than the corner: as an absolute corner line it needed 9rem reserved
+     beside the tiles, which made the tiles line up as four plus a corner and
+     stepped their labels an extra time on the way down.
+
+     Dropped once the legend fills the row, because the totals are the figures
+     that have to survive. */
+  margin-left: auto;
+
+  @media screen and (max-width: ${NOTE_FITS_BESIDE_LEGEND}) {
+    display: none;
   }
 `;
 
 /* -------------------------------- cells ---------------------------------- */
-
-/** Digits of one width, so a column of them reads as a column. */
-export const NumericCell = styled.span`
-  font-variant-numeric: tabular-nums;
-`;
 
 /* --------------------------- scoped table skin --------------------------- */
 
@@ -114,6 +146,42 @@ const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
 
 export const BlocksTableWrapper = styled.div`
   ${dataListTableSkin}
+  ${compactFilterRow}
+
+  /* Below this width the three controls do not fit on one line at all: the
+     switch, the pills and the button measure 355px against the 328 a 360px
+     screen leaves, which pushed the whole page sideways (measured: 11px of
+     document overflow at 360, 51 at 320). The shared row forbids wrapping so
+     the refresh button can never leave the pills; here the switch takes a line
+     of its own instead, which keeps that rule intact. */
+  @media screen and (max-width: 374px) {
+    ${TableControls} {
+      flex-wrap: wrap;
+      /* The shared row also pins flex-shrink to 0; without lifting that the
+         box stays at its 355px max-content and the wrap changes nothing. */
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    ${TableControls} > *:first-child {
+      flex-basis: 100%;
+    }
+  }
+
+  /* The auto-update toggle rides along with the page-size controls here, so
+     the row runs out at 585px rather than the 444 the shared rule assumes:
+     measured, 182px filter, 355 controls, the 16px gap and the padding. Below
+     that the lone date filter takes the row instead of leaving dead space. */
+  @media screen and (max-width: 584px) {
+    ${CompactFilterBar} {
+      width: 100%;
+
+      > div {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
+  }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
     /* One row height across every data-list table on the site. */
@@ -169,11 +237,8 @@ export const AutoUpdateContainer = styled.div`
   color: ${props => props.theme.black};
   font-size: 0.9rem;
 
-  /* The bottom margin LimitContainer carries below this width; the block
-     aligns its children on their bottom edge, so without it the switch sits
-     10px under the page-size buttons. Ends at the buttons' baseline, which is
-     also why the label needs no extra offset above that width. */
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    margin-bottom: 10px;
-  }
+  /* No offset of its own: it mirrored the 10px bottom margin LimitContainer
+     used to carry below the tablet width, which compactFilterRow now zeroes.
+     Keeping the mirror after the original left this switch floating 10px
+     above the pills, measured on every width from 600 to 1024. */
 `;

@@ -3,7 +3,6 @@ import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
 import { cleanEmptyValues } from '../../FormInput';
 import { Pack, PackInfo, WhitelistInfo } from './types';
 
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export const parseSplitRoyalties = (data: any): void => {
   if (!data.royalties) {
     return;

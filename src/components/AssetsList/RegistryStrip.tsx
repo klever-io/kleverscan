@@ -7,7 +7,6 @@ import {
   LegendDot,
   LegendItem,
   LegendRow,
-  SummaryCard,
   Tile,
   TileLabel,
   TileSub,
@@ -18,7 +17,7 @@ import { useTheme } from '@/contexts/theme';
 import api from '@/services/api';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/router';
-import { StripBarArea } from './styles';
+import { RegistryCard, StripBarArea } from './styles';
 
 interface IRegistryCounts {
   total: number;
@@ -106,7 +105,7 @@ const RegistryStrip: React.FC = () => {
   });
 
   return (
-    <SummaryCard aria-label={t('assets:List.RegistryAria')}>
+    <RegistryCard aria-label={t('assets:List.RegistryAria')}>
       <TilesGrid>
         <Tile>
           <TileLabel>{t('assets:List.AssetsOnChain')}</TileLabel>
@@ -158,7 +157,7 @@ const RegistryStrip: React.FC = () => {
           </LegendRow>
         </StripBarArea>
       )}
-    </SummaryCard>
+    </RegistryCard>
   );
 };
 

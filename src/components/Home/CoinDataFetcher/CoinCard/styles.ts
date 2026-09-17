@@ -1,7 +1,6 @@
 import { ArrowUpRightSquare, ArrowUpSquare, Currency } from '@/assets/icons';
 import { TableGradientBorder } from '@/components/Table/styles';
 import { DefaultCardStyles } from '@/styles/common';
-import { DataCardDefaultStyles } from '@/views/home';
 import Image from 'next/legacy/image';
 import styled, { keyframes } from 'styled-components';
 interface IVariation {
@@ -490,61 +489,51 @@ export const SpanTime = styled.span<{ selected: boolean }>`
   cursor: pointer;
 `;
 
-export const ExchangeIconContainer = styled.div`
+export const ExchangeIconContainer = styled.div<{ $color?: string }>`
   display: flex;
-  align-items: flex-start;
-  height: 100%;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 57px;
+  color: ${props => props.$color || props.theme.black};
 
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    align-items: center;
+  svg {
+    display: block;
+    max-width: 100%;
+    max-height: 56px;
   }
 `;
 
 export const ExchangeTextContainer = styled.div``;
 
 export const Button = styled.a<{ borderColor: string }>`
-  ${DataCardDefaultStyles}
   display: flex;
   align-items: center;
   text-align: start;
   gap: 8px;
 
   width: 100%;
-  padding: 16px 20px;
+  min-height: 80px;
+  padding: 8px;
   border-radius: 8px;
+  background-color: ${props => props.theme.white};
   color: ${props => props.theme.black};
-
   border: 1px solid ${props => props.borderColor};
 
-  transition: 0.25s ease-in-out;
+  transition:
+    background-color 0.25s ease-in-out,
+    color 0.25s ease-in-out;
 
   font-size: 1rem;
-
   text-decoration: none !important;
 
   &:hover,
-  &:focus {
-    box-shadow: inset 350px 0 0 0 ${props => props.borderColor};
-
+  &:focus-visible {
+    background-color: ${props => props.borderColor};
     color: ${props => props.theme.true.newBlack};
-    svg {
-      path {
-        fill: ${props => props.theme.true.newBlack};
-        fill-opacity: 1;
-      }
-    }
-  }
-  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 16px 20px;
-  }
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    margin-top: 0rem;
-    align-items: flex-start;
-    text-align: start;
-    color: ${props => props.theme.black};
+    ${ExchangeIconContainer} {
+      color: ${props => props.theme.true.white};
+    }
   }
 `;
 

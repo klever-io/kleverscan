@@ -87,6 +87,7 @@ const swapExchangeInfo = [
     text2: '',
     url: NEXT_PUBLIC_SWAP_URL || 'https://app.voxswap.io/KLV-USDT',
     icon: <VoxSwap />,
+    iconColor: '#B7EC42',
     color: '#B7EC42',
   },
   {
@@ -101,6 +102,7 @@ const swapExchangeInfo = [
     text2: '',
     url: NEXT_PUBLIC_EXCHANGE_URL || 'https://bitcoin.me/',
     icon: <BitcoinMe />,
+    iconColor: '#FF6700',
     color: '#FF6700',
   },
 ];
@@ -411,7 +413,9 @@ const CoinCard: React.FC<PropsWithChildren> = () => {
               rel="noreferrer nofollow"
               key={index}
             >
-              <ExchangeIconContainer>{item.icon}</ExchangeIconContainer>
+              <ExchangeIconContainer $color={item.iconColor}>
+                {item.icon}
+              </ExchangeIconContainer>
               <ExchangeTextContainer>
                 <p>{item.text1}</p>
                 <p>{item.text2}</p>

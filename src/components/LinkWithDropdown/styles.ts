@@ -30,7 +30,11 @@ export const Dropdown = styled.div<DropdownProps>`
   border-radius: 12px;
   max-width: 15rem;
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    width: 12rem;
+    /* A floor, not a fixed width. At this breakpoint the root font drops to
+       87.5%, so 12rem is 168px, and a label like "Copy Contract Address" needs
+       more than that. Fixed, the panel could not grow and the icon beside the
+       label was squeezed to nothing; the max-width above still caps it. */
+    min-width: 12rem;
     left: 0;
   }
 `;
@@ -103,6 +107,14 @@ export const DropdownActionItem = styled.div<{
   gap: 0.45rem;
   height: 2.5rem;
   font-size: 14px;
+  /* The copy item sits inside Copy's icon-button wrapper, which sets
+     line-height: 0 for its icon. A label that fits on one line hides that; one
+     that wraps renders both lines on the same baseline, glyphs interleaved. */
+  line-height: normal;
+  /* Menu items are actions, not prose: never wrap a label mid-phrase. The
+     panel grows to fit between its min-width and its max-width, so a longer
+     label widens the menu instead of being clipped or wrapped. */
+  white-space: nowrap;
   width: 100%;
   font-weight: 400;
   padding: 0.75rem;
@@ -110,6 +122,12 @@ export const DropdownActionItem = styled.div<{
   border-radius: 6px;
   cursor: pointer;
   user-select: none;
+
+  /* The label is the flexible part. Without this the icon is what a long
+     label pushes out, because it is the only shrinkable box in the row. */
+  > svg {
+    flex-shrink: 0;
+  }
 
   ${props =>
     props.active &&

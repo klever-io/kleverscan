@@ -35,7 +35,8 @@ export const requestAssetsList = async (
         .join(',');
 
       const res = await api.get({
-        route: `assets/list?asset=${assetsInput}`,
+        route: 'assets/list',
+        query: { asset: assetsInput },
       });
       if (!res.error || res.error === '') {
         return res.data.assets;

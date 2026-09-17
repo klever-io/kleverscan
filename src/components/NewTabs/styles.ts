@@ -7,7 +7,10 @@ export const Container = styled.div`
 `;
 
 export const TabContainer = styled.div`
-  margin: 2rem 0;
+  /* Top margin matches the gap between the description and the tab row above
+     it, so both bands on the asset page read the same. Bottom margin trimmed
+     so the gap to the filter row below matches the assets list, at 48px. */
+  margin: 3rem 0 1rem;
 
   display: flex;
 
@@ -22,14 +25,15 @@ export const TabContainer = styled.div`
 
 export const TabContent = styled.div`
   display: flex;
-  margin: 2rem 0;
   overflow-x: auto;
   overflow-y: hidden;
 
   gap: 1rem;
 
+  /* No vertical margin: TabContainer already spaces this row, and having both
+     doubled the gap between the tabs and the content below them. */
   @media (max-width: ${props => props.theme.breakpoints.mobile}) {
-    margin: 2rem 1rem;
+    margin: 0 1rem;
   }
 `;
 

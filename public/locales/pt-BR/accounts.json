@@ -1,8 +1,7 @@
 {
   "SingleAccount": {
     "Title": "Conta",
-    "BurnAddress": "ENDEREÇO DE QUEIMA",
-    "BlackHole": "BURACO NEGRO",
+    "Void": "Void",
     "Tabs": {
       "Permission": "Permissão",
       "ProprietaryAssets": "Ativos da Conta",
@@ -55,9 +54,45 @@
       "PermissionsName": "Nome das Permissões"
     }
   },
-  "AccountsPage": {
-    "Number of Accounts": "Número de Contas",
-    "Accounts created in the last 24h": "Contas criadas nas últimas 24 horas",
-    "List Of Accounts": "Lista de Contas"
+  "List": {
+    "SummaryAria": "Estatísticas de contas",
+    "OnChain": "na rede",
+    "TotalShort": "Contas",
+    "New24h": "Novas (24h)",
+    "VersusYesterday": "{{change}} em relação às 24h anteriores",
+    "NewWindow": "Novas ({{days}}d)",
+    "AcrossDays_one": "em {{count}} dia",
+    "AcrossDays_other": "em {{count}} dias",
+    "Nonce": "Nonce",
+    "ValidatorBadgesLoaded": "Selos de validador carregados"
+  },
+  "Common": {
+    "CopyAddress": "Copiar endereço",
+    "AddressCopied": "Endereço copiado para a área de transferência",
+    "OpenAccount": "Abrir conta em uma nova aba",
+    "OpenInNewTab": "Abrir em uma nova aba"
+  },
+  "Badges": {
+    "Foundation": "Fundação",
+    "FoundationTooltip": "Criada no primeiro bloco da rede",
+    "Validator": "Validador",
+    "ValidatorTooltip": "Possui um nó validador registrado",
+    "GenesisValidator": "Validador genesis",
+    "GenesisValidatorTooltip": "Possui um validador registrado no bloco genesis",
+    "ListState": {
+      "elected": "Eleito",
+      "eligible": "Elegível",
+      "waiting": "Aguardando",
+      "jailed": "Penalizado",
+      "inactive": "Inativo",
+      "leaving": "Saindo",
+      "observer": "Observador"
+    }
+  },
+  "Filters": {
+    "Type": "Tipo de conta",
+    "All": "Todas",
+    "foundation": "Fundação",
+    "genesisValidator": "Validador genesis"
   }
 }

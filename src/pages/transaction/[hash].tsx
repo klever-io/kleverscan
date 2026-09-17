@@ -117,16 +117,22 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   );
   const StatusIcon = getStatusIcon(status);
 
-  const getPrecisionTransaction = async () => {
-    if (kdaFee) {
-      const precision = await getPrecision(kdaFee.kda);
-      setPrecisionTransaction(precision);
-    }
-  };
-
+  // Keyed on the fee asset, not on mount: the page no longer remounts between
+  // two transactions, so empty deps kept the previous transaction's precision.
+  // The active flag mirrors usePrecision: a slower earlier lookup must not
+  // overwrite the current transaction's answer.
   useEffect(() => {
+    if (!kdaFee) return;
+    let active = true;
+    const getPrecisionTransaction = async () => {
+      const precision = await getPrecision(kdaFee.kda);
+      if (active) setPrecisionTransaction(precision);
+    };
     getPrecisionTransaction();
-  }, []);
+    return () => {
+      active = false;
+    };
+  }, [kdaFee?.kda]);
 
   const overviewProps = {
     hash,
@@ -223,7 +229,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   }
 
   const transaction: ITransactionResponse = await api.get({
-    route: `transaction/${hash}`,
+    route: `transaction/${encodeURIComponent(String(hash))}`,
   });
 
   const tx = transaction?.data?.transaction;
@@ -234,7 +240,7 @@ export const getServerSideProps: GetServerSideProps<ITransactionPage> = async ({
   if (tx?.contract.some(contract => contract.type == 63)) {
     const nodeTransaction: any = await api.get({
       service: Service.NODE,
-      route: `transaction/${hash}?withResults=true`,
+      route: `transaction/${encodeURIComponent(String(hash))}?withResults=true`,
     });
 
     const logs = nodeTransaction?.data?.transaction?.logs;

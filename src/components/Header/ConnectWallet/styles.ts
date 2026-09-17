@@ -11,7 +11,9 @@ export const ConnectButton = styled.div<{
 }>`
   max-width: 200px;
   width: 100%;
-  height: 36px;
+  /* The same two heights the spotlight pill beside it uses, in the same rem,
+     so the pair stays level while the root font shrinks below tablet width. */
+  height: 2.5rem;
   padding: 0.5rem 1rem;
   border-radius: 24px;
   position: relative;
@@ -39,12 +41,23 @@ export const ConnectButton = styled.div<{
   span {
     white-space: nowrap;
   }
+
+  /* Pins every direct span; only the icon's wrapper span could shrink (the
+     labels are nowrap): under compression it went from 25px to 11 at 560 and
+     to 0 at 480 while the words stayed. Rigid children make the pill's own
+     minimum its content, so the row has to find the space elsewhere. */
+  > span {
+    flex-shrink: 0;
+  }
   label {
     cursor: pointer;
   }
 
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: 2.25rem;
+  }
+
   @media screen and (max-width: ${props => props.theme.breakpoints.mobile}) {
-    max-width: 100%;
     svg {
       width: 18px;
       height: 18px;

@@ -80,7 +80,7 @@ export function WriteResult({ hash, setHash, outputTypes }: WriteResultProps) {
       try {
         res = await api.get({
           service: Service.NODE,
-          route: `transaction/${hash}?withResults=true`,
+          route: `transaction/${encodeURIComponent(hash)}?withResults=true`,
         });
       } catch {
         scheduleNext();

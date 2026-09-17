@@ -24,37 +24,30 @@ describe('Assets Page', () => {
 
     // although the test is failing, it is working as itended. todo: fix test.
     it.skip(`should filter Assets by type - ${type}`, () => {
-      const typeFilter = cy.get(TYPE_FILTER_SELECTOR, {
-        timeout: 5000,
-      });
+      cy.get(TYPE_FILTER_SELECTOR, { timeout: 5000 }).click();
+      cy.get(TYPE_FILTER_SELECTOR).contains(type, { timeout: 5000 }).click();
 
-      typeFilter.click();
-
-      typeFilter.contains(type, { timeout: 5000 }).click();
-
-      cy.wait(5000);
-
-      cy.url().then(currentUrl => {
+      cy.url().should(currentUrl => {
         const url = new URL(currentUrl);
-        const typeParam = url.searchParams.get('type');
-        expect(typeParam).to.eq(type);
+        expect(url.searchParams.get('type')).to.eq(type);
       });
+
+      cy.get(`${TABLE_ROW_SELECTOR}, ${TABLE_EMPTY_SELECTOR}`, {
+        timeout: 15000,
+      }).should('exist');
 
       cy.get('body').then($body => {
-        if ($body.length > 0) {
-          const hasRow = $body.find(TABLE_ROW_SELECTOR).length > 0;
-          if (hasRow) {
-            cy.get(TABLE_ROW_0_LINK_SELECTOR, { timeout: 5000 })
-              .first()
-              .invoke('attr', 'href')
-              .then(href => {
-                href && assetsLinks.push({ name: type, link: href });
-              });
-          } else {
-            cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should(
-              'be.visible',
-            );
-          }
+        const hasRow = $body.find(TABLE_ROW_SELECTOR).length > 0;
+        if (hasRow) {
+          cy.get(TABLE_ROW_0_LINK_SELECTOR, { timeout: 5000 })
+            .first()
+            .invoke('attr', 'href')
+            .then(href => {
+              expect(href).to.be.a('string').and.not.be.empty;
+              assetsLinks.push({ name: type, link: href as string });
+            });
+        } else {
+          cy.get(TABLE_EMPTY_SELECTOR, { timeout: 5000 }).should('be.visible');
         }
       });
     });

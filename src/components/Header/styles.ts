@@ -1,10 +1,9 @@
-import { Search } from '@/assets/icons';
 import { transparentize } from 'polished';
-import { AiOutlineClose } from 'react-icons/ai';
 import { HiOutlineMenuAlt2 } from 'react-icons/hi';
+import { kbdAccent } from '@/styles/common';
 import styled, { css, keyframes } from 'styled-components';
-import { default as DefaultInput } from '../InputGlobal';
 import { DefaultCardStyleWithBorder } from '@/styles/common';
+import { ConnectButton } from './ConnectWallet/styles';
 
 interface IMobileMenu {
   opened: boolean;
@@ -20,10 +19,14 @@ export const Container = styled.div`
   right: 0;
   z-index: 6;
   transition: top 0.1s linear;
-  background-color: ${props =>
-    props.theme.dark ? props.theme.background : props.theme.true.white};
+  /* The raised surface, the same one the cards and tables sit on: #fff in the
+     light theme, #151515 in the dark one. Reading the background token for
+     dark gave the bar the page's own colour, so it had no edge of its own and
+     only its hairline told a reader where the chrome ended. Identical in
+     light, where both tokens are #fff. */
+  background-color: ${props => props.theme.white};
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
+    ${props => (props.theme.dark ? props.theme.black20 : props.theme.black10)};
   @media (min-width: ${props => props.theme.breakpoints.mobile}) {
     width: 100%;
     justify-content: space-between;
@@ -56,11 +59,10 @@ export const Content = styled.div<{ isMainNet?: boolean }>`
 
 export const HeaderContainer = styled.span<{
   isMainNet: boolean;
-  openSearch: boolean;
 }>`
   flex-direction: column;
   width: ${props => (props.isMainNet ? '15rem' : '17rem')};
-  display: ${props => (props.openSearch ? 'none' : 'flex')};
+  display: flex;
   span {
     color: ${props => props.theme.navbar.text};
     font-size: 0.8rem;
@@ -154,76 +156,6 @@ export const MobileItem = styled(Item)`
   font-size: 1.5rem;
 `;
 
-export const Input = styled(DefaultInput)`
-  border-color: ${props => props.theme.lightGray};
-  padding: 0.5rem 1rem;
-  max-width: 30rem;
-  input {
-    color: ${props => props.theme.text.inputHeader};
-    font-size: 0.9rem;
-    &::placeholder {
-      color: ${props => props.theme.text.inputHeader};
-    }
-  }
-  input:placeholder-shown {
-    text-overflow: ellipsis;
-  }
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-  }
-`;
-
-const fadeInContainer = keyframes`
-  from {
-    opacity: 0.3;
-    transform: translateX(-50%);
-
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
-
-export const SearchContainer = styled.div<{ $openSearch: boolean }>`
-  display: ${props => (props.$openSearch ? 'flex' : 'none')};
-  align-items: center;
-  width: 20vw;
-  max-width: 20rem;
-  gap: 0.2rem;
-  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: 100%;
-    max-width: 65vw;
-  }
-  animation: ${fadeInContainer} 0.3s;
-`;
-
-export const CloseSearch = styled(AiOutlineClose)<{ $openSearch: boolean }>`
-  display: ${props => (props.$openSearch ? 'block' : 'none')};
-  color: ${props => props.theme.black};
-  padding: 0.3rem;
-
-  height: 1.7rem;
-  width: 1.7rem;
-  cursor: pointer;
-`;
-export const SearchIcon = styled(Search)`
-  & path {
-    fill: ${props => props.theme.black};
-  }
-  cursor: pointer;
-  overflow: visible;
-`;
-
-export const SearchIconWrapper = styled.div<{ openSearch: boolean }>`
-  display: ${props => (props.openSearch ? 'none' : 'grid')};
-  padding: 0.5rem;
-  place-items: center;
-  @media (min-width: ${props => props.theme.breakpoints.tablet}) {
-    padding: 1rem;
-  }
-  cursor: pointer;
-`;
 export const DesktopContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -245,6 +177,95 @@ export const DesktopSubWrapper = styled.div`
   width: 100%;
 `;
 
+export const SpotlightTrigger = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  height: 2.5rem;
+  padding: 0 0.7rem 0 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  color: ${props =>
+    props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+  background: ${props =>
+    props.theme.dark ? 'rgba(255, 255, 255, 0.04)' : props.theme.true.white};
+  border: 1px solid
+    ${props =>
+      props.theme.dark ? 'rgba(255, 255, 255, 0.1)' : props.theme.black10};
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.25rem;
+    padding: 0 0.35rem;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    font-family: inherit;
+    ${kbdAccent}
+  }
+
+  svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    path {
+      fill: ${props =>
+        props.theme.dark ? props.theme.lightGray : props.theme.gray800};
+    }
+  }
+
+  &:hover {
+    border-color: ${props =>
+      props.theme.dark ? 'rgba(125, 63, 241, 0.45)' : props.theme.purple};
+    background: ${props =>
+      props.theme.dark
+        ? 'rgba(125, 63, 241, 0.08)'
+        : 'rgba(125, 63, 241, 0.06)'};
+  }
+
+  /* Touch widths keep the desktop pill, label included, for as long as the
+     row holds it: the logo ends near x=222 and the icons claim the last
+     ~77px, which leaves the ~118px the labelled pill needs from about 430px
+     up (measured); 480 keeps a margin. The shortcut badge never shows here,
+     a key hint means nothing to a screen answering to touch. */
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    height: 2.25rem;
+
+    kbd {
+      display: none;
+    }
+
+    svg {
+      width: 1.15rem;
+      height: 1.15rem;
+    }
+  }
+
+  /* Below that there is no room beside the logo: a round icon button. */
+  @media (max-width: 480px) {
+    width: 2.25rem;
+    padding: 0;
+    justify-content: center;
+
+    span {
+      display: none;
+    }
+  }
+`;
+
 export const IconsMenu = styled.div`
   display: flex;
   width: 100%;
@@ -258,7 +279,7 @@ export const IconsMenu = styled.div`
   }
 `;
 
-export const MobileContainer = styled.div<{ $openSearch: boolean }>`
+export const MobileContainer = styled.div`
   z-index: 6;
   position: relative;
   display: none;
@@ -269,7 +290,7 @@ export const MobileContainer = styled.div<{ $openSearch: boolean }>`
     }
   }
   @media (max-width: ${props => props.theme.breakpoints.tablet}) {
-    width: ${props => (props.$openSearch ? '100%' : 'auto')};
+    width: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -471,14 +492,23 @@ export const SvgWrapper = styled.div`
   justify-content: center;
 `;
 
+/**
+ * The wallet button on its own row under the bar, for the widths where the bar
+ * itself has no room left for it. Its full width belongs to this spot rather
+ * than to a breakpoint: the pill keeps its 200px cap wherever the bar holds it.
+ */
 export const ConnectionWrapper = styled.div`
   width: 100%;
   position: relative;
   z-index: 3;
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid
-    ${props => (props.theme.dark ? props.theme.blue : props.theme.black10)};
+    ${props => (props.theme.dark ? props.theme.black20 : props.theme.black10)};
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  ${ConnectButton} {
+    max-width: 100%;
+  }
 `;

@@ -17,13 +17,22 @@ export const ContainerView = styled.div`
   width: 100%;
 `;
 
+/**
+ * The card's own surface, plus the gradient hairline around it.
+ *
+ * The fill is `white` in both themes on purpose. That token is the raised
+ * surface, not the colour white: #fff in the light theme and #151515 in the
+ * dark one. Filling the dark card with `background` instead, as this did,
+ * gave it exactly the page's own colour, so a table and a summary card had no
+ * surface at all and the hairline was left holding them together on its own.
+ * Measured: interior against page was 1.00 in dark and 1.10 in light; reading
+ * `white` in both makes it 1.11, the same step the light theme has.
+ */
 export const TableGradientBorder = css`
   border: 1px solid transparent;
   background-image: linear-gradient(
-      ${props =>
-        props.theme.dark ? props.theme.background : props.theme.white},
-      ${props =>
-        props.theme.dark ? props.theme.background : props.theme.white}
+      ${props => props.theme.white},
+      ${props => props.theme.white}
     ),
     linear-gradient(
       to bottom,
@@ -37,9 +46,18 @@ export const TableGradientBorder = css`
   background-clip: padding-box, border-box;
 `;
 
-export const TableBody = styled.div<{ smaller?: boolean }>`
+export const TableBody = styled.div<{ smaller?: boolean; $stale?: boolean }>`
   min-width: fit-content;
   width: 100%;
+
+  /* The rows of the page being replaced stay in place and step back rather
+     than disappearing, so paging reads as a change instead of a flash. */
+  opacity: ${props => (props.$stale ? 0.55 : 1)};
+  transition: opacity 150ms ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
 
   display: flex;
   flex-direction: column;
@@ -89,6 +107,55 @@ export const HeaderItem = styled.div<{
     `}
 `;
 
+/**
+ * Opt-in sort control inside a header cell. Inherits the header typography so
+ * tables that do not pass sortable columns look exactly as before; the arrow
+ * only surfaces on the active column, or faintly on hover.
+ */
+export const HeaderSortButton = styled.button<{ $active?: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+
+  svg {
+    flex-shrink: 0;
+    color: ${props => props.theme.violet};
+    opacity: ${props => (props.$active ? 1 : 0)};
+    transition: opacity 150ms ease-out;
+  }
+
+  &:hover svg,
+  &:focus-visible svg {
+    opacity: ${props => (props.$active ? 1 : 0.45)};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${props => props.theme.violet};
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ${props =>
+    props.$active &&
+    css`
+      color: ${props.theme.black};
+    `}
+
+  @media (prefers-reduced-motion: reduce) {
+    svg {
+      transition: none;
+    }
+  }
+`;
+
 export const TableRow = styled.div<TableRowProps>`
   display: flex;
   flex-direction: column;
@@ -108,7 +175,7 @@ export const TableRow = styled.div<TableRowProps>`
       ${props =>
         props.theme.dark ? props.theme.darkGray : props.theme.black10};
 
-    background-color: ${props => props.theme.table.background};
+    background-color: ${props => props.theme.white};
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
@@ -297,10 +364,6 @@ export const Status = styled.span<IStatus>`
   }
 `;
 
-export const InOutSpan = styled(Status)`
-  min-width: 50px !important;
-`;
-
 export const EmptyRow = styled.div`
   width: 100% !important;
 
@@ -474,6 +537,33 @@ export const ItemContainer = styled.div<{
         : css`
             cursor: not-allowed;
           `}
+  }
+`;
+
+/**
+ * Items per page and the refresh control as one unit.
+ *
+ * They used to be two siblings of the filters, so the two-column grid below
+ * the tablet width had three children to place and dropped the refresh button
+ * onto a row of its own, floating under the filters. One child instead of two
+ * keeps them together at every width.
+ */
+export const TableControls = styled.div`
+  display: flex;
+  align-items: end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  margin-left: auto;
+
+  /* The float container is a two-column grid below this width, and one 171px
+     column cannot hold these controls: they wrapped into three rows with the
+     refresh button alone again. The full row can. */
+  @media (max-width: ${props => props.theme.breakpoints.tablet}) {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-left: 0;
   }
 `;
 

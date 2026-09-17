@@ -1,3 +1,4 @@
+import { isDotSegment } from '@/pages/api/contract-validator/_proxy';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const API_URL = process.env.DEFAULT_KLEVERSCAN_API_URL || '';
@@ -16,8 +17,13 @@ export default async function handler(
   try {
     const { asset_id } = req.query;
 
-    // Validate asset_id
-    if (typeof asset_id !== 'string' || asset_id.trim() === '') {
+    // encodeURIComponent leaves `.` and `..` alone and URL parsing then walks
+    // up a level, so `..` reaches the collection endpoint instead of a record.
+    if (
+      typeof asset_id !== 'string' ||
+      asset_id.trim() === '' ||
+      isDotSegment(asset_id)
+    ) {
       res.status(400).json({
         error: 'Bad Request',
         message: 'Invalid asset identifier',

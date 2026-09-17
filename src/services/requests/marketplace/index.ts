@@ -18,7 +18,8 @@ export const getMarketplace = async (
   page: number,
 ): Promise<IMarketplaceResponse> => {
   const res: IMarketplaceResponse = await api.get({
-    route: `marketplaces/${marketplaceId}?page=${page}`,
+    route: `marketplaces/${encodeURIComponent(marketplaceId)}`,
+    query: { page },
   });
   return res;
 };

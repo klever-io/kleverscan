@@ -1,0 +1,244 @@
+import {
+  CompactFilterBar,
+  compactFilterRow,
+  DATA_LIST_ROW_HEIGHT,
+  dataListTableSkin,
+  SummaryCard,
+  Tile,
+  TilesGrid,
+} from '@/components/DataList/styles';
+import {
+  HeaderItem,
+  MobileCardItem,
+  TableControls,
+} from '@/components/Table/styles';
+import styled, { css, DefaultTheme } from 'styled-components';
+import { RIGHT_ALIGNED_COLUMNS } from './columns';
+
+/* ------------------------------- summary --------------------------------- */
+
+// 1.5rem is the rhythm the old CardContainer had, so the figures land where
+// the cards used to. The loading shape carries the same margin, or the page
+// shifts by 24px once the numbers arrive.
+/* Below this the legend's own items fill the row, leaving no room for the age
+   line beside them. Measured on the loaded card: 258px free at 768px against
+   the 118px the line needs, and 90px free at 600px. */
+const NOTE_FITS_BESIDE_LEGEND = '767.98px';
+
+/* Above this every label fits on one line by itself, so the held pair of lines
+   is dropped and the card sits a line shorter. Measured with the labels' own
+   wrapping: the longest, "Transaction fees (yesterday)", takes two lines at
+   920px and one at 940px. Moving the age line into the legend row bought that
+   width: as a corner line it reserved 9rem beside the tiles and the same
+   threshold sat at 1080px. */
+const LABELS_ON_ONE_LINE_MIN = '939.98px';
+
+const pageSummarySpacing = css`
+  margin-top: 1.5rem;
+`;
+
+/**
+ * Holds the tile to the height a tile reaches on /transactions, so the two
+ * cards line up. Theirs carries a `TrendValue` at 0.8125rem where a plain
+ * `TileSub` is 0.75rem, which is 18px of line box against 16,5px: without this
+ * a card with no trend figure sits 1,5px lower than one with. Measured, and on
+ * the loading shape too so the card does not grow when the figures land.
+ */
+const tileHeight = css`
+  ${Tile} {
+    min-height: 66.5px;
+  }
+`;
+
+export const BlocksSummaryCard = styled(SummaryCard)`
+  ${pageSummarySpacing}
+  ${tileHeight}
+
+  /* Anchors the age line in the top-right corner. */
+  position: relative;
+
+  /* Two lines for every label, until all four fit on one. Left to wrap on
+     their own they stepped twice on the way down: measured, the two rightmost
+     went to one line at 840px and back to two at 890px, where the corner
+     line's reservation takes the width back. Holding them together means the
+     row's height changes once, at the width where the longest label
+     ("Transaction fees (yesterday)") stops wrapping, which is 1080px.
+
+     Every label reads "<what> (yesterday)", and the words before the
+     parenthesis are bound with non-breaking spaces in the translations, so
+     the one breakable space is the one in front of it: the window a figure
+     describes is what moves to the second line, never half a name.
+
+     Applies wherever a single line is not enough for all four, which is every
+     width below the one where the longest label stops wrapping. */
+  @media screen and (max-width: ${LABELS_ON_ONE_LINE_MIN}) {
+    ${TilesGrid} > div > span:first-child {
+      display: block;
+      /* Pinned rather than inherited: the label's line-height is normal,
+         which the font decides, so two lines is only a fixed number once the
+         ratio is. In em rather than lh, which Safari only learned in 16.4 and
+         this repo carries no browserslist to fall back on. */
+      line-height: 1.35;
+      min-height: 2.7em;
+      /* Reserving the height is not the same as taking it: only the longest
+         label wrapped on its own, so the other three kept "(yesterday)" up on
+         the first line with empty space below. The words before the
+         parenthesis are bound with non-breaking spaces, so a box just wide
+         enough for the longest of those names, and no wider, breaks at that
+         one space on every label.
+
+         Measured at 11px uppercase: the names run 46 to 115px, and
+         "(yesterday)" is 88px, so 11em (121px) clears the widest name while
+         staying under the two together. */
+      max-width: 11em;
+    }
+  }
+`;
+
+// Same red the holders bar uses for its burned segment, so one colour means
+// one thing across the site.
+const SEGMENT_COLOR = {
+  burned: (theme: DefaultTheme) => (theme.dark ? '#FF4465' : theme.red),
+  validators: (theme: DefaultTheme) => theme.violet,
+  kapp: (theme: DefaultTheme) => theme.lightPurple,
+};
+
+export type FeeSegmentKey = keyof typeof SEGMENT_COLOR;
+
+export const feeSegmentColor = (
+  key: FeeSegmentKey,
+  theme: DefaultTheme,
+): string => SEGMENT_COLOR[key](theme);
+
+/**
+ * The age of the figures, in the card's top-right corner. Out of the flow on
+ * purpose: in it, the line and its margin added 28,5px that the loading shape
+ * has no counterpart for, so the card grew by that much the moment the numbers
+ * arrived. `top`/`right` match the card's own 20px padding.
+ */
+export const UpdatedNote = styled.p`
+  color: ${props => props.theme.darkText};
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  /* Last in the legend row and pushed to its end, so it reads against the
+     card's right edge on the same line as the fee totals. In the flow rather
+     than the corner: as an absolute corner line it needed 9rem reserved
+     beside the tiles, which made the tiles line up as four plus a corner and
+     stepped their labels an extra time on the way down.
+
+     Dropped once the legend fills the row, because the totals are the figures
+     that have to survive. */
+  margin-left: auto;
+
+  @media screen and (max-width: ${NOTE_FITS_BESIDE_LEGEND}) {
+    display: none;
+  }
+`;
+
+/* -------------------------------- cells ---------------------------------- */
+
+/* --------------------------- scoped table skin --------------------------- */
+
+/** `nth-child` is 1-based; the column indexes are not. */
+const rightAligned = RIGHT_ALIGNED_COLUMNS.map(index => index + 1);
+
+export const BlocksTableWrapper = styled.div`
+  ${dataListTableSkin}
+  ${compactFilterRow}
+
+  /* Below this width the three controls do not fit on one line at all: the
+     switch, the pills and the button measure 355px against the 328 a 360px
+     screen leaves, which pushed the whole page sideways (measured: 11px of
+     document overflow at 360, 51 at 320). The shared row forbids wrapping so
+     the refresh button can never leave the pills; here the switch takes a line
+     of its own instead, which keeps that rule intact. */
+  @media screen and (max-width: 374px) {
+    ${TableControls} {
+      flex-wrap: wrap;
+      /* The shared row also pins flex-shrink to 0; without lifting that the
+         box stays at its 355px max-content and the wrap changes nothing. */
+      flex-shrink: 1;
+      min-width: 0;
+    }
+
+    ${TableControls} > *:first-child {
+      flex-basis: 100%;
+    }
+  }
+
+  /* The auto-update toggle rides along with the page-size controls here, so
+     the row runs out at 585px rather than the 444 the shared rule assumes:
+     measured, 182px filter, 355 controls, the 16px gap and the padding. Below
+     that the lone date filter takes the row instead of leaving dead space. */
+  @media screen and (max-width: 584px) {
+    ${CompactFilterBar} {
+      width: 100%;
+
+      > div {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+    }
+  }
+
+  @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    /* One row height across every data-list table on the site. */
+    ${MobileCardItem} {
+      height: ${DATA_LIST_ROW_HEIGHT};
+      /* The amounts are the anonymous text of their cells, which the shared
+         a/span rule cannot reach; under width pressure they wrapped mid-value. */
+      white-space: nowrap;
+    }
+
+    /* One 20px content line, centered by the cell's vertical-align inside the
+       60px row; the shared rule would pin these to 24px. */
+    ${MobileCardItem} a,
+    ${MobileCardItem} span {
+      height: 20px;
+    }
+
+    /* The skin drops the permanent underline, so a link needs hover and focus
+       affordances to stay distinguishable from the static text beside it. */
+    ${MobileCardItem} a:hover,
+    ${MobileCardItem} a:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 0.2rem;
+    }
+
+    ${rightAligned
+      .map(
+        position => `
+    ${MobileCardItem}:nth-child(${position}),
+    ${HeaderItem}:nth-child(${position}) {
+      text-align: right;
+    }`,
+      )
+      .join('')}
+  }
+`;
+
+/* ------------------------------ auto update ------------------------------ */
+
+/**
+ * Sits in the table's control slot, directly beside Items per page. The click
+ * lives on the wrapper as a convenience; the switch inside is the real button.
+ */
+export const AutoUpdateContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  color: ${props => props.theme.black};
+  font-size: 0.9rem;
+
+  /* No offset of its own: it mirrored the 10px bottom margin LimitContainer
+     used to carry below the tablet width, which compactFilterRow now zeroes.
+     Keeping the mirror after the original left this switch floating 10px
+     above the pills, measured on every width from 600 to 1024. */
+`;

@@ -7,6 +7,11 @@ export const Container = styled.div`
   flex-direction: row;
   align-items: center;
 
+  /* Pages with a title icon get a 40px row from the icon itself; without one
+     the row shrank to the text height and the arrow sat higher than on every
+     other page. */
+  min-height: 40px;
+
   gap: 16px;
 
   color: ${props => props.theme.black};

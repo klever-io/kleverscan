@@ -3,12 +3,13 @@ import { NonFungibleView } from '@/components/Asset/NonFungibleView';
 import { SemiFungibleView } from '@/components/Asset/SemiFungibleView';
 import Title from '@/components/Layout/Title';
 import { ITable } from '@/components/Table';
+import TransactionsMobileCard from '@/components/TransactionsList/MobileCard';
+import { useTransactionHeaders } from '@/components/TransactionsList/useTransactionHeaders';
 import TransactionsFilters from '@/components/TransactionsFilters';
-import { transactionRowSections } from '@/pages/transactions';
+import { useTransactionRowSections } from '@/pages/transactions';
 import api from '@/services/api';
 import { requestNonceDetails } from '@/services/requests/asset/nonce';
 import { Container, Header, SpacedContainer } from '@/styles/common';
-import { transactionTableHeaders } from '@/utils/contracts';
 import { getParsedTransactionPrecision } from '@/utils/precisionFunctions';
 import { GetServerSideProps } from 'next';
 import { useTranslation } from 'next-i18next';
@@ -21,6 +22,7 @@ import { AssetTitle } from '@/components/Asset/AssetSummary/AssetTitle';
 
 const AssetNonce: React.FC<PropsWithChildren> = () => {
   const { t } = useTranslation(['common', 'assets']);
+  const transactionHeaders = useTransactionHeaders();
   const router = useRouter();
   const assetId = router.query.asset as string;
   const nonceValue = router.query.nonce as string;
@@ -57,13 +59,17 @@ const AssetNonce: React.FC<PropsWithChildren> = () => {
     };
   };
 
+  const rowSections = useTransactionRowSections();
+
   const tableProps: ITable = {
     type: 'transactions',
-    header: transactionTableHeaders,
-    rowSections: transactionRowSections,
+    header: transactionHeaders,
+    rowSections,
     dataName: 'transactions',
     request: (page, limit) => requestTransactions(page, limit),
     Filters: TransactionsFilters,
+    MobileCard: TransactionsMobileCard,
+    singleLineSkeleton: true,
   };
 
   return (
@@ -94,7 +100,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 }) => {
   const props = await serverSideTranslations(
     locale,
-    ['common', 'assets'],
+    ['common', 'assets', 'table', 'transactions'],
     nextI18nextConfig,
     ['en'],
   );

@@ -1,4 +1,10 @@
-import { CardContent, CardHeaderItem, Container } from '@/styles/common';
+import {
+  CardContent,
+  CardHeaderItem,
+  Container,
+  PAGE_TOP_SPACING,
+} from '@/styles/common';
+import { TabContent } from '@/components/Tabs/styles';
 import styled, { css } from 'styled-components';
 
 export const Title = styled.div`
@@ -49,7 +55,33 @@ export const ContainerAssetName = styled(ContainerAssetId)`
 
 export const AssetPageContainer = styled(Container)`
   max-width: 1440px;
-  margin: 0 auto;
+  margin: ${PAGE_TOP_SPACING} auto 0;
+`;
+
+export const AssetsListContainer = styled(Container)`
+  /* The title sits above the tab row, aligned with other page titles. */
+  margin-top: ${PAGE_TOP_SPACING};
+
+  > div {
+    margin-top: 1rem;
+  }
+
+  /* Same gap under the tab row as the asset detail page has under its
+     Transactions/Holders row (24px, measured in the browser). */
+  [data-testid^='tab-content'] {
+    margin-top: 1.5rem;
+  }
+
+  /* The shared TabContent takes a 2rem block margin below the mobile
+     breakpoint, which at these widths opened a dead band between the shrunken
+     tab row and the summary strip (58px against the 24 the page uses
+     everywhere else, measured at 530). The 1rem side margin goes with it: the
+     cards it indented against sit at the container edge here. */
+  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+    ${TabContent} {
+      margin: 0;
+    }
+  }
 `;
 
 export const AssetCardContent = styled(CardContent)`

@@ -4,12 +4,14 @@ import { DoubleRow } from '@/styles/common';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
 import { setQueryAndRouter } from '@/utils';
 import { useDidUpdateEffect } from '@/utils/hooks';
-import { processRowSectionsLayout } from '@/utils/table';
+import { normalizePageParam, processRowSectionsLayout } from '@/utils/table';
+import { useBelowWidth } from '@/utils/viewport';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { BsFillArrowUpCircleFill } from 'react-icons/bs';
 import { IoReloadSharp } from 'react-icons/io5';
-import { useQuery } from '@tanstack/react-query';
+import { MdArrowDownward } from 'react-icons/md';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import Pagination from '../Pagination';
 import { PaginationContainer } from '../Pagination/styles';
 import Skeleton from '../Skeleton';
@@ -22,9 +24,11 @@ import {
   ExportContainer,
   FloatContainer,
   HeaderItem,
+  HeaderSortButton,
   IoReloadSharpWrapper,
   ItemContainer,
   LimitContainer,
+  TableControls,
   LimitItems,
   MobileCardItem,
   MobileHeader,
@@ -35,9 +39,8 @@ import {
   TableRowProps,
   TableEmptyData,
 } from './styles';
-import SmartContractCard from '../SmartContracts/SmartContractCard';
 
-export interface ITable {
+export interface ITable<TCard = Record<string, never>> {
   type:
     | 'transactions'
     | 'blocks'
@@ -71,10 +74,66 @@ export interface ITable {
   intervalController?: React.Dispatch<React.SetStateAction<number>>;
   showLimit?: boolean;
   Filters?: React.FC;
+  /** Rendered beside Items per page rather than with the filters, for a
+   *  control that acts on the table itself. An element, not a component:
+   *  a component built per render is a new type each time and remounts. */
+  TableControl?: React.ReactNode;
   smaller?: boolean;
   showPagination?: boolean;
   refreshKey?: number;
+  /**
+   * Opt-in clickable column headers that switch the API sort field
+   * (descending only). Labels must match `header` entries exactly.
+   */
+  sortableColumns?: string[];
+  activeSortColumn?: string;
+  onSortColumn?: (column: string) => void;
+  /**
+   * Opt-in replacement for the generic labeled card on mobile and tablet.
+   * `item` is `any` for the same reason `rowSections` above is: this table
+   * serves every list on the site and the row type differs per caller.
+   */
+  MobileCard?: React.ComponentType<{ item: any; index: number } & TCard>;
+  /**
+   * Extra props for MobileCard, on top of `item` and `index`. Passing them
+   * here keeps the component type stable: a card built as a closure per
+   * render remounts every row and restarts its animations mid-scroll. The
+   * generic ties the two together, so a card whose props are missing from
+   * the bag fails to compile rather than at render time.
+   */
+  mobileCardProps?: TCard;
+  /**
+   * Opt-in for tables whose rows are a single line: the loading placeholder
+   * then draws one line per cell too, instead of the two-line default that
+   * suits tables stacking a value over a label.
+   */
+  singleLineSkeleton?: boolean;
+  /** Column indexes whose loading bar hugs the right edge, matching a skin
+   *  that right-aligns those cells; default all-left, as unskinned tables. */
+  rightAlignedSkeletonColumns?: number[];
+  /**
+   * Viewport width under which the rows render as `MobileCard` instead of as
+   * table rows, for a table whose row needs more width than the shared tablet
+   * breakpoint gives it. Without it the switch happens at that breakpoint, as
+   * it always did. The caller's stylesheet has to move with it: the loading
+   * rows and the table's own surface still read the shared breakpoint from
+   * CSS, which JS cannot see.
+   */
+  cardBreakpoint?: number;
+  /**
+   * False while the caller cannot answer `request` yet, for a filter it
+   * resolves client-side against a second query. The table then holds its
+   * loading rows instead of running the request: answering unfiltered painted
+   * a full page of rows, and an unfiltered record count, under a filtered URL
+   * for as long as that second query took (measured 393ms to 579ms, and 1.6s
+   * on a throttled connection).
+   */
+  requestReady?: boolean;
 }
+
+/** Floor for a loading bar, so a narrow column gets a placeholder rather than
+ *  a sliver. Below the 58px the narrowest column measured while loading. */
+const SKELETON_MIN_WIDTH = '2rem';
 
 const onErrorHandler = () => {
   return {
@@ -85,7 +144,7 @@ const onErrorHandler = () => {
   };
 };
 
-const Table: React.FC<PropsWithChildren<ITable>> = ({
+const Table = <TCard,>({
   type,
   header,
   rowSections,
@@ -94,20 +153,36 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
   interval,
   intervalController,
   Filters,
+  TableControl,
   smaller = false,
   showLimit = true,
   showPagination = true,
   refreshKey,
-}) => {
+  sortableColumns,
+  activeSortColumn,
+  onSortColumn,
+  MobileCard,
+  mobileCardProps,
+  singleLineSkeleton = false,
+  rightAlignedSkeletonColumns = [],
+  cardBreakpoint,
+  requestReady = true,
+}: PropsWithChildren<ITable<TCard>>) => {
   const router = useRouter();
   const { isMobile, isTablet } = useMobile();
+  // One answer for every layout decision below, so the header, the loading
+  // rows and the loaded rows cannot each pick a different one.
+  const showCards = useBelowWidth(cardBreakpoint) || isMobile || isTablet;
   const limits = [10, 20, 50];
   const [scrollTop, setScrollTop] = useState<boolean>(false);
 
   const tableRef = React.useRef<HTMLDivElement>(null);
 
-  const page = Number(router.query?.page) || 1;
-  const limit = Number(router.query?.limit) || 10;
+  // Clamped where they enter and used everywhere below, request included: the
+  // API answers 500 "invalid pagination parameter" for a raw `3.5`, and the
+  // loading render's `Array(limit)` RangeError lands server-side as a 500.
+  const page = normalizePageParam(router.query?.page, 1);
+  const limit = normalizePageParam(router.query?.limit, 10, 100);
 
   const tableRequest = async (page: number, limit: number): Promise<any> => {
     let responseFormatted = {};
@@ -117,13 +192,18 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         responseFormatted = {
           items: response.data[dataName],
           totalPages: response?.pagination?.totalPages,
+          perPage: response?.pagination?.perPage,
         };
         return responseFormatted;
       }
 
-      return [];
+      return { items: [], totalPages: 0, perPage: 0 };
     } catch (error) {
+      // React Query rejects an undefined result outright ("data is
+      // undefined") instead of storing it, so a failed request would land the
+      // table in an error state; an empty page shows the empty state.
       console.error(error);
+      return { items: [], totalPages: 0, perPage: 0 };
     }
   };
 
@@ -131,6 +211,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
     data: response,
     isLoading,
     isFetching,
+    isPlaceholderData,
     refetch,
   } = useQuery({
     queryKey: [
@@ -140,14 +221,36 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
       refreshKey,
     ],
 
-    queryFn: () =>
-      tableRequest(
-        Number(router.query?.page) || 1,
-        Number(router.query?.limit) || 10,
-      ),
+    queryFn: () => tableRequest(page, limit),
+
+    // Keep the current rows on screen while the next page loads. Swapping
+    // them for placeholders and back made paging flicker.
+    placeholderData: keepPreviousData,
+
+    // Re-shows just-read rows on a step out and back (a round trip costs about
+    // a second). Only lists with rows: failures arrive as empty successes.
+    staleTime: query =>
+      (query.state.data as { items?: unknown[] } | undefined)?.items?.length
+        ? 10_000
+        : 0,
+
+    enabled: requestReady,
 
     ...onErrorHandler(),
   });
+
+  /* `enabled: false` reports isLoading false, not true, so without this the
+     held state would fall through to the empty state instead of the rows. */
+  const pending = isLoading || !requestReady;
+
+  /* Manual triggers pierce `enabled`: react-query's refetch() fetches a
+     disabled query too, so the refresh icon and the page-change effect ran
+     the request inside the hold window and painted what the hold exists to
+     prevent. Every manual trigger goes through here, the render-gated retry
+     included, so nothing enforces the hold from a distance. */
+  const refetchWhenReady = (): void => {
+    if (requestReady) refetch();
+  };
 
   const props: TableRowProps = {
     pathname: router.pathname,
@@ -170,17 +273,20 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
     if (page !== 1 && intervalController) {
       intervalController(0);
     }
-    refetch();
+    refetchWhenReady();
   }, [page]);
 
   useEffect(() => {
     if (interval) {
       const intervalId = setInterval(() => {
-        refetch();
+        refetchWhenReady();
       }, interval);
       return () => clearInterval(intervalId);
     }
-  }, [interval, limit]);
+    /* requestReady in the deps on purpose: the callback closes over it, and
+       without the re-run a hold that arrives after mount kept polling through
+       the stale closure. */
+  }, [interval, limit, requestReady]);
 
   const handleScrollTop = () => {
     window.scrollTo({
@@ -194,7 +300,8 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         <FloatContainer>
           {Filters && <Filters />}
           {showLimit ? (
-            <>
+            <TableControls>
+              {TableControl}
               <LimitContainer>
                 <span>Items per page</span>
                 <LimitItems>
@@ -202,6 +309,9 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                     <ItemContainer
                       key={value}
                       onClick={() => {
+                        // No refetch: the router write changes the query key,
+                        // and a call from this closure re-requested the old
+                        // limit first (measured: two requests per click).
                         setQueryAndRouter(
                           {
                             ...router.query,
@@ -210,9 +320,8 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                           },
                           router,
                         );
-                        refetch();
                       }}
-                      active={value === (Number(router.query?.limit) || limit)}
+                      active={value === limit}
                     >
                       {value}
                     </ItemContainer>
@@ -225,7 +334,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                   msg="Refresh"
                   Component={() => (
                     <IoReloadSharpWrapper $loading={isFetching}>
-                      <IoReloadSharp size={22} onClick={() => refetch()} />
+                      <IoReloadSharp size={22} onClick={refetchWhenReady} />
                     </IoReloadSharpWrapper>
                   )}
                 />
@@ -234,21 +343,30 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                   <ExportButton
                     items={response?.items}
                     tableRequest={tableRequest}
-                    totalRecords={response?.totalPages * limit || 10000}
+                    // `perPage` as the API applied it: it caps a page at 100,
+                    // so multiplying by the asked-for limit halves the export.
+                    totalRecords={
+                      response?.totalPages * (response?.perPage || limit) ||
+                      10000
+                    }
                   />
                 )}
               </ExportContainer>
-            </>
+            </TableControls>
           ) : null}
         </FloatContainer>
       )}
       <ContainerView ref={tableRef}>
-        <TableBody smaller={smaller} data-testid="table-body">
-          {!isMobile &&
-            !isTablet &&
-            response?.items &&
-            response?.items.length !== 0 && (
-              <TableRow>
+        <TableBody
+          smaller={smaller}
+          data-testid="table-body"
+          $stale={isFetching && isPlaceholderData}
+        >
+          {/* The header stays while fetching: dropping it made the table lose
+              its height and snap back once the rows arrived. */}
+          {!showCards &&
+            (pending || (response?.items && response.items.length !== 0)) && (
+              <TableRow data-testid="table-header">
                 {header?.map((item, index) => (
                   <HeaderItem
                     key={JSON.stringify(item)}
@@ -258,13 +376,29 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                     dynamicWidth={rowSections(item)?.[index]?.width}
                     maxWidth={rowSections(item)?.[index]?.maxWidth}
                   >
-                    {item}
+                    {sortableColumns?.includes(item) && onSortColumn ? (
+                      <HeaderSortButton
+                        type="button"
+                        $active={item === activeSortColumn}
+                        onClick={() => onSortColumn(item)}
+                        aria-label={
+                          item === activeSortColumn
+                            ? `Sorted by ${item}, descending`
+                            : `Sort by ${item}, descending`
+                        }
+                      >
+                        {item}
+                        <MdArrowDownward size={12} />
+                      </HeaderSortButton>
+                    ) : (
+                      item
+                    )}
                   </HeaderItem>
                 ))}
               </TableRow>
             )}
 
-          {isLoading && (
+          {pending && (
             <>
               {Array(limit)
                 .fill(limit)
@@ -274,7 +408,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                       return (
                         <MobileCardItem
                           isAssets={type === 'assets' || type === 'proposals'}
-                          isRightAligned={isMobile || isTablet}
+                          isRightAligned={showCards}
                           key={String(index2) + String(index)}
                           columnSpan={2}
                           isLastRow={index === limit - 1}
@@ -283,8 +417,34 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                           smaller={smaller}
                         >
                           <DoubleRow {...props}>
-                            {type !== 'accounts' && <Skeleton width="100%" />}
-                            <Skeleton width="100%" />
+                            {/* A block inside a column flex, so the cell's
+                                text-align does not reach it; the skin decides
+                                per column which edge the bar hugs. The floor
+                                is for narrow columns: the proposals table has
+                                one 58px wide while loading, where a bare 30%
+                                is an 8px sliver that reads as an artefact. */}
+                            {!singleLineSkeleton && (
+                              <Skeleton
+                                width={index2 === 0 ? '40%' : '30%'}
+                                containerCustomStyles={{
+                                  minWidth: SKELETON_MIN_WIDTH,
+                                  ...(rightAlignedSkeletonColumns.includes(
+                                    index2,
+                                  )
+                                    ? { marginLeft: 'auto' }
+                                    : {}),
+                                }}
+                              />
+                            )}
+                            <Skeleton
+                              width={index2 === 0 ? '70%' : '40%'}
+                              containerCustomStyles={{
+                                minWidth: SKELETON_MIN_WIDTH,
+                                ...(rightAlignedSkeletonColumns.includes(index2)
+                                  ? { marginLeft: 'auto' }
+                                  : {}),
+                              }}
+                            />
                           </DoubleRow>
                         </MobileCardItem>
                       );
@@ -293,23 +453,28 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                 ))}
             </>
           )}
-          {response?.items &&
+          {/* Held along with everything else: a hold that arrives AFTER a
+              successful load (the version join dropping away mid-session)
+              otherwise painted these cached rows underneath the skeletons. */}
+          {!pending &&
+            response?.items &&
             response?.items?.length > 0 &&
             response?.items?.map((item: any, index: number) => {
               let spanCount = 0;
               const isLastRow = index === response?.items?.length - 1;
 
-              return type === 'smartContracts' && (isMobile || isTablet) ? (
-                <SmartContractCard
-                  key={index}
-                  name={item?.name}
-                  timestamp={item?.timestamp}
-                  contractAddress={item?.contractAddress}
-                  deployer={item?.deployer}
-                  deployTxHash={item?.deployTxHash}
-                  totalTransactions={item?.totalTransactions}
-                />
-              ) : (
+              if (showCards && MobileCard) {
+                return (
+                  <MobileCard
+                    key={JSON.stringify(item)}
+                    {...(mobileCardProps as TCard)}
+                    item={item}
+                    index={index}
+                  />
+                );
+              }
+
+              return (
                 <TableRow
                   key={JSON.stringify(item)}
                   {...props}
@@ -317,7 +482,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                 >
                   {rowSections &&
                     rowSections(item)?.map(
-                      ({ element: Element, span, width, maxWidth }, index2) => {
+                      ({ element, span, width, maxWidth }, index2) => {
                         const [updatedSpanCount, isRightAligned] =
                           processRowSectionsLayout(spanCount, span);
                         spanCount = updatedSpanCount;
@@ -325,9 +490,7 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                         return (
                           <MobileCardItem
                             isAssets={type === 'assets' || type === 'proposals'}
-                            isRightAligned={
-                              (isMobile || isTablet) && isRightAligned
-                            }
+                            isRightAligned={showCards && isRightAligned}
                             key={String(index2) + String(index)}
                             columnSpan={span}
                             isLastRow={isLastRow}
@@ -338,10 +501,14 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
                             currentColumn={index2}
                             data-testid={`table-row-${index}`}
                           >
-                            {isMobile || isTablet ? (
+                            {showCards ? (
                               <MobileHeader>{header[index2]}</MobileHeader>
                             ) : null}
-                            <Element $smaller={smaller} />
+                            {/* Called, not mounted as a component type: the
+                                builder returns a fresh arrow per render, and
+                                as a type that remounted every cell, dropping
+                                focus and cell state (#697). */}
+                            {element({ $smaller: smaller })}
                           </MobileCardItem>
                         );
                       },
@@ -351,9 +518,13 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
             })}
 
           {!isFetching &&
+            requestReady &&
             (!response?.items || response?.items?.length === 0) && (
               <TableEmptyData>
-                <RetryContainer onClick={() => refetch()} $loading={isFetching}>
+                <RetryContainer
+                  onClick={refetchWhenReady}
+                  $loading={isFetching}
+                >
                   <span>Retry</span>
                   <IoReloadSharp size={20} />
                 </RetryContainer>
@@ -368,13 +539,14 @@ const Table: React.FC<PropsWithChildren<ITable>> = ({
         </BackTopButton>
       </ContainerView>
       {showPagination &&
+        !pending &&
         typeof response?.totalPages === 'number' &&
         response?.totalPages > 1 && (
           <PaginationContainer>
             <Pagination
               tableRef={tableRef}
               count={response?.totalPages}
-              page={Number(router.query?.page) || page}
+              page={page}
               onPaginate={page => {
                 setQueryAndRouter(
                   { ...router.query, page: page.toString() },

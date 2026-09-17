@@ -75,6 +75,7 @@ export const Content = styled.div<{ open: boolean }>`
 
   height: 32px;
   width: 100%;
+  min-width: 12rem;
 
   padding: 8px 16px;
 
@@ -102,6 +103,36 @@ export const Content = styled.div<{ open: boolean }>`
   }
 `;
 
+/**
+ * The keyboard entry point of the closed control. Wraps only the value span,
+ * stretched over the free row space, so the visual layout stays exactly what
+ * the bare span produced. `color: inherit` is load-bearing: the global
+ * \`button\` rule paints button text in \`theme.white\`, which on this white
+ * card renders the value invisible.
+ */
+export const OpenerButton = styled.button`
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid ${props => props.theme.violet};
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+`;
+
 export const SelectorContainer = styled.div<{ open: boolean }>`
   padding: 0.25rem;
   padding-left: 0.5rem;
@@ -121,8 +152,11 @@ export const SelectorContainer = styled.div<{ open: boolean }>`
 
   gap: 0.25rem;
 
-  background-color: ${props =>
-    props.theme.dark ? props.theme.background : props.theme.white};
+  /* The raised surface, as everywhere else. This one matters most: the panel
+     floats over the page, and reading the background token gave it the page's
+     own colour, so an overlay had nothing separating it from what it covered.
+     Reads #fff in the light theme and #151515 in the dark one. */
+  background-color: ${props => props.theme.white};
 
   border: 1px solid ${props => props.theme.black10};
   border-radius: 16px;
@@ -164,7 +198,7 @@ export const LoadContainer = styled.div`
   padding: 0.5rem 0.75rem;
 `;
 
-export const Item = styled.div<{ selected: boolean }>`
+export const Item = styled.div<{ selected: boolean; $active?: boolean }>`
   padding: 0.25rem 0.5rem;
 
   display: flex;
@@ -184,6 +218,15 @@ export const Item = styled.div<{ selected: boolean }>`
       backdrop-filter: brightness(2);
     `}
 
+  ${props =>
+    props.$active &&
+    css`
+      background-color: ${props => transparentize(0.75, props.theme.lightGray)};
+      /* The tint alone measured ~1.12:1 against unhighlighted rows; the
+         cursor is where Enter lands, so it gets the app's focus color. */
+      border-color: ${props => props.theme.violet};
+    `}
+
   &:hover {
     background-color: ${props => transparentize(0.75, props.theme.lightGray)};
   }
@@ -200,26 +243,63 @@ export const HiddenInput = styled.input<{
   show: boolean;
   isHiddenInput: boolean;
 }>`
-  width: 100%;
+  /* Sit in the control row so caret + typed text are visible when open. */
   position: absolute;
-  visibility: ${props => (props.show ? 'visible' : 'hidden')};
-  caret-color: ${props => props.theme.black};
-  color: ${props => props.theme.black};
+  left: 16px;
+  right: 4.5rem; /* leave room for clear + chevron */
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+
+  width: auto;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: transparent;
 
   font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 32px;
+
+  color: ${props => props.theme.black};
+  caret-color: ${props => props.theme.black};
+
+  visibility: ${props => (props.show ? 'visible' : 'hidden')};
+  opacity: ${props => (props.show ? 1 : 0)};
+  pointer-events: ${props => (props.show ? 'auto' : 'none')};
+
+  &::placeholder {
+    color: ${props =>
+      props.theme.dark ? props.theme.gray700 : props.theme.darkGray};
+    opacity: 0.85;
+  }
 
   &:hover {
     cursor: ${props => (props.isHiddenInput ? 'text' : 'pointer')};
   }
+
+  &:focus {
+    outline: none;
+  }
 `;
 
-export const CloseContainer = styled.div<{ empty: boolean }>`
+export const CloseContainer = styled.button<{ empty: boolean }>`
   display: grid;
   place-items: center;
 
   padding: 6px;
+  margin: 0;
   margin-top: 0 !important;
   margin-left: auto;
+  position: relative;
+  z-index: 3;
+
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
 
   ${props =>
     props.empty &&
@@ -233,6 +313,12 @@ export const CloseContainer = styled.div<{ empty: boolean }>`
       fill: ${props => props.theme.violet};
     }
   }
+
+  &:focus-visible {
+    outline: 2px solid ${props => props.theme.violet};
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 `;
 
 export const ArrowDownContainer = styled.div<{ open: boolean }>`
@@ -241,6 +327,8 @@ export const ArrowDownContainer = styled.div<{ open: boolean }>`
 
   padding: 6px;
   margin-top: 0 !important;
+  position: relative;
+  z-index: 3;
 
   svg {
     transition: 0.2s ease;

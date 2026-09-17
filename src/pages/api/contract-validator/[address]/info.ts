@@ -14,7 +14,10 @@ export default async function handler(
   const { address } = req.query;
   const validatorUrl = process.env.DEFAULT_CONTRACT_VALIDATOR_URL;
 
-  if (typeof address !== 'string' || !address) {
+  // Pinned to the bech32 shape the six sibling handlers already require,
+  // rather than escaped only: this request carries the API key, so it should
+  // not depend on how the upstream normalises a percent-encoded path.
+  if (typeof address !== 'string' || !/^klv1[0-9a-z]{58}$/.test(address)) {
     res.status(400).json({ message: 'Invalid contract address' });
     return;
   }
@@ -27,10 +30,13 @@ export default async function handler(
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10_000);
-    const response = await fetch(`${validatorUrl}/contract/${address}/info`, {
-      headers: { 'X-API-KEY': API_KEY },
-      signal: controller.signal,
-    });
+    const response = await fetch(
+      `${validatorUrl}/contract/${encodeURIComponent(address)}/info`,
+      {
+        headers: { 'X-API-KEY': API_KEY },
+        signal: controller.signal,
+      },
+    );
     clearTimeout(timeoutId);
 
     const contentType = response.headers.get('content-type') || '';

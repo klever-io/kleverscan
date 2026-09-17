@@ -1,6 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { NonceDetails } from '@/components/Asset/NFTDetails';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import {
   CardContent,
   CardHeader,
@@ -52,7 +53,7 @@ export const NonFungibleView: React.FC<
       <CardContainer>
         <SingleNFTTableContainer>
           <h3>Asset Transactions</h3>
-          <Table {...tableProps} />
+          <TransactionsTable {...tableProps} />
         </SingleNFTTableContainer>
       </CardContainer>
     </>

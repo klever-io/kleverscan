@@ -1,4 +1,3 @@
-import Title from '@/components/Layout/Title';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Skeleton from '@/components/Skeleton';
 
@@ -27,13 +26,15 @@ export const AssetTitle: React.FC<{ asset: any }> = ({ asset }) => {
         <Skeleton width={56} height={56} />
       )}
       <AssetHeaderContainer>
+        {/* Plain heading: wrapping it in Title added a second back arrow next
+            to the page title above, and that one navigated home instead of
+            back. */}
         {asset ? (
-          <Title
-            key={asset?.name}
-            Component={() =>
-              isMobile ? <span>{asset?.name}</span> : <h1>{asset?.name}</h1>
-            }
-          />
+          isMobile ? (
+            <span>{asset?.name}</span>
+          ) : (
+            <h1>{asset?.name}</h1>
+          )
         ) : (
           <Skeleton width={200} height={40} />
         )}

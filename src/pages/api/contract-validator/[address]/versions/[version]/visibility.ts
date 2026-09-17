@@ -22,11 +22,15 @@ export default async function handler(
   const { address, version } = req.query;
   const validatorUrl = process.env.DEFAULT_CONTRACT_VALIDATOR_URL;
 
-  if (typeof address !== 'string' || !address) {
+  // Address is pinned to bech32, same as the other contract-validator handlers.
+  if (typeof address !== 'string' || !/^klv1[0-9a-z]{58}$/.test(address)) {
     res.status(400).json({ message: 'Invalid contract address' });
     return;
   }
-  if (typeof version !== 'string' || !version) {
+  // Same digit pin as source.ts: the only caller is changeCodeVisibility, which
+  // takes version: number. The audits handler wants a 64-char hash instead,
+  // which is a different endpoint rather than a different opinion.
+  if (typeof version !== 'string' || !/^\d+$/.test(version)) {
     res.status(400).json({ message: 'Invalid version' });
     return;
   }
@@ -71,7 +75,9 @@ export default async function handler(
 
   await proxyToValidator(
     res,
-    `${validatorUrl}/contract/${address}/versions/${version}/visibility`,
+    `${validatorUrl}/contract/${encodeURIComponent(
+      address,
+    )}/versions/${encodeURIComponent(version)}/visibility`,
     {
       method: 'POST',
       headers: {

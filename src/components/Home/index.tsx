@@ -2,9 +2,9 @@ import { PropsWithChildren } from 'react';
 import BlockCardFetcher from '@/components/Home/BlockCardFetcher';
 import HomeDataCards from '@/components/Home/CardDataFetcher/HomeDataCards';
 import CoinCard from '@/components/Home/CoinDataFetcher/CoinCard';
+import HomeSpotlightHero from '@/components/Home/HomeSpotlightHero';
 import HomeTransactions from '@/components/Home/HomeTransactions';
 import { ChartDailyTransactions } from '@/components/Home/HomeTransactions/ChartDailyTransactions';
-import { HomeInput } from '@/components/InputGlobal/HomeInput';
 import { HomeDataProvider } from '@/contexts/mainPage';
 import {
   CardContainer,
@@ -22,7 +22,7 @@ const Home: React.FC<PropsWithChildren> = () => {
     <HomeDataProvider>
       <Container>
         <DataContainer>
-          <HomeInput />
+          <HomeSpotlightHero />
           <DataCardsContainer>
             <HomeDataCards />
             <ChartDailyTransactions />

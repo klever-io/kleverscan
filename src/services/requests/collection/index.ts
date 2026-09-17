@@ -13,9 +13,13 @@ export const collectionListCall = async (
   isSFT = false,
 ): Promise<ICollection[] | undefined> => {
   try {
-    const parsedCollection = JSON.parse(
-      router?.query?.contractDetails as string,
-    ).collection;
+    // Parsed out of the URL, so it is escaped before going into a route
+    // segment: unescaped, a `?` or `&` in it rewrote the request's parameters.
+    // The wallet address below is escaped only for consistency, it comes from
+    // the extension rather than the URL and is not attacker-reachable.
+    const parsedCollection = encodeURIComponent(
+      JSON.parse(router?.query?.contractDetails as string).collection,
+    );
 
     if (isSFT) {
       const res: IAssetsResponse = await api.get({
@@ -28,9 +32,10 @@ export const collectionListCall = async (
     }
 
     const res: ICollectionIdListResponse = await api.get({
-      route: `address/${walletAddress}/collection/${parsedCollection}?page=${
-        partialId ? Number(partialId) : 0
-      }`,
+      route: `address/${encodeURIComponent(
+        walletAddress,
+      )}/collection/${parsedCollection}`,
+      query: { page: partialId ? Number(partialId) : 0 },
     });
 
     if (!res.error || res.error === '') {

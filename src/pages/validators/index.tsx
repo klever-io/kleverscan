@@ -1,329 +1,204 @@
-import { Validators as Icon } from '@/assets/cards';
-import { getStatusIcon } from '@/assets/status';
-import Copy from '@/components/Copy';
-import Detail from '@/components/Detail';
-import { IFilter } from '@/components/Filter';
-import Progress from '@/components/Progress';
-import { ITable } from '@/components/Table';
-import { CustomFieldWrapper, Status } from '@/components/Table/styles';
-import Skeleton from '@/components/Skeleton';
-import Tooltip from '@/components/Tooltip';
-import api from '@/services/api';
-import { fetchHeartbeatStatus } from '@/services/requests/heartbeat';
+import { Validators as Icon } from '@/assets/title-icons';
+import { klvAmount } from '@/components/DataList/format';
+import Title from '@/components/Layout/Title';
+import Table, { ITable } from '@/components/Table';
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
 import {
-  Card,
-  CardContainer,
-  CenteredRow,
-  DoubleRow,
-  Mono,
-} from '@/styles/common';
-import { IRowSection, IValidator } from '@/types/index';
+  RIGHT_ALIGNED_COLUMNS,
+  VALIDATOR_COLUMNS,
+} from '@/components/ValidatorsList/columns';
+import ValidatorsFilters from '@/components/ValidatorsList/Filters';
+import ValidatorsMobileCard, {
+  type IValidatorsMobileCardExtras,
+} from '@/components/ValidatorsList/MobileCard';
+import {
+  validatorRowSections,
+  IValidatorRowContext,
+} from '@/components/ValidatorsList/rows';
+import { ValidatorsTableWrapper } from '@/components/ValidatorsList/styles';
+import ValidatorsSummary from '@/components/ValidatorsList/Summary';
+import { useColumnHeaders } from '@/components/DataList/useColumnHeaders';
+import { useValidatorSources } from '@/components/ValidatorsList/useValidatorSources';
+import { useVersionStats } from '@/components/ValidatorsList/useVersionStats';
+import VersionDistribution, {
+  DistributionMode,
+} from '@/components/Validators/VersionDistribution';
+import { validatorsTableRequest } from '@/services/requests/validators';
+import {
+  canFilterByVersion,
+  versionFilteredPage,
+} from '@/services/requests/validators/versionFilter';
+import { Container, Header } from '@/styles/common';
 import { setQueryAndRouter } from '@/utils';
-import { capitalizeString } from '@/utils/convertString';
-import { formatAmount } from '@/utils/formatFunctions';
-import { KLV_PRECISION } from '@/utils/globalVariables';
-import { useFetchPartial } from '@/utils/hooks';
-import { parseValidators } from '@/utils/parseValues';
-import { AddressContainer } from '@/views/validators/detail';
-import Link from 'next/link';
+import { IPaginatedResponse, IRowSection, IValidator } from '@/types/index';
+import { GetServerSideProps } from 'next';
+import { NextParsedUrlQuery } from 'next/dist/server/request-meta';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import styled from 'styled-components';
-
-const VersionStatus = styled(Status)`
-  width: fit-content;
-  max-width: none;
-  padding: 2px 10px;
-`;
-
-export const validatorsHeaders = [
-  'Rank',
-  'Name/Can Delegate',
-  'Status/Rating',
-  'Stake/Commission',
-  'Produced / Missed',
-  'Software Version',
-  'Cumulative Stake',
-];
+import React, { PropsWithChildren, useState } from 'react';
+import nextI18nextConfig from '../../../next-i18next.config';
 
 const Validators: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
-  const [filterValidators, fetchPartialValidator, loading, setLoading] =
-    useFetchPartial<IValidator>('validators', 'validator/list', 'name');
-  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [latestVersion, setLatestVersion] = useState<string | undefined>();
-  const [versionMap, setVersionMap] = useState<Record<string, string>>({});
-  const [versionLoading, setVersionLoading] = useState(true);
-  const [totalValidators, setTotalValidators] = useState<number | undefined>();
+  const header = useColumnHeaders(VALIDATOR_COLUMNS);
+  const { t } = useTranslation(['common', 'validators']);
+  // The page owns the recovery poll; the summary and the filter bar read the
+  // same query without adding a second and third timer to it.
+  const { data: sources, isLoading, dataUpdatedAt } = useValidatorSources(true);
+  const { latestVersion, stats: versionStats } = useVersionStats();
+  const [distributionMode, setDistributionMode] =
+    useState<DistributionMode>('nodes');
 
-  useEffect(() => {
-    const loadHeartbeat = async () => {
-      const result = await fetchHeartbeatStatus();
-      if (result) {
-        setLatestVersion(result.latestVersion);
-        setVersionMap(result.versionMap);
-      }
-      setVersionLoading(false);
-    };
-    loadHeartbeat();
-  }, []);
+  const labels: IValidatorRowContext['labels'] = {
+    copyAddress: t('validators:List.CopyAddress'),
+    addressCopied: t('validators:List.AddressCopied'),
+    openValidator: t('validators:List.OpenValidator'),
+    openInNewTab: t('validators:List.OpenInNewTab'),
+    canDelegate: t('validators:List.CanDelegate'),
+    canDelegateTooltip: t('validators:List.CanDelegateTooltip'),
+    cannotDelegate: t('validators:List.CannotDelegate'),
+    cannotDelegateTooltip: t('validators:List.CannotDelegateTooltip'),
+    missedShare: t('validators:List.MissedShare'),
+    unknownVersion: t('validators:List.UnknownVersion'),
+    versionUnavailable: t('validators:List.VersionUnavailable'),
+    versionUnavailableReason: t('validators:List.VersionUnavailableReason'),
+    noDelegationLimit: t('validators:List.NoDelegationLimit'),
+    statusLabel: (status: string) =>
+      t(`validators:States.${status}`, { defaultValue: status }),
+    capacityDetail: (staked, cap) =>
+      t('validators:List.CapacityDetail', {
+        staked: klvAmount(staked),
+        cap: klvAmount(cap),
+      }),
+  };
 
-  const validatorsRowSections = useCallback(
-    (validator: IValidator): IRowSection[] => {
-      const {
-        name,
-        ownerAddress,
-        parsedAddress,
-        rank,
-        staked,
-        commission,
-        cumulativeStaked,
-        rating,
-        status,
-        totalProduced,
-        totalMissed,
-        canDelegate,
-        blsPublicKey,
-      } = validator;
+  const selectedVersion =
+    typeof router.query.version === 'string' ? router.query.version : undefined;
 
-      const softwareVersion = blsPublicKey
-        ? versionMap[blsPublicKey]
-        : undefined;
-      const DelegateIcon = getStatusIcon(canDelegate ? 'success' : 'fail');
-      const sections: IRowSection[] = ownerAddress
-        ? [
-            {
-              element: props => <p key={rank}>{rank}°</p>,
-              span: 1,
-              width: 100,
-            },
-            {
-              element: props => (
-                <DoubleRow key={ownerAddress + status} {...props}>
-                  <span>
-                    {
-                      <AddressContainer>
-                        <Link
-                          href={`validator/${ownerAddress}`}
-                          data-testid="validator-link"
-                        >
-                          {name ? name : <Mono>{parsedAddress}</Mono>}
-                        </Link>
-                        <Copy data={ownerAddress} info="Validator Address" />
-                      </AddressContainer>
-                    }
-                  </span>
-                  <Status
-                    status={canDelegate ? 'success' : 'fail'}
-                    key={String(canDelegate)}
-                  >
-                    {canDelegate ? 'Yes' : 'No'}
-                  </Status>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
+  const versionFilterable = canFilterByVersion({
+    version: selectedVersion,
+    heartbeatAvailable: sources.heartbeatAvailable,
+    validatorsAvailable: sources.validatorsAvailable,
+  });
 
-            {
-              element: props => (
-                <DoubleRow key={status + rating} {...props}>
-                  <span>{capitalizeString(status)}</span>
-                  <span>{((rating * 100) / 10000000).toFixed(2)}%</span>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <DoubleRow key={staked} {...props}>
-                  <span>{formatAmount(staked / 10 ** KLV_PRECISION)} KLV</span>
-                  <span key={commission}>{commission / 10 ** 2}%</span>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <DoubleRow key={totalProduced} {...props}>
-                  <span>{totalProduced}</span>
-                  <CenteredRow>
-                    <span>{totalMissed}</span>
-                    <Tooltip
-                      msg="Missed Percentage"
-                      Component={() => (
-                        <CustomFieldWrapper>
-                          <span>
-                            {' '}
-                            (
-                            {totalProduced
-                              ? (
-                                  ((totalMissed || 0) * 100) /
-                                  totalProduced
-                                ).toFixed(2)
-                              : '- -'}
-                            %)
-                          </span>
-                        </CustomFieldWrapper>
-                      )}
-                    />
-                  </CenteredRow>
-                </DoubleRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <CenteredRow key={softwareVersion}>
-                  {softwareVersion ? (
-                    <VersionStatus
-                      status={
-                        softwareVersion === latestVersion ? 'success' : 'fail'
-                      }
-                    >
-                      {softwareVersion}
-                    </VersionStatus>
-                  ) : (
-                    <span>-</span>
-                  )}
-                </CenteredRow>
-              ),
-              span: 1,
-            },
-            {
-              element: props => (
-                <Progress percent={cumulativeStaked} key={cumulativeStaked} />
-              ),
-              span: 2,
-            },
-          ]
-        : [];
+  const handleSelectVersion = (version: string | undefined): void => {
+    // Back to page one: a narrower set has fewer pages, so staying put would
+    // land on an empty page with no control to get back from.
+    const updated: NextParsedUrlQuery = { ...router.query, version };
+    if (!version) delete updated.version;
+    delete updated.page;
+    setQueryAndRouter(updated, router);
+  };
 
-      return sections;
-    },
-    [latestVersion, versionMap],
-  );
-
-  const filters: IFilter[] = useMemo(() => {
-    return [
-      {
-        title: 'Name',
-        data: filterValidators
-          .map(validator => validator.name)
-          .filter(validator => !!validator) as string[],
-        onClick: async value => {
-          if (value === 'All') {
-            setQueryAndRouter({}, router);
-          } else {
-            setQueryAndRouter({ name: value }, router);
-          }
+  const request = async (
+    page: number,
+    limit: number,
+  ): Promise<IPaginatedResponse> => {
+    // The version filter has no server-side counterpart, so it is resolved
+    // against the heartbeat join the shared query already holds. With either
+    // half of that join down the filter is dropped rather than answered: the
+    // unfiltered list is a true answer where an empty filtered page is not,
+    // and the version card above already names the outage.
+    if (versionFilterable) {
+      return versionFilteredPage(
+        sources.validators,
+        sources.versionMap,
+        {
+          version: selectedVersion,
+          name:
+            typeof router.query.name === 'string'
+              ? router.query.name
+              : undefined,
         },
-        onChange: async value => {
-          setLoading(true);
-          if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-          searchTimeoutRef.current = setTimeout(() => {
-            setQueryAndRouter(value ? { name: value } : {}, router);
-          }, 500);
-          await fetchPartialValidator(value);
-        },
-        current: (router.query.name as string) || undefined,
-        loading,
-      },
-    ];
-  }, [filterValidators, router]);
-  const requestValidators = async (page: number, limit: number) => {
-    const localQuery = { ...router.query, page, limit };
-    const validators = await api.get({
-      route: 'validator/list',
-      query: { sort: 'elected', ...localQuery },
-    });
-
-    if (!validators.error) {
-      const parsedValidators = parseValidators(validators);
-      if (totalValidators === undefined) {
-        setTotalValidators(validators.pagination?.totalRecords ?? undefined);
-      }
-      return { ...validators, data: { validators: parsedValidators } };
-    } else {
-      return validators;
+        page,
+        limit,
+      );
     }
+    return validatorsTableRequest(page, limit, router.query);
   };
 
-  const tableProps: ITable = {
+  const tableProps: ITable<IValidatorsMobileCardExtras> = {
     type: 'validators',
-    header: validatorsHeaders,
-    rowSections: validatorsRowSections,
-    request: (page, limit) => requestValidators(page, limit),
+    header,
+    rowSections: (validator: IValidator | string): IRowSection[] =>
+      validatorRowSections(validator, {
+        versionMap: sources.versionMap,
+        latestVersion,
+        heartbeatAvailable: sources.heartbeatAvailable,
+        sourcesLoading: isLoading,
+        labels,
+      }),
     dataName: 'validators',
+    request,
+    Filters: ValidatorsFilters,
+    MobileCard: ValidatorsMobileCard,
+    // Once here, not per card: ten cards resolving the join themselves would
+    // each subscribe to the same shared query.
+    mobileCardProps: {
+      versionMap: sources.versionMap,
+      latestVersion,
+      heartbeatAvailable: sources.heartbeatAvailable,
+      sourcesLoading: isLoading,
+    },
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: RIGHT_ALIGNED_COLUMNS,
+    // Same source as the wrapper's media queries, so the loading rows and the
+    // loaded rows cannot end up in different shapes.
+    cardBreakpoint: ROW_LAYOUT_MIN_WIDTH,
+    /* A version-filtered URL cannot be answered from the API, so the table
+       holds its loading rows until the join has settled one way or the other.
+       Answering meanwhile served the unfiltered list, with the unfiltered
+       record count in the pager, under a filtered URL. */
+    requestReady: !selectedVersion || !isLoading,
+    /* Keyed on when the shared query last settled, and only while the filter
+       can actually be answered from it. Both earlier keys were derived from
+       one half of the join and each left the other half's recovery invisible.
+       Gating on `canFilterByVersion` keeps the recovery poll from minting a
+       key per settle in the state where the request goes to the API anyway:
+       measured with the heartbeat blocked, three identical list requests where
+       the same page without `?version=` made one. */
+    refreshKey: versionFilterable ? dataUpdatedAt : 0,
   };
 
-  const versionCard = (
-    <CardContainer>
-      <Card>
-        <div>
-          <span>
-            <strong>Total Validators</strong>
-          </span>
-        </div>
-        <div>
-          <span>
-            <small>Network</small>
-          </span>
-        </div>
-        <div>
-          <span>
-            {totalValidators === undefined ? (
-              <Skeleton width={40} height={19} />
-            ) : (
-              totalValidators
-            )}
-          </span>
-        </div>
-      </Card>
-      <Card>
-        <div>
-          <span>
-            <strong>Software Version</strong>
-          </span>
-        </div>
-        <div>
-          <span>
-            <small>Newest Version</small>
-          </span>
-        </div>
-        <div>
-          <span>
-            {versionLoading ? (
-              <Skeleton width={80} height={19} />
-            ) : (
-              (latestVersion ?? '-')
-            )}
-          </span>
-        </div>
-      </Card>
-    </CardContainer>
+  return (
+    <Container>
+      <Header>
+        <Title title={t('common:Titles.Validators')} Icon={Icon} />
+      </Header>
+
+      <ValidatorsSummary />
+
+      <VersionDistribution
+        stats={versionStats}
+        latestVersion={latestVersion}
+        loading={isLoading}
+        heartbeatAvailable={sources.heartbeatAvailable}
+        validatorsAvailable={sources.validatorsAvailable}
+        mode={distributionMode}
+        onModeChange={setDistributionMode}
+        selectedVersion={selectedVersion}
+        onSelectVersion={handleSelectVersion}
+      />
+
+      <ValidatorsTableWrapper>
+        <Table {...tableProps} />
+      </ValidatorsTableWrapper>
+    </Container>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async ({
+  locale = 'en',
+}) => {
+  const props = await serverSideTranslations(
+    locale,
+    ['common', 'validators', 'table'],
+    nextI18nextConfig,
+    ['en'],
   );
 
-  const detailProps = {
-    title: 'Validators',
-    headerIcon: Icon,
-    cards: undefined,
-    tableProps,
-    filters,
-    customHeader: versionCard,
-  };
-
-  // useEffect(() => {
-  //   fetchPartialValidator('');
-  // }, [fetchPartialValidator]);
-
-  return <Detail {...detailProps} />;
+  return { props };
 };
 
 export default Validators;

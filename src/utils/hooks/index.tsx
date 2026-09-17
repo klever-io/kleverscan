@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import Skeleton from '@/components/Skeleton';
 import api from '@/services/api';
 import { IAssetsResponse, IValidatorResponse } from '@/types';
@@ -47,12 +46,34 @@ export function usePrecision(
   const [precision, setPrecision] = useState<
     number | { [assetId: string]: number }
   >(0);
+  // Keyed on the ids themselves, not the array identity: callers build the list
+  // inline, so a reference dep would refetch every render. Empty deps used to be
+  // harmless only because the app remounted on every navigation.
+  const assetKey = Array.isArray(assetIds) ? assetIds.join(',') : assetIds;
   useEffect(() => {
+    let active = true;
+    // Back to the initial shape first: on a rejected lookup, and during the
+    // window before the new one resolves, the previous asset's precision must
+    // not scale the new asset's amounts. The array overload resets to a map
+    // of zeros, keyed like getPrecision keys its result, because consumers
+    // index it and 10 ** undefined renders NaN.
+    setPrecision(
+      Array.isArray(assetIds)
+        ? Object.fromEntries(assetIds.map(id => [id.split('/')[0], 0]))
+        : 0,
+    );
     const precisionCall = async () => {
-      setPrecision(await getPrecision(assetIds));
+      const resolved = await getPrecision(assetIds);
+      // A slower earlier request must not overwrite a newer one's answer.
+      if (active) setPrecision(resolved);
     };
-    precisionCall();
-  }, []);
+    // The reset above IS the failure fallback; without this catch every
+    // failed lookup is an unhandled rejection.
+    precisionCall().catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [assetKey]);
   if (typeof precision === 'number') {
     return precision as number;
   } else {
@@ -100,51 +121,63 @@ export const useFetchPartial = <T,>(
   useEffect(() => {
     initialState();
   }, []);
+  // Skips rows whose field is not a string: the API can return rows with the
+  // field missing, and calling toUpperCase on one used to throw inside the
+  // timer below, where nothing rejects. The whole body is wrapped so the
+  // promise settles and the spinner resets no matter what fails; before, a
+  // throw in here left the caller's `await` hanging and its loading state on
+  // forever.
+  const matchesValue = (asset: T, value: string): boolean => {
+    const field = (asset as { [key: string]: unknown })[dataType];
+    return (
+      typeof field === 'string' &&
+      field.toUpperCase().includes(value.toUpperCase())
+    );
+  };
+
   return [
     items,
     value => {
       clearTimeout(fetchPartialTimeout);
       return new Promise(res => {
         fetchPartialTimeout = setTimeout(async () => {
-          let response: PartialResponse;
-          if (
-            value &&
-            !items.find(asset =>
-              (asset as { [key: string]: string })[dataType]
-                .toUpperCase()
-                .includes(value.toUpperCase()),
-            )
-          ) {
-            setLoading(true);
-            if (type !== 'assets') {
-              query = { ...query };
-              query[dataType] = value;
-              response = await api.get({
-                route: `${route}`,
-                query: {
-                  dataType: value,
-                  ...query,
-                },
-              });
+          try {
+            let response: PartialResponse;
+            if (value && !items.some(asset => matchesValue(asset, value))) {
+              setLoading(true);
+              if (type !== 'assets') {
+                query = { ...query };
+                query[dataType] = value;
+                response = await api.get({
+                  route: `${route}`,
+                  query: {
+                    dataType: value,
+                    ...query,
+                  },
+                });
+              } else {
+                response = await api.get({
+                  route: `${route}`,
+                  query: {
+                    asset: value,
+                    ...query,
+                  },
+                });
+              }
+              // The API's failure mode is HTTP 200 with data: null, so the
+              // read has to survive that as well as an empty list.
+              const found = response?.data?.[type] ?? [];
+              if (found.length) {
+                setItems([...items, ...found]);
+              }
+              res(found.length ? found : items);
             } else {
-              response = await api.get({
-                route: `${route}`,
-                query: {
-                  asset: value,
-                  ...query,
-                },
-              });
+              res(items);
             }
-            if (!response.data[type].length) {
-              setItems([...items]);
-            } else {
-              res(response.data[type]);
-              setItems([...items, ...response.data[type]]);
-            }
-            res(response.data[type]);
-            setLoading(false);
-          } else {
+          } catch (error) {
+            console.error(error);
             res(items);
+          } finally {
             setLoading(false);
           }
         }, 500);
@@ -184,27 +217,30 @@ type PackInfoHookResult = [
 export const usePackInfoPrecisions = (
   packInfo: IPackInfo[],
 ): PackInfoHookResult => {
-  const assetIds: string[] = [];
-  const getInitialPrecisions = () => {
-    const initialPrecisions: { [key: string]: number } = {};
-    for (let index = 0; index < packInfo.length; index++) {
-      assetIds.push(packInfo[index].key);
-      initialPrecisions[packInfo[index].key] = 0;
-    }
-    return initialPrecisions;
-  };
-
-  const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(
-    getInitialPrecisions(),
+  const [packsPrecision, setPacksPrecision] = useState<PacksPrecision>(() =>
+    Object.fromEntries(packInfo.map(pack => [pack.key, 0])),
   );
 
+  // Same treatment as usePrecision above: the ids used to be collected inside
+  // the useState initializer, so they were frozen at mount and the effect
+  // never saw a later packInfo.
+  const assetKey = packInfo.map(pack => pack.key).join(',');
   useEffect(() => {
+    let active = true;
+    const ids = assetKey === '' ? [] : assetKey.split(',');
+    // Same reset as usePrecision: a rejected or still-pending lookup must not
+    // leave the previous packs' precisions under the new packs.
+    setPacksPrecision(Object.fromEntries(ids.map(id => [id, 0])));
     const getPacksPrecision = async () => {
-      const precisions = await getPrecision(assetIds);
-      setPacksPrecision(precisions);
+      const precisions = await getPrecision(ids);
+      if (active) setPacksPrecision(precisions);
     };
-    getPacksPrecision();
-  }, []);
+    // Same reason as usePrecision: the zero map above is the fallback.
+    getPacksPrecision().catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [assetKey]);
 
   return [packsPrecision, setPacksPrecision];
 };

@@ -64,15 +64,15 @@ export const requestITOSQuery = async (
   return dataITOs;
 };
 
-interface RenderViewAssetButtonProps {
+interface ViewAssetButtonProps {
   assetId: string;
   reference?: string;
 }
 
-export const renderViewAssetButton = ({
+export const ViewAssetButton: React.FC<ViewAssetButtonProps> = ({
   assetId,
   reference,
-}: RenderViewAssetButtonProps): React.ReactElement => {
+}) => {
   const router = useRouter();
   return (
     <ParticipateButton
@@ -85,6 +85,44 @@ export const renderViewAssetButton = ({
     >
       View Asset
     </ParticipateButton>
+  );
+};
+
+interface ParticipateCellProps {
+  asset: IParsedITO;
+  reference?: string;
+  setITO: (asset: IParsedITO) => void;
+  setOpenParticipateModal: (open: boolean) => void;
+}
+
+/**
+ * A real component rather than logic in the row closure: it reads the wallet
+ * context, and the tables call `element` as a plain function, where a hook
+ * would break the rules of hooks.
+ */
+const ParticipateCell: React.FC<ParticipateCellProps> = ({
+  asset,
+  reference,
+  setITO,
+  setOpenParticipateModal,
+}) => {
+  const { walletAddress } = useExtension();
+  const { assetId, whitelistInfo } = asset;
+  const isParticipateEnabled =
+    !whitelistInfo ||
+    (walletAddress &&
+      whitelistInfo.some(info => info.address === walletAddress));
+  return isParticipateEnabled ? (
+    <ParticipateButton
+      onClick={() => {
+        setITO(asset);
+        setOpenParticipateModal(true);
+      }}
+    >
+      Participate
+    </ParticipateButton>
+  ) : (
+    <ViewAssetButton assetId={assetId} reference={reference} />
   );
 };
 
@@ -110,7 +148,6 @@ export const getITOrowSections =
       endTime,
       whitelistStartTime,
       whitelistEndTime,
-      whitelistInfo,
     } = asset;
 
     const bestKLVRate = getBestKLVRate(packData);
@@ -208,25 +245,14 @@ export const getITOrowSections =
         span: 1,
       },
       {
-        element: props => {
-          const { walletAddress } = useExtension();
-          const isParticipateEnabled =
-            !whitelistInfo ||
-            (walletAddress &&
-              whitelistInfo.some(info => info.address === walletAddress));
-          return isParticipateEnabled ? (
-            <ParticipateButton
-              onClick={() => {
-                setITO(asset);
-                setOpenParticipateModal(true);
-              }}
-            >
-              Participate
-            </ParticipateButton>
-          ) : (
-            renderViewAssetButton({ assetId, reference })
-          );
-        },
+        element: () => (
+          <ParticipateCell
+            asset={asset}
+            reference={reference}
+            setITO={setITO}
+            setOpenParticipateModal={setOpenParticipateModal}
+          />
+        ),
         span: 2,
       },
     ];
@@ -256,7 +282,6 @@ export const getITOTabletRowSections =
       endTime,
       whitelistStartTime,
       whitelistEndTime,
-      whitelistInfo,
     } = asset;
 
     const bestKLVRate = getBestKLVRate(packData);
@@ -349,25 +374,14 @@ export const getITOTabletRowSections =
         span: 1,
       },
       {
-        element: props => {
-          const { walletAddress } = useExtension();
-          const isParticipateEnabled =
-            !whitelistInfo ||
-            (walletAddress &&
-              whitelistInfo.some(info => info.address === walletAddress));
-          return isParticipateEnabled ? (
-            <ParticipateButton
-              onClick={() => {
-                setITO(asset);
-                setOpenParticipateModal(true);
-              }}
-            >
-              Participate
-            </ParticipateButton>
-          ) : (
-            renderViewAssetButton({ assetId, reference })
-          );
-        },
+        element: () => (
+          <ParticipateCell
+            asset={asset}
+            reference={reference}
+            setITO={setITO}
+            setOpenParticipateModal={setOpenParticipateModal}
+          />
+        ),
         span: 2,
       },
     ];

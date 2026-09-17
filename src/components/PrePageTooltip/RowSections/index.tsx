@@ -237,7 +237,7 @@ export const AssetRowSections = (
       {
         element: props => (
           <>
-            <SpanWrapperBottom> Circulating Supply:</SpanWrapperBottom>
+            <SpanWrapperBottom> Total Supply:</SpanWrapperBottom>
             <TxTypeSpan>
               {toLocaleFixed(
                 asset.circulatingSupply / 10 ** precision,

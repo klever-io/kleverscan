@@ -49,7 +49,7 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
     'ID',
     'Token Type',
     'Precision',
-    'Circulating Supply',
+    'Total Supply',
     'Frozen Balance',
     'Staking Type',
     '',

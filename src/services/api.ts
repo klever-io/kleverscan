@@ -25,6 +25,13 @@ export interface IProps {
   service?: Service;
   requestMode?: RequestMode;
   tries?: number;
+  /**
+   * Opt-in for `preserveBigDigits` on this response. Off by default on
+   * purpose: the field names also occur inside transaction payloads, and the
+   * raw-JSON surfaces (the Raw Tx card, the JSON export) must show the wire
+   * verbatim. A consumer that reads `<field>String` twins asks for them here.
+   */
+  preserveBigAmounts?: boolean;
 }
 
 export interface IAssetInfoRequestProps {
@@ -56,9 +63,74 @@ const pagination = {
   totalRecords: 0,
 };
 
-const buildUrlQuery = (query: IQuery): string =>
-  Object.keys(query)
-    .map(key => `${key}=${query[key]}`)
+/**
+ * Amount fields that some surface displays exactly (tooltips, the asset
+ * overview figures). Only these get the preserved-digits treatment: the goal
+ * is the exact display path, not a general bigint payload.
+ */
+const BIG_AMOUNT_FIELDS = [
+  'circulatingSupply',
+  'netCirculatingSupply',
+  'voidedSupply',
+  'initialSupply',
+  'maxSupply',
+  'burnedValue',
+  'totalStaked',
+  'klvBalance',
+  'kdaBalance',
+] as const;
+
+/**
+ * `[{,]` anchors a real key (no suffix matches, and inside a JSON string a
+ * quote is always escaped, so `"maxSupply":` cannot occur there); 16 digits is
+ * where integers can pass Number.MAX_SAFE_INTEGER; the lookahead rejects
+ * fractions and exponents, which these chain integers never carry.
+ */
+const BIG_AMOUNT_PATTERN = new RegExp(
+  String.raw`([{,]\s*"(${BIG_AMOUNT_FIELDS.join('|')})"\s*:\s*)(\d{16,})(?=\s*[,}\]])`,
+  'g',
+);
+
+/**
+ * JSON.parse maps every number onto a double, exact only up to 2^53, and
+ * chain supplies routinely exceed that: the last digits were gone before any
+ * code ran (#679). This raw-text pass leaves the number token untouched, so
+ * everything numeric parses bit-identically to before, and injects an exact
+ * `<field>String` sibling for the display path to prefer.
+ */
+export const preserveBigDigits = (text: string): string =>
+  text.replace(
+    BIG_AMOUNT_PATTERN,
+    (_match, prefix: string, field: string, digits: string) =>
+      `${prefix}${digits},"${field}String":"${digits}"`,
+  );
+
+/**
+ * Percent-encodes both sides of every pair.
+ *
+ * Next has already decoded `router.query` by the time a value reaches here, so
+ * interpolating it raw let it act as query syntax rather than as data: an `&`
+ * added a parameter of its own and a `#` cut the request short at a fragment,
+ * dropping every parameter written after it. The API resolves a repeated
+ * parameter first-wins, so a value carrying `&asset=KFI` decided the response
+ * rather than the real `asset` written later in the same query. The injection
+ * rides in the value of some other key, not in a second key of the same name:
+ * a route param and a search param that share a name are merged by Next long
+ * before this, and the route one wins.
+ *
+ * It is not only reachable through a crafted link. Labels the app writes to the
+ * URL itself carry the same characters, `Staking & Royalties` among them.
+ *
+ * `String(value)` keeps exactly the coercion the template literal performed,
+ * including an array joining on a comma, so only characters that were already
+ * being sent as syntax change on the wire.
+ */
+export const buildUrlQuery = (query: IQuery): string =>
+  Object.entries(query)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
+    )
     .join('&');
 
 export const getHost = (
@@ -134,27 +206,53 @@ export const withoutBody = async (
 ): Promise<any> => {
   const request = async () => {
     try {
-      const { route, query, service, apiVersion } = getProps(props);
+      const { route, query, service, apiVersion, preserveBigAmounts } =
+        getProps(props);
       const requestMode: RequestMode = props?.requestMode ?? 'cors';
 
+      // No Content-Type here on purpose: this path carries no body, so the
+      // header describes nothing, and it is not on the CORS safelist. Sending
+      // it turned every cross-origin GET into a preflighted request, so the
+      // browser had to complete an OPTIONS round trip before it was allowed
+      // to ask for the data. Measured against mainnet, that preflight cost
+      // 107 to 229ms in front of the one request a list page waits on, and it
+      // is cached per URL, so paging paid it again on every page.
       const response = await fetch(getHost(route, query, service, apiVersion), {
         method: method.toString(),
-        headers: {
-          'Content-Type': 'application/json',
-        },
         mode: requestMode,
       });
 
       if (!response.ok) {
+        // Falls back to the status, and tolerates a body that is not JSON at
+        // all. An error body without an `error` key yielded `error: undefined`,
+        // which every `if (response?.error)` guard in the request modules reads
+        // as success: the caller then took the module-default pagination and
+        // printed its `totalRecords: 0` as a fact.
+        const body = await response.json().catch(() => null);
+        // Spelled out rather than `||`, and deliberately not `??`: a body
+        // carrying `error: ''` must not survive either, because every caller
+        // reads a falsy error as success.
+        const message =
+          typeof body?.error === 'string' && body.error.length > 0
+            ? body.error
+            : `request failed with status ${response.status}`;
         return {
           data: null,
-          error: (await response.json()).error,
+          error: message,
           code: 'internal_error',
           pagination,
         };
       }
 
-      return response.json();
+      // Through text so the exact digits survive the parse boundary (#679).
+      // Returned WITHOUT await, exactly like `return response.json()` was: a
+      // returned promise's rejection bypasses this try/catch, so a malformed
+      // body still rejects the call in one attempt instead of resolving as an
+      // error shape and paying the full retry loop.
+      return (async () => {
+        const text = await response.text();
+        return JSON.parse(preserveBigAmounts ? preserveBigDigits(text) : text);
+      })();
     } catch (error) {
       return {
         data: null,
@@ -199,7 +297,7 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
         if (!response.ok) {
           return {
             data: null,
-            error: 'Could not parse response',
+            error: `request failed with status ${response.status}`,
             code: 'internal_error',
             pagination,
           };
@@ -213,9 +311,15 @@ export const withBody = async (props: IProps, method: Method): Promise<any> => {
       }
 
       if (!response.ok) {
+        // Same rule as `withoutBody` and `withText`: a body without a string
+        // `error` yielded `error: undefined`, which `asyncDoIf` and every
+        // `if (response?.error)` guard read as success on a failed POST.
         return {
           data: null,
-          error: resJson.error,
+          error:
+            typeof resJson?.error === 'string' && resJson.error.length > 0
+              ? resJson.error
+              : `request failed with status ${response.status}`,
           code: 'internal_error',
           pagination,
         };
@@ -387,9 +491,17 @@ export const withText = async (
       });
 
       if (!response.ok) {
+        // Same shape as `withoutBody` above, and for the same reason: an error
+        // body without a string `error` used to yield `error: undefined`, which
+        // every caller reads as success, and a body that is not JSON threw
+        // inside this expression.
+        const body = await response.json().catch(() => null);
         return {
           data: null,
-          error: (await response.json()).error,
+          error:
+            typeof body?.error === 'string' && body.error.length > 0
+              ? body.error
+              : `request failed with status ${response.status}`,
           code: 'internal_error',
           pagination,
         };

@@ -11,6 +11,7 @@ import {
   TableContainer,
   Title,
   TitleContainer,
+  TableScroll,
 } from './styles';
 import AssetLogo from '@/components/Logo/AssetLogo';
 import Link from 'next/link';
@@ -76,57 +77,59 @@ const MostTransacted: React.FC<PropsWithChildren> = () => {
               </Link>
             </TitleContainer>
           )}
-          <Table>
-            <thead>
-              <Row>
-                {table.header.map((item, index: number) => (
-                  <HeaderItem key={index}>{item}</HeaderItem>
-                ))}
-              </Row>
-            </thead>
-            <tbody>
-              {loadingMostTransacted ? (
-                <SkeletonTable items={10} columns={table.header.length} />
-              ) : (
-                table?.data?.map((item, index) =>
-                  table.title !== 'Hot Contracts' ? (
-                    <Row key={index}>
-                      <Cell>{index + 1}</Cell>
-                      <Cell>
-                        <Link href={`/asset/${item?.key}`} legacyBehavior>
-                          <MostTransactedLink href={`/asset/${item?.key}`}>
-                            <AssetLogo
-                              logo={item?.logo}
-                              ticker={item?.key}
-                              name={item?.key}
-                            />
-                            {item?.key}
-                          </MostTransactedLink>
-                        </Link>
-                      </Cell>
-                      <Cell>{item?.doc_count?.toLocaleString()}</Cell>
-                    </Row>
-                  ) : (
-                    <Row key={index}>
-                      <Cell>{index + 1}</Cell>
-                      <Cell>
-                        <MostTransactedDoubleRow>
-                          <span>{item?.name || '- -'}</span>
-                          <MostTransactedLink
-                            href={`/smart-contract/${item?.address}`}
-                          >
-                            <span>{parseAddress(item?.address, 16)}</span>
-                          </MostTransactedLink>
-                        </MostTransactedDoubleRow>
-                      </Cell>
-                      <Cell>{parseAddress(item?.ownerAddress, 16)}</Cell>
-                      <Cell>{item?.count}</Cell>
-                    </Row>
-                  ),
-                )
-              )}
-            </tbody>
-          </Table>
+          <TableScroll>
+            <Table>
+              <thead>
+                <Row>
+                  {table.header.map((item, index: number) => (
+                    <HeaderItem key={index}>{item}</HeaderItem>
+                  ))}
+                </Row>
+              </thead>
+              <tbody>
+                {loadingMostTransacted ? (
+                  <SkeletonTable items={10} columns={table.header.length} />
+                ) : (
+                  table?.data?.map((item, index) =>
+                    table.title !== 'Hot Contracts' ? (
+                      <Row key={index}>
+                        <Cell>{index + 1}</Cell>
+                        <Cell>
+                          <Link href={`/asset/${item?.key}`} legacyBehavior>
+                            <MostTransactedLink href={`/asset/${item?.key}`}>
+                              <AssetLogo
+                                logo={item?.logo}
+                                ticker={item?.key}
+                                name={item?.key}
+                              />
+                              {item?.key}
+                            </MostTransactedLink>
+                          </Link>
+                        </Cell>
+                        <Cell>{item?.doc_count?.toLocaleString()}</Cell>
+                      </Row>
+                    ) : (
+                      <Row key={index}>
+                        <Cell>{index + 1}</Cell>
+                        <Cell>
+                          <MostTransactedDoubleRow>
+                            <span>{item?.name || '- -'}</span>
+                            <MostTransactedLink
+                              href={`/smart-contract/${item?.address}`}
+                            >
+                              <span>{parseAddress(item?.address, 16)}</span>
+                            </MostTransactedLink>
+                          </MostTransactedDoubleRow>
+                        </Cell>
+                        <Cell>{parseAddress(item?.ownerAddress, 16)}</Cell>
+                        <Cell>{item?.count}</Cell>
+                      </Row>
+                    ),
+                  )
+                )}
+              </tbody>
+            </Table>
+          </TableScroll>
         </TableContainer>
       ))}
     </SectionContainer>

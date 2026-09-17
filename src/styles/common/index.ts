@@ -2,6 +2,12 @@ import { TableRowElementProps } from '@/types';
 import { transparentize, lighten } from 'polished';
 import styled, { css } from 'styled-components';
 
+// Distance between the site header and the first visible page content.
+// Kept in px because the root font size shrinks below the mobile breakpoint,
+// which would otherwise make this gap differ per viewport. Pages with extra
+// inner spacing compensate so their first visible text lands on this value.
+export const PAGE_TOP_SPACING = '40px';
+
 export const SpanBold = styled.span`
   font-weight: 700 !important;
 `;
@@ -11,7 +17,7 @@ export const Container = styled.div`
 
   flex-direction: column;
 
-  margin-top: 40px;
+  margin-top: ${PAGE_TOP_SPACING};
 `;
 
 export const SpacedContainer = styled(Container)`
@@ -64,9 +70,19 @@ export const CardContainer = styled.section`
   }
 `;
 
+/**
+ * The surface a field, a select or a small card sits on.
+ *
+ * `white` in both themes: the token is the raised surface, not the colour
+ * white, so it reads #fff in the light theme and #151515 in the dark one.
+ * Dark used to reach for the table background here instead, which measured
+ * 1.03 against the page where the light theme's equivalent measures 1.10, and
+ * which was a third value agreeing with neither the page nor the cards. The
+ * light theme already puts fields and cards on one surface; this makes dark
+ * do the same.
+ */
 export const DefaultCardStyles = css`
-  background-color: ${props =>
-    props.theme.dark ? props.theme.table.background : props.theme.white};
+  background-color: ${props => props.theme.white};
 `;
 
 export const DefaultCardStyleWithBorder = css`
@@ -177,6 +193,7 @@ export const RowAlert = styled.div`
   align-items: center;
   gap: 1rem;
   span {
+    text-transform: uppercase;
     font-size: 14px;
     font-weight: 400;
     background-color: #f8496033;
@@ -868,4 +885,22 @@ export const NoNftsFound = styled.div`
   text-align: center;
   padding: 2rem;
   color: #666;
+`;
+
+/**
+ * The accent palette of a keyboard-shortcut pill, the one the home hero's
+ * Spotlight badge established. One definition on purpose: the navbar badge
+ * and the Spotlight modal's key hints each carried their own gray variant of
+ * the same pill, and three hand-kept copies of one look is how that happened.
+ */
+export const kbdAccent = css`
+  color: ${props =>
+    props.theme.dark ? 'rgba(212, 200, 255, 0.95)' : props.theme.purple};
+  background: ${props =>
+    props.theme.dark ? 'rgba(125, 63, 241, 0.16)' : 'rgba(125, 63, 241, 0.08)'};
+  border: 1px solid
+    ${props =>
+      props.theme.dark
+        ? 'rgba(155, 108, 255, 0.35)'
+        : 'rgba(125, 63, 241, 0.18)'};
 `;

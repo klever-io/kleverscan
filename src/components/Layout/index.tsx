@@ -8,6 +8,7 @@ import React from 'react';
 import Footer from '../Footer';
 import { MobileNavBar } from '../Footer/MobileNavBar';
 import Navbar from '../Header';
+import Spotlight from '../Spotlight';
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const { pathname, asPath } = useRouter();
@@ -58,6 +59,7 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
 
       <Footer />
       <MobileNavBar />
+      <Spotlight />
     </LayoutContainer>
   );
 };

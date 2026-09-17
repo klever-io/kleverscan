@@ -1,6 +1,6 @@
 import { IChartData } from '@/configs/home';
 import { ISO2 } from '@/utils/country';
-import { Dispatch, PropsWithChildren, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { IBlock, IBlockResponse } from './blocks';
 import {
   Contract,
@@ -424,6 +424,8 @@ export interface IStaking {
   interestType: string;
   minEpochsToWithdraw: number;
   totalStaked: number;
+  /** Exact digit twin from the parse boundary, values past 2^53 (#679). */
+  totalStakedString?: string;
   apr:
     | {
         timestamp: number;
@@ -459,7 +461,19 @@ export interface IAsset {
   precision: number;
   initialSupply: number;
   circulatingSupply: number;
+  // Served by newer proxy builds only, so both are optional: an environment
+  // running an older build omits them and the UI falls back to the raw supply.
+  voidedSupply?: number;
+  netCirculatingSupply?: number;
   maxSupply: number;
+  // Exact digit twins, injected at the parse boundary for values past 2^53
+  // (#679); present only when the wire value was 16 digits or more.
+  initialSupplyString?: string;
+  circulatingSupplyString?: string;
+  voidedSupplyString?: string;
+  netCirculatingSupplyString?: string;
+  maxSupplyString?: string;
+  burnedValueString?: string;
   royalties: IRoyalties;
   mintedValue: number;
   issueDate: number;
@@ -484,6 +498,8 @@ export interface IAsset {
   metadata?: string;
   mime?: string;
   stakingHolders: number;
+  /** Served by the assets list endpoint: the asset has a KDA fee pool. */
+  hasKdaPool?: boolean;
 }
 
 export interface ISftAsset extends IAsset {
@@ -531,6 +547,9 @@ export interface IAssetPool {
   active: boolean;
   klvBalance: number;
   kdaBalance: number;
+  /** Exact digit twins from the parse boundary, values past 2^53 (#679). */
+  klvBalanceString?: string;
+  kdaBalanceString?: string;
   convertedFees: number;
   adminAddress: string;
   fRatioKLV: number;
@@ -538,6 +557,19 @@ export interface IAssetPool {
   hidden: boolean;
   verified: boolean;
   ratio: number;
+}
+
+/**
+ * A pool joined with its KDA's asset record. The pool payload carries only
+ * the asset id, while the amounts and the rate need the asset's precision to
+ * be read correctly, so the list request looks the assets up in one batch.
+ */
+export interface IAssetPoolRow extends IAssetPool {
+  name?: string;
+  logo?: string;
+  ticker?: string;
+  assetVerified?: boolean;
+  precision?: number;
 }
 
 export interface IParsedAsset extends IAsset {
@@ -631,8 +663,16 @@ export interface IValidator {
   rating: number;
   selfStake: number;
   status: string;
+  /** Leader successes PLUS consensus signatures. Not a block count: summed
+   *  over the set it lands at roughly 21x the chain height, because every
+   *  block is also signed by the rest of the consensus group. */
   totalProduced: number;
   totalMissed: number;
+  /** Blocks this validator actually produced as leader. Summed over the set
+   *  this tracks the chain height (measured 32.804.821 against a height of
+   *  32.806.707), which is what a block count is supposed to do. */
+  blocksProduced: number;
+  blocksMissed: number;
   canDelegate: boolean;
   commission: number;
   maxDelegation: number;
@@ -801,18 +841,6 @@ export interface IDataMetrics {
   epochLoadPercent: number;
   remainingTime: string;
 }
-export interface IDataCards {
-  metrics: IDataMetrics;
-  totalAccounts: number;
-  newAccounts: number;
-  totalTransactions: number;
-  newTransactions: number;
-  beforeYesterdayTransactions: number;
-  actualTPS: string;
-  blocks: IBlock[];
-  counterEpoch: number;
-}
-
 export interface ICoinCards {
   coins: ICoinInfo[];
   assetsData: IAssetsData;
@@ -850,7 +878,7 @@ export interface IAssetPoolResponse extends IResponse {
 
 export interface IAssetPoolsResponse extends IPaginatedResponse {
   data: {
-    pools: IAssetPool[];
+    pools: IAssetPoolRow[];
   };
 }
 
@@ -1081,7 +1109,14 @@ export interface TableRowElementProps {
   $smaller?: boolean;
 }
 export interface IRowSection {
-  element: React.FC<PropsWithChildren<TableRowElementProps>>;
+  /**
+   * A plain function the tables CALL, not a component type they mount: builders
+   * hand over a fresh arrow every render, and rendering that as `<Element />`
+   * gave every cell a new identity, so React remounted all of them on each
+   * re-render, dropping keyboard focus and cell state (#697). Consequence: no
+   * hooks inside; a cell needing hooks renders a real component instead.
+   */
+  element: (props: TableRowElementProps) => React.ReactNode;
   span: number;
   width?: number;
   maxWidth?: number;

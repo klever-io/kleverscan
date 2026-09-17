@@ -1,6 +1,7 @@
 import { SftMetadata } from '@/components/Asset/SFTMetadata';
 import { SftOverviewTab } from '@/components/Asset/SftOverviewTab';
-import Table, { ITable } from '@/components/Table';
+import { ITable } from '@/components/Table';
+import TransactionsTable from '@/components/TransactionsList/Table';
 import { requestSftDetails } from '@/services/requests/asset/nonce';
 import {
   CardContent,
@@ -53,7 +54,7 @@ export const SemiFungibleView: React.FC<
 
       <CardContainer>
         <h3>Asset Transactions</h3>
-        <Table {...tableProps} />
+        <TransactionsTable {...tableProps} />
       </CardContainer>
     </>
   );

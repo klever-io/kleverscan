@@ -24,7 +24,8 @@
     "Total Staked": "Total Staked",
     "Estimated APR": "Estimated APR",
     "KLV per KFI": "KLV per KFI",
-    "ViewAll": "View all"
+    "ViewAll": "View all",
+    "UpdatedAgo": "Updated {{age}} ago"
   },
   "Titles": {
     "Assets": "Assets",
@@ -71,6 +72,7 @@
     "Change Owner": "Change Owner",
     "Add Roles": "Add Roles",
     "Paused": "Paused",
+    "Is Paused": "Is Paused",
     "NFT Mint Stopped": "NFT mint Stopped"
   },
   "Statements": {

@@ -34,7 +34,7 @@ const Detail: React.FC<PropsWithChildren<IDetail>> = ({
       <Header filterOn={!!filters}>
         <Title title={title} Icon={Icon} route={route} />
       </Header>
-      {customHeader && <FilterContainer>{customHeader}</FilterContainer>}
+      {customHeader}
       {filters && (
         <FilterContainer>
           {filters.map(filter => (

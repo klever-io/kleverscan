@@ -1,23 +1,14 @@
 import { PropsWithChildren, useMemo } from 'react';
-import CopyAction from '@/components/DataList/CopyAction';
 import Table, { ITable } from '@/components/Table';
 import { fetchAllValidators } from '@/services/requests/validators';
 import { IPaginatedResponse, IRowSection } from '@/types/index';
-import { parseAddress } from '@/utils/parseValues';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
+import { KeyCell, NameCell } from './cells';
 import ValidatorsMobileCard from './MobileCard';
 import { buildBlockValidatorPage } from './page';
 import { IBlockValidatorRow } from './row';
-import {
-  LeaderBadge,
-  NameLine,
-  ValidatorAddress,
-  ValidatorKeyLink,
-  ValidatorLine,
-  ValidatorNameLink,
-  ValidatorsTableWrapper,
-} from './styles';
+import { ValidatorsTableWrapper } from './styles';
 
 interface IValidatorsProps {
   validators: string[];
@@ -25,53 +16,6 @@ interface IValidatorsProps {
 }
 
 const DIRECTORY_STALE_MS = 5 * 60 * 1000;
-
-const NameCell: React.FC<{ row: IBlockValidatorRow }> = ({ row }) => {
-  const label =
-    row.name ||
-    (row.ownerAddress ? parseAddress(row.ownerAddress, 16) : 'Unknown');
-  if (!row.ownerAddress) {
-    return <ValidatorAddress title={row.blsKey}>{label}</ValidatorAddress>;
-  }
-  return (
-    <NameLine>
-      <ValidatorNameLink
-        href={`/validator/${row.ownerAddress}`}
-        title={row.name || row.ownerAddress}
-        data-testid="validator-link"
-      >
-        {label}
-      </ValidatorNameLink>
-      {row.leader && (
-        <LeaderBadge $variant="accent" data-testid="block-leader">
-          Leader
-        </LeaderBadge>
-      )}
-    </NameLine>
-  );
-};
-
-const KeyCell: React.FC<{ row: IBlockValidatorRow }> = ({ row }) => {
-  return (
-    <ValidatorLine>
-      {row.ownerAddress ? (
-        <ValidatorKeyLink
-          href={`/validator/${row.ownerAddress}`}
-          title={row.blsKey}
-        >
-          {row.blsKey}
-        </ValidatorKeyLink>
-      ) : (
-        <ValidatorAddress title={row.blsKey}>{row.blsKey}</ValidatorAddress>
-      )}
-      <CopyAction
-        value={row.blsKey}
-        label="Copy BLS key"
-        announcement="BLS key copied to clipboard"
-      />
-    </ValidatorLine>
-  );
-};
 
 const Validators: React.FC<PropsWithChildren<IValidatorsProps>> = props => {
   const validators = props.validators;

@@ -150,6 +150,40 @@ describe('wallet reconnect', () => {
     expect(window.localStorage.getItem('klever-connected')).toBeNull();
   });
 
+  it('stays quiet when the browser blocks reading storage', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage blocked');
+    });
+
+    try {
+      mounted.push(mount());
+      expect(connect).not.toHaveBeenCalled();
+      expect(console.error).not.toHaveBeenCalled();
+    } finally {
+      jest.restoreAllMocks();
+    }
+  });
+
+  it('finishes a rejected restore when the browser blocks clearing storage', () => {
+    window.localStorage.setItem('klever-connected', 'true');
+    const view = mount();
+    mounted.push(view);
+
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+      throw new Error('storage blocked');
+    });
+
+    try {
+      klever.error = new Error('User rejected the connection');
+      view.rerender();
+      expect(console.error).not.toHaveBeenCalled();
+    } finally {
+      jest.restoreAllMocks();
+    }
+  });
+
   it('does not call connect on mount from the pages that used to do that', () => {
     const offenders = AUTO_CONNECT_FILES.filter(file => {
       const source = fs.readFileSync(file, 'utf8');

@@ -7,6 +7,24 @@ import { createContext, useContext, useState } from 'react';
 // removes on disconnect. A missing key means the visitor never agreed.
 const CONNECTED_FLAG = 'klever-connected';
 
+// Private mode and blocked storage throw on access. A throw must not surface
+// from the effect: skip the restore, and ignore a failed cleanup.
+const readConnectedFlag = (): boolean => {
+  try {
+    return window.localStorage.getItem(CONNECTED_FLAG) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+const clearConnectedFlag = (): void => {
+  try {
+    window.localStorage.removeItem(CONNECTED_FLAG);
+  } catch {
+    // The marker stays. The next load hits the same block and stays quiet.
+  }
+};
+
 interface IExtension {
   searchingExtension: boolean;
   extensionInstalled: boolean | undefined;
@@ -45,7 +63,7 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
   useEffect(() => {
     if (reconnectAttempted.current) return;
     if (!extensionInstalled || isConnected || isConnecting) return;
-    if (window.localStorage.getItem(CONNECTED_FLAG) !== 'true') return;
+    if (!readConnectedFlag()) return;
     reconnectAttempted.current = true;
     void connect();
   }, [extensionInstalled, isConnected, isConnecting, connect]);
@@ -56,7 +74,7 @@ export const ExtensionProvider: React.FC<PropsWithChildren> = ({
     if (!reconnectAttempted.current || isConnecting || isConnected || !error) {
       return;
     }
-    window.localStorage.removeItem(CONNECTED_FLAG);
+    clearConnectedFlag();
   }, [error, isConnecting, isConnected]);
 
   const checkKleverWebObject = () => {

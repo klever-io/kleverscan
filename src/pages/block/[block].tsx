@@ -58,6 +58,9 @@ const TextFact: React.FC<{ label: string; value: string }> = ({
   </FactRow>
 );
 
+const CARD_HEADERS = ['Overview', 'Info'];
+const TABLE_HEADERS = ['Transactions', 'Validators'];
+
 const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
   const {
     hash,
@@ -81,8 +84,6 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
     randSeed,
   } = block;
   const router = useRouter();
-  const cardHeaders = ['Overview', 'Info'];
-  const tableHeaders = ['Transactions', 'Validators'];
   const precision = 6; // default KLV precision
 
   // Null until the URL is read. The server does not see ?tab= or ?card=, so
@@ -103,8 +104,10 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
     const card = params.get('card');
-    setSelectedTab(tab && tableHeaders.includes(tab) ? tab : tableHeaders[0]);
-    setSelectedCard(card && cardHeaders.includes(card) ? card : cardHeaders[0]);
+    setSelectedTab(tab && TABLE_HEADERS.includes(tab) ? tab : TABLE_HEADERS[0]);
+    setSelectedCard(
+      card && CARD_HEADERS.includes(card) ? card : CARD_HEADERS[0],
+    );
   }, [router.asPath]);
 
   // `||` keeps a NaN fee at 0, which is what the three old call sites did.
@@ -118,9 +121,9 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
   };
 
   const tabProps: ITabs = {
-    headers: tableHeaders,
+    headers: TABLE_HEADERS,
     selectedIndex:
-      selectedTab === null ? -1 : tableHeaders.indexOf(selectedTab),
+      selectedTab === null ? -1 : TABLE_HEADERS.indexOf(selectedTab),
     onClick: header => {
       setSelectedTab(header);
       const updatedQuery = { ...router.query };
@@ -138,7 +141,7 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
 
       <FactsCard>
         <FactsTabs aria-label="Block details">
-          {cardHeaders.map(header => (
+          {CARD_HEADERS.map(header => (
             <FactsTab
               key={header}
               type="button"

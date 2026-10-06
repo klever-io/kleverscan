@@ -102,8 +102,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   ];
   const tabHeaders = [t('common:Tabs.Overview')];
   const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
-  const { walletAddress, extensionInstalled, connectExtension } =
-    useExtension();
+  const { walletAddress } = useExtension();
   const { isTablet } = useMobile();
   const { paramsList } = useNetworkParams();
   const router = useRouter();
@@ -194,12 +193,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     }
   };
   getHeaders();
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   useEffect(() => {
     setSelectedTabHeader(tabHeaders[0]);

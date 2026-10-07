@@ -33,8 +33,10 @@ const Blocks: React.FC<PropsWithChildren> = () => {
   const router = useRouter();
   const header = useColumnHeaders(BLOCK_COLUMNS);
   const { t } = useTranslation(['blocks']);
-  // Translated here and handed down: the row builder is no component, so
-  // t() is out of its reach, and the mobile card already translates this key.
+  const { t: commonT } = useTranslation('common');
+  // Translated here and handed down: the translator the builder receives is
+  // optional and bound to `common`, so the blocks key is resolved up here
+  // (the mobile card already translates it, and the two must not drift).
   const epochLabel = t('blocks:Table.Epoch', { defaultValue: 'Epoch' });
   // Two pieces of state on purpose: the switch and storage carry the user's
   // INTENT, the interval is derived from it. Conflating them made the toggle
@@ -65,7 +67,7 @@ const Blocks: React.FC<PropsWithChildren> = () => {
     type: 'blocks',
     header,
     rowSections: (block: Parameters<typeof blockRowSections>[0]) =>
-      blockRowSections(block, epochLabel),
+      blockRowSections(block, epochLabel, commonT),
     dataName: 'blocks',
     request: (page: number, limit: number) =>
       blockListCall(page, limit, router.query),

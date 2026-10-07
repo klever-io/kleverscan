@@ -66,7 +66,7 @@ import { getPrecision } from '@/utils/precisionFunctions';
 import { TXType } from '@klever/connect';
 import { GetServerSideProps } from 'next';
 import { MdOutlineDescription } from 'react-icons/md';
-import { useTranslation } from 'next-i18next';
+import { TFunction, useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { NextRouter, useRouter } from 'next/router';
@@ -266,6 +266,7 @@ export const getCustomFields = (
 export const transactionRowSections = (
   props: ITransaction,
   routeState?: { pathname?: string; query?: ParsedUrlQuery },
+  t?: TFunction,
 ): IRowSection[] => {
   const {
     hash,
@@ -329,15 +330,23 @@ export const transactionRowSections = (
   // shows the first half, the tooltip the full date.
   const ageElapsed = formatDate(timestamp || Date.now(), {
     showElapsedTime: true,
+    t,
   }).split(' (')[0];
+
+  // The label follows the mobile card, which translates the same key with the
+  // same defaultValue, so the desktop column and the phone card cannot drift
+  // on it. A translator bound to another namespace still resolves an explicit
+  // `transactions:` prefix, and every page that reaches this builder loads
+  // that namespace. The literal stays for the header-string probe, which runs
+  // the builder outside any i18n context and hands it no translator at all.
+  const notApplicableLabel = t
+    ? t('transactions:Table.NotApplicable', { defaultValue: 'Not applicable' })
+    : 'Not applicable';
 
   const emptyCell = (
     <>
-      {/* English like every other literal this builder renders: t() is out
-          of reach here, the builder also runs for the header-string probe
-          outside any i18n context. */}
       <span aria-hidden="true">- -</span>
-      <VisuallyHidden>Not applicable</VisuallyHidden>
+      <VisuallyHidden>{notApplicableLabel}</VisuallyHidden>
     </>
   );
 
@@ -551,10 +560,12 @@ export const useTransactionRowSections = (): ((
   props: ITransaction,
 ) => IRowSection[]) => {
   const { pathname, query } = useRouter();
+  const { t: commonT } = useTranslation('common');
 
   return useCallback(
-    (props: ITransaction) => transactionRowSections(props, { pathname, query }),
-    [pathname, query],
+    (props: ITransaction) =>
+      transactionRowSections(props, { pathname, query }, commonT),
+    [pathname, query, commonT],
   );
 };
 

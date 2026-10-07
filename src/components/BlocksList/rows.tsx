@@ -12,6 +12,7 @@ import { IRowSection } from '@/types/index';
 import { formatDate, formatDateWithSeconds } from '@/utils/formatFunctions';
 import { bandwidthFeeReward } from '@/utils/fees';
 import { parseAddress } from '@/utils/parseValues';
+import { TFunction } from 'next-i18next';
 import React from 'react';
 import { BLOCK_COLUMNS, BlockColumnKey } from './columns';
 
@@ -27,14 +28,18 @@ export const COLUMN_LAYOUT: IRowSection[] = BLOCK_COLUMNS.map(column => ({
 }));
 
 /**
- * `epochLabel` arrives translated from the page: `t()` is out of reach in
- * this builder (it is no component, and it also runs for the Table's
- * header-string probe), and hardcoding it here showed "Epoch" on desktop
- * beside "Época" on the pt-BR mobile card.
+ * `epochLabel` arrives translated from the page. The translator this builder
+ * does receive is optional and bound to `common` (that is what `formatDate`
+ * needs it for), so resolving the `blocks` key here would ask that bundle for
+ * a key it does not carry. The builder is no component and also runs for the
+ * Table's header-string probe, where there is no i18n context at all — and
+ * hardcoding the label showed "Epoch" on desktop beside "Época" on the pt-BR
+ * mobile card.
  */
 export const blockRowSections = (
   block: IBlock | string,
   epochLabel = 'Epoch',
+  t?: TFunction,
 ): IRowSection[] => {
   // The header-string probe above. Handled explicitly so a future dereference
   // of the argument cannot take the page down while rendering its own header.
@@ -60,7 +65,7 @@ export const blockRowSections = (
   // tooltip is hover-only, so without this a keyboard user on desktop had no
   // way to reach the epoch at all.
   const fullDate = `${formatDateWithSeconds(timestamp)} · ${epochLabel} ${epoch}`;
-  const elapsed = formatDate(timestamp, { showElapsedTime: true }).split(
+  const elapsed = formatDate(timestamp, { showElapsedTime: true, t }).split(
     ' (',
   )[0];
 

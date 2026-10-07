@@ -45,6 +45,7 @@ export const ValidatorsTableWrapper = styled.div`
       min-width: 0;
       max-width: 100%;
       overflow: hidden;
+      gap: 8px;
     }
 
     /* The shared row becomes two equal columns here. The loaded card stacks

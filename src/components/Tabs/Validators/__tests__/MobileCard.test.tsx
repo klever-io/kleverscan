@@ -101,6 +101,17 @@ describe('ValidatorsMobileCard', () => {
     expect(screen.queryByTestId('block-leader')).not.toBeInTheDocument();
   });
 
+  it('wraps a long unknown key and keeps the name on one line', () => {
+    const key = `aa${'b'.repeat(80)}`;
+    draw({ blsKey: key });
+    const keyNode = screen.getByText(key);
+    const nameNode = screen.getByText('Unknown');
+    expect(getComputedStyle(keyNode).whiteSpace).toBe('normal');
+    expect(getComputedStyle(keyNode).textOverflow).toBe('clip');
+    expect(getComputedStyle(nameNode).whiteSpace).toBe('nowrap');
+    expect(keyNode).toHaveAttribute('title', key);
+  });
+
   it('shows Unknown and no link when the directory does not know the key', () => {
     const { container } = draw({ blsKey: 'zz' });
     expect(screen.getByText('Unknown')).toHaveAttribute('title', 'zz');

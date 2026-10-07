@@ -12,7 +12,7 @@ import {
   TableBody,
   TableRow,
 } from '@/components/Table/styles';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 // theme.breakpoints.tablet, and the width isTablet treats as desktop.
 // belowWidth keeps the card rule off at that exact pixel, where both a
@@ -68,8 +68,8 @@ export const ValidatorsTableWrapper = styled.div`
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    /* Names are short. The key takes the rest of the card and ellipsizes,
-       so the row fills instead of leaving a gap after an 8-character clip. */
+    /* Names stay short. The key uses the rest of the row and wraps, so a
+       long key stays visible instead of ending in an ellipsis. */
     ${TableBody} {
       min-width: 0;
       width: 100%;
@@ -82,9 +82,10 @@ export const ValidatorsTableWrapper = styled.div`
       display: table-row;
     }
 
+    /* On a table cell, height is the minimum, so a wrapped key is not clipped. */
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};
-      overflow: hidden;
+      overflow: visible;
     }
 
     ${HeaderItem}:nth-child(1),
@@ -107,10 +108,9 @@ export const ValidatorsTableWrapper = styled.div`
       width: calc(100% - 2rem);
     }
 
-    /* One 20px line inside the 60px row. The shared cell rule pins spans
-       to 24px, which is the two-line row this list does not use. */
-    /* The shared cell makes every span a flex row, which cannot ellipsize.
-       Two classes beat that rule. */
+    /* The name stays one line. The shared cell makes every span a flex row
+       and pins it to 24px. Two classes beat that rule. The key does not
+       use this span: it wraps in its own component. */
     ${MobileCardItem} ${ValidatorAddress} {
       display: block;
       flex: 1;
@@ -141,24 +141,29 @@ export const LeaderBadge = styled(BadgePill)`
   }
 `;
 
+const keyWrap = css`
+  display: block;
+  flex: 1;
+  height: auto;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  overflow-wrap: anywhere;
+`;
+
 export const ValidatorKeyLink = styled(AddressLink)`
   && {
-    display: block;
-    flex: 1;
-    height: 20px;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    ${keyWrap}
   }
+`;
 
-  /* On the card the 20px box is centered on the 24px copy button, but the
-     glyphs sit at the top of that box, about 3px above the icon. A box as
-     tall as the line centers on the icon. The button is not in this rule. */
-  @media screen and (max-width: ${belowWidth(TABLET_PX)}) {
-    && {
-      height: auto;
-    }
+export const ValidatorKeyText = styled.span`
+  && {
+    ${keyWrap}
+    font-family: 'Fira Mono', monospace;
+    font-size: 0.875rem;
+    color: ${props => props.theme.black};
   }
 `;
 

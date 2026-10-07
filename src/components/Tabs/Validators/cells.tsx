@@ -7,6 +7,7 @@ import {
   NameLine,
   ValidatorAddress,
   ValidatorKeyLink,
+  ValidatorKeyText,
   ValidatorLine,
   ValidatorNameLink,
 } from './styles';
@@ -49,7 +50,7 @@ export const KeyCell: React.FC<{ row: IBlockValidatorRow }> = ({ row }) => (
         {row.blsKey}
       </ValidatorKeyLink>
     ) : (
-      <ValidatorAddress title={row.blsKey}>{row.blsKey}</ValidatorAddress>
+      <ValidatorKeyText title={row.blsKey}>{row.blsKey}</ValidatorKeyText>
     )}
     <CopyAction
       value={row.blsKey}

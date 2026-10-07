@@ -28,10 +28,13 @@ export const COLUMN_LAYOUT: IRowSection[] = BLOCK_COLUMNS.map(column => ({
 }));
 
 /**
- * `epochLabel` arrives translated from the page: `t()` is out of reach in
- * this builder (it is no component, and it also runs for the Table's
- * header-string probe), and hardcoding it here showed "Epoch" on desktop
- * beside "Época" on the pt-BR mobile card.
+ * `epochLabel` arrives translated from the page. The translator this builder
+ * does receive is optional and bound to `common` (that is what `formatDate`
+ * needs it for), so resolving the `blocks` key here would ask that bundle for
+ * a key it does not carry. The builder is no component and also runs for the
+ * Table's header-string probe, where there is no i18n context at all — and
+ * hardcoding the label showed "Epoch" on desktop beside "Época" on the pt-BR
+ * mobile card.
  */
 export const blockRowSections = (
   block: IBlock | string,

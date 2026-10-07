@@ -1,7 +1,36 @@
 import { KLV } from '@/assets/coins';
-import { AccountDetails as AccountIcon } from '@/assets/title-icons';
 import { PermissionOperations } from '@/components/AccountPermission';
-import Copy from '@/components/Copy';
+import CopyAction from '@/components/DataList/CopyAction';
+import FittedHash from '@/components/AccountDetail/FittedHash';
+import {
+  CARD_OVERVIEW,
+  CARD_PERMISSION,
+  accountListHeaders,
+  accountListTabIndex,
+  transactionDirectionLabel,
+  visibleAccountCard,
+} from '@/components/AccountDetail/state';
+import {
+  AccountBox,
+  FactLabel,
+  FactRow,
+  FactValue,
+  FactValueRow,
+  FactsCard,
+  FactsTab,
+  FactsTabs,
+  FigureRow,
+  GroupBody,
+  GroupRow,
+  OperationsWrap,
+  PermHeading,
+  PermissionBlock,
+  SignerLabel,
+  SignerRow,
+  StackedLabel,
+  WeightText,
+} from '@/components/AccountDetail/styles';
+import { pickUrlEffect } from '@/components/BlockDetail/urlEffect';
 import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -16,7 +45,6 @@ import {
 } from '@/components/TransactionsFilters/styles';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
-import { useMobile } from '@/contexts/mobile';
 import { useNetworkParams } from '@/contexts/contract/networkParams';
 import api from '@/services/api';
 import {
@@ -26,38 +54,20 @@ import {
   accountCall,
   pricesCall,
 } from '@/services/requests/account';
-import {
-  CardContent,
-  CardHeader,
-  CardHeaderItem,
-  CardTabContainer,
-  CenteredRow,
-  Container,
-  FrozenContainer,
-  Header,
-  Row,
-  RowAlert,
-  RowContent,
-} from '@/styles/common';
+import { Container, Header, RowAlert } from '@/styles/common';
 import { IResponse } from '@/types/index';
 import { IsTokenBurn, setQueryAndRouter } from '@/utils';
 import { toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
-import { parseAddress } from '@/utils/parseValues';
 import {
   AmountContainer,
   BalanceContainer,
   BalanceKLVValue,
   BalanceTransferContainer,
-  ContainerSigners,
-  Em,
-  FrozenContainerLi,
-  FrozenContentRewards,
   IconContainer,
   ItemContainerPermissions,
   ItemContentPermissions,
   RewardExpiry,
-  RewardsAvailableContainer,
   StakingRewards,
 } from '@/views/accounts/detail';
 import { ReceiveBackground } from '@/views/validator';
@@ -95,16 +105,8 @@ export interface IAllowanceResponse extends IResponse {
 
 const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const { t } = useTranslation(['common', 'accounts']);
-  const headers = [
-    t('common:Titles.Assets'),
-    t('common:Titles.Transactions'),
-    t('accounts:SingleAccount.Tabs.SmartContracts'),
-  ];
-  const tabHeaders = [t('common:Tabs.Overview')];
-  const [selectedTabHeader, setSelectedTabHeader] = useState(tabHeaders[0]);
   const { walletAddress, extensionInstalled, connectExtension } =
     useExtension();
-  const { isTablet } = useMobile();
   const { paramsList } = useNetworkParams();
   const router = useRouter();
 
@@ -138,11 +140,12 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     enabled: !!router?.isReady,
   });
 
-  const { data: hasProprietaryAssets } = useQuery({
-    queryKey: [`hasProprietaryAssets`, router.query.account],
-    queryFn: () => accountAssetsOwnerCall(router.query.account as string),
-    enabled: !!router?.isReady,
-  });
+  const { data: hasProprietaryAssets, isFetched: proprietaryFetched } =
+    useQuery({
+      queryKey: [`hasProprietaryAssets`, router.query.account],
+      queryFn: () => accountAssetsOwnerCall(router.query.account as string),
+      enabled: !!router?.isReady,
+    });
 
   const { data: currentEpoch } = useQuery({
     queryKey: ['epoch'],
@@ -177,33 +180,53 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     asset => (asset as { buckets?: unknown[] })?.buckets?.length,
   );
 
-  const getHeaders = () => {
-    if (hasProprietaryAssets) {
-      headers.splice(1, 0, t('accounts:SingleAccount.Tabs.ProprietaryAssets'));
-    }
-    if (hasBuckets) {
-      const transactionsIndex = headers.indexOf(
-        t('common:Titles.Transactions'),
-      );
-      headers.splice(
-        transactionsIndex + 1,
-        0,
-        t('accounts:SingleAccount.Tabs.Buckets'),
-        t('accounts:SingleAccount.Tabs.Rewards'),
-      );
-    }
-  };
-  getHeaders();
+  const assetsLabel = t('common:Titles.Assets');
+  const transactionsLabel = t('common:Titles.Transactions');
+  const headers = accountListHeaders({
+    assets: assetsLabel,
+    proprietary: hasProprietaryAssets
+      ? t('accounts:SingleAccount.Tabs.ProprietaryAssets')
+      : null,
+    transactions: transactionsLabel,
+    buckets: hasBuckets ? t('accounts:SingleAccount.Tabs.Buckets') : null,
+    rewards: hasBuckets ? t('accounts:SingleAccount.Tabs.Rewards') : null,
+    contracts: t('accounts:SingleAccount.Tabs.SmartContracts'),
+  });
+
+  // Null until the address bar is read. The server does not see ?card= or
+  // ?tab=, so starting on Overview and Assets painted those and then jumped.
+  const [urlRead, setUrlRead] = useState(false);
+  const [cardQuery, setCardQuery] = useState<string | null>(null);
+  const [tabQuery, setTabQuery] = useState<string | null>(null);
+  const useUrlLayoutEffect = pickUrlEffect(globalThis.window);
+  useUrlLayoutEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setCardQuery(params.get('card'));
+    setTabQuery(params.get('tab'));
+    setUrlRead(true);
+  }, [router.asPath]);
+
+  const permissionsKnown = !isLoadingAccount && account !== undefined;
+  const hasPermissions = (account?.permissions?.length || 0) > 0;
+  const card = visibleAccountCard(
+    cardQuery,
+    urlRead,
+    permissionsKnown,
+    hasPermissions,
+  );
+  const headersSettled = !isLoadingAccount && proprietaryFetched;
+  const tabIndex = accountListTabIndex(
+    headers,
+    tabQuery,
+    urlRead,
+    headersSettled,
+  );
 
   useEffect(() => {
     if (extensionInstalled) {
       connectExtension();
     }
   }, [extensionInstalled]);
-
-  useEffect(() => {
-    setSelectedTabHeader(tabHeaders[0]);
-  }, [account, router.isReady]);
 
   const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking
@@ -263,6 +286,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const tabProps: ITabs = {
     headers,
     onClick: header => {
+      setTabQuery(header);
       const updatedQuery = { ...router.query };
       delete updatedQuery.page;
       delete updatedQuery.limit;
@@ -281,32 +305,15 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     setQuery: setQueryAndRouter,
   };
 
-  const SelectedComponent: React.FC<PropsWithChildren> = () => {
-    switch (selectedTabHeader) {
-      case t('common:Tabs.Overview'):
-        return <Overview />;
-      case t('accounts:SingleAccount.Tabs.Permission'):
-        return <Permission />;
-      default:
-        return <div />;
-    }
-  };
-
   const availableBalance = (account?.balance || 0) / 10 ** KLV_PRECISION;
   const totalKLV = calculateTotalKLV();
   const pricedKLV = totalKLV * (priceCall || 0);
+  const accountAddress = String(router.query.account || '');
+  const directionLabel = transactionDirectionLabel(
+    router.query,
+    accountAddress,
+  );
 
-  const getFilterName = () => {
-    if (router.query?.role === 'sender') {
-      return 'Transactions Out';
-    } else if (router.query?.role === 'receiver') {
-      return 'Transactions In';
-    } else if (router.query?.role === '' || router.query?.role === undefined) {
-      return 'All Transactions';
-    }
-    return 'All Transactions';
-  };
-  const filterName = useCallback(getFilterName, [router.query]);
   const handleClickFilterName = (filter: string) => {
     switch (filter) {
       case 'All Transactions':
@@ -330,19 +337,17 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
       onClick: e => {
         handleClickFilterName(e);
       },
-      current: filterName(),
+      current: directionLabel,
       overFlow: 'visible',
       inputType: 'button',
       isHiddenInput: false,
     },
   ];
 
-  const getAccountAddress = (address: string) => {
-    if (!address) return;
-    if (isTablet && address) {
-      return parseAddress(address, 15);
-    }
-    return address && parseAddress(address, 50);
+  const selectCard = (next: typeof CARD_OVERVIEW | typeof CARD_PERMISSION) => {
+    setCardQuery(next);
+    setUrlRead(true);
+    setQueryAndRouter({ ...router.query, card: next }, router);
   };
 
   const [
@@ -395,8 +400,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
       ])
     : Array.from({ length: 6 }, () => EmptyComponent);
 
-  (account?.permissions?.length || 0) > 0 &&
-    tabHeaders.push(t('accounts:SingleAccount.Tabs.Permission'));
   const Permission: React.FC<PropsWithChildren> = () => {
     const msg = `Owner - This is the default permission, 
     granting the holder the ability to execute all contracts.
@@ -408,166 +411,133 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
       `;
 
     return (
-      <Container>
-        {account?.permissions?.map(permission => {
-          return (
-            <Row key={permission.id}>
-              <span>
-                <strong>PermID {permission.id}</strong>
-              </span>
-              <RowContent>
-                <BalanceContainer>
-                  <FrozenContainer>
-                    <ItemContainerPermissions isOperations={true}>
-                      <strong>
-                        {t('accounts:SingleAccount.PermissionsTab.Signers')}
-                      </strong>
-                      <ContainerSigners
-                        isSignersRow={true}
-                        rowColumnMobile={true}
-                      >
-                        {permission.signers.map((signer, key) => (
-                          <FrozenContentRewards key={key}>
-                            <ul key={key}>
-                              <FrozenContainerLi>
-                                <Em>{getAccountAddress(signer.address)}</Em>
-                                <Copy info="Address" data={signer.address} />
-                              </FrozenContainerLi>
-                              <li>
-                                <Em>
-                                  {t(
-                                    'accounts:SingleAccount.PermissionsTab.Weight',
-                                  )}
-                                </Em>
-                                {signer.weight}
-                              </li>
-                            </ul>
-                          </FrozenContentRewards>
-                        ))}
-                      </ContainerSigners>
-                    </ItemContainerPermissions>
-                    <ItemContainerPermissions>
-                      <strong>
-                        {t('accounts:SingleAccount.PermissionsTab.Type')}
-                      </strong>
-                      <ItemContentPermissions>
-                        <p>{permission.type === 0 ? 'Owner' : 'User'}</p>
-                        <Tooltip msg={msg} />
-                      </ItemContentPermissions>
-                    </ItemContainerPermissions>
-
-                    <ItemContainerPermissions>
-                      <strong>
-                        {t('accounts:SingleAccount.PermissionsTab.Threshold')}
-                      </strong>
-                      <ItemContentPermissions>
-                        <p>{permission.Threshold}</p>
-                      </ItemContentPermissions>
-                    </ItemContainerPermissions>
-                    <ItemContainerPermissions isOperations={true}>
-                      <strong>
-                        {t('accounts:SingleAccount.PermissionsTab.Operations')}
-                      </strong>
-                      <ItemContentPermissions rowColumnMobile={true}>
-                        <PermissionOperations {...permission} />
-                      </ItemContentPermissions>
-                    </ItemContainerPermissions>
-                    <ItemContainerPermissions>
-                      <strong>
-                        {t(
-                          'accounts:SingleAccount.PermissionsTab.PermissionsName',
-                        )}
-                      </strong>
-                      <ItemContentPermissions rowColumnMobile={true}>
-                        <p>{permission.permissionName || '--'}</p>
-                      </ItemContentPermissions>
-                    </ItemContainerPermissions>
-                  </FrozenContainer>
-                </BalanceContainer>
-              </RowContent>
-            </Row>
-          );
-        })}
-      </Container>
+      <>
+        {account?.permissions?.map(permission => (
+          <PermissionBlock key={permission.id}>
+            <PermHeading>PermID {permission.id}</PermHeading>
+            {permission.signers.map((signer, index) => (
+              <SignerRow key={signer.address}>
+                <SignerLabel $show={index === 0}>
+                  {index === 0
+                    ? t('accounts:SingleAccount.PermissionsTab.Signers')
+                    : ''}
+                </SignerLabel>
+                <FactValueRow>
+                  <FittedHash value={signer.address} />
+                  <WeightText>
+                    {t('accounts:SingleAccount.PermissionsTab.Weight')}{' '}
+                    {signer.weight}
+                  </WeightText>
+                  <CopyAction
+                    value={signer.address}
+                    label={t('accounts:Common.CopyAddress')}
+                    announcement={t('accounts:Common.AddressCopied')}
+                  />
+                </FactValueRow>
+              </SignerRow>
+            ))}
+            <FactRow>
+              <FactLabel>
+                {t('accounts:SingleAccount.PermissionsTab.Type')}
+              </FactLabel>
+              <FactValueRow>
+                <FactValue>
+                  {permission.type === 0 ? 'Owner' : 'User'}
+                </FactValue>
+                <Tooltip msg={msg} />
+              </FactValueRow>
+            </FactRow>
+            <FactRow>
+              <FactLabel>
+                {t('accounts:SingleAccount.PermissionsTab.Threshold')}
+              </FactLabel>
+              <FactValueRow>
+                <FactValue>{permission.Threshold}</FactValue>
+              </FactValueRow>
+            </FactRow>
+            <FactRow>
+              <FactLabel>
+                {t('accounts:SingleAccount.PermissionsTab.PermissionsName')}
+              </FactLabel>
+              <FactValueRow>
+                <FactValue>{permission.permissionName || '--'}</FactValue>
+              </FactValueRow>
+            </FactRow>
+            <OperationsWrap>
+              <ItemContainerPermissions isOperations={true}>
+                <strong>
+                  {t('accounts:SingleAccount.PermissionsTab.Operations')}
+                </strong>
+                <ItemContentPermissions rowColumnMobile={true}>
+                  <PermissionOperations {...permission} />
+                </ItemContentPermissions>
+              </ItemContainerPermissions>
+            </OperationsWrap>
+          </PermissionBlock>
+        ))}
+      </>
     );
   };
 
   const Overview: React.FC<PropsWithChildren> = () => {
     return (
-      <Container>
-        <Row isMobileRow>
-          <span>
-            <strong>{t('accounts:SingleAccount.Content.Address')}</strong>
-          </span>
-          <RowContent>
-            <AmountContainer>
-              <BalanceTransferContainer>
-                <CenteredRow>
-                  <span>
-                    {getAccountAddress(router.query.account as string)}
-                  </span>
-                  <Copy info="Address" data={router.query.account as string} />
-                  <ReceiveBackground>
-                    <QrCodeModal
-                      value={router.query.account as string}
-                      isOverflow={false}
-                    />
-                  </ReceiveBackground>
-                </CenteredRow>
-                <SetAccountNameButton />
-              </BalanceTransferContainer>
-            </AmountContainer>
-            {IsTokenBurn(router.query.account as string) && (
+      <>
+        <FactRow>
+          <FactLabel>{t('accounts:SingleAccount.Content.Address')}</FactLabel>
+          <FactValueRow>
+            <FittedHash value={accountAddress} />
+            <CopyAction
+              value={accountAddress}
+              label={t('accounts:Common.CopyAddress')}
+              announcement={t('accounts:Common.AddressCopied')}
+            />
+            <ReceiveBackground>
+              <QrCodeModal value={accountAddress} isOverflow={false} />
+            </ReceiveBackground>
+            <SetAccountNameButton />
+            {IsTokenBurn(accountAddress) && (
               <RowAlert>
                 <span>{t('accounts:SingleAccount.Void')}</span>
               </RowAlert>
             )}
-          </RowContent>
-        </Row>
-        <Row>
-          <span>
-            <strong>
-              {t('accounts:SingleAccount.Content.Balance.Balance')}
-            </strong>
-          </span>
-          <RowContent>
+          </FactValueRow>
+        </FactRow>
+        <GroupRow>
+          <StackedLabel>
+            {t('accounts:SingleAccount.Content.Balance.Balance')}
+          </StackedLabel>
+          <GroupBody>
             <BalanceContainer>
-              <AmountContainer>
-                {!isTablet && (
+              <FigureRow>
+                <AmountContainer>
                   <IconContainer>
                     <KLV />
                     <span>KLV</span>
                   </IconContainer>
-                )}
-                <BalanceTransferContainer>
-                  <div>
-                    <BalanceKLVValue>
-                      {!isLoadingAccount ? (
-                        <span data-testid="klv-balance">
-                          {toLocaleFixed(totalKLV, KLV_PRECISION)}
-                        </span>
-                      ) : (
-                        <Skeleton height={19} />
-                      )}
-                      {isTablet && (
-                        <IconContainer>
-                          <KLV />
-                          <span>KLV</span>
-                        </IconContainer>
-                      )}
-                    </BalanceKLVValue>
-                    <p>
-                      {!isLoadingAccount && !isLoadingPriceCall ? (
-                        <>USD {pricedKLV.toLocaleString()}</>
-                      ) : (
-                        <Skeleton height={16} />
-                      )}
-                    </p>
-                  </div>
-                  <TransferButton />
-                </BalanceTransferContainer>
-              </AmountContainer>
-              <FrozenContainer>
+                  <BalanceTransferContainer>
+                    <div>
+                      <BalanceKLVValue>
+                        {!isLoadingAccount ? (
+                          <span data-testid="klv-balance">
+                            {toLocaleFixed(totalKLV, KLV_PRECISION)}
+                          </span>
+                        ) : (
+                          <Skeleton height={19} />
+                        )}
+                      </BalanceKLVValue>
+                      <p>
+                        {!isLoadingAccount && !isLoadingPriceCall ? (
+                          <>USD {pricedKLV.toLocaleString()}</>
+                        ) : (
+                          <Skeleton height={16} />
+                        )}
+                      </p>
+                    </div>
+                    <TransferButton />
+                  </BalanceTransferContainer>
+                </AmountContainer>
+              </FigureRow>
+              <AccountBox>
                 <div>
                   <strong>
                     {t('accounts:SingleAccount.Content.Balance.Available')}
@@ -604,24 +574,22 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                     )}
                   </span>
                 </div>
-              </FrozenContainer>
+              </AccountBox>
             </BalanceContainer>
-          </RowContent>
-        </Row>
-        <Row>
-          <span>
-            <RewardsAvailableContainer>
-              <strong>
-                {t('accounts:SingleAccount.Content.RewardsAvailable.Rewards')}
-              </strong>
-              <strong>
-                {t('accounts:SingleAccount.Content.RewardsAvailable.Available')}
-              </strong>
-            </RewardsAvailableContainer>
-          </span>
-          <RowContent>
+          </GroupBody>
+        </GroupRow>
+        <GroupRow>
+          <StackedLabel>
+            <span>
+              {t('accounts:SingleAccount.Content.RewardsAvailable.Rewards')}
+            </span>
+            <span>
+              {t('accounts:SingleAccount.Content.RewardsAvailable.Available')}
+            </span>
+          </StackedLabel>
+          <GroupBody>
             <BalanceContainer>
-              <FrozenContainer>
+              <AccountBox>
                 <StakingRewards>
                   <strong>
                     {t(
@@ -697,71 +665,78 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
                     <Skeleton height={19} />
                   )}
                 </StakingRewards>
-              </FrozenContainer>
+              </AccountBox>
             </BalanceContainer>
-          </RowContent>
-        </Row>
-        <Row>
-          <span>
-            <strong>{t('accounts:SingleAccount.Content.Nonce')}</strong>
-          </span>
-          <RowContent>
-            <small>
+          </GroupBody>
+        </GroupRow>
+        <FactRow>
+          <FactLabel>{t('accounts:SingleAccount.Content.Nonce')}</FactLabel>
+          <FactValueRow>
+            <FactValue>
               {!isLoadingAccount ? account?.nonce : <Skeleton height={19} />}
-            </small>
-          </RowContent>
-        </Row>
-      </Container>
+            </FactValue>
+          </FactValueRow>
+        </FactRow>
+      </>
     );
   };
+
+  const showPermissionTab = hasPermissions || card === CARD_PERMISSION;
 
   return (
     <Container>
       <Header>
         <Title
           title={
-            account?.name ? account?.name : t('accounts:SingleAccount.Title')
+            account?.name ? account.name : t('accounts:SingleAccount.Title')
           }
-          Icon={AccountIcon}
-          route={-1}
-          isAccountOwner={!!account?.name}
+          route="/accounts"
         />
       </Header>
-      <CardTabContainer>
-        <CardHeader>
-          {tabHeaders.map((header, index) => (
-            <CardHeaderItem
-              key={String(index)}
-              selected={selectedTabHeader === header}
-              onClick={() => {
-                setSelectedTabHeader(header);
-              }}
-              data-testid={`header-tab`}
+      <FactsCard>
+        <FactsTabs aria-label={t('accounts:SingleAccount.Title')}>
+          <FactsTab
+            type="button"
+            $selected={card === CARD_OVERVIEW}
+            onClick={() => selectCard(CARD_OVERVIEW)}
+          >
+            {t('common:Tabs.Overview')}
+          </FactsTab>
+          {showPermissionTab && (
+            <FactsTab
+              type="button"
+              $selected={card === CARD_PERMISSION}
+              onClick={() => selectCard(CARD_PERMISSION)}
             >
-              <span>{header}</span>
-            </CardHeaderItem>
-          ))}
-        </CardHeader>
-        <CardContent>
-          <SelectedComponent />
-        </CardContent>
-      </CardTabContainer>
-      <Tabs {...tabProps}>
-        {router?.query?.tab === 'Transactions' && (
-          <TxsFiltersWrapper>
-            <ContainerFilter>
-              <RightFiltersContent>
-                <FilterDiv>
-                  <span>Transaction In/Out</span>
-                  {filters.map((filter, index) => (
-                    <Filter key={index} {...filter} />
-                  ))}
-                </FilterDiv>
-              </RightFiltersContent>
-            </ContainerFilter>
-          </TxsFiltersWrapper>
+              {t('accounts:SingleAccount.Tabs.Permission')}
+            </FactsTab>
+          )}
+        </FactsTabs>
+        {card === CARD_OVERVIEW && <Overview />}
+        {card === CARD_PERMISSION && permissionsKnown && <Permission />}
+      </FactsCard>
+      <Tabs {...tabProps} selectedIndex={tabIndex}>
+        {router.isReady &&
+          tabIndex >= 0 &&
+          router.query.tab === transactionsLabel && (
+            <TxsFiltersWrapper>
+              <ContainerFilter>
+                <RightFiltersContent>
+                  <FilterDiv>
+                    <span>Transaction In/Out</span>
+                    {filters.map((filter, index) => (
+                      <Filter key={index} {...filter} />
+                    ))}
+                  </FilterDiv>
+                </RightFiltersContent>
+              </ContainerFilter>
+            </TxsFiltersWrapper>
+          )}
+        {router.isReady && tabIndex >= 0 && (
+          <SelectedTabComponent
+            showInteractionButtons={showInteractionButtons}
+          />
         )}
-        <SelectedTabComponent showInteractionButtons={showInteractionButtons} />
       </Tabs>
     </Container>
   );

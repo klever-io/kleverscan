@@ -333,13 +333,20 @@ export const transactionRowSections = (
     t,
   }).split(' (')[0];
 
+  // The label follows the mobile card, which translates the same key with the
+  // same defaultValue, so the desktop column and the phone card cannot drift
+  // on it. A translator bound to another namespace still resolves an explicit
+  // `transactions:` prefix, and every page that reaches this builder loads
+  // that namespace. The literal stays for the header-string probe, which runs
+  // the builder outside any i18n context and hands it no translator at all.
+  const notApplicableLabel = t
+    ? t('transactions:Table.NotApplicable', { defaultValue: 'Not applicable' })
+    : 'Not applicable';
+
   const emptyCell = (
     <>
-      {/* English like every other literal this builder renders: t() is out
-          of reach here, the builder also runs for the header-string probe
-          outside any i18n context. */}
       <span aria-hidden="true">- -</span>
-      <VisuallyHidden>Not applicable</VisuallyHidden>
+      <VisuallyHidden>{notApplicableLabel}</VisuallyHidden>
     </>
   );
 

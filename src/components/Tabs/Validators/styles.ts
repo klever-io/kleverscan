@@ -33,8 +33,8 @@ export const ValidatorAddress = styled.span`
 export const ValidatorsTableWrapper = styled.div`
   ${dataListTableSkin}
 
-  /* Below the table breakpoint the full key is one flex item. Without a
-     bounded body it widens the card past the screen. */
+  /* Below the table breakpoint the key is one flex item. Without a
+     bounded body a key that is not shortened yet widens the card. */
   @media screen and (max-width: ${belowWidth(TABLET_PX)}) {
     ${TableBody} {
       min-width: 0;
@@ -69,8 +69,8 @@ export const ValidatorsTableWrapper = styled.div`
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
-    /* Names stay short. The key uses the rest of the row and wraps, so a
-       long key stays visible instead of ending in an ellipsis. */
+    /* Names stay short. The key uses the rest of the row and is shortened
+       in the middle to that width, on one line. */
     ${TableBody} {
       min-width: 0;
       width: 100%;
@@ -83,10 +83,9 @@ export const ValidatorsTableWrapper = styled.div`
       display: table-row;
     }
 
-    /* On a table cell, height is the minimum, so a wrapped key is not clipped. */
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};
-      overflow: visible;
+      overflow: hidden;
     }
 
     ${HeaderItem}:nth-child(1),
@@ -110,8 +109,8 @@ export const ValidatorsTableWrapper = styled.div`
     }
 
     /* The name stays one line. The shared cell makes every span a flex row
-       and pins it to 24px. Two classes beat that rule. The key does not
-       use this span: it wraps in its own component. */
+       and pins it to 24px. Two classes beat that rule. The key uses its own
+       component and stays on one line too. */
     ${MobileCardItem} ${ValidatorAddress} {
       display: block;
       flex: 1;
@@ -142,26 +141,25 @@ export const LeaderBadge = styled(BadgePill)`
   }
 `;
 
-const keyWrap = css`
+const keyLine = css`
   display: block;
   flex: 1;
   height: auto;
   min-width: 0;
-  overflow: visible;
+  overflow: hidden;
   text-overflow: clip;
-  white-space: normal;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 `;
 
 export const ValidatorKeyLink = styled(AddressLink)`
   && {
-    ${keyWrap}
+    ${keyLine}
   }
 `;
 
 export const ValidatorKeyText = styled.span`
   && {
-    ${keyWrap}
+    ${keyLine}
     font-family: 'Fira Mono', monospace;
     font-size: 0.875rem;
     color: ${props => props.theme.black};

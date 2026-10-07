@@ -101,12 +101,12 @@ describe('ValidatorsMobileCard', () => {
     expect(screen.queryByTestId('block-leader')).not.toBeInTheDocument();
   });
 
-  it('wraps a long unknown key and keeps the name on one line', () => {
+  it('keeps a long unknown key on one line', () => {
     const key = `aa${'b'.repeat(80)}`;
     draw({ blsKey: key });
     const keyNode = screen.getByText(key);
     const nameNode = screen.getByText('Unknown');
-    expect(getComputedStyle(keyNode).whiteSpace).toBe('normal');
+    expect(getComputedStyle(keyNode).whiteSpace).toBe('nowrap');
     expect(getComputedStyle(keyNode).textOverflow).toBe('clip');
     expect(getComputedStyle(nameNode).whiteSpace).toBe('nowrap');
     expect(keyNode).toHaveAttribute('title', key);

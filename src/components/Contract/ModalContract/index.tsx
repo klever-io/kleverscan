@@ -2,7 +2,6 @@ import AdvancedOptions from '@/components/Form/AdvancedOptions';
 import WarningModal from '@/components/Modals/Warning';
 import { useMulticontract } from '@/contexts/contract/multicontract';
 import { useContractModal } from '@/contexts/contractModal';
-import { useExtension } from '@/contexts/extension';
 import { warningMessage } from '@/pages/create-transaction';
 import { QueueItemContainer } from '@/views/create-transaction';
 import { PropsWithChildren, useEffect } from 'react';
@@ -22,7 +21,6 @@ const ModalContract: React.FC<PropsWithChildren<IModalContract>> = ({
   defaultValues,
   closeQuickAccessModal,
 }) => {
-  const { extensionInstalled, connectExtension } = useExtension();
   const {
     queue,
     selectedId,
@@ -33,12 +31,6 @@ const ModalContract: React.FC<PropsWithChildren<IModalContract>> = ({
   } = useMulticontract();
 
   const { setOpenModal } = useContractModal();
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   const closeModal = () => {
     setOpenModal(false);

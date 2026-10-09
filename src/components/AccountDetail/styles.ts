@@ -25,8 +25,11 @@ const FIGURE_LABEL = '11rem';
 const FIGURE_VALUE = '12rem';
 const FIGURE_GAP = '16px';
 
-/* Local to the account detail card. views/accounts/detail is also imported
-   by transaction pages, so this skin cannot live there. */
+/* Local copy of the block detail facts skin. The account card adds signer
+   rows, grouped balance boxes, and a wrapping value row, so the two pages
+   do not share one styled module. views/accounts/detail is also imported
+   by transaction pages, so this skin cannot live there either. The
+   reduced-motion rule below matches FactsTab on the block page. */
 
 export const FactsCard = styled.section`
   ${TableGradientBorder}
@@ -62,6 +65,17 @@ export const FactsTab = styled.button<{ $selected: boolean }>`
   font-weight: 600;
   color: ${props =>
     props.$selected ? props.theme.black : props.theme.darkText};
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.black};
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
   ${focusRing}
 `;
 

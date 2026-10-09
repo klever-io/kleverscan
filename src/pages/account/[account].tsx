@@ -7,8 +7,11 @@ import {
   CARD_PERMISSION,
   accountListHeaders,
   accountListTabIndex,
+  accountPermissionsKnown,
+  resolvedListTab,
   transactionDirectionLabel,
   visibleAccountCard,
+  withoutRole,
 } from '@/components/AccountDetail/state';
 import {
   AccountBox,
@@ -117,7 +120,11 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     queryFn: pricesCall,
   });
 
-  const { data: account, isLoading: isLoadingAccount } = useQuery({
+  const {
+    data: account,
+    isLoading: isLoadingAccount,
+    isFetched: accountFetched,
+  } = useQuery({
     queryKey: [`account`, router.query.account],
     queryFn: () => accountCall(router),
     enabled: !!router?.isReady,
@@ -206,7 +213,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     setUrlRead(true);
   }, [router.asPath]);
 
-  const permissionsKnown = !isLoadingAccount && account !== undefined;
+  const permissionsKnown = accountPermissionsKnown(accountFetched);
   const hasPermissions = (account?.permissions?.length || 0) > 0;
   const card = visibleAccountCard(
     cardQuery,
@@ -221,6 +228,16 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     urlRead,
     headersSettled,
   );
+  const activeTab = resolvedListTab(headers, tabIndex);
+
+  useEffect(() => {
+    if (!router.isReady) return;
+    const next = withoutRole(router.query);
+    if (!next) return;
+    router.replace({ pathname: router.pathname, query: next }, undefined, {
+      shallow: true,
+    });
+  }, [router, router.isReady, router.query.role]);
 
   useEffect(() => {
     if (extensionInstalled) {
@@ -264,8 +281,8 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const filterFromTo = (op: number) => {
     const address = router.query.account as string;
     const updatedQuery = { ...router.query };
+    delete updatedQuery.role;
     if (op === 0) {
-      delete updatedQuery.role;
       delete updatedQuery.fromAddress;
       delete updatedQuery.toAddress;
       setQueryAndRouter(
@@ -400,7 +417,10 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
       ])
     : Array.from({ length: 6 }, () => EmptyComponent);
 
-  const Permission: React.FC<PropsWithChildren> = () => {
+  // Render helpers, not components. A component declared here would be a
+  // new type on every refetch and would remount the card, closing the QR
+  // modal and resetting the copy button. These helpers must not call hooks.
+  const renderPermission = () => {
     const msg = `Owner - This is the default permission, 
     granting the holder the ability to execute all contracts.
     The permission can be transferred to another person and
@@ -416,7 +436,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
           <PermissionBlock key={permission.id}>
             <PermHeading>PermID {permission.id}</PermHeading>
             {permission.signers.map((signer, index) => (
-              <SignerRow key={signer.address}>
+              <SignerRow key={`${signer.address}-${index}`}>
                 <SignerLabel $show={index === 0}>
                   {index === 0
                     ? t('accounts:SingleAccount.PermissionsTab.Signers')
@@ -479,7 +499,7 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     );
   };
 
-  const Overview: React.FC<PropsWithChildren> = () => {
+  const renderOverview = () => {
     return (
       <>
         <FactRow>
@@ -712,29 +732,28 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
             </FactsTab>
           )}
         </FactsTabs>
-        {card === CARD_OVERVIEW && <Overview />}
-        {card === CARD_PERMISSION && permissionsKnown && <Permission />}
+        {card === CARD_OVERVIEW && renderOverview()}
+        {card === CARD_PERMISSION && permissionsKnown && renderPermission()}
       </FactsCard>
       <Tabs {...tabProps} selectedIndex={tabIndex}>
-        {router.isReady &&
-          tabIndex >= 0 &&
-          router.query.tab === transactionsLabel && (
-            <TxsFiltersWrapper>
-              <ContainerFilter>
-                <RightFiltersContent>
-                  <FilterDiv>
-                    <span>Transaction In/Out</span>
-                    {filters.map((filter, index) => (
-                      <Filter key={index} {...filter} />
-                    ))}
-                  </FilterDiv>
-                </RightFiltersContent>
-              </ContainerFilter>
-            </TxsFiltersWrapper>
-          )}
+        {router.isReady && tabIndex >= 0 && activeTab === transactionsLabel && (
+          <TxsFiltersWrapper>
+            <ContainerFilter>
+              <RightFiltersContent>
+                <FilterDiv>
+                  <span>Transaction In/Out</span>
+                  {filters.map((filter, index) => (
+                    <Filter key={index} {...filter} />
+                  ))}
+                </FilterDiv>
+              </RightFiltersContent>
+            </ContainerFilter>
+          </TxsFiltersWrapper>
+        )}
         {router.isReady && tabIndex >= 0 && (
           <SelectedTabComponent
             showInteractionButtons={showInteractionButtons}
+            tab={activeTab ?? undefined}
           />
         )}
       </Tabs>

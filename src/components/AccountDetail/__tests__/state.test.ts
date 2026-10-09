@@ -6,8 +6,11 @@ import {
   DIRECTION_OUT,
   accountListHeaders,
   accountListTabIndex,
+  accountPermissionsKnown,
+  resolvedListTab,
   transactionDirectionLabel,
   visibleAccountCard,
+  withoutRole,
 } from '@/components/AccountDetail/state';
 
 const headers = (proprietary: string | null, buckets: boolean) =>
@@ -82,6 +85,16 @@ describe('accountListTabIndex', () => {
     expect(accountListTabIndex(list, '', true, true)).toBe(0);
   });
 
+  it('shows the highlighted header when the URL names a tab the account does not have', () => {
+    const index = accountListTabIndex(list, 'Buckets', true, true);
+    expect(index).toBe(0);
+    expect(resolvedListTab(list, index)).toBe('Assets');
+  });
+
+  it('shows nothing while the URL has not been read', () => {
+    expect(resolvedListTab(list, -1)).toBeNull();
+  });
+
   it('highlights nothing when the account has no tabs', () => {
     expect(accountListTabIndex([], null, true, true)).toBe(-1);
     expect(accountListTabIndex([], 'Buckets', true, true)).toBe(-1);
@@ -137,5 +150,22 @@ describe('transactionDirectionLabel', () => {
     expect(
       transactionDirectionLabel({ fromAddress: address }, ''),
     ).toBe(DIRECTION_ALL);
+  });
+});
+
+describe('account query and the legacy role filter', () => {
+  it('counts a finished account call as known even when it returned nothing', () => {
+    expect(accountPermissionsKnown(true)).toBe(true);
+    expect(accountPermissionsKnown(false)).toBe(false);
+    expect(
+      visibleAccountCard(CARD_PERMISSION, true, accountPermissionsKnown(true), false),
+    ).toBe(CARD_OVERVIEW);
+  });
+
+  it('drops a legacy role and leaves the other filters', () => {
+    expect(
+      withoutRole({ role: 'sender', fromAddress: 'klv1example' }),
+    ).toEqual({ fromAddress: 'klv1example' });
+    expect(withoutRole({ fromAddress: 'klv1example' })).toBeNull();
   });
 });

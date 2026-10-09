@@ -20,8 +20,9 @@ export interface DirectionQuery {
   fromAddress?: string | string[];
   toAddress?: string | string[];
   /**
-   * The old label read this. The click handler never writes it, so the
-   * label ignores it on purpose.
+   * Legacy bookmark. The label does not read it. `withoutRole` drops it
+   * so the request cannot keep filtering while the label says every
+   * transaction.
    */
   role?: string | string[];
 }
@@ -95,4 +96,31 @@ export const transactionDirectionLabel = (
   if (one(query.fromAddress) === address) return DIRECTION_OUT;
   if (one(query.toAddress) === address) return DIRECTION_IN;
   return DIRECTION_ALL;
+};
+
+/**
+ * True once the account query has finished, including a call that caught
+ * an error and returned no account. While this is false, Permission stays
+ * selected so a refresh does not paint Overview and then jump.
+ */
+export const accountPermissionsKnown = (isFetched: boolean): boolean =>
+  isFetched;
+
+/** The header the highlight already chose. The table and the filter use it. */
+export const resolvedListTab = (
+  headers: string[],
+  tabIndex: number,
+): string | null => (tabIndex >= 0 ? (headers[tabIndex] ?? null) : null);
+
+/**
+ * A copy of the query without the legacy `role` key. Null when the query
+ * had no role, so the caller does not rewrite the address bar.
+ */
+export const withoutRole = <T extends { role?: unknown }>(
+  query: T,
+): Omit<T, 'role'> | null => {
+  if (query.role == null) return null;
+  const next = { ...query };
+  delete next.role;
+  return next;
 };

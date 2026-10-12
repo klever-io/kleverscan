@@ -21,5 +21,14 @@ export default tseslint.config({
   rules: {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'off',
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          "CallExpression[callee.name=/^(useEffect|useDidUpdateEffect)$/] CallExpression[callee.name='connectExtension']",
+        message:
+          'Do not call connectExtension() from an effect. That opens the wallet popup on mount. Connect from a click, or from the restore in ExtensionProvider.',
+      },
+    ],
   },
 });

@@ -1,5 +1,4 @@
 import { ExtensionProvider } from '@/contexts/extension';
-import fs from 'fs';
 import React, { act } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
@@ -7,24 +6,16 @@ import { createRoot, Root } from 'react-dom/client';
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
-/**
- * Pages used to call connect() as soon as the extension existed. connect()
- * opens the extension popup. These files are the ones that did that on mount.
- */
-const AUTO_CONNECT_FILES = [
-  'src/pages/account/[account].tsx',
-  'src/pages/create-transaction/index.tsx',
-  'src/components/Asset/AssetSummary/index.tsx',
-  'src/components/Asset/ITOTab.tsx',
-  'src/components/Contract/ModalContract/index.tsx',
-  'src/components/Wizard/index.tsx',
-  'src/components/MultsignComponent/MultSign/index.tsx',
-];
-
-const MOUNT_CONNECT =
-  /if\s*\(\s*extensionInstalled\s*\)\s*\{[^}]*connectExtension\s*\(/;
-
 const connect = jest.fn().mockResolvedValue(undefined);
+
+const router = {
+  isReady: true,
+  query: {} as Record<string, string | string[] | undefined>,
+};
+
+jest.mock('next/router', () => ({
+  useRouter: () => router,
+}));
 
 const klever = {
   wallet: null as unknown,
@@ -83,6 +74,8 @@ describe('wallet reconnect', () => {
   beforeEach(() => {
     resetKlever();
     window.localStorage.clear();
+    router.isReady = true;
+    router.query = {};
   });
 
   afterEach(() => {
@@ -184,12 +177,25 @@ describe('wallet reconnect', () => {
     }
   });
 
-  it('does not call connect on mount from the pages that used to do that', () => {
-    const offenders = AUTO_CONNECT_FILES.filter(file => {
-      const source = fs.readFileSync(file, 'utf8');
-      return MOUNT_CONNECT.test(source);
-    });
+  it('connects when the K5 deep link asks for it', () => {
+    router.query = { autoconnect: 'true' };
 
-    expect(offenders).toEqual([]);
+    mounted.push(mount());
+
+    expect(connect).toHaveBeenCalledTimes(1);
+  });
+
+  it('waits to read the deep link until the router is ready', () => {
+    router.isReady = false;
+    router.query = { autoconnect: 'true' };
+
+    const view = mount();
+    mounted.push(view);
+    expect(connect).not.toHaveBeenCalled();
+
+    router.isReady = true;
+    view.rerender();
+
+    expect(connect).toHaveBeenCalledTimes(1);
   });
 });

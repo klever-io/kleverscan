@@ -25,7 +25,7 @@ export default tseslint.config({
       'error',
       {
         selector:
-          "CallExpression[callee.name=/^(useEffect|useDidUpdateEffect)$/] CallExpression[callee.name='connectExtension']",
+          ":matches(CallExpression[callee.name=/^(useEffect|useDidUpdateEffect)$/], CallExpression[callee.property.name=/^(useEffect|useDidUpdateEffect)$/]) CallExpression[callee.name='connectExtension']",
         message:
           'Do not call connectExtension() from an effect. That opens the wallet popup on mount. Connect from a click, or from the restore in ExtensionProvider.',
       },

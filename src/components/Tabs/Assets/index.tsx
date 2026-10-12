@@ -1,3 +1,4 @@
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
 import Filter, { IFilter } from '@/components/Filter';
 import Table, { ITable } from '@/components/Table';
 import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
@@ -17,6 +18,7 @@ import {
   ActionsDropdownContainer,
   ActionsDropdownButton,
   ActionsDropdownMenu,
+  AssetsTableWrapper,
   DropdownItem,
   DropdownIcon,
 } from './styles';
@@ -330,9 +332,15 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
     showLimit: false,
     header,
     Filters: FiltersComponent,
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [4, 5, 6],
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <AssetsTableWrapper>
+      <Table {...tableProps} cardBreakpoint={ROW_LAYOUT_MIN_WIDTH} />
+    </AssetsTableWrapper>
+  );
 };
 
 export default Assets;

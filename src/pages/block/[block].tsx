@@ -1,43 +1,65 @@
 import { PropsWithChildren } from 'react';
-import Copy from '@/components/Copy';
+import CopyAction from '@/components/DataList/CopyAction';
+import {
+  BlockStep,
+  FactHash,
+  FactLabel,
+  FactRow,
+  FactsCard,
+  FactsTab,
+  FactsTabs,
+  FactValue,
+  FactValueRow,
+} from '@/components/BlockDetail/styles';
+import { pickUrlEffect } from '@/components/BlockDetail/urlEffect';
 import Title from '@/components/Layout/Title';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Transactions from '@/components/Tabs/Transactions';
 import Validators from '@/components/Tabs/Validators';
-import Tooltip from '@/components/Tooltip';
 import api from '@/services/api';
-import {
-  CardContent,
-  CardHeader,
-  CardHeaderItem,
-  CardTabContainer,
-  CenteredRow,
-  Container,
-  Header,
-  Row,
-} from '@/styles/common';
+import { Container, Header } from '@/styles/common';
 import { IBlock, IBlockPage, IBlockResponse } from '@/types/blocks';
 import { setQueryAndRouter } from '@/utils';
-import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
+import { formatDateWithSeconds, toLocaleFixed } from '@/utils/formatFunctions';
 import { blockTransactionsCall } from '@/services/requests/block';
-import {
-  CenteredRowSpan,
-  CommonSpan,
-  RowBlockNavigation,
-  ToolTipStyle,
-  TooltipContainer,
-} from '@/views/blocks/detail';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import nextI18nextConfig from '../../../next-i18next.config';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   MdOutlineKeyboardArrowLeft,
   MdOutlineKeyboardArrowRight,
 } from 'react-icons/md';
 import { ITransactionsResponse, NotFound } from '../../types';
+
+const HashFact: React.FC<{
+  label: string;
+  value: string;
+  copyLabel: string;
+  announcement: string;
+}> = ({ label, value, copyLabel, announcement }) => (
+  <FactRow>
+    <FactLabel>{label}</FactLabel>
+    <FactValueRow>
+      <FactHash title={value}>{value}</FactHash>
+      <CopyAction value={value} label={copyLabel} announcement={announcement} />
+    </FactValueRow>
+  </FactRow>
+);
+
+const TextFact: React.FC<{ label: string; value: string }> = ({
+  label,
+  value,
+}) => (
+  <FactRow>
+    <FactLabel>{label}</FactLabel>
+    <FactValue>{value}</FactValue>
+  </FactRow>
+);
+
+const CARD_HEADERS = ['Overview', 'Info'];
+const TABLE_HEADERS = ['Transactions', 'Validators'];
 
 const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
   const {
@@ -56,17 +78,18 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
     trieRoot,
     validatorsTrieRoot,
     validators,
+    producerOwnerAddress,
     kappsTrieRoot,
     prevRandSeed,
     randSeed,
   } = block;
   const router = useRouter();
-  const cardHeaders = ['Overview', 'Info'];
-  const tableHeaders = ['Transactions', 'Validators'];
   const precision = 6; // default KLV precision
 
-  const [selectedCard, setSelectedCard] = useState(cardHeaders[0]);
-  const [selectedTab, setSelectedTab] = useState(tableHeaders[0]);
+  // Null until the URL is read. The server does not see ?tab= or ?card=, so
+  // starting on Overview and Transactions painted those and then jumped.
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string | null>(null);
 
   const requestBlock = async (
     page: number,
@@ -74,230 +97,33 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
   ): Promise<ITransactionsResponse> =>
     blockTransactionsCall(nonce, page, limit, router.query);
 
-  useEffect(() => {
-    if (!router.isReady) return;
-    setSelectedTab((router.query.tab as string) || tableHeaders[0]);
-    setSelectedCard((router.query.card as string) || cardHeaders[0]);
-    setQueryAndRouter({ ...router.query }, router);
-    // Also keyed on the block: prev/next keeps the page mounted now, and the
-    // shared Tabs highlight resets on the query change while this state did
-    // not, splitting the highlight from the rendered content.
-  }, [router.isReady, router.query.block]);
-
-  const BlockNavigation: React.FC<PropsWithChildren> = () => {
-    return (
-      <TooltipContainer>
-        <Link href={`/block/${nonce - 1}`}>
-          <ToolTipStyle>
-            <Tooltip
-              msg="View previous block"
-              Component={MdOutlineKeyboardArrowLeft}
-            />
-          </ToolTipStyle>
-        </Link>
-        <Link href={`/block/${nonce + 1}`}>
-          <ToolTipStyle>
-            <Tooltip
-              msg="View next block"
-              Component={MdOutlineKeyboardArrowRight}
-            />
-          </ToolTipStyle>
-        </Link>
-      </TooltipContainer>
+  // Before paint, and again when prev/next changes the URL. router.query is
+  // empty on the first render, so the address bar is the source.
+  const useUrlLayoutEffect = pickUrlEffect(globalThis.window);
+  useUrlLayoutEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    const card = params.get('card');
+    setSelectedTab(tab && TABLE_HEADERS.includes(tab) ? tab : TABLE_HEADERS[0]);
+    setSelectedCard(
+      card && CARD_HEADERS.includes(card) ? card : CARD_HEADERS[0],
     );
-  };
+  }, [router.asPath]);
 
-  const Overview: React.FC<PropsWithChildren> = () => {
-    return (
-      <>
-        <Row>
-          <CommonSpan>
-            <strong>Block</strong>
-          </CommonSpan>
-          <RowBlockNavigation>
-            #{nonce}
-            <BlockNavigation />
-          </RowBlockNavigation>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Hash</strong>
-          </CommonSpan>
-          <CenteredRow>
-            <CenteredRowSpan>{hash}</CenteredRowSpan>
-            <Copy info="Hash" data={hash} />
-          </CenteredRow>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Timestamp</strong>
-          </CommonSpan>
-          <CommonSpan>
-            <small>{formatDate(timestamp)}</small>
-          </CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Epoch</strong>
-          </CommonSpan>
-          <CommonSpan>
-            <small>{epoch}</small>
-          </CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Block Size</strong>
-          </CommonSpan>
-          <CommonSpan>{size} Bytes</CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>KApp Fee</strong>
-          </CommonSpan>
-          <CommonSpan>
-            <small>
-              {toLocaleFixed((kAppFees || 0) / 10 ** precision, precision)}
-            </small>
-          </CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Burned Fee</strong>
-          </CommonSpan>
-          <CommonSpan>
-            <small>
-              {toLocaleFixed((txBurnedFees || 0) / 10 ** precision, precision)}
-            </small>
-          </CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Bandwidth Fee</strong>
-          </CommonSpan>
-          <CommonSpan>
-            <small>
-              {toLocaleFixed((txFees || 0) / 10 ** precision, precision)}
-            </small>
-          </CommonSpan>
-        </Row>
-      </>
-    );
-  };
-
-  const Info: React.FC<PropsWithChildren> = () => {
-    return (
-      <>
-        <Row>
-          <CommonSpan>
-            <strong>Software Version</strong>
-          </CommonSpan>
-          <CommonSpan>{softwareVersion}</CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Chain ID</strong>
-          </CommonSpan>
-          <CommonSpan>
-            <small>{chainID}</small>
-          </CommonSpan>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Producer Signature</strong>
-          </CommonSpan>
-
-          <CenteredRow>
-            <CenteredRowSpan>{producerSignature}</CenteredRowSpan>
-            <Copy info="Signature" data={producerSignature} />
-          </CenteredRow>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Parent Hash</strong>
-          </CommonSpan>
-          <CenteredRow>
-            <CenteredRowSpan>{parentHash}</CenteredRowSpan>
-            <Copy info="Parent hash" data={parentHash} />
-          </CenteredRow>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Trie Root</strong>
-          </CommonSpan>
-          <CenteredRow>
-            <CenteredRowSpan>{trieRoot}</CenteredRowSpan>
-            <Copy info="Trie root" data={trieRoot} />
-          </CenteredRow>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Validators Trie Root</strong>
-          </CommonSpan>
-          <CenteredRow>
-            <CenteredRowSpan>{validatorsTrieRoot}</CenteredRowSpan>
-            <Copy data={validatorsTrieRoot} />
-          </CenteredRow>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>KApps Trie Root</strong>
-          </CommonSpan>
-          <CenteredRow>
-            <CenteredRowSpan>{kappsTrieRoot}</CenteredRowSpan>
-            <Copy data={kappsTrieRoot} />
-          </CenteredRow>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Previous Random Seed</strong>
-          </CommonSpan>
-          <CenteredRow>
-            <CenteredRowSpan>{prevRandSeed}</CenteredRowSpan>
-            <Copy data={prevRandSeed} />
-          </CenteredRow>
-        </Row>
-        <Row>
-          <CommonSpan>
-            <strong>Random Seed</strong>
-          </CommonSpan>
-          <CenteredRow>
-            <CenteredRowSpan>{randSeed}</CenteredRowSpan>
-            <Copy info="Random seed" data={randSeed} />
-          </CenteredRow>
-        </Row>
-      </>
-    );
-  };
-
-  const SelectedComponent: React.FC<PropsWithChildren> = () => {
-    switch (selectedCard) {
-      case 'Overview':
-        return <Overview />;
-      case 'Info':
-        return <Info />;
-      default:
-        return <div />;
-    }
-  };
+  // `||` keeps a NaN fee at 0, which is what the three old call sites did.
+  // `??` would hand NaN to the formatter.
+  const klv = (raw: number | undefined): string =>
+    toLocaleFixed((raw || 0) / 10 ** precision, precision);
 
   const transactionTableProps = {
     dataName: 'transactions',
     request: (page: number, limit: number) => requestBlock(page, limit),
   };
 
-  const SelectedTabComponent: React.FC<PropsWithChildren> = () => {
-    switch (selectedTab) {
-      case 'Transactions':
-        return <Transactions transactionsTableProps={transactionTableProps} />;
-      case 'Validators':
-        return <Validators validators={validators} />;
-      default:
-        return <div />;
-    }
-  };
-
   const tabProps: ITabs = {
-    headers: tableHeaders,
+    headers: TABLE_HEADERS,
+    selectedIndex:
+      selectedTab === null ? -1 : TABLE_HEADERS.indexOf(selectedTab),
     onClick: header => {
       setSelectedTab(header);
       const updatedQuery = { ...router.query };
@@ -313,29 +139,125 @@ const Block: React.FC<PropsWithChildren<IBlockPage>> = ({ block }) => {
         <Title title="Block Details" route="/blocks" />
       </Header>
 
-      <CardTabContainer>
-        <CardHeader>
-          {cardHeaders.map((header, index) => (
-            <CardHeaderItem
-              key={String(index)}
-              selected={selectedCard === header}
+      <FactsCard>
+        <FactsTabs aria-label="Block details">
+          {CARD_HEADERS.map(header => (
+            <FactsTab
+              key={header}
+              type="button"
+              $selected={selectedCard === header}
               onClick={() => {
                 setSelectedCard(header);
                 setQueryAndRouter({ ...router.query, card: header }, router);
               }}
             >
-              <span>{header}</span>
-            </CardHeaderItem>
+              {header}
+            </FactsTab>
           ))}
-        </CardHeader>
+        </FactsTabs>
 
-        <CardContent>
-          <SelectedComponent />
-        </CardContent>
-      </CardTabContainer>
+        {selectedCard === 'Info' && (
+          <>
+            <TextFact label="Software Version" value={softwareVersion} />
+            <TextFact label="Chain ID" value={chainID} />
+            <HashFact
+              label="Producer Signature"
+              value={producerSignature}
+              copyLabel="Copy signature"
+              announcement="Signature copied to clipboard"
+            />
+            <HashFact
+              label="Parent Hash"
+              value={parentHash}
+              copyLabel="Copy parent hash"
+              announcement="Parent hash copied to clipboard"
+            />
+            <HashFact
+              label="Trie Root"
+              value={trieRoot}
+              copyLabel="Copy trie root"
+              announcement="Trie root copied to clipboard"
+            />
+            <HashFact
+              label="Validators Trie Root"
+              value={validatorsTrieRoot}
+              copyLabel="Copy validators trie root"
+              announcement="Validators trie root copied to clipboard"
+            />
+            <HashFact
+              label="KApps Trie Root"
+              value={kappsTrieRoot}
+              copyLabel="Copy KApps trie root"
+              announcement="KApps trie root copied to clipboard"
+            />
+            <HashFact
+              label="Previous Random Seed"
+              value={prevRandSeed}
+              copyLabel="Copy previous random seed"
+              announcement="Previous random seed copied to clipboard"
+            />
+            <HashFact
+              label="Random Seed"
+              value={randSeed}
+              copyLabel="Copy random seed"
+              announcement="Random seed copied to clipboard"
+            />
+          </>
+        )}
+        {selectedCard === 'Overview' && (
+          <>
+            <FactRow>
+              <FactLabel>Block</FactLabel>
+              <FactValueRow>
+                <FactValue>#{nonce}</FactValue>
+                <BlockStep
+                  href={`/block/${nonce - 1}`}
+                  aria-label="View previous block"
+                  title="View previous block"
+                >
+                  <MdOutlineKeyboardArrowLeft size={18} />
+                </BlockStep>
+                <BlockStep
+                  href={`/block/${nonce + 1}`}
+                  aria-label="View next block"
+                  title="View next block"
+                >
+                  <MdOutlineKeyboardArrowRight size={18} />
+                </BlockStep>
+              </FactValueRow>
+            </FactRow>
+            <HashFact
+              label="Hash"
+              value={hash}
+              copyLabel="Copy hash"
+              announcement="Hash copied to clipboard"
+            />
+            <TextFact
+              label="Timestamp"
+              value={formatDateWithSeconds(timestamp)}
+            />
+            <TextFact label="Epoch" value={String(epoch)} />
+            <TextFact label="Block Size" value={`${size} Bytes`} />
+            <TextFact label="KApp Fee" value={klv(kAppFees)} />
+            <TextFact label="Burned Fee" value={klv(txBurnedFees)} />
+            <TextFact label="Bandwidth Fee" value={klv(txFees)} />
+          </>
+        )}
+      </FactsCard>
 
       <Tabs {...tabProps}>
-        <SelectedTabComponent />
+        {/* The highlight comes from the address bar, before paint. The table
+            itself waits until the router has copied page and limit, or a
+            refresh of page 2 paints page 1 and then jumps. */}
+        {router.isReady && selectedTab === 'Transactions' && (
+          <Transactions transactionsTableProps={transactionTableProps} />
+        )}
+        {router.isReady && selectedTab === 'Validators' && (
+          <Validators
+            validators={validators}
+            producerOwnerAddress={producerOwnerAddress}
+          />
+        )}
       </Tabs>
     </Container>
   );

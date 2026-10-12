@@ -1,15 +1,18 @@
 import { getStatusIcon } from '@/assets/status';
-import { TransactionDetails as Icon } from '@/assets/title-icons';
+import ContractsList from '@/components/TransactionDetails/ContractsList';
+import OverviewDetails from '@/components/TransactionDetails/OverviewDetails';
+import Overview from '@/components/TransactionDetail/Overview';
+import {
+  ContractsBody,
+  FactsCard,
+  RawBody,
+  SectionBar,
+  SectionLabel,
+} from '@/components/TransactionDetail/styles';
 import Title from '@/components/Layout/Title';
 import { useTheme } from '@/contexts/theme/index';
 import api from '@/services/api';
-import {
-  CardContent,
-  CardHeader,
-  CardHeaderItem,
-  Container,
-  Header,
-} from '@/styles/common';
+import { Container, Header } from '@/styles/common';
 import {
   IKdaFee,
   ITransactionPage,
@@ -19,15 +22,12 @@ import {
 } from '@/types';
 import { IBlock, IBlockResponse } from '@/types/blocks';
 import { getPrecision } from '@/utils/precisionFunctions';
-import { CardContainer, CardRaw } from '@/views/transactions/detail';
-import KappFee from '@/components/TransactionDetails/KappFee';
-import ContractsList from '@/components/TransactionDetails/ContractsList';
 import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import OverviewDetails from '@/components/TransactionDetails/OverviewDetails';
+
 export { OverviewDetails };
 
 interface IRawTxTheme {
@@ -155,27 +155,19 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   return (
     <Container>
       <Header>
-        <Title
-          title="Transaction Details"
-          Icon={Icon}
-          route={'/transactions'}
-        />
+        <Title title="Transaction Details" route="/transactions" />
       </Header>
-      <CardContainer>
-        <CardHeader>
-          <CardHeaderItem selected={true}>
-            <span>Overview</span>
-          </CardHeaderItem>
-        </CardHeader>
-        <OverviewDetails {...overviewProps} />
-      </CardContainer>
-      <CardContainer>
-        <CardHeader>
-          <CardHeaderItem selected={true}>
-            <span>Contracts</span>
-          </CardHeaderItem>
-        </CardHeader>
-        <CardContent>
+      <FactsCard aria-label="Overview" data-testid="transaction-overview">
+        <SectionBar>
+          <SectionLabel>Overview</SectionLabel>
+        </SectionBar>
+        <Overview {...overviewProps} />
+      </FactsCard>
+      <FactsCard aria-label="Contracts" data-testid="transaction-contracts">
+        <SectionBar>
+          <SectionLabel>Contracts</SectionLabel>
+        </SectionBar>
+        <ContractsBody>
           <ContractsList
             contracts={contract}
             receipts={receipts}
@@ -183,27 +175,23 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
             data={data}
             logs={transaction?.logs}
           />
-        </CardContent>
-      </CardContainer>
-      <CardContainer>
-        <CardHeader>
-          <CardHeaderItem selected={true}>
-            <span>Raw Tx</span>
-          </CardHeaderItem>
-        </CardHeader>
-        <CardContent>
-          <CardRaw>
-            <ReactJson
-              src={transaction}
-              name={false}
-              displayObjectSize={false}
-              enableClipboard={true}
-              displayDataTypes={false}
-              theme={getRawTxTheme(isDarkTheme)}
-            />
-          </CardRaw>
-        </CardContent>
-      </CardContainer>
+        </ContractsBody>
+      </FactsCard>
+      <FactsCard aria-label="Raw transaction" data-testid="transaction-raw">
+        <SectionBar>
+          <SectionLabel>Raw Tx</SectionLabel>
+        </SectionBar>
+        <RawBody>
+          <ReactJson
+            src={transaction}
+            name={false}
+            displayObjectSize={false}
+            enableClipboard={true}
+            displayDataTypes={false}
+            theme={getRawTxTheme(isDarkTheme)}
+          />
+        </RawBody>
+      </FactsCard>
     </Container>
   );
 };

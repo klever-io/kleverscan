@@ -202,6 +202,9 @@ export const requestTransactionsDefault = async (
   };
   router.query.account && (localQuery['address'] = router.query.account);
   delete localQuery.account;
+  // The account page label does not read role. A leftover role still
+  // filtered this request while the label said every transaction.
+  delete localQuery.role;
 
   const transactionsResponse = await api.get({
     route: `transaction/list`,

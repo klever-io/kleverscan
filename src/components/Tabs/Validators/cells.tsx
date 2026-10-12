@@ -1,7 +1,7 @@
 import CopyAction from '@/components/DataList/CopyAction';
+import { useMiddleFit } from '@/components/FittedText/useMiddleFit';
 import { parseAddress } from '@/utils/parseValues';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { middleFit } from './fitKey';
+import React from 'react';
 import { IBlockValidatorRow } from './row';
 import {
   LeaderBadge,
@@ -13,50 +13,11 @@ import {
   ValidatorNameLink,
 } from './styles';
 
-const useIsoLayoutEffect =
-  typeof window === 'undefined' ? useEffect : useLayoutEffect;
-
 const FittedKey: React.FC<{ value: string; href?: string }> = ({
   value,
   href,
 }) => {
-  const ref = useRef<HTMLElement | null>(null);
-  const [shown, setShown] = useState(value);
-
-  useIsoLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return undefined;
-
-    let cancelled = false;
-    const fit = () => {
-      if (cancelled) return;
-      const next = middleFit(value, el.clientWidth, text => {
-        const previous = el.textContent;
-        el.textContent = text;
-        const width = el.scrollWidth;
-        el.textContent = previous;
-        return width;
-      });
-      setShown(current => (current === next ? current : next));
-    };
-
-    fit();
-    const fonts = document.fonts;
-    if (fonts) {
-      fonts.ready.then(fit).catch(() => undefined);
-    }
-    if (typeof ResizeObserver === 'undefined') {
-      return () => {
-        cancelled = true;
-      };
-    }
-    const observer = new ResizeObserver(fit);
-    observer.observe(el);
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
-  }, [value]);
+  const { ref, shown } = useMiddleFit<HTMLElement>(value);
 
   if (href) {
     return (

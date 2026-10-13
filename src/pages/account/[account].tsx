@@ -108,8 +108,7 @@ export interface IAllowanceResponse extends IResponse {
 
 const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const { t } = useTranslation(['common', 'accounts']);
-  const { walletAddress, extensionInstalled, connectExtension } =
-    useExtension();
+  const { walletAddress } = useExtension();
   const { paramsList } = useNetworkParams();
   const router = useRouter();
 
@@ -238,12 +237,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
       shallow: true,
     });
   }, [router, router.isReady, router.query.role]);
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   const calculateTotalKLV = useCallback(() => {
     // does not include Allowance and Staking

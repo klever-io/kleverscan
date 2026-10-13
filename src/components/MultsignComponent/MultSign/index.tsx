@@ -8,7 +8,6 @@ import {
   requestMultisign,
 } from '@/services/requests/multisign';
 import { ITransaction as ITransactionDecoded } from '@/types/index';
-import { useDidUpdateEffect } from '@/utils/hooks';
 import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -54,16 +53,9 @@ const MultisignComponent: React.FC<{
   const [signBcastTransaction, setSignBcastTransaction] = useState(false);
   const [draggingOverlayCount, setDragginOverlayCount] = useState(0);
 
-  const { extensionInstalled, connectExtension, walletAddress } =
-    useExtension();
+  const { walletAddress } = useExtension();
 
   const { isDarkTheme } = useTheme();
-
-  useDidUpdateEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   const {
     data: multiSignData,

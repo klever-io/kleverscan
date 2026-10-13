@@ -11,7 +11,7 @@ import DOMPurify from 'dompurify';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/legacy/image';
 import { useRouter } from 'next/router';
-import { PropsWithChildren, useCallback, useEffect } from 'react';
+import { PropsWithChildren, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { TbPencilMinus } from 'react-icons/tb';
 import { useQuery } from '@tanstack/react-query';
@@ -61,8 +61,7 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
   } = useParticipate();
   const { isTablet, isMobile } = useMobile();
   const router = useRouter();
-  const { walletAddress, connectExtension, extensionInstalled } =
-    useExtension();
+  const { walletAddress } = useExtension();
 
   const { t } = useTranslation(['common', 'assets', 'table']);
 
@@ -91,12 +90,6 @@ export const AssetSummary: React.FC<PropsWithChildren<AssetSummaryProps>> = ({
 
     return matchingSocials;
   }, [asset]);
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   const { data: asset_info, refetch: refetchAssetInfo } = useQuery({
     queryKey: [`assetInfo`, router.query.asset],

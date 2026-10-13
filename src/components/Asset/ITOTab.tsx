@@ -2,7 +2,6 @@ import { PropsWithChildren } from 'react';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
 import { displayITOpacks } from '@/components/ITO';
-import { useExtension } from '@/contexts/extension';
 import { IParsedITO } from '@/types';
 import { formatDate, toLocaleFixed } from '@/utils/formatFunctions';
 import {
@@ -18,7 +17,7 @@ import { ButtonExpand } from '@/views/transactions/detail';
 import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { HashComponent } from '../Contract';
 
 export interface ITOTabProps {
@@ -26,17 +25,11 @@ export interface ITOTabProps {
 }
 
 export const ITOTab: React.FC<PropsWithChildren<ITOTabProps>> = ({ ITO }) => {
-  const { extensionInstalled, connectExtension } = useExtension();
   const { t } = useTranslation('itos');
   const router = useRouter();
   const [expand, setExpand] = useState({ whitelist: false, packs: false });
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
   return (
     <>
       {ITO && ITO.isActive ? (

@@ -190,7 +190,7 @@ export const proposalsMap: IProposalsMap = {
   },
   GasMultiplier: {
     message: 'Gas Multiplier',
-    precision: KLV_PRECISION,
+    precision: 0,
     unit: 'X',
   },
   MaxGasPerBlock: {

@@ -30,6 +30,7 @@ const BlocksMobileCard: React.FC<IBlocksMobileCardProps> = ({
   index,
 }) => {
   const { t } = useTranslation(['blocks']);
+  const { t: commonT } = useTranslation('common');
   const label = (key: BlockColumnKey): string => {
     const column = BLOCK_COLUMNS.find(c => c.key === key);
     return column ? t(column.i18nKey, { defaultValue: column.header }) : key;
@@ -49,9 +50,10 @@ const BlocksMobileCard: React.FC<IBlocksMobileCardProps> = ({
     blockRewards,
   } = item;
 
-  const elapsed = formatDate(timestamp, { showElapsedTime: true }).split(
-    ' (',
-  )[0];
+  const elapsed = formatDate(timestamp, {
+    showElapsedTime: true,
+    t: commonT,
+  }).split(' (')[0];
 
   return (
     <MobileListCard data-testid={`table-row-${index}`}>

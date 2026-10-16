@@ -9,7 +9,7 @@ import {
   ProgressBarVotes,
 } from '@/views/proposals/detail';
 import Tooltip from '@/components/Tooltip';
-import { OverviewDetails } from '@/pages/transaction/[hash]';
+import OverviewDetails from '@/components/TransactionDetails/OverviewDetails';
 
 interface IMultisignOverview {
   multiSignData: IMultisignData;

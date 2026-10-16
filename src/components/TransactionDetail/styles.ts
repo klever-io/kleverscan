@@ -15,8 +15,8 @@ import styled from 'styled-components';
 
 /* Local to the transaction detail page. views/transactions/detail is also
    imported by the multisign page, asset pages, and the contract rows, so
-   this skin cannot live there. The account and block cards keep their own
-   copy for the same reason. */
+   this skin cannot live there. The account and block cards are 0.875rem.
+   This card is 1rem, so the three skins stay separate. */
 
 export const FactsCard = styled.section`
   ${TableGradientBorder}
@@ -119,25 +119,17 @@ export const FactValueRow = styled.div`
     flex-shrink: 0;
   }
 
+  /* From uses the shared link, which does not set its own size. */
+  a {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
   ${Status} span {
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.4;
-  }
-`;
-
-/* The contract "To" address uses the same fitted link and copy button as
-   the overview "From" row. A div, because the shared row clips anything
-   inside a span. */
-export const ContractAddress = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  flex: 1;
-
-  button {
-    flex-shrink: 0;
   }
 `;
 
@@ -163,7 +155,7 @@ export const FactWrap = styled.span`
 `;
 
 export const FactHash = styled.span`
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -176,7 +168,7 @@ export const FactHash = styled.span`
 `;
 
 export const FactHashLink = styled(Link)`
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -267,6 +259,12 @@ export const TokenSlot = styled.div`
     }
   }
 
+  /* This row is the only child, so the shared :not(:last-child) line never
+     paints, and that line is lightGray in the light theme. */
+  && ${Row} {
+    border-bottom: 1px solid ${props => props.theme.black10};
+  }
+
   ${RowContent} {
     min-width: 0;
     flex: 1;
@@ -287,6 +285,13 @@ export const TokenSlot = styled.div`
 export const ContractsBody = styled.div`
   min-width: 0;
   max-width: 100%;
+
+  /* The line under the Contracts label is black10. The shared row uses
+     lightGray in the light theme, so the lines between fields did not match. */
+  ${Row}:not(:last-child),
+  ${DetailRow}:not(:last-child) {
+    border-bottom-color: ${props => props.theme.black10};
+  }
 
   ${Row}, ${DetailRow} {
     box-sizing: border-box;
@@ -318,6 +323,14 @@ export const ContractsBody = styled.div`
     > :not(:first-child) {
       min-width: 0;
       max-width: 100%;
+    }
+
+    /* The value span was only as wide as its text, so a shorter address
+       made the next measurement smaller too. It takes the free column. */
+    > span:not(:first-child) {
+      flex: 1 1 auto;
+      width: auto;
+      min-width: 0;
     }
   }
 

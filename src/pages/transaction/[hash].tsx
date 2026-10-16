@@ -1,6 +1,5 @@
 import { getStatusIcon } from '@/assets/status';
 import ContractsList from '@/components/TransactionDetails/ContractsList';
-import OverviewDetails from '@/components/TransactionDetails/OverviewDetails';
 import Overview from '@/components/TransactionDetail/Overview';
 import {
   ContractsBody,
@@ -14,21 +13,18 @@ import { useTheme } from '@/contexts/theme/index';
 import api from '@/services/api';
 import { Container, Header } from '@/styles/common';
 import {
-  IKdaFee,
   ITransactionPage,
   ITransactionResponse,
   NotFound,
   Service,
 } from '@/types';
-import { IBlock, IBlockResponse } from '@/types/blocks';
+import { IBlockResponse } from '@/types/blocks';
 import { getPrecision } from '@/utils/precisionFunctions';
 import { GetServerSideProps } from 'next';
 import dynamic from 'next/dynamic';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import nextI18nextConfig from '../../../next-i18next.config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-
-export { OverviewDetails };
 
 interface IRawTxTheme {
   base00: string;
@@ -47,26 +43,6 @@ interface IRawTxTheme {
   base0D: string;
   base0E: string;
   base0F: string;
-}
-
-export interface IOverviewDetails {
-  hash: string | undefined;
-  StatusIcon?: any;
-  status?: string;
-  resultCode?: string;
-  block?: IBlock;
-  blockNum?: number;
-  nonce: number | undefined;
-  sender: string | undefined;
-  KappFeeRow?: React.FC<PropsWithChildren>;
-  bandwidthFee: number | undefined;
-  kdaFee?: IKdaFee | undefined;
-  precisionTransaction?: number | undefined;
-  timestamp?: number;
-  signature: string | string[] | undefined;
-  ThresholdComponent?: React.FC<PropsWithChildren>;
-  loading?: boolean;
-  MultiSignList?: React.FC<PropsWithChildren>;
 }
 
 export const getRawTxTheme = (isDarkTheme = false): IRawTxTheme => {
@@ -90,6 +66,13 @@ export const getRawTxTheme = (isDarkTheme = false): IRawTxTheme => {
   };
 };
 
+// One component type for the life of the page. Calling dynamic() inside the
+// component built a new type on every render and remounted the tree.
+const ReactJson = dynamic(
+  () => import('@microlink/react-json-view').then(mod => mod.default),
+  { ssr: false },
+);
+
 const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   const { transaction, block } = props;
   const {
@@ -111,10 +94,6 @@ const Transaction: React.FC<PropsWithChildren<ITransactionPage>> = props => {
   const [precisionTransaction, setPrecisionTransaction] = useState<number>(0);
 
   const { isDarkTheme } = useTheme();
-  const ReactJson = dynamic(
-    () => import('@microlink/react-json-view').then(mod => mod.default),
-    { ssr: false },
-  );
   const StatusIcon = getStatusIcon(status);
 
   // Keyed on the fee asset, not on mount: the page no longer remounts between

@@ -4,7 +4,9 @@ export const signatureList = (
   signature: string | string[] | undefined,
 ): string[] => {
   if (Array.isArray(signature)) {
-    return signature.filter(item => item.length > 0);
+    return signature.filter(
+      (item): item is string => typeof item === 'string' && item.length > 0,
+    );
   }
   if (typeof signature === 'string' && signature.length > 0) {
     return [signature];

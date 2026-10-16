@@ -1,10 +1,7 @@
 import { KLV } from '@/assets/coins';
 import { statusWithIcon } from '@/assets/status';
 import Copy from '@/components/Copy';
-import CopyAction from '@/components/DataList/CopyAction';
 import ReturnData, { hasReturnData } from '@/components/ReturnData';
-import FittedHash from '@/components/TransactionDetail/FittedHash';
-import { ContractAddress } from '@/components/TransactionDetail/styles';
 import { FrozenContainer, Row, RowContent } from '@/styles/common';
 import {
   EnumTriggerTypeName,
@@ -289,17 +286,7 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
           <strong>To</strong>
         </span>
         {parameter?.toAddress ? (
-          <ContractAddress>
-            <FittedHash
-              value={parameter.toAddress}
-              href={`/account/${parameter.toAddress}`}
-            />
-            <CopyAction
-              value={parameter.toAddress}
-              label="Copy address"
-              announcement="Address copied to clipboard"
-            />
-          </ContractAddress>
+          <ExplorerLink type="account" value={parameter.toAddress} />
         ) : (
           <span>--</span>
         )}

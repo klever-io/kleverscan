@@ -140,6 +140,14 @@ describe('FittedHash', () => {
     expect(node).toHaveAttribute('href', '/account/example');
   });
 
+  it('shortens a linked value in a narrow cell', () => {
+    metrics(40, 8);
+    renderHash('/account/example');
+    const node = screen.getByTitle(value);
+    expect(node).toHaveAttribute('href', '/account/example');
+    expect(node.textContent).toContain('...');
+  });
+
   it('shortens once the fonts finish loading into a narrow cell', async () => {
     let width = 0;
     metrics(() => width, 8);

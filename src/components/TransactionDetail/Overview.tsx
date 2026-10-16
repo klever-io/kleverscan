@@ -1,4 +1,5 @@
 import CopyAction from '@/components/DataList/CopyAction';
+import ExplorerLink from '@/components/ExplorerLink';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import Tooltip from '@/components/Tooltip';
@@ -74,9 +75,9 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
       <WideFactRow>
         <FactLabel>Hash</FactLabel>
         <FactValueRow>
-          {loading || !hash ? (
+          {loading ? (
             <Skeleton />
-          ) : (
+          ) : hash ? (
             <>
               <FittedHash value={hash} />
               <CopyAction
@@ -88,6 +89,8 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
                 <QrCodeModal value={hash} isOverflow />
               </ReceiveBackground>
             </>
+          ) : (
+            <FactValue>--</FactValue>
           )}
         </FactValueRow>
       </WideFactRow>
@@ -117,11 +120,11 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
         </FactRow>
       )}
 
-      {block && (
+      {block?.epoch !== undefined && (
         <FactRow>
           <FactLabel>Epoch</FactLabel>
           <FactValueRow>
-            <FactValue>{block.epoch ?? ''}</FactValue>
+            <FactValue>{block.epoch}</FactValue>
           </FactValueRow>
         </FactRow>
       )}
@@ -145,17 +148,12 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
       <WideFactRow>
         <FactLabel>From</FactLabel>
         <FactValueRow>
-          {loading || !sender ? (
+          {loading ? (
             <Skeleton />
+          ) : sender ? (
+            <ExplorerLink type="account" value={sender} />
           ) : (
-            <>
-              <FittedHash value={sender} href={`/account/${sender}`} />
-              <CopyAction
-                value={sender}
-                label="Copy address"
-                announcement="Address copied to clipboard"
-              />
-            </>
+            <FactValue>--</FactValue>
           )}
         </FactValueRow>
       </WideFactRow>
@@ -208,6 +206,8 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
         <FactRow>
           <FactLabel>Time</FactLabel>
           <FactValueRow>
+            {/* Seconds only, same as the block card. The elapsed suffix
+                depends on the clock, so it stays off. */}
             <FactValue>{formatDateWithSeconds(timestamp)}</FactValue>
           </FactValueRow>
         </FactRow>

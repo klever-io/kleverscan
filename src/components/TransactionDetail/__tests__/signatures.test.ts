@@ -14,4 +14,9 @@ describe('signatureList', () => {
     expect(signatureList('')).toEqual([]);
     expect(signatureList(undefined)).toEqual([]);
   });
+
+  it('drops a null slot instead of reading its length', () => {
+    const slots = ['kept', null, undefined] as unknown as string[];
+    expect(signatureList(slots)).toEqual(['kept']);
+  });
 });

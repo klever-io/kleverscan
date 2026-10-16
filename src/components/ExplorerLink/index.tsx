@@ -1,10 +1,12 @@
-import Copy from '@/components/Copy';
+import CopyAction from '@/components/DataList/CopyAction';
+import { useMiddleFit } from '@/components/FittedText/useMiddleFit';
 import LinkWithDropdown from '@/components/LinkWithDropdown';
 import { menuForEntity } from '@/components/LinkWithDropdown/menu';
-import { CenteredRow, Mono } from '@/styles/common';
+import { Mono } from '@/styles/common';
 import Link from 'next/link';
 import React from 'react';
 import { IoOpenOutline } from 'react-icons/io5';
+import { LinkRow, NewTab, ValueLink } from './styles';
 
 export type ExplorerLinkType =
   | 'account'
@@ -57,20 +59,21 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
   dataTestId,
   mono,
 }) => {
+  const textSource =
+    typeof label === 'string' && label.length > 0 ? label : (value ?? '');
+  const { ref, shown } = useMiddleFit<HTMLAnchorElement>(textSource, true);
+
   if (!value) {
     return <span>{label || '--'}</span>;
   }
 
   const href = `${routes[type]}/${value}`;
-  const displayText = label || value;
-  const text =
-    (mono ?? monoTypes.includes(type)) ? (
-      <Mono>{displayText}</Mono>
-    ) : (
-      displayText
-    );
+  const useMono = mono ?? monoTypes.includes(type);
+  const menu = menuForEntity(type);
 
   if (compact) {
+    const displayText = label || value;
+    const text = useMono ? <Mono>{displayText}</Mono> : displayText;
     return (
       <LinkWithDropdown link={href} address={value || ''} entity={type}>
         <Link href={href} data-testid={dataTestId}>
@@ -79,24 +82,35 @@ const ExplorerLink: React.FC<ExplorerLinkProps> = ({
       </LinkWithDropdown>
     );
   }
+
+  const fitted = typeof label === 'string' || label == null;
+
   return (
-    <CenteredRow>
-      <Link href={href} data-testid={dataTestId}>
-        {text}
-      </Link>
-      <a
+    <LinkRow>
+      <ValueLink
+        ref={fitted ? ref : undefined}
+        href={href}
+        data-testid={dataTestId}
+        title={value}
+        $mono={useMono}
+      >
+        {fitted ? shown : label}
+      </ValueLink>
+      <NewTab
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`Open ${menuForEntity(type).noun} in a new tab`}
+        aria-label={`Open ${menu.noun} in a new tab`}
         title="Open in a new tab"
       >
         <IoOpenOutline size={20} />
-      </a>
-      {/* The same table the hover menu uses, so this path cannot say
-          "account copied to clipboard" while the other says "Wallet Address". */}
-      <Copy data={value} info={menuForEntity(type).copyInfo} />
-    </CenteredRow>
+      </NewTab>
+      <CopyAction
+        value={value}
+        label={menu.copyLabel}
+        announcement={`${menu.copyInfo} copied to clipboard`}
+      />
+    </LinkRow>
   );
 };
 

@@ -44,18 +44,26 @@ const isPageRoot = (node: HTMLElement | null): boolean =>
  * The box to measure and to watch. A fit-content wrapper stays as wide as
  * the text, so a wider viewport never resizes it and the text cannot grow
  * back. Climb while an ancestor is wider, and skip a wrapper that is only
- * as wide as the text when something above that wrapper is wider. The climb
- * stops at the detail row: the card around it is the same width.
+ * as wide as the text when something above that wrapper is wider.
+ *
+ * Once the box is wider than the link row, stop. The card around the detail
+ * row is the same width, and a page container a few pixels wider must not
+ * become the box: measuring the page subtracts the other rows.
  */
 export const fitBox = (el: HTMLElement): HTMLElement => {
   let node: HTMLElement = el;
   let parent: HTMLElement | null = node.parentElement;
+  const cluster =
+    parent && !isPageRoot(parent) ? parent.clientWidth : el.clientWidth;
 
   while (parent && !isPageRoot(parent)) {
     if (parent.clientWidth > node.clientWidth + PROBE_SLACK_PX) {
       node = parent;
       parent = node.parentElement;
       continue;
+    }
+    if (node.clientWidth > cluster + PROBE_SLACK_PX) {
+      return node;
     }
     const grand = parent.parentElement;
     if (

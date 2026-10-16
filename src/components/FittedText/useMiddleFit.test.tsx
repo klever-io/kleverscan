@@ -204,4 +204,47 @@ describe('useMiddleFit reserveSiblings', () => {
     // 400 column, minus the icons only. The label is on its own line.
     expect(screen.getByTitle(value)).toHaveTextContent('w360');
   });
+
+  it('stops on the detail row when the page container is a few pixels wider', () => {
+    const PageAroundCard = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div data-main data-cw="800">
+          <div data-container data-cw="768">
+            <section data-card data-cw="766">
+              <div data-row data-cw="766" style={{ display: 'flex' }}>
+                <span data-label data-cw="80">
+                  From
+                </span>
+                <div data-value data-cw="518">
+                  <div data-linkrow data-cw="518">
+                    <span
+                      data-text
+                      ref={node => {
+                        ref.current = node;
+                      }}
+                      title={value}
+                    >
+                      {shown}
+                    </span>
+                    <i data-icon data-cw="20" />
+                    <i data-icon data-cw="20" />
+                  </div>
+                </div>
+              </div>
+              <div data-other data-cw="766" />
+            </section>
+          </div>
+        </div>
+      );
+    };
+
+    render(<PageAroundCard />);
+    const row = document.querySelector('[data-row]') as HTMLElement;
+
+    // 766 row, minus the 80 label and two 20px icons. The other fact row
+    // and the page must not be part of the measure.
+    expect(screen.getByTitle(value)).toHaveTextContent('w646');
+    expect(observed.at(-1)).toBe(row);
+  });
 });

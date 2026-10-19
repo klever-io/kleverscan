@@ -39,10 +39,10 @@ jest.mock('@/components/TransactionDetails/KappFee', () => ({
 }));
 
 import { render, screen } from '@testing-library/react';
-import React from 'react';
+import React, { act } from 'react';
 import { ThemeProvider } from 'styled-components';
 import theme from '@/styles/theme';
-import { formatDateWithSeconds } from '@/utils/formatFunctions';
+import { formatDate, formatDateWithSeconds } from '@/utils/formatFunctions';
 import Overview, { ITransactionOverview } from '../Overview';
 
 (
@@ -132,11 +132,203 @@ describe('Overview', () => {
     expect(screen.getByText('2.000000')).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText('KLV')).toBeInTheDocument();
-    expect(
-      screen.getByText(formatDateWithSeconds(when)),
-    ).toBeInTheDocument();
+    expect(screen.getByText(formatDateWithSeconds(when))).toBeInTheDocument();
     expect(screen.getByTitle('sigvalue')).toBeInTheDocument();
     expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument();
+  });
+
+  it('drops the seconds when the time is wider than the card', () => {
+    const original = HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      if (this.tagName === 'SECTION') {
+        return {
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          right: 300,
+          bottom: 0,
+          width: 300,
+          height: 0,
+          toJSON() {
+            return {};
+          },
+        } as DOMRect;
+      }
+      if ((this.textContent || '').includes(':55')) {
+        return {
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          right: 400,
+          bottom: 0,
+          width: 400,
+          height: 0,
+          toJSON() {
+            return {};
+          },
+        } as DOMRect;
+      }
+      return original.call(this);
+    };
+
+    try {
+      render(
+        <ThemeProvider theme={theme}>
+          <section>
+            <Overview {...loaded()} />
+          </section>
+        </ThemeProvider>,
+      );
+      expect(screen.getByText(formatDate(when))).toBeInTheDocument();
+      expect(
+        screen.queryByText(formatDateWithSeconds(when)),
+      ).not.toBeInTheDocument();
+    } finally {
+      HTMLElement.prototype.getBoundingClientRect = original;
+    }
+  });
+
+  it('keeps the seconds when the time fits inside the card', () => {
+    const original = HTMLElement.prototype.getBoundingClientRect;
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      if (this.tagName === 'SECTION') {
+        return {
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          right: 400,
+          bottom: 0,
+          width: 400,
+          height: 0,
+          toJSON() {
+            return {};
+          },
+        } as DOMRect;
+      }
+      if ((this.textContent || '').includes(':55')) {
+        return {
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          right: 300,
+          bottom: 0,
+          width: 300,
+          height: 0,
+          toJSON() {
+            return {};
+          },
+        } as DOMRect;
+      }
+      return original.call(this);
+    };
+
+    try {
+      render(
+        <ThemeProvider theme={theme}>
+          <section>
+            <Overview {...loaded()} />
+          </section>
+        </ThemeProvider>,
+      );
+      expect(screen.getByText(formatDateWithSeconds(when))).toBeInTheDocument();
+    } finally {
+      HTMLElement.prototype.getBoundingClientRect = original;
+    }
+  });
+
+  it('remeasures the time when the card changes size', async () => {
+    const originalRect = HTMLElement.prototype.getBoundingClientRect;
+    let cardRight = 300;
+    HTMLElement.prototype.getBoundingClientRect = function () {
+      const stamp = (this.textContent || '').includes(':55');
+      if (this.tagName !== 'SECTION' && !stamp) return originalRect.call(this);
+      const right = this.tagName === 'SECTION' ? cardRight : 400;
+      return {
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0,
+        right,
+        bottom: 0,
+        width: right,
+        height: 0,
+        toJSON() {
+          return {};
+        },
+      } as DOMRect;
+    };
+
+    const watched: {
+      callback: ResizeObserverCallback;
+      element?: Element;
+    }[] = [];
+    let disconnected = false;
+    const OriginalObserver = global.ResizeObserver;
+    class FakeObserver {
+      callback: ResizeObserverCallback;
+      element?: Element;
+      constructor(callback: ResizeObserverCallback) {
+        this.callback = callback;
+        watched.push(this);
+      }
+      observe(element: Element) {
+        this.element = element;
+      }
+      unobserve() {}
+      disconnect() {
+        disconnected = true;
+      }
+    }
+    global.ResizeObserver = FakeObserver as unknown as typeof ResizeObserver;
+
+    let rejectReady: (reason: unknown) => void = () => undefined;
+    const ready = new Promise<void>((_resolve, reject) => {
+      rejectReady = reject;
+    });
+    const originalFonts = Object.getOwnPropertyDescriptor(document, 'fonts');
+    Object.defineProperty(document, 'fonts', {
+      configurable: true,
+      value: { ready },
+    });
+
+    const view = render(
+      <ThemeProvider theme={theme}>
+        <section>
+          <Overview {...loaded()} />
+        </section>
+      </ThemeProvider>,
+    );
+
+    try {
+      expect(screen.getByText(formatDate(when))).toBeInTheDocument();
+      const timeWatch = watched.find(item =>
+        (item.element?.textContent || '').includes('UTC'),
+      );
+      expect(timeWatch).toBeDefined();
+      cardRight = 500;
+      await act(async () => {
+        timeWatch?.callback([], {} as ResizeObserver);
+      });
+      expect(screen.getByText(formatDateWithSeconds(when))).toBeInTheDocument();
+      await act(async () => {
+        rejectReady(new Error('fonts failed'));
+        await ready.catch(() => undefined);
+      });
+      view.unmount();
+      expect(disconnected).toBe(true);
+    } finally {
+      HTMLElement.prototype.getBoundingClientRect = originalRect;
+      global.ResizeObserver = OriginalObserver;
+      if (originalFonts) {
+        Object.defineProperty(document, 'fonts', originalFonts);
+      } else {
+        delete (document as { fonts?: FontFaceSet }).fonts;
+      }
+    }
   });
 
   it('shows a dash for a missing sender instead of a skeleton', () => {
@@ -157,7 +349,12 @@ describe('Overview', () => {
       sender: undefined,
     });
 
-    expect(screen.getAllByTestId('skeleton').length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId('skeleton')).toHaveLength(7);
+    expect(screen.getByText('Time')).toBeInTheDocument();
+    expect(screen.queryByText(formatDate(when))).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(formatDateWithSeconds(when)),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText('--')).not.toBeInTheDocument();
   });
 

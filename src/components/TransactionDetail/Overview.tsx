@@ -1,12 +1,17 @@
+import { pickUrlEffect } from '@/components/BlockDetail/urlEffect';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/ExplorerLink';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import Tooltip from '@/components/Tooltip';
 import { Status } from '@/styles/common';
-import { formatDateWithSeconds, toLocaleFixed } from '@/utils/formatFunctions';
+import {
+  formatDate,
+  formatDateWithSeconds,
+  toLocaleFixed,
+} from '@/utils/formatFunctions';
 import { ReceiveBackground } from '@/views/validator';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useRef, useState } from 'react';
 import KappFee from '../TransactionDetails/KappFee';
 import TokenOperations from '../TransactionDetails/TokenOperations';
 import FittedHash from './FittedHash';
@@ -49,6 +54,64 @@ export interface ITransactionOverview {
 
 const klvFee = (raw: number | undefined): string =>
   toLocaleFixed((raw ?? 0) / 1000000, 6);
+
+const useIsoLayoutEffect = pickUrlEffect(
+  typeof window === 'undefined' ? undefined : window,
+);
+
+/* The seconds stay when they fit inside the card. A phone that is only
+   320px wide cannot hold them beside the label, so that width drops them. */
+const TimeValue: React.FC<{ timestamp: number }> = ({ timestamp }) => {
+  const full = formatDateWithSeconds(timestamp);
+  const short = formatDate(timestamp);
+  const ref = useRef<HTMLSpanElement>(null);
+  const [withSeconds, setWithSeconds] = useState(true);
+
+  useIsoLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+
+    let cancelled = false;
+
+    const fit = () => {
+      if (cancelled) return;
+      const node = ref.current;
+      if (!node) return;
+      const card = node.closest('section');
+      if (!card) {
+        setWithSeconds(true);
+        return;
+      }
+      const previous = node.textContent;
+      node.textContent = full;
+      const past =
+        node.getBoundingClientRect().right - card.getBoundingClientRect().right;
+      node.textContent = previous;
+      const next = past <= 1;
+      setWithSeconds(current => (current === next ? current : next));
+    };
+
+    fit();
+    const fonts = document.fonts;
+    if (fonts) {
+      fonts.ready.then(fit).catch(() => undefined);
+    }
+    if (typeof ResizeObserver === 'undefined') {
+      return () => {
+        cancelled = true;
+      };
+    }
+    const observer = new ResizeObserver(fit);
+    const card = el.closest('section');
+    if (card) observer.observe(card);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [full]);
+
+  return <FactValue ref={ref}>{withSeconds ? full : short}</FactValue>;
+};
 
 const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
   hash,
@@ -202,13 +265,20 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
         </FeeValue>
       </FactRow>
 
-      {timestamp ? (
+      {loading ? (
         <FactRow>
           <FactLabel>Time</FactLabel>
           <FactValueRow>
-            {/* Seconds only, same as the block card. The elapsed suffix
+            <Skeleton />
+          </FactValueRow>
+        </FactRow>
+      ) : timestamp ? (
+        <FactRow>
+          <FactLabel>Time</FactLabel>
+          <FactValueRow>
+            {/* Seconds when the card can hold them. The elapsed suffix
                 depends on the clock, so it stays off. */}
-            <FactValue>{formatDateWithSeconds(timestamp)}</FactValue>
+            <TimeValue timestamp={timestamp} />
           </FactValueRow>
         </FactRow>
       ) : null}

@@ -102,6 +102,39 @@ const loaded = (): ITransactionOverview => ({
   receipts: [{ typeString: 'Transfer' }],
 });
 
+const rect = (right: number, width = right): DOMRect =>
+  ({
+    x: 0,
+    y: 0,
+    top: 0,
+    left: 0,
+    right,
+    bottom: 0,
+    width,
+    height: 0,
+    toJSON() {
+      return {};
+    },
+  }) as DOMRect;
+
+const paddingRight = (
+  padding: string,
+  original: typeof window.getComputedStyle,
+): typeof window.getComputedStyle =>
+  ((elt: Element, pseudoElt?: string | null) => {
+    const style = original(elt, pseudoElt);
+    if (elt.tagName !== 'DIV' || !(elt.textContent || '').includes('UTC')) {
+      return style;
+    }
+    return new Proxy(style, {
+      get(target, prop, receiver) {
+        if (prop === 'paddingRight') return padding;
+        const value = Reflect.get(target, prop, receiver);
+        return typeof value === 'function' ? value.bind(target) : value;
+      },
+    });
+  }) as typeof window.getComputedStyle;
+
 const renderOverview = (props: ITransactionOverview) =>
   render(
     <ThemeProvider theme={theme}>
@@ -137,40 +170,36 @@ describe('Overview', () => {
     expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument();
   });
 
-  it('drops the seconds when the time is wider than the card', () => {
-    const original = HTMLElement.prototype.getBoundingClientRect;
+  it('keeps the KDA tooltip on the value line', () => {
+    renderOverview(loaded());
+    const kda = screen.getByText('KLV').parentElement;
+    const kapp = screen.getByText('1').parentElement?.parentElement;
+    expect(kda?.className).toBeTruthy();
+    expect(kda?.className).not.toBe(kapp?.className);
+    const css = [...document.querySelectorAll('style')]
+      .map(node => node.textContent || '')
+      .join('')
+      .replace(/\s/g, '');
+    expect(css).toContain('flex-wrap:nowrap');
+  });
+
+  it('drops the seconds when the time crosses the value padding', () => {
+    const originalRect = HTMLElement.prototype.getBoundingClientRect;
+    const originalStyle = window.getComputedStyle;
+    // The card border is far to the right, so a card-border measure keeps
+    // the seconds. The value cell ends sooner, and its padding is part of
+    // that edge.
+    window.getComputedStyle = paddingRight('20px', originalStyle);
     HTMLElement.prototype.getBoundingClientRect = function () {
-      if (this.tagName === 'SECTION') {
-        return {
-          x: 0,
-          y: 0,
-          top: 0,
-          left: 0,
-          right: 300,
-          bottom: 0,
-          width: 300,
-          height: 0,
-          toJSON() {
-            return {};
-          },
-        } as DOMRect;
+      if (this.getAttribute('data-time-probe') === 'true') return rect(290, 290);
+      if (this.tagName === 'SECTION') return rect(500);
+      if (this.tagName === 'DIV' && (this.textContent || '').includes('UTC')) {
+        return rect(300);
       }
-      if ((this.textContent || '').includes(':55')) {
-        return {
-          x: 0,
-          y: 0,
-          top: 0,
-          left: 0,
-          right: 400,
-          bottom: 0,
-          width: 400,
-          height: 0,
-          toJSON() {
-            return {};
-          },
-        } as DOMRect;
+      if (this.tagName === 'SPAN' && (this.textContent || '').includes(':55')) {
+        return rect(300);
       }
-      return original.call(this);
+      return originalRect.call(this);
     };
 
     try {
@@ -186,44 +215,25 @@ describe('Overview', () => {
         screen.queryByText(formatDateWithSeconds(when)),
       ).not.toBeInTheDocument();
     } finally {
-      HTMLElement.prototype.getBoundingClientRect = original;
+      HTMLElement.prototype.getBoundingClientRect = originalRect;
+      window.getComputedStyle = originalStyle;
     }
   });
 
-  it('keeps the seconds when the time fits inside the card', () => {
-    const original = HTMLElement.prototype.getBoundingClientRect;
+  it('keeps the seconds when the time fits inside the value cell', () => {
+    const originalRect = HTMLElement.prototype.getBoundingClientRect;
+    // The stamp is past the card border, which is what used to drop the
+    // seconds. The value cell still has room for the probe.
     HTMLElement.prototype.getBoundingClientRect = function () {
-      if (this.tagName === 'SECTION') {
-        return {
-          x: 0,
-          y: 0,
-          top: 0,
-          left: 0,
-          right: 400,
-          bottom: 0,
-          width: 400,
-          height: 0,
-          toJSON() {
-            return {};
-          },
-        } as DOMRect;
+      if (this.getAttribute('data-time-probe') === 'true') return rect(300, 300);
+      if (this.tagName === 'SECTION') return rect(100);
+      if (this.tagName === 'DIV' && (this.textContent || '').includes('UTC')) {
+        return rect(400);
       }
-      if ((this.textContent || '').includes(':55')) {
-        return {
-          x: 0,
-          y: 0,
-          top: 0,
-          left: 0,
-          right: 300,
-          bottom: 0,
-          width: 300,
-          height: 0,
-          toJSON() {
-            return {};
-          },
-        } as DOMRect;
+      if (this.tagName === 'SPAN' && (this.textContent || '').includes(':55')) {
+        return rect(300);
       }
-      return original.call(this);
+      return originalRect.call(this);
     };
 
     try {
@@ -236,30 +246,25 @@ describe('Overview', () => {
       );
       expect(screen.getByText(formatDateWithSeconds(when))).toBeInTheDocument();
     } finally {
-      HTMLElement.prototype.getBoundingClientRect = original;
+      HTMLElement.prototype.getBoundingClientRect = originalRect;
     }
   });
 
-  it('remeasures the time when the card changes size', async () => {
+  it('remeasures the time when the value cell changes size', async () => {
     const originalRect = HTMLElement.prototype.getBoundingClientRect;
-    let cardRight = 300;
+    const originalStyle = window.getComputedStyle;
+    let cellRight = 280;
+    window.getComputedStyle = paddingRight('20px', originalStyle);
     HTMLElement.prototype.getBoundingClientRect = function () {
-      const stamp = (this.textContent || '').includes(':55');
-      if (this.tagName !== 'SECTION' && !stamp) return originalRect.call(this);
-      const right = this.tagName === 'SECTION' ? cardRight : 400;
-      return {
-        x: 0,
-        y: 0,
-        top: 0,
-        left: 0,
-        right,
-        bottom: 0,
-        width: right,
-        height: 0,
-        toJSON() {
-          return {};
-        },
-      } as DOMRect;
+      if (this.getAttribute('data-time-probe') === 'true') return rect(290, 290);
+      if (this.tagName === 'SECTION') return rect(200);
+      if (this.tagName === 'DIV' && (this.textContent || '').includes('UTC')) {
+        return rect(cellRight);
+      }
+      if (this.tagName === 'SPAN' && (this.textContent || '').includes(':55')) {
+        return rect(400);
+      }
+      return originalRect.call(this);
     };
 
     const watched: {
@@ -309,7 +314,7 @@ describe('Overview', () => {
         (item.element?.textContent || '').includes('UTC'),
       );
       expect(timeWatch).toBeDefined();
-      cardRight = 500;
+      cellRight = 500;
       await act(async () => {
         timeWatch?.callback([], {} as ResizeObserver);
       });
@@ -322,6 +327,7 @@ describe('Overview', () => {
       expect(disconnected).toBe(true);
     } finally {
       HTMLElement.prototype.getBoundingClientRect = originalRect;
+      window.getComputedStyle = originalStyle;
       global.ResizeObserver = OriginalObserver;
       if (originalFonts) {
         Object.defineProperty(document, 'fonts', originalFonts);

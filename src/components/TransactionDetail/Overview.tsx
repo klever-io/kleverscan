@@ -1,4 +1,4 @@
-import { pickUrlEffect } from '@/components/BlockDetail/urlEffect';
+import { useIsoLayoutEffect } from '@/components/BlockDetail/urlEffect';
 import CopyAction from '@/components/DataList/CopyAction';
 import ExplorerLink from '@/components/ExplorerLink';
 import QrCodeModal from '@/components/QrCodeModal';
@@ -55,12 +55,40 @@ export interface ITransactionOverview {
 const klvFee = (raw: number | undefined): string =>
   toLocaleFixed((raw ?? 0) / 1000000, 6);
 
-const useIsoLayoutEffect = pickUrlEffect(
-  typeof window === 'undefined' ? undefined : window,
-);
+/* Right edge of the value cell's content, after its padding. The string
+   may not sit in that padding. */
+const contentRight = (node: HTMLElement): number => {
+  const cell = node.parentElement;
+  if (!cell) return node.getBoundingClientRect().right;
+  const pad = parseFloat(getComputedStyle(cell).paddingRight) || 0;
+  return cell.getBoundingClientRect().right - pad;
+};
 
-/* The seconds stay when they fit inside the card. A phone that is only
-   320px wide cannot hold them beside the label, so that width drops them. */
+/* Width of the full timestamp, measured on a detached clone so React keeps
+   the text it rendered. */
+const textEnd = (node: HTMLElement, text: string): number => {
+  const probe = node.cloneNode(false) as HTMLSpanElement;
+  probe.textContent = text;
+  probe.setAttribute('data-time-probe', 'true');
+  probe.style.position = 'absolute';
+  probe.style.visibility = 'hidden';
+  probe.style.pointerEvents = 'none';
+  probe.style.left = '0';
+  probe.style.top = '0';
+  probe.style.width = 'max-content';
+  probe.style.maxWidth = 'none';
+  (node.parentElement ?? node).appendChild(probe);
+  try {
+    return (
+      node.getBoundingClientRect().left + probe.getBoundingClientRect().width
+    );
+  } finally {
+    probe.remove();
+  }
+};
+
+/* Seconds stay when the full timestamp ends on or before the value cell's
+   content edge. The short form, without seconds, is the floor. */
 const TimeValue: React.FC<{ timestamp: number }> = ({ timestamp }) => {
   const full = formatDateWithSeconds(timestamp);
   const short = formatDate(timestamp);
@@ -82,12 +110,7 @@ const TimeValue: React.FC<{ timestamp: number }> = ({ timestamp }) => {
         setWithSeconds(true);
         return;
       }
-      const previous = node.textContent;
-      node.textContent = full;
-      const past =
-        node.getBoundingClientRect().right - card.getBoundingClientRect().right;
-      node.textContent = previous;
-      const next = past <= 1;
+      const next = textEnd(node, full) - contentRight(node) <= 1;
       setWithSeconds(current => (current === next ? current : next));
     };
 
@@ -243,7 +266,7 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
 
       <FactRow>
         <FactLabel>KDA Fee</FactLabel>
-        <FeeValue>
+        <FeeValue $keepIcon>
           {loading ? (
             <Skeleton />
           ) : (
@@ -276,8 +299,8 @@ const Overview: React.FC<PropsWithChildren<ITransactionOverview>> = ({
         <FactRow>
           <FactLabel>Time</FactLabel>
           <FactValueRow>
-            {/* Seconds when the card can hold them. The elapsed suffix
-                depends on the clock, so it stays off. */}
+            {/* Seconds when the value cell can hold them. The elapsed
+                suffix depends on the clock, so it stays off. */}
             <TimeValue timestamp={timestamp} />
           </FactValueRow>
         </FactRow>

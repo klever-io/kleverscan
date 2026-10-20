@@ -1,10 +1,6 @@
-import { pickUrlEffect } from '@/components/BlockDetail/urlEffect';
+import { useIsoLayoutEffect } from '@/components/BlockDetail/urlEffect';
 import { middleFit } from '@/components/Tabs/Validators/fitKey';
 import { useRef, useState } from 'react';
-
-const useIsoLayoutEffect = pickUrlEffect(
-  typeof window === 'undefined' ? undefined : window,
-);
 
 const PROBE_SLACK_PX = 1;
 
@@ -14,10 +10,22 @@ const padX = (style: CSSStyleDeclaration): number =>
 const gapX = (style: CSSStyleDeclaration): number =>
   parseFloat(style.columnGap || style.gap) || 0;
 
+/* One computed track means the children sit on their own rows. `none` and
+   `subgrid` are not one track, and a two-column grid still sits beside. */
+const singleGridTrack = (style: CSSStyleDeclaration): boolean => {
+  if (style.display !== 'grid' && style.display !== 'inline-grid') {
+    return false;
+  }
+  const columns = style.gridTemplateColumns.trim();
+  if (!columns || columns === 'none' || columns === 'subgrid') return false;
+  return columns.split(/\s+/).length === 1;
+};
+
 const stacksVertically = (style: CSSStyleDeclaration): boolean =>
-  (style.display === 'flex' || style.display === 'inline-flex') &&
-  (style.flexDirection === 'column' ||
-    style.flexDirection === 'column-reverse');
+  ((style.display === 'flex' || style.display === 'inline-flex') &&
+    (style.flexDirection === 'column' ||
+      style.flexDirection === 'column-reverse')) ||
+  singleGridTrack(style);
 
 const siblingWidths = (parent: HTMLElement, keep: Element): number => {
   let others = 0;
@@ -62,6 +70,9 @@ export const fitBox = (el: HTMLElement): HTMLElement => {
       parent = node.parentElement;
       continue;
     }
+    /* The cluster check stays after the climb. Returning at the first
+       wider ancestor would box the shrink wrapper, and that wrapper does
+       not grow when the viewport does. */
     if (node.clientWidth > cluster + PROBE_SLACK_PX) {
       return node;
     }

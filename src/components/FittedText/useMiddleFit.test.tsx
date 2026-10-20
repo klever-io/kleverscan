@@ -205,6 +205,174 @@ describe('useMiddleFit reserveSiblings', () => {
     expect(screen.getByTitle(value)).toHaveTextContent('w360');
   });
 
+  it('does not subtract a label that sits in a one-column grid', () => {
+    const OneColumn = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{ display: 'grid', gridTemplateColumns: '1fr' }}
+        >
+          <span data-label data-cw="400">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<OneColumn />);
+    // 400 grid, minus the icons only. The label is the only column.
+    expect(screen.getByTitle(value)).toHaveTextContent('w360');
+  });
+
+  it('still subtracts a label that sits beside the value in a two-column grid', () => {
+    const TwoColumn = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}
+        >
+          <span data-label data-cw="80">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<TwoColumn />);
+    // 400 grid, minus the 80 label and two 20px icons.
+    expect(screen.getByTitle(value)).toHaveTextContent('w280');
+  });
+
+  it('still subtracts a label when the grid columns are a subgrid', () => {
+    const Subgrid = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{ display: 'grid', gridTemplateColumns: 'subgrid' }}
+        >
+          <span data-label data-cw="400">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<Subgrid />);
+    // subgrid is not one track. The 400px label eats the free width.
+    expect(screen.getByTitle(value)).toHaveTextContent(value);
+  });
+
+  it('still subtracts a label when the grid columns are none', () => {
+    const None = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{ display: 'grid', gridTemplateColumns: 'none' }}
+        >
+          <span data-label data-cw="400">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<None />);
+    expect(screen.getByTitle(value)).toHaveTextContent(value);
+  });
+
+  it('does not subtract a label that sits in a one-column inline grid', () => {
+    const Inline = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{ display: 'inline-grid', gridTemplateColumns: '1fr' }}
+        >
+          <span data-label data-cw="400">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<Inline />);
+    expect(screen.getByTitle(value)).toHaveTextContent('w360');
+  });
+
   it('stops on the detail row when the page container is a few pixels wider', () => {
     const PageAroundCard = () => {
       const { ref, shown } = useMiddleFit<HTMLElement>(value, true);

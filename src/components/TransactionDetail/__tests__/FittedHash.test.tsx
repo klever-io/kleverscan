@@ -67,10 +67,10 @@ import FittedHash from '@/components/TransactionDetail/FittedHash';
 
 const value = 'klv1exampleaddressvalue000000000000000000000000000000';
 
-const renderHash = (href?: string) =>
+const renderHash = () =>
   render(
     <ThemeProvider theme={theme}>
-      <FittedHash value={value} href={href} />
+      <FittedHash value={value} />
     </ThemeProvider>,
   );
 
@@ -80,6 +80,10 @@ describe('FittedHash', () => {
       HTMLElement.prototype,
       'clientWidth',
     ),
+    offsetWidth: Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'offsetWidth',
+    ),
     scrollWidth: Object.getOwnPropertyDescriptor(
       HTMLElement.prototype,
       'scrollWidth',
@@ -87,20 +91,12 @@ describe('FittedHash', () => {
   };
 
   afterEach(() => {
-    if (originals.clientWidth) {
-      Object.defineProperty(
-        HTMLElement.prototype,
-        'clientWidth',
-        originals.clientWidth,
-      );
-    }
-    if (originals.scrollWidth) {
-      Object.defineProperty(
-        HTMLElement.prototype,
-        'scrollWidth',
-        originals.scrollWidth,
-      );
-    }
+    (['clientWidth', 'offsetWidth', 'scrollWidth'] as const).forEach(key => {
+      const original = originals[key];
+      if (original) {
+        Object.defineProperty(HTMLElement.prototype, key, original);
+      }
+    });
     delete (document as { fonts?: unknown }).fonts;
   });
 
@@ -133,19 +129,54 @@ describe('FittedHash', () => {
     expect(node).toHaveAttribute('title', value);
   });
 
-  it('renders a link when the value has a destination', () => {
-    metrics(0, 8);
-    renderHash('/account/example');
-    const node = screen.getByTitle(value);
-    expect(node).toHaveAttribute('href', '/account/example');
+  const perElement = () => {
+    const read = (el: HTMLElement) => {
+      const raw = el.getAttribute('data-cw');
+      return raw ? Number(raw) : 0;
+    };
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get() {
+        return read(this as HTMLElement);
+      },
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get() {
+        return read(this as HTMLElement);
+      },
+    });
+    Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
+      configurable: true,
+      get() {
+        return (this.textContent || '').length * 8;
+      },
+    });
+  };
+
+  const renderRow = (iconWidth: string) =>
+    render(
+      <ThemeProvider theme={theme}>
+        <div data-cw="600" style={{ display: 'flex' }}>
+          <FittedHash value={value} />
+          <i data-cw={iconWidth} />
+          <i data-cw={iconWidth} />
+        </div>
+      </ThemeProvider>,
+    );
+
+  it('keeps the whole value when the row fits it beside empty icons', () => {
+    perElement();
+    renderRow('0');
+    expect(screen.getByTitle(value)).toHaveTextContent(value);
   });
 
-  it('shortens a linked value in a narrow cell', () => {
-    metrics(40, 8);
-    renderHash('/account/example');
+  it('shortens the value by the width of the icons beside it', () => {
+    perElement();
+    renderRow('100');
     const node = screen.getByTitle(value);
-    expect(node).toHaveAttribute('href', '/account/example');
     expect(node.textContent).toContain('...');
+    expect(node.textContent).not.toBe(value);
   });
 
   it('shortens once the fonts finish loading into a narrow cell', async () => {

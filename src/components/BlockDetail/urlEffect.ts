@@ -13,3 +13,8 @@ type UrlEffect = (effect: EffectCallback, deps?: DependencyList) => void;
  */
 export const pickUrlEffect = (win: unknown): UrlEffect =>
   win === undefined ? useEffect : useLayoutEffect;
+
+/** Layout effect in the browser, plain effect while the server has no window. */
+export const useIsoLayoutEffect = pickUrlEffect(
+  typeof window === 'undefined' ? undefined : window,
+);

@@ -1,4 +1,3 @@
-import { focusRing } from '@/components/DataList/styles';
 import { TableGradientBorder } from '@/components/Table/styles';
 import { CenteredRow, Row, RowContent, Status } from '@/styles/common';
 import {
@@ -10,8 +9,7 @@ import {
   Panel,
   Row as DetailRow,
 } from '@/views/transactions/detail';
-import Link from 'next/link';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 /* Local to the transaction detail page. views/transactions/detail is also
    imported by the multisign page, asset pages, and the contract rows, so
@@ -167,28 +165,25 @@ export const FactHash = styled.span`
   color: ${props => props.theme.black};
 `;
 
-export const FactHashLink = styled(Link)`
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: 'Fira Mono', monospace;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.4;
-  color: ${props => props.theme.black};
-  text-decoration: none;
-  ${focusRing}
-
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-export const FeeValue = styled(FactValueRow)`
+export const FeeValue = styled(FactValueRow)<{ $keepIcon?: boolean }>`
   flex-wrap: wrap;
   align-items: center;
+  ${props =>
+    props.$keepIcon &&
+    css`
+      flex-wrap: nowrap;
+
+      ${FactValue} {
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      > span:last-child {
+        flex-shrink: 0;
+      }
+    `}
 
   /* KappFee renders the amount in a plain paragraph, and the failed amount
      in its own paragraph. Both keep the body size unless this card sets it.

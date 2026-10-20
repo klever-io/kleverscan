@@ -11,12 +11,13 @@ const gapX = (style: CSSStyleDeclaration): number =>
   parseFloat(style.columnGap || style.gap) || 0;
 
 /* One computed track means the children sit on their own rows. `none` and
-   `subgrid` are not one track, and a two-column grid still sits beside. */
+   `subgrid` are not one track. Line names (`[a]`) are not tracks. A
+   two-column grid still sits beside. */
 const singleGridTrack = (style: CSSStyleDeclaration): boolean => {
   if (style.display !== 'grid' && style.display !== 'inline-grid') {
     return false;
   }
-  const columns = style.gridTemplateColumns.trim();
+  const columns = style.gridTemplateColumns.replace(/\[[^\]]*\]/g, '').trim();
   if (!columns || columns === 'none' || columns === 'subgrid') return false;
   return columns.split(/\s+/).length === 1;
 };

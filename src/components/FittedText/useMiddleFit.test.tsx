@@ -373,6 +373,110 @@ describe('useMiddleFit reserveSiblings', () => {
     expect(screen.getByTitle(value)).toHaveTextContent('w360');
   });
 
+  it('does not subtract a label when one track has line names', () => {
+    const Named = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{ display: 'grid', gridTemplateColumns: '[a] 251px [b]' }}
+        >
+          <span data-label data-cw="400">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<Named />);
+    // [a] and [b] are line names, not columns. 400 minus the icons.
+    expect(screen.getByTitle(value)).toHaveTextContent('w360');
+  });
+
+  it('still subtracts a label when Chrome reports a subgrid with empty line names', () => {
+    const Reported = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{ display: 'grid', gridTemplateColumns: 'subgrid [] [] []' }}
+        >
+          <span data-label data-cw="400">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<Reported />);
+    expect(screen.getByTitle(value)).toHaveTextContent(value);
+  });
+
+  it('still subtracts a label when two tracks both have line names', () => {
+    const TwoNamed = () => {
+      const { ref, shown } = useMiddleFit<HTMLElement>(value, true);
+      return (
+        <div
+          data-row
+          data-cw="400"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '[a] 100px [b] 200px [c]',
+          }}
+        >
+          <span data-label data-cw="80">
+            Owner
+          </span>
+          <div data-linkrow data-cw="120">
+            <span
+              data-text
+              ref={node => {
+                ref.current = node;
+              }}
+              title={value}
+            >
+              {shown}
+            </span>
+            <i data-icon data-cw="20" />
+            <i data-icon data-cw="20" />
+          </div>
+        </div>
+      );
+    };
+
+    render(<TwoNamed />);
+    // Two lengths remain after the line names. 400 - 80 - 40.
+    expect(screen.getByTitle(value)).toHaveTextContent('w280');
+  });
+
   it('stops on the detail row when the page container is a few pixels wider', () => {
     const PageAroundCard = () => {
       const { ref, shown } = useMiddleFit<HTMLElement>(value, true);

@@ -1,5 +1,7 @@
 import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
+import { TokenMark } from '@/components/DataList/styles';
 import Filter, { IFilter } from '@/components/Filter';
+import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
 import { CustomFieldWrapper, CustomLink } from '@/components/Table/styles';
 import Tooltip from '@/components/Tooltip';
@@ -211,15 +213,18 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
   const rowSections = (props: IAccountAsset): IRowSection[] => {
     const {
       assetId,
+      assetName,
       assetType,
       precision,
       balance,
       frozenBalance,
       unfrozenBalance,
       staking,
+      logo,
+      verified,
     } = props;
 
-    const ticker = assetId?.split('-')[0];
+    const ticker = props.ticker || assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 1 ? (
         <Link
@@ -236,7 +241,21 @@ const Assets: React.FC<PropsWithChildren<IAssets>> = ({
       );
 
     const sections: IRowSection[] = [
-      { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
+      {
+        element: props => (
+          <TokenMark>
+            <AssetLogo
+              logo={logo || ''}
+              ticker={ticker}
+              name={assetName || ticker}
+              verified={verified}
+              size={32}
+            />
+            <span>{ticker}</span>
+          </TokenMark>
+        ),
+        span: 1,
+      },
       {
         element: props => <ExplorerLink type="asset" value={assetId} compact />,
         span: 1,

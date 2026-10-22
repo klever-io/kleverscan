@@ -1,3 +1,6 @@
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
+import { TokenMark } from '@/components/DataList/styles';
+import AssetLogo from '@/components/Logo/AssetLogo';
 import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
@@ -17,6 +20,7 @@ import { AssetType, AssetTypeString } from '@/types/assets';
 import { useRouter } from 'next/router';
 import Filter, { IFilter } from '@/components/Filter';
 import { FilterDiv } from '@/components/TransactionsFilters/styles';
+import { ProprietaryTableWrapper } from './styles';
 
 interface IProprietaryAssets {
   assetsTableProps: IInnerTableProps;
@@ -54,6 +58,7 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
     'Staking Type',
     '',
   ];
+  if (showInteractionButtons) header.push('');
   const { t } = useTranslation('accounts');
   const { getInteractionsButtons } = useContractModal();
   const router = useRouter();
@@ -120,9 +125,18 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
   };
 
   const rowSections = (props: IProprietaryAsset): IRowSection[] => {
-    const { assetId, assetType, precision, circulatingSupply, staking } = props;
+    const {
+      assetId,
+      assetType,
+      precision,
+      circulatingSupply,
+      staking,
+      name,
+      logo,
+      verified,
+    } = props;
 
-    const ticker = assetId?.split('-')[0];
+    const ticker = props.ticker || assetId?.split('-')[0];
     const sectionViewNfts =
       assetType === 'Non Fungible' ? (
         <Link
@@ -138,7 +152,21 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
         <></>
       );
     const sections: IRowSection[] = [
-      { element: props => <span key={ticker}>{ticker}</span>, span: 1 },
+      {
+        element: props => (
+          <TokenMark>
+            <AssetLogo
+              logo={logo || ''}
+              ticker={ticker}
+              name={name || ticker}
+              verified={verified}
+              size={32}
+            />
+            <span>{ticker}</span>
+          </TokenMark>
+        ),
+        span: 1,
+      },
       {
         element: props => <ExplorerLink type="asset" value={assetId} compact />,
         span: 1,
@@ -203,9 +231,15 @@ const ProprietaryAssets: React.FC<PropsWithChildren<IProprietaryAssets>> = ({
     type: 'assets',
     header,
     Filters: FiltersComponent,
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [4, 5],
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <ProprietaryTableWrapper $ownerActions={showInteractionButtons}>
+      <Table {...tableProps} cardBreakpoint={ROW_LAYOUT_MIN_WIDTH} />
+    </ProprietaryTableWrapper>
+  );
 };
 
 export default ProprietaryAssets;

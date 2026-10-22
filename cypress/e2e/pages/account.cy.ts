@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 describe('Account Page', () => {
-  const transactionsTypes = ['Transactions Out', 'Transactions In'];
+  const transactionsTypes = ['Out', 'In'];
   const address =
     'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
   const transaction_links: { name: string; link: string }[] = [];
@@ -46,9 +46,9 @@ describe('Account Page', () => {
 
       cy.url().should(currentUrl => {
         const url = new URL(currentUrl);
-        if (type === 'Transactions Out') {
+        if (type === 'Out') {
           expect(url.searchParams.get('fromAddress')).to.eq(address);
-        } else if (type === 'Transactions In') {
+        } else if (type === 'In') {
           expect(url.searchParams.get('toAddress')).to.eq(address);
         }
       });

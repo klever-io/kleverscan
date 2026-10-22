@@ -12,10 +12,12 @@ import { ThemeProvider } from 'styled-components';
 const routerQuery: Record<string, string> = {};
 
 let routerIsReady = true;
+let routerPathname = '/transactions';
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
     isReady: routerIsReady,
+    pathname: routerPathname,
     query: routerQuery,
     push: jest.fn(),
   }),
@@ -292,4 +294,86 @@ describe('TransactionsFilters translation coverage', () => {
       expect(drifted).toEqual([]);
     },
   );
+});
+
+describe('TransactionsFilters account direction', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    routerPathname = '/transactions';
+  });
+
+  const pick = (label: string) => {
+    const container = openFilter('direction');
+    const option = within(container)
+      .getAllByTestId('selector-item')
+      .find(item => item.textContent === label);
+    if (!option) throw new Error(`missing option ${label}`);
+    fireEvent.click(option);
+  };
+
+  it('stays off the chain transactions page', () => {
+    renderFilters({ account: 'klv1abc' });
+
+    expect(screen.queryByTestId('filter-direction')).toBeNull();
+  });
+
+  it('stays off when the account query is repeated', () => {
+    routerPathname = '/account/[account]';
+    Object.keys(routerQuery).forEach(key => delete routerQuery[key]);
+    (routerQuery as Record<string, unknown>).account = ['klv1abc', 'klv1def'];
+
+    render(
+      <ThemeProvider theme={theme}>
+        <TransactionsFilters />
+      </ThemeProvider>,
+    );
+
+    expect(screen.queryByTestId('filter-direction')).toBeNull();
+  });
+
+  it('writes fromAddress for Out and returns to the first page', () => {
+    routerPathname = '/account/[account]';
+    renderFilters({
+      account: 'klv1abc',
+      page: '4',
+      role: 'legacy',
+      toAddress: 'klv1other',
+    });
+
+    pick('Out');
+
+    expect(mockedSetQuery).toHaveBeenCalledWith(
+      { account: 'klv1abc', page: '1', fromAddress: 'klv1abc' },
+      expect.anything(),
+    );
+  });
+
+  it('writes toAddress for In', () => {
+    routerPathname = '/account/[account]';
+    renderFilters({ account: 'klv1abc', fromAddress: 'klv1abc' });
+
+    pick('In');
+
+    expect(mockedSetQuery).toHaveBeenCalledWith(
+      { account: 'klv1abc', page: '1', toAddress: 'klv1abc' },
+      expect.anything(),
+    );
+  });
+
+  it('clears both addresses for All', () => {
+    routerPathname = '/account/[account]';
+    renderFilters({
+      account: 'klv1abc',
+      fromAddress: 'klv1abc',
+      toAddress: 'klv1other',
+      role: 'legacy',
+    });
+
+    pick('All');
+
+    expect(mockedSetQuery).toHaveBeenCalledWith(
+      { account: 'klv1abc', page: '1' },
+      expect.anything(),
+    );
+  });
 });

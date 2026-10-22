@@ -1,5 +1,12 @@
 import { PropsWithChildren } from 'react';
+import {
+  DIRECTION_ALL,
+  DIRECTION_IN,
+  DIRECTION_OUT,
+  transactionDirectionLabel,
+} from '@/components/AccountDetail/state';
 import Filter, { IFilter } from '@/components/Filter';
+import { showsInOut } from '@/components/TransactionsList/columns';
 import { buyType, contracts, status } from '@/configs/transactions';
 import { IAsset } from '@/types';
 import { setQueryAndRouter } from '@/utils';
@@ -150,6 +157,34 @@ const TransactionsFilters: React.FC<
     });
   }
 
+  const accountAddress =
+    router.pathname === '/account/[account]' &&
+    typeof router.query.account === 'string'
+      ? router.query.account
+      : '';
+  const showDirection = showsInOut(router) && accountAddress !== '';
+
+  const selectDirection = (selected: string): void => {
+    // Same reason as the other filters: a narrower set can have fewer pages
+    // than the one on screen, and the pager hides when there is only one.
+    const updatedQuery: NextParsedUrlQuery = { ...router.query, page: '1' };
+    delete updatedQuery.role;
+    if (selected === DIRECTION_OUT) {
+      delete updatedQuery.toAddress;
+      setQueryAndRouter(
+        { ...updatedQuery, fromAddress: accountAddress },
+        router,
+      );
+    } else if (selected === DIRECTION_IN) {
+      delete updatedQuery.fromAddress;
+      setQueryAndRouter({ ...updatedQuery, toAddress: accountAddress }, router);
+    } else {
+      delete updatedQuery.fromAddress;
+      delete updatedQuery.toAddress;
+      setQueryAndRouter({ ...updatedQuery }, router);
+    }
+  };
+
   return (
     <FilterContainer>
       {/* Not gated on router.isReady. Next answers that differently on each
@@ -157,9 +192,11 @@ const TransactionsFilters: React.FC<
           server, true on the client's first render. While the filter list was
           state seeded with [], both sides rendered nothing and the difference
           stayed hidden; built during render it made /block/<n> hydrate against
-          a tree that had no filters in it. Nothing here reads router.query
-          directly, only the local `query` copy, which is {} on both sides
-          until the effect runs. */}
+          a tree that had no filters in it. The mapped filters read only the
+          local `query` copy, which is {} on both sides until the effect runs.
+          The account In/Out control is the exception: it reads the account
+          route, and that page is server-rendered, so both sides have the
+          address. */}
       {filters.map(filter => (
         // Keyed on the identifier alone: a translated title would change a
         // title-based key, and keying on `current` remounted the control on
@@ -169,6 +206,18 @@ const TransactionsFilters: React.FC<
         <Filter key={filter?.testId} {...filter} />
       ))}
       <DateFilter />
+      {showDirection && (
+        <Filter
+          title="Transaction In/Out"
+          testId="direction"
+          firstItem={DIRECTION_ALL}
+          data={[DIRECTION_IN, DIRECTION_OUT]}
+          onClick={selectDirection}
+          current={transactionDirectionLabel(router.query, accountAddress)}
+          inputType="button"
+          isHiddenInput={false}
+        />
+      )}
     </FilterContainer>
   );
 };

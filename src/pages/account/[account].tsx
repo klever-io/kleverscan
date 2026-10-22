@@ -9,7 +9,6 @@ import {
   accountListTabIndex,
   accountPermissionsKnown,
   resolvedListTab,
-  transactionDirectionLabel,
   visibleAccountCard,
   withoutRole,
 } from '@/components/AccountDetail/state';
@@ -34,18 +33,11 @@ import {
   WeightText,
 } from '@/components/AccountDetail/styles';
 import { pickUrlEffect } from '@/components/BlockDetail/urlEffect';
-import Filter, { IFilter } from '@/components/Filter';
 import Title from '@/components/Layout/Title';
 import QrCodeModal from '@/components/QrCodeModal';
 import Skeleton from '@/components/Skeleton';
 import Tabs, { ITabs } from '@/components/Tabs';
 import Tooltip from '@/components/Tooltip/index';
-import {
-  ContainerFilter,
-  FilterDiv,
-  RightFiltersContent,
-  TxsFiltersWrapper,
-} from '@/components/TransactionsFilters/styles';
 import { useContractModal } from '@/contexts/contractModal';
 import { useExtension } from '@/contexts/extension';
 import { useNetworkParams } from '@/contexts/contract/networkParams';
@@ -271,28 +263,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
     return toLocaleFixed(stakingRewards / 10 ** KLV_PRECISION, KLV_PRECISION);
   };
 
-  const filterFromTo = (op: number) => {
-    const address = router.query.account as string;
-    const updatedQuery = { ...router.query };
-    delete updatedQuery.role;
-    if (op === 0) {
-      delete updatedQuery.fromAddress;
-      delete updatedQuery.toAddress;
-      setQueryAndRouter(
-        {
-          ...updatedQuery,
-        },
-        router,
-      );
-    } else if (op === 1) {
-      delete updatedQuery.toAddress;
-      setQueryAndRouter({ ...updatedQuery, fromAddress: address }, router);
-    } else if (op === 2) {
-      delete updatedQuery.fromAddress;
-      setQueryAndRouter({ ...updatedQuery, toAddress: address }, router);
-    }
-  };
-
   const tabProps: ITabs = {
     headers,
     onClick: header => {
@@ -319,40 +289,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
   const totalKLV = calculateTotalKLV();
   const pricedKLV = totalKLV * (priceCall || 0);
   const accountAddress = String(router.query.account || '');
-  const directionLabel = transactionDirectionLabel(
-    router.query,
-    accountAddress,
-  );
-
-  const handleClickFilterName = (filter: string) => {
-    switch (filter) {
-      case 'All Transactions':
-        filterFromTo && filterFromTo(0);
-        break;
-      case 'Transactions Out':
-        filterFromTo && filterFromTo(1);
-        break;
-      case 'Transactions In':
-        filterFromTo && filterFromTo(2);
-        break;
-
-      default:
-        filterFromTo && filterFromTo(0);
-    }
-  };
-  const filters: IFilter[] = [
-    {
-      firstItem: 'All Transactions',
-      data: ['Transactions Out', 'Transactions In'],
-      onClick: e => {
-        handleClickFilterName(e);
-      },
-      current: directionLabel,
-      overFlow: 'visible',
-      inputType: 'button',
-      isHiddenInput: false,
-    },
-  ];
 
   const selectCard = (next: typeof CARD_OVERVIEW | typeof CARD_PERMISSION) => {
     setCardQuery(next);
@@ -729,20 +665,6 @@ const Account: React.FC<PropsWithChildren<IAccountPage>> = () => {
         {card === CARD_PERMISSION && permissionsKnown && renderPermission()}
       </FactsCard>
       <Tabs {...tabProps} selectedIndex={tabIndex}>
-        {router.isReady && tabIndex >= 0 && activeTab === transactionsLabel && (
-          <TxsFiltersWrapper>
-            <ContainerFilter>
-              <RightFiltersContent>
-                <FilterDiv>
-                  <span>Transaction In/Out</span>
-                  {filters.map((filter, index) => (
-                    <Filter key={index} {...filter} />
-                  ))}
-                </FilterDiv>
-              </RightFiltersContent>
-            </ContainerFilter>
-          </TxsFiltersWrapper>
-        )}
         {router.isReady && tabIndex >= 0 && (
           <SelectedTabComponent
             showInteractionButtons={showInteractionButtons}

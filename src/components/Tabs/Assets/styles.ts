@@ -1,6 +1,7 @@
 import { ROW_LAYOUT_MIN_WIDTH, belowWidth } from '@/components/DataList/layout';
 import {
   DATA_LIST_ROW_HEIGHT,
+  TokenMark,
   dataListCardBand,
   dataListRowPadding,
   dataListTableSkin,
@@ -22,10 +23,105 @@ export const AssetsTableWrapper = styled.div`
   ${dataListTableSkin}
   ${dataListCardBand(BELOW_ROW)}
 
+  /* Below the row, the shared skeleton gives every header cell span 2, so
+     nine bars stack full width (291px at 390) against the fungible card,
+     which is four rows of span-1 cells (202px). The ninth cell is the empty
+     actions column a fungible row does not render. Heights are the loaded
+     cells, measured on the example account. */
+  @media screen and (max-width: ${props => props.theme.breakpoints.tablet}) {
+    ${TableRow} ${MobileCardItem}:has([data-testid='skeleton']) {
+      grid-column: span 1;
+      min-width: 0;
+    }
+
+    ${TableRow} ${MobileCardItem}:nth-child(9):has([data-testid='skeleton']) {
+      display: none;
+    }
+
+    ${TableRow}
+    ${MobileCardItem}:nth-child(1):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(2):has([data-testid='skeleton'])
+      [data-testid='skeleton'] {
+      height: 50px !important;
+    }
+
+    ${TableRow}
+    ${MobileCardItem}:nth-child(3):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(4):has([data-testid='skeleton'])
+      [data-testid='skeleton'] {
+      height: 32px !important;
+    }
+
+    ${TableRow}
+    ${MobileCardItem}:nth-child(5):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(6):has([data-testid='skeleton'])
+      [data-testid='skeleton'] {
+      height: 38px !important;
+    }
+
+    /* 36 rather than the loaded 38: the same cells at 38 land the card at
+       204 against the fungible card's 202. */
+    ${TableRow}
+    ${MobileCardItem}:nth-child(7):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(8):has([data-testid='skeleton'])
+      [data-testid='skeleton'] {
+      height: 36px !important;
+    }
+  }
+
   @media screen and (min-width: ${props =>
-    props.theme.breakpoints.tablet}) and (max-width: ${BELOW_ROW}) {
+      props.theme.breakpoints.tablet}) and (max-width: ${BELOW_ROW}) {
     ${TableRow} {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    ${TableRow} ${MobileCardItem}:nth-child(9) {
+      grid-column: span 2;
+    }
+
+    ${TableRow} ${MobileCardItem}:nth-child(9):has([data-testid='skeleton']) {
+      display: none;
+    }
+
+    ${TableRow}
+    ${MobileCardItem}:nth-child(1):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(2):has([data-testid='skeleton'])
+      [data-testid='skeleton'] {
+      height: 56px !important;
+    }
+
+    ${TableRow}
+    ${MobileCardItem}:nth-child(3):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(4):has([data-testid='skeleton'])
+      [data-testid='skeleton'] {
+      height: 40px !important;
+    }
+
+    ${TableRow}
+    ${MobileCardItem}:nth-child(5):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(6):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(7):has([data-testid='skeleton'])
+      [data-testid='skeleton'],
+    ${TableRow}
+      ${MobileCardItem}:nth-child(8):has([data-testid='skeleton'])
+      [data-testid='skeleton'] {
+      height: 44px !important;
     }
   }
 
@@ -39,14 +135,16 @@ export const AssetsTableWrapper = styled.div`
       min-width: 0;
     }
 
+    /* Token is the ticker plus a 32px mark. The 4 points come off the ID
+       column, which already truncates. */
     ${HeaderItem}:nth-child(1),
     ${MobileCardItem}:nth-child(1) {
-      width: 9.53%;
+      width: 13.53%;
     }
 
     ${HeaderItem}:nth-child(2),
     ${MobileCardItem}:nth-child(2) {
-      width: 12.56%;
+      width: 8.56%;
     }
 
     ${HeaderItem}:nth-child(3),
@@ -100,6 +198,16 @@ export const AssetsTableWrapper = styled.div`
     ${MobileCardItem} a,
     ${MobileCardItem} span {
       height: 20px;
+    }
+
+    /* The cell rule above pins every span to 20px and the shared table rule
+       gives it min-width: fit-content. Both would clip the ticker beside a
+       32px mark, or push the mark into the ID column. */
+    ${TokenMark} span {
+      height: auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     ${MobileCardItem} a:hover,

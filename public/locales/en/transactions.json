@@ -11,7 +11,10 @@
     "Contract": "Contract",
     "ContractPlaceholder": "Type the contract",
     "BuyType": "Buy Type",
-    "NotFound": "No match found"
+    "NotFound": "No match found",
+    "Direction": "Transaction In/Out",
+    "In": "In",
+    "Out": "Out"
   },
   "Status": {
     "Success": "Success",

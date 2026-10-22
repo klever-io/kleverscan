@@ -19,13 +19,17 @@ import {
 } from '@/components/DataList/styles';
 import { belowWidth } from '@/components/DataList/layout';
 import {
+  ExportContainer,
   FloatContainer,
   HeaderItem,
+  LimitContainer,
   MobileCardItem,
   MobileHeader,
+  TableBody,
   TableControls,
   TableRow,
 } from '@/components/Table/styles';
+import { Content as FilterContent } from '@/components/Filter/styles';
 import { FilterContainer } from '@/components/TransactionsFilters/styles';
 import Link from 'next/link';
 import styled, { css } from 'styled-components';
@@ -54,6 +58,8 @@ interface IRowLayoutWidth {
   /** The viewport width from which this list's row fits, from
    *  `rowLayoutMinWidth`; it differs by one column between the variants. */
   $rowLayoutMin: number;
+  /** The account list inserts In/Out, ten columns instead of nine. */
+  $showInOut?: boolean;
 }
 
 /** Same reason as BELOW_ROW_LAYOUT one breakpoint up: `max-width: N` and
@@ -196,6 +202,22 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
     }
   }
 
+  /* From the mobile breakpoint the loaded card is one header line plus one
+     field line: 96px on the account tab, 94px on the shorter contracts. The
+     phone skeleton above is five rows and stays 155px through this whole
+     band. Ten bars in five columns is two rows, and a 29px bar lands the
+     card at 96. */
+  @media screen and (min-width: ${props =>
+      props.theme.breakpoints.mobile}) and (max-width: ${belowRow}) {
+    ${TableRow} {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    ${TableRow} [data-testid='skeleton'] {
+      height: 29px !important;
+    }
+  }
+
   ${dataListCardBand(belowRow)}
 
   /* The age and the two buttons live in one group in the card's top-right
@@ -303,24 +325,119 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
     }
   }
 
+  /* The account page's In/Out filter is the fifth control. Below the row it
+     leaves the filter grid (display: contents) so it lands under Contract, in
+     the same grid row as the page-size controls, which is the empty stretch
+     those controls used to sit in alone. Buy type is inserted before Date and
+     would pair Date with In/Out; spanning Buy puts Date back beside Contract
+     and keeps In/Out with the controls. */
+  @media screen and (max-width: ${belowRow}) {
+    ${FloatContainer}:has([data-testid='filter-direction']) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      /* Buy spans a row of its own and leaves a hole beside Contract.
+         Sparse placement would not fill it, so Date would sit next to
+         In/Out and the page-size controls would drop to the next row. */
+      grid-auto-flow: dense;
+      /* Start, not end. Below the tablet width the page-size block and the
+         export buttons each carry a 10px bottom margin. End alignment used
+         that extra height to push In/Out down, so its gap under Date grew
+         past the 12px of the rows above. */
+      align-items: start;
+      gap: 12px;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction']) ${LimitContainer},
+    ${FloatContainer}:has([data-testid='filter-direction']) ${ExportContainer} {
+      margin-bottom: 0;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction']) ${FilterContainer} {
+      display: contents;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction'])
+      [data-testid='filter-buyType'] {
+      grid-column: 1 / -1;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction']) ${TableControls} {
+      grid-column: auto;
+      width: auto;
+      margin-left: 0;
+      justify-self: end;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+    }
+  }
+
+  /* The page-size cluster does not fit an equal half below this width, so the
+     other filters take the full row and In/Out keeps the cluster's row.
+     Below 480 the leftover beside that cluster is narrower than the In/Out
+     label, so In/Out takes a row of its own directly above it. */
+  @media screen and (max-width: 599px) {
+    ${FloatContainer}:has([data-testid='filter-direction']) {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction'])
+      ${FilterContainer}
+      > div:not([data-testid='filter-direction']) {
+      grid-column: 1 / -1;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction'])
+      [data-testid='filter-direction']
+      ${FilterContent} {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    ${FloatContainer}:has([data-testid='filter-direction'])
+      [data-testid='filter-direction'] {
+      grid-column: 1 / -1;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction']) ${TableControls} {
+      grid-column: 1 / -1;
+    }
+  }
+
   /* Selecting Contract = Buy adds a fifth filter, and five of them are 1098px
      against a 1280px content box, so they can never share a row with the
-     controls whatever the viewport. Read off the DOM rather than passed as a
-     prop: the bar decides for itself how many filters it renders. */
+     controls whatever the viewport. The account In/Out filter is also a fifth
+     child, but it is meant to stay on that row, so it is excluded here. Six
+     children (Buy plus In/Out) still cannot fit and stack the same way.
+     Read off the DOM rather than passed as a prop: the bar decides for itself
+     how many filters it renders. */
   @media screen and (min-width: ${fromRow}) {
-    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5)) {
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5)):not(
+        :has([data-testid='filter-direction'])
+      ),
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(6)) {
       flex-direction: column;
       align-items: stretch;
     }
 
-    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5))
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5)):not(
+        :has([data-testid='filter-direction'])
+      )
+      ${FilterContainer},
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(6))
       ${FilterContainer} {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
 
-    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5))
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5)):not(
+        :has([data-testid='filter-direction'])
+      )
+      ${FilterContainer}
+      > div,
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(6))
       ${FilterContainer}
       > div {
       width: 100%;
@@ -328,9 +445,53 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
       min-width: 0;
     }
 
-    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5))
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(5)):not(
+        :has([data-testid='filter-direction'])
+      )
+      ${TableControls},
+    ${FloatContainer}:has(${FilterContainer} > div:nth-child(6))
       ${TableControls} {
       justify-content: flex-end;
+    }
+
+    /* One width for the whole row. 170px is the In/Out control measured at
+       1440 while its label still read "Transaction In/Out". */
+    ${FloatContainer}:has([data-testid='filter-direction']):not(
+        :has(${FilterContainer} > div:nth-child(6))
+      )
+      ${FilterContainer} {
+      flex-wrap: nowrap;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction']):not(
+        :has(${FilterContainer} > div:nth-child(6))
+      )
+      ${FilterContainer}
+      > div {
+      width: 170px;
+      min-width: 170px;
+      max-width: 170px;
+    }
+
+    ${FloatContainer}:has([data-testid='filter-direction']):not(
+        :has(${FilterContainer} > div:nth-child(6))
+      )
+      ${FilterContainer}
+      > div
+      ${FilterContent} {
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* Date is an input. Its default size measured 211px, wider than 170. */
+    ${FloatContainer}:has([data-testid='filter-direction']):not(
+        :has(${FilterContainer} > div:nth-child(6))
+      )
+      ${FilterContainer}
+      > [data-testid='filter-date']
+      input {
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 
@@ -375,6 +536,60 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
       text-decoration: underline;
       text-underline-offset: 0.2rem;
     }
+
+    /* The ten-column account row was auto-sized, so the skeleton bars and
+       the loaded cells gave the header different widths. Shares of the
+       loaded 1278px row, measured on the account tab at 1440. */
+    ${props =>
+      props.$showInOut
+        ? css`
+            ${TableBody} {
+              table-layout: fixed;
+              min-width: 0;
+            }
+
+            ${HeaderItem}:nth-child(1),
+            ${MobileCardItem}:nth-child(1) {
+              width: 14.01%;
+            }
+            ${HeaderItem}:nth-child(2),
+            ${MobileCardItem}:nth-child(2) {
+              width: 12.83%;
+            }
+            ${HeaderItem}:nth-child(3),
+            ${MobileCardItem}:nth-child(3) {
+              width: 7.28%;
+            }
+            ${HeaderItem}:nth-child(4),
+            ${MobileCardItem}:nth-child(4) {
+              width: 8.61%;
+            }
+            ${HeaderItem}:nth-child(5),
+            ${MobileCardItem}:nth-child(5) {
+              width: 14.08%;
+            }
+            ${HeaderItem}:nth-child(6),
+            ${MobileCardItem}:nth-child(6) {
+              width: 3.36%;
+            }
+            ${HeaderItem}:nth-child(7),
+            ${MobileCardItem}:nth-child(7) {
+              width: 15.34%;
+            }
+            ${HeaderItem}:nth-child(8),
+            ${MobileCardItem}:nth-child(8) {
+              width: 5.32%;
+            }
+            ${HeaderItem}:nth-child(9),
+            ${MobileCardItem}:nth-child(9) {
+              width: 11.66%;
+            }
+            ${HeaderItem}:nth-child(10),
+            ${MobileCardItem}:nth-child(10) {
+              width: 7.51%;
+            }
+          `
+        : null}
   }
 
   /* Outside the row band on purpose: the hover handler sits on the badge,

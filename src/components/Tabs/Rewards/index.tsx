@@ -1,3 +1,6 @@
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
+import { TokenMark } from '@/components/DataList/styles';
+import AssetLogo from '@/components/Logo/AssetLogo';
 import { PropsWithChildren } from 'react';
 import Table, { ITable } from '@/components/Table';
 import { IInnerTableProps, IRewardsAssets, IRowSection } from '@/types/index';
@@ -7,9 +10,10 @@ import { useTranslation } from 'next-i18next';
 import React, { useState } from 'react';
 import {
   ArrowExpand,
-  ButtonContent,
-  FrozenContainerRewards,
-  FrozenContent,
+  ExpandButton,
+  RewardLine,
+  RewardLines,
+  RewardsTableWrapper,
 } from './styles';
 
 interface IRewards {
@@ -30,7 +34,9 @@ const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
     }));
   };
   const rowSections = (props: IRewardsAssets): IRowSection[] => {
-    const { assetId, allStakingRewards, allowance } = props;
+    const { assetId, allStakingRewards, allowance, assetName, logo, verified } =
+      props;
+    const ticker = props.ticker || assetId?.split('-')[0] || '';
 
     const displayRewards = expanded[assetId]
       ? allStakingRewards
@@ -38,45 +44,50 @@ const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
 
     const sections: IRowSection[] = [
       {
-        element: props => <ExplorerLink type="asset" value={assetId} compact />,
+        element: props => (
+          <TokenMark>
+            <AssetLogo
+              logo={logo || ''}
+              ticker={ticker}
+              name={assetName || ticker}
+              verified={verified}
+              size={32}
+            />
+            <ExplorerLink type="asset" value={assetId} compact />
+          </TokenMark>
+        ),
         span: 1,
       },
       {
         element: props => (
-          <>
-            <FrozenContainerRewards>
-              {displayRewards && displayRewards.length >= 1 ? (
-                displayRewards.map((rewards, key) => (
-                  <FrozenContent key={key}>
-                    <span>{` ${rewards.assetId || ''}`}</span>
-                    <span>
-                      {(
-                        rewards.rewards /
-                        10 ** rewards.precision
-                      ).toLocaleString()}
-                    </span>
-                  </FrozenContent>
-                ))
-              ) : (
-                <FrozenContent>
-                  <span>{` ${assetId || ''}`}</span>
-                  <span>{allowance / 10 ** KLV_PRECISION || 0}</span>
-                </FrozenContent>
-              )}
-              {!!allStakingRewards?.length && allStakingRewards?.length > 3 && (
-                <ButtonContent onClick={() => toggleExpand(assetId)}>
-                  <p>
-                    {expanded[assetId]
-                      ? t('Buttons.Hide')
-                      : t('Buttons.Expand')}
-                  </p>
-                  <ArrowExpand expended={expanded[assetId]} />
-                </ButtonContent>
-              )}
-            </FrozenContainerRewards>
-          </>
+          <RewardLines>
+            {displayRewards && displayRewards.length >= 1 ? (
+              displayRewards.map((rewards, key) => (
+                <RewardLine key={key}>
+                  <span>{rewards.assetId || ''}</span>
+                  <span>
+                    {(
+                      rewards.rewards /
+                      10 ** rewards.precision
+                    ).toLocaleString()}
+                  </span>
+                </RewardLine>
+              ))
+            ) : (
+              <RewardLine>
+                <span>{assetId || ''}</span>
+                <span>{allowance / 10 ** KLV_PRECISION || 0}</span>
+              </RewardLine>
+            )}
+            {!!allStakingRewards?.length && allStakingRewards.length > 3 && (
+              <ExpandButton type="button" onClick={() => toggleExpand(assetId)}>
+                {expanded[assetId] ? t('Buttons.Hide') : t('Buttons.Expand')}
+                <ArrowExpand $open={!!expanded[assetId]} />
+              </ExpandButton>
+            )}
+          </RewardLines>
         ),
-        span: 2,
+        span: 1,
       },
     ];
 
@@ -87,9 +98,14 @@ const Rewards: React.FC<PropsWithChildren<IRewards>> = ({
     rowSections,
     type: 'rewards',
     header: headers,
+    singleLineSkeleton: true,
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <RewardsTableWrapper>
+      <Table {...tableProps} cardBreakpoint={ROW_LAYOUT_MIN_WIDTH} />
+    </RewardsTableWrapper>
+  );
 };
 
 export default Rewards;

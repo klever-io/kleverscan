@@ -1,9 +1,9 @@
 export const CARD_OVERVIEW = 'Overview';
 export const CARD_PERMISSION = 'Permission';
 
-export const DIRECTION_ALL = 'All Transactions';
-export const DIRECTION_OUT = 'Transactions Out';
-export const DIRECTION_IN = 'Transactions In';
+export const DIRECTION_ALL = 'All';
+export const DIRECTION_OUT = 'Out';
+export const DIRECTION_IN = 'In';
 
 export type AccountCard = typeof CARD_OVERVIEW | typeof CARD_PERMISSION;
 

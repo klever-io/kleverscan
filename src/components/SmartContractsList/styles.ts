@@ -20,6 +20,7 @@ import {
   LimitContainer,
   MobileCardItem,
   MobileHeader,
+  TableBody,
   TableControls,
   TableRow,
 } from '@/components/Table/styles';
@@ -497,6 +498,45 @@ export const ContractsTableWrapper = styled.div`
   }
 
   @media screen and (min-width: ${props => props.theme.breakpoints.tablet}) {
+    /* Shares of the loaded 1278px row, measured at 1440. Auto layout kept
+       those widths there and gave them up at 1100: the identity's 230px
+       minimum pushed the first column 32px and the header moved with it.
+       Fixed shares keep the header still at both widths. */
+    ${TableBody} {
+      table-layout: fixed;
+      min-width: 0;
+    }
+
+    ${HeaderItem}:nth-child(1),
+    ${MobileCardItem}:nth-child(1) {
+      width: 38.96%;
+    }
+
+    ${HeaderItem}:nth-child(2),
+    ${MobileCardItem}:nth-child(2) {
+      width: 9.39%;
+    }
+
+    ${HeaderItem}:nth-child(3),
+    ${MobileCardItem}:nth-child(3) {
+      width: 16.43%;
+    }
+
+    ${HeaderItem}:nth-child(4),
+    ${MobileCardItem}:nth-child(4) {
+      width: 14.87%;
+    }
+
+    ${HeaderItem}:nth-child(5),
+    ${MobileCardItem}:nth-child(5) {
+      width: 8.61%;
+    }
+
+    ${HeaderItem}:nth-child(6),
+    ${MobileCardItem}:nth-child(6) {
+      width: 11.74%;
+    }
+
     /* One row height across every data-list table on the site. */
     ${MobileCardItem} {
       height: ${DATA_LIST_ROW_HEIGHT};

@@ -6,10 +6,11 @@ import {
   IAccountAsset,
   IAccountResponse,
   IAssetsBuckets,
-  IAssetsResponse,
   IBucket,
   IPaginatedResponse,
+  IProprietaryAsset,
   IResponse,
+  IRewardsAssets,
   Service,
 } from '@/types';
 import { AssetType } from '@/types/assets';
@@ -48,6 +49,57 @@ export const generateEmptyAccountResponse = (
   };
 };
 
+// The public assets/list route returns at most 100 rows and still reports the
+// requested page size, so a single call cannot cover a longer id list.
+const REGISTRY_PAGE_SIZE = 100;
+
+type RegistryAsset = {
+  assetId: string;
+  logo?: string;
+  ticker?: string;
+  name?: string;
+  verified?: boolean;
+  staking?: IAccountAsset['staking'];
+};
+
+const registryAssets = async (ids: string[]): Promise<RegistryAsset[]> => {
+  const pages = await Promise.all(
+    Array.from(
+      { length: Math.ceil(ids.length / REGISTRY_PAGE_SIZE) },
+      (_, index) => {
+        const chunk = ids.slice(
+          index * REGISTRY_PAGE_SIZE,
+          (index + 1) * REGISTRY_PAGE_SIZE,
+        );
+        // A 200 with a non-JSON body rejects api.get. Without this catch,
+        // Promise.all drops the chunks that succeeded and the caller never
+        // reaches its own fallback rows.
+        return api
+          .get({
+            route: 'assets/list',
+            query: {
+              asset: chunk.join(','),
+              page: 1,
+              limit: chunk.length,
+            },
+          })
+          .catch(() => ({ error: 'request failed', data: null }));
+      },
+    ),
+  );
+
+  const rows: RegistryAsset[] = [];
+  for (const page of pages) {
+    const assets = page?.error ? null : page?.data?.assets;
+    if (!Array.isArray(assets)) continue;
+    for (const item of assets as RegistryAsset[]) {
+      if (!item?.assetId) continue;
+      rows.push(item);
+    }
+  }
+  return rows;
+};
+
 export const assetsRequest = (
   address: string,
   assetType?: string,
@@ -81,27 +133,24 @@ export const assetsRequest = (
         code: 'error',
       };
     }
-    let assetsToRequest = '';
-    const assetsArray = Object.keys(assets).map(asset => {
-      assetsToRequest += `${assets[asset].assetId},`;
-      return assets[asset];
-    });
+    const assetsArray = Object.keys(assets).map(asset => assets[asset]);
 
-    assetsToRequest = assetsToRequest.slice(0, -1);
-    const allAccountAssets = await api.get({
-      route: 'assets/list',
-      query: { page, limit, asset: assetsToRequest },
+    // The table draws every holding from this one response, so the detail
+    // lookup has to cover the whole set. The table page only filled staking
+    // for the first slice of ids, and the same slice is where the logo lives.
+    const listed = await registryAssets(
+      assetsArray.map(asset => asset.assetId),
+    );
+    const byId = new Map(listed.map(item => [item.assetId, item]));
+    assetsArray.forEach((asset: IAccountAsset) => {
+      const details = byId.get(asset.assetId);
+      if (!details) return;
+      asset.staking = details.staking;
+      asset.logo = details.logo;
+      asset.ticker = details.ticker;
+      asset.verified = details.verified;
+      if (details.name) asset.assetName = details.name;
     });
-    if (!allAccountAssets.error || allAccountAssets.error === '') {
-      assetsArray.forEach((asset: IAccountAsset, index) => {
-        const stakingToInsert = allAccountAssets.data.assets.find(
-          (asset2: IAccountAsset) => asset2.assetId === asset.assetId,
-        );
-        if (stakingToInsert) {
-          asset.staking = stakingToInsert.staking;
-        }
-      });
-    }
 
     // Filter by asset type if specified
     let filteredAssets = assetsArray;
@@ -158,9 +207,37 @@ export const ownedAssetsRequest = (
         code: 'error',
       };
     }
+    const owned = Array.isArray(ownedAssetsResponse.data?.assets)
+      ? ownedAssetsResponse.data.assets
+      : [];
+    // kassets can carry a broken logo (the string "https/"). The registry
+    // list is the same source the holdings table uses.
+    if (owned.length) {
+      const listed = await registryAssets(
+        owned.map((item: { assetId: string }) => item.assetId),
+      );
+      const byId = new Map(listed.map(item => [item.assetId, item]));
+      owned.forEach((asset: IProprietaryAsset) => {
+        const details = byId.get(asset.assetId) as
+          | {
+              logo?: string;
+              ticker?: string;
+              name?: string;
+              verified?: boolean;
+            }
+          | undefined;
+        if (!details) return;
+        if (details.logo) asset.logo = details.logo;
+        if (details.ticker) asset.ticker = details.ticker;
+        if (details.name) asset.name = details.name;
+        if (typeof details.verified === 'boolean') {
+          asset.verified = details.verified;
+        }
+      });
+    }
     const proprietaryAssets = {
       data: {
-        proprietaryAssets: ownedAssetsResponse.data.assets,
+        proprietaryAssets: owned,
       },
       error: '',
       code: 'successful',
@@ -199,25 +276,41 @@ export const bucketsRequest = (
       };
     }
 
-    const assetsDetailsResponse: IAssetsResponse = await api.get({
-      route: `assets/list`,
-      query: { asset: assetsWithBuckets, page, limit },
-    });
+    const allAssetsDetails = await registryAssets(assetsWithBuckets);
+    const detailsById = new Map(
+      allAssetsDetails.map(details => [details.assetId, details]),
+    );
 
-    const allAssetsDetails = assetsDetailsResponse?.data?.assets;
-
-    for (const { assetId, staking } of allAssetsDetails) {
+    // Account order, not registry order. A failed page used to append its
+    // stakes after the rows the registry did return, so the next request
+    // could put the same stake on a different page.
+    for (const assetId of assetsWithBuckets) {
       const asset = assets[assetId];
-
-      if (asset?.staking) asset.staking = staking;
-
-      for (const bucket of asset?.buckets ?? [])
+      const details = detailsById.get(assetId);
+      if (details) {
+        if (asset.staking) asset.staking = details.staking;
+        asset.logo = details.logo;
+        asset.ticker = details.ticker;
+        asset.verified = details.verified;
+        if (details.name) asset.assetName = details.name;
+      }
+      for (const bucket of asset.buckets as IBucket[]) {
         assetsBuckets.push({ asset, bucket });
+      }
     }
+
+    // Page the rows before the validator lookup. Resolving every stake first
+    // crawled the full validator list on each table page.
+    const safeLimit = limit > 0 ? limit : 10;
+    const safePage = page > 0 ? page : 1;
+    const totalRecords = assetsBuckets.length;
+    const totalPages = Math.max(1, Math.ceil(totalRecords / safeLimit));
+    const start = (safePage - 1) * safeLimit;
+    const pageRows = assetsBuckets.slice(start, start + safeLimit);
 
     const uniqueDelegations = Array.from(
       new Set(
-        assetsBuckets
+        pageRows
           .map(ab => ab.bucket?.delegation)
           .filter((d): d is string => !!d && d.length > 0),
       ),
@@ -274,15 +367,25 @@ export const bucketsRequest = (
       }
     }
 
-    for (const ab of assetsBuckets) {
+    for (const ab of pageRows) {
       if (ab.bucket?.delegation) {
         ab.validatorStatus = statusMap.get(ab.bucket.delegation) || '';
       }
     }
 
+    // The registry call loads a logo for every stake. The table still pages
+    // the bucket rows themselves. Passing the registry pagination through
+    // made every page repeat the full set.
     return {
-      data: { buckets: assetsBuckets },
-      pagination: assetsDetailsResponse.pagination,
+      data: { buckets: pageRows },
+      pagination: {
+        self: safePage,
+        next: safePage < totalPages ? safePage + 1 : 0,
+        previous: safePage > 1 ? safePage - 1 : 0,
+        perPage: safeLimit,
+        totalPages,
+        totalRecords,
+      },
       code: 'successful',
       error: '',
     };
@@ -450,7 +553,35 @@ export const rewardsFPRPool = (
         }
       }),
     );
-    return { data: { rewards: responseAll }, code: 'successful', error: '' };
+    const rewards: IRewardsAssets[] = [];
+    responseAll.forEach(row => {
+      if (!row?.assetId) return;
+      rewards.push({
+        allowance: row.allowance,
+        allStakingRewards: row.allStakingRewards,
+        assetId: row.assetId,
+      });
+    });
+    if (rewards.length) {
+      const listed = await registryAssets(rewards.map(row => row.assetId));
+      const byId = new Map(listed.map(item => [item.assetId, item]));
+      rewards.forEach(row => {
+        const details = byId.get(row.assetId) as
+          | {
+              logo?: string;
+              ticker?: string;
+              name?: string;
+              verified?: boolean;
+            }
+          | undefined;
+        if (!details) return;
+        row.logo = details.logo;
+        row.ticker = details.ticker;
+        row.assetName = details.name;
+        row.verified = details.verified;
+      });
+    }
+    return { data: { rewards }, code: 'successful', error: '' };
   };
 
   return get;

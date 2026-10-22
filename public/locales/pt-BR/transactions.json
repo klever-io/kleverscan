@@ -11,7 +11,10 @@
     "Contract": "Contrato",
     "ContractPlaceholder": "Digite o contrato",
     "BuyType": "Tipo de compra",
-    "NotFound": "Nenhum resultado encontrado"
+    "NotFound": "Nenhum resultado encontrado",
+    "Direction": "Entrada/Saída",
+    "In": "Entrada",
+    "Out": "Saída"
   },
   "Status": {
     "Success": "Sucesso",

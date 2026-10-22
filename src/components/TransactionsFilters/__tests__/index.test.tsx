@@ -389,4 +389,20 @@ describe('TransactionsFilters account direction', () => {
 
     expect(mockedSetQuery).not.toHaveBeenCalled();
   });
+
+  it('clears a foreign address when All is chosen again', () => {
+    routerPathname = '/account/[account]';
+    renderFilters({
+      account: 'klv1abc',
+      page: '5',
+      toAddress: 'klv1other',
+    });
+
+    pick('All');
+
+    expect(mockedSetQuery).toHaveBeenCalledWith(
+      { account: 'klv1abc', page: '1' },
+      expect.anything(),
+    );
+  });
 });

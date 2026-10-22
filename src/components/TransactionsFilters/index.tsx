@@ -167,9 +167,17 @@ const TransactionsFilters: React.FC<
   const selectDirection = (selected: string): void => {
     // Filter reports the click even when the value is already selected.
     // Resetting the page then jumps a reader from page 5 back to page 1.
-    if (selected === transactionDirectionLabel(router.query, accountAddress)) {
-      return;
-    }
+    // The label can still read All while a foreign address is in the query,
+    // and that address has to be cleared.
+    const fromIsAccount = router.query.fromAddress === accountAddress;
+    const toIsAccount = router.query.toAddress === accountAddress;
+    const fromAbsent = !('fromAddress' in router.query);
+    const toAbsent = !('toAddress' in router.query);
+    const alreadyApplied =
+      (selected === DIRECTION_OUT && fromIsAccount && toAbsent) ||
+      (selected === DIRECTION_IN && toIsAccount && fromAbsent) ||
+      (selected === DIRECTION_ALL && fromAbsent && toAbsent);
+    if (alreadyApplied) return;
     // Same reason as the other filters: a narrower set can have fewer pages
     // than the one on screen, and the pager hides when there is only one.
     const updatedQuery: NextParsedUrlQuery = { ...router.query, page: '1' };

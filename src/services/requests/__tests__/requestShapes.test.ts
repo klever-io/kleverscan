@@ -499,6 +499,41 @@ describe('escaped route segments', () => {
     expect(result.data.buckets[1].asset.logo).toBeUndefined();
   });
 
+  it('bucketsRequest keeps account order when the registry returns the other order', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', balance: 1 }],
+              },
+              KFI: {
+                assetId: 'KFI',
+                buckets: [{ id: 'b2', balance: 2 }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [
+            { assetId: 'KFI', logo: '/kfi.png' },
+            { assetId: 'KLV', logo: '/klv.png' },
+          ],
+        },
+      });
+
+    const result = await bucketsRequest('klv1abc')(1, 10);
+
+    expect(result.data.buckets.map(row => row.bucket.id)).toEqual(['b1', 'b2']);
+    expect(result.data.buckets[1].asset.logo).toBe('/kfi.png');
+  });
+
   it('bucketsRequest pages the bucket rows and still asks the registry for every asset', async () => {
     mockGet
       .mockResolvedValueOnce({

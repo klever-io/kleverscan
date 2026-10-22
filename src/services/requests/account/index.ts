@@ -277,32 +277,24 @@ export const bucketsRequest = (
     }
 
     const allAssetsDetails = await registryAssets(assetsWithBuckets);
-    const returnedIds = new Set<string>();
+    const detailsById = new Map(
+      allAssetsDetails.map(details => [details.assetId, details]),
+    );
 
-    for (const details of allAssetsDetails) {
-      const asset = assets[details.assetId];
-      if (!asset) continue;
-      returnedIds.add(details.assetId);
-
-      if (asset.staking) asset.staking = details.staking;
-      asset.logo = details.logo;
-      asset.ticker = details.ticker;
-      asset.verified = details.verified;
-      if (details.name) asset.assetName = details.name;
-
-      for (const bucket of asset.buckets ?? [])
-        assetsBuckets.push({ asset, bucket });
-    }
-
-    // A failed or partial registry list must not hide stakes. Holdings and
-    // rewards already keep their rows without a logo. Buckets used to return
-    // an empty list instead, because rows were built only from the list.
+    // Account order, not registry order. A failed page used to append its
+    // stakes after the rows the registry did return, so the next request
+    // could put the same stake on a different page.
     for (const assetId of assetsWithBuckets) {
-      if (returnedIds.has(assetId)) continue;
-      // The id list above only keeps assets that already have buckets.
       const asset = assets[assetId];
-      const buckets = asset.buckets as IBucket[];
-      for (const bucket of buckets) {
+      const details = detailsById.get(assetId);
+      if (details) {
+        if (asset.staking) asset.staking = details.staking;
+        asset.logo = details.logo;
+        asset.ticker = details.ticker;
+        asset.verified = details.verified;
+        if (details.name) asset.assetName = details.name;
+      }
+      for (const bucket of asset.buckets as IBucket[]) {
         assetsBuckets.push({ asset, bucket });
       }
     }

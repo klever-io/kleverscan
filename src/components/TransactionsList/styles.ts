@@ -488,7 +488,7 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
         :has(${FilterContainer} > div:nth-child(6))
       )
       ${FilterContainer}
-      > div:has(input[placeholder='All'])
+      > [data-testid='filter-date']
       input {
       overflow: hidden;
       text-overflow: ellipsis;

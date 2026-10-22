@@ -6,7 +6,6 @@ import {
   IAccountAsset,
   IAccountResponse,
   IAssetsBuckets,
-  IAssetsResponse,
   IBucket,
   IPaginatedResponse,
   IProprietaryAsset,
@@ -50,6 +49,57 @@ export const generateEmptyAccountResponse = (
   };
 };
 
+// The public assets/list route returns at most 100 rows and still reports the
+// requested page size, so a single call cannot cover a longer id list.
+const REGISTRY_PAGE_SIZE = 100;
+
+type RegistryAsset = {
+  assetId: string;
+  logo?: string;
+  ticker?: string;
+  name?: string;
+  verified?: boolean;
+  staking?: IAccountAsset['staking'];
+};
+
+const registryAssets = async (ids: string[]): Promise<RegistryAsset[]> => {
+  const pages = await Promise.all(
+    Array.from(
+      { length: Math.ceil(ids.length / REGISTRY_PAGE_SIZE) },
+      (_, index) => {
+        const chunk = ids.slice(
+          index * REGISTRY_PAGE_SIZE,
+          (index + 1) * REGISTRY_PAGE_SIZE,
+        );
+        // A 200 with a non-JSON body rejects api.get. Without this catch,
+        // Promise.all drops the chunks that succeeded and the caller never
+        // reaches its own fallback rows.
+        return api
+          .get({
+            route: 'assets/list',
+            query: {
+              asset: chunk.join(','),
+              page: 1,
+              limit: chunk.length,
+            },
+          })
+          .catch(() => ({ error: 'request failed', data: null }));
+      },
+    ),
+  );
+
+  const rows: RegistryAsset[] = [];
+  for (const page of pages) {
+    const assets = page?.error ? null : page?.data?.assets;
+    if (!Array.isArray(assets)) continue;
+    for (const item of assets as RegistryAsset[]) {
+      if (!item?.assetId) continue;
+      rows.push(item);
+    }
+  }
+  return rows;
+};
+
 export const assetsRequest = (
   address: string,
   assetType?: string,
@@ -83,41 +133,24 @@ export const assetsRequest = (
         code: 'error',
       };
     }
-    let assetsToRequest = '';
-    const assetsArray = Object.keys(assets).map(asset => {
-      assetsToRequest += `${assets[asset].assetId},`;
-      return assets[asset];
-    });
+    const assetsArray = Object.keys(assets).map(asset => assets[asset]);
 
-    assetsToRequest = assetsToRequest.slice(0, -1);
     // The table draws every holding from this one response, so the detail
     // lookup has to cover the whole set. The table page only filled staking
     // for the first slice of ids, and the same slice is where the logo lives.
-    const allAccountAssets = await api.get({
-      route: 'assets/list',
-      query: {
-        page: 1,
-        limit: assetsArray.length,
-        asset: assetsToRequest,
-      },
+    const listed = await registryAssets(
+      assetsArray.map(asset => asset.assetId),
+    );
+    const byId = new Map(listed.map(item => [item.assetId, item]));
+    assetsArray.forEach((asset: IAccountAsset) => {
+      const details = byId.get(asset.assetId);
+      if (!details) return;
+      asset.staking = details.staking;
+      asset.logo = details.logo;
+      asset.ticker = details.ticker;
+      asset.verified = details.verified;
+      if (details.name) asset.assetName = details.name;
     });
-    const listed: Array<IAccountAsset & { name?: string }> = Array.isArray(
-      allAccountAssets.data?.assets,
-    )
-      ? allAccountAssets.data.assets
-      : [];
-    if (!allAccountAssets.error || allAccountAssets.error === '') {
-      const byId = new Map(listed.map(item => [item.assetId, item]));
-      assetsArray.forEach((asset: IAccountAsset) => {
-        const details = byId.get(asset.assetId);
-        if (!details) return;
-        asset.staking = details.staking;
-        asset.logo = details.logo;
-        asset.ticker = details.ticker;
-        asset.verified = details.verified;
-        if (details.name) asset.assetName = details.name;
-      });
-    }
 
     // Filter by asset type if specified
     let filteredAssets = assetsArray;
@@ -180,21 +213,10 @@ export const ownedAssetsRequest = (
     // kassets can carry a broken logo (the string "https/"). The registry
     // list is the same source the holdings table uses.
     if (owned.length) {
-      const listed = await api.get({
-        route: 'assets/list',
-        query: {
-          asset: owned
-            .map((item: { assetId: string }) => item.assetId)
-            .join(','),
-          page: 1,
-          limit: owned.length,
-        },
-      });
-      const byId = new Map(
-        (Array.isArray(listed.data?.assets) ? listed.data.assets : []).map(
-          (item: { assetId: string }) => [item.assetId, item],
-        ),
+      const listed = await registryAssets(
+        owned.map((item: { assetId: string }) => item.assetId),
       );
+      const byId = new Map(listed.map(item => [item.assetId, item]));
       owned.forEach((asset: IProprietaryAsset) => {
         const details = byId.get(asset.assetId) as
           | {
@@ -254,18 +276,7 @@ export const bucketsRequest = (
       };
     }
 
-    const assetsDetailsResponse: IAssetsResponse = await api.get({
-      route: `assets/list`,
-      query: {
-        asset: assetsWithBuckets.join(','),
-        page: 1,
-        limit: assetsWithBuckets.length,
-      },
-    });
-
-    const allAssetsDetails = Array.isArray(assetsDetailsResponse?.data?.assets)
-      ? assetsDetailsResponse.data.assets
-      : [];
+    const allAssetsDetails = await registryAssets(assetsWithBuckets);
     const returnedIds = new Set<string>();
 
     for (const details of allAssetsDetails) {
@@ -296,9 +307,18 @@ export const bucketsRequest = (
       }
     }
 
+    // Page the rows before the validator lookup. Resolving every stake first
+    // crawled the full validator list on each table page.
+    const safeLimit = limit > 0 ? limit : 10;
+    const safePage = page > 0 ? page : 1;
+    const totalRecords = assetsBuckets.length;
+    const totalPages = Math.max(1, Math.ceil(totalRecords / safeLimit));
+    const start = (safePage - 1) * safeLimit;
+    const pageRows = assetsBuckets.slice(start, start + safeLimit);
+
     const uniqueDelegations = Array.from(
       new Set(
-        assetsBuckets
+        pageRows
           .map(ab => ab.bucket?.delegation)
           .filter((d): d is string => !!d && d.length > 0),
       ),
@@ -355,7 +375,7 @@ export const bucketsRequest = (
       }
     }
 
-    for (const ab of assetsBuckets) {
+    for (const ab of pageRows) {
       if (ab.bucket?.delegation) {
         ab.validatorStatus = statusMap.get(ab.bucket.delegation) || '';
       }
@@ -364,14 +384,8 @@ export const bucketsRequest = (
     // The registry call loads a logo for every stake. The table still pages
     // the bucket rows themselves. Passing the registry pagination through
     // made every page repeat the full set.
-    const safeLimit = limit > 0 ? limit : 10;
-    const safePage = page > 0 ? page : 1;
-    const totalRecords = assetsBuckets.length;
-    const totalPages = Math.max(1, Math.ceil(totalRecords / safeLimit));
-    const start = (safePage - 1) * safeLimit;
-
     return {
-      data: { buckets: assetsBuckets.slice(start, start + safeLimit) },
+      data: { buckets: pageRows },
       pagination: {
         self: safePage,
         next: safePage < totalPages ? safePage + 1 : 0,
@@ -557,19 +571,8 @@ export const rewardsFPRPool = (
       });
     });
     if (rewards.length) {
-      const listed = await api.get({
-        route: 'assets/list',
-        query: {
-          asset: rewards.map(row => row.assetId).join(','),
-          page: 1,
-          limit: rewards.length,
-        },
-      });
-      const byId = new Map(
-        (Array.isArray(listed.data?.assets) ? listed.data.assets : []).map(
-          (item: { assetId: string }) => [item.assetId, item],
-        ),
-      );
+      const listed = await registryAssets(rewards.map(row => row.assetId));
+      const byId = new Map(listed.map(item => [item.assetId, item]));
       rewards.forEach(row => {
         const details = byId.get(row.assetId) as
           | {

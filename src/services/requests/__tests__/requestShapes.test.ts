@@ -61,7 +61,7 @@ const routerWith = (query: Record<string, unknown>): NextRouter =>
 const callArg = (call = 0) => mockGet.mock.calls[call][0];
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  mockGet.mockReset();
   mockGet.mockResolvedValue({ error: '', code: 'successful', data: {} });
 });
 
@@ -234,6 +234,97 @@ describe('escaped route segments', () => {
     expect(result.data.assets[0].staking).toEqual({ interestType: 'APRI' });
     expect(result.data.assets[1].ticker).toBe('CHIPS');
     expect(result.data.assets[1].verified).toBe(false);
+  });
+
+  it('assetsRequest asks the registry in pages of 100', async () => {
+    const assets: Record<string, { assetId: string; assetType: number }> = {};
+    for (let index = 0; index < 101; index += 1) {
+      const assetId = `T${String(index).padStart(3, '0')}`;
+      assets[assetId] = { assetId, assetType: 0 };
+    }
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: { account: { assets } },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [{}, { assetId: 'T000', logo: '/a.png' }],
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [{ assetId: 'T100', logo: '/b.png' }] },
+      });
+
+    const result = await assetsRequest('klv1abc')(1, 10);
+    const ids = Object.keys(assets);
+
+    expect(mockGet).toHaveBeenCalledTimes(3);
+    expect(callArg(1)).toEqual({
+      route: 'assets/list',
+      query: { asset: ids.slice(0, 100).join(','), page: 1, limit: 100 },
+    });
+    expect(callArg(2)).toEqual({
+      route: 'assets/list',
+      query: { asset: 'T100', page: 1, limit: 1 },
+    });
+    expect(result.data.assets).toHaveLength(101);
+    expect(result.data.assets[0].logo).toBe('/a.png');
+    expect(result.data.assets[100].logo).toBe('/b.png');
+  });
+
+  it('assetsRequest keeps a holding when a later registry page fails', async () => {
+    const assets: Record<string, { assetId: string; assetType: number }> = {};
+    for (let index = 0; index < 101; index += 1) {
+      const assetId = `T${String(index).padStart(3, '0')}`;
+      assets[assetId] = { assetId, assetType: 0 };
+    }
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: { account: { assets } },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [{ assetId: 'T000', logo: '/a.png' }] },
+      })
+      .mockResolvedValueOnce({
+        error: 'request failed',
+        data: { assets: null },
+      });
+
+    const result = await assetsRequest('klv1abc')(1, 10);
+
+    expect(mockGet).toHaveBeenCalledTimes(3);
+    expect(result.data.assets).toHaveLength(101);
+    expect(result.data.assets[0].logo).toBe('/a.png');
+    expect(result.data.assets[100].logo).toBeUndefined();
+  });
+
+  it('assetsRequest keeps the holdings when a registry page rejects', async () => {
+    const assets: Record<string, { assetId: string; assetType: number }> = {};
+    for (let index = 0; index < 101; index += 1) {
+      const assetId = `T${String(index).padStart(3, '0')}`;
+      assets[assetId] = { assetId, assetType: 0 };
+    }
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: { account: { assets } },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [{ assetId: 'T000', logo: '/a.png' }] },
+      })
+      .mockRejectedValueOnce(new Error('not json'));
+
+    const result = await assetsRequest('klv1abc')(1, 10);
+
+    expect(result.data.assets).toHaveLength(101);
+    expect(result.data.assets[0].logo).toBe('/a.png');
+    expect(result.data.assets[100].logo).toBeUndefined();
   });
 
   it('ownedAssetsRequest replaces a broken kassets logo with the registry logo', async () => {
@@ -447,6 +538,46 @@ describe('escaped route segments', () => {
       totalPages: 2,
       totalRecords: 2,
     });
+  });
+
+  it('bucketsRequest looks up validator status only for the page on screen', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', delegation: 'klv1off' }],
+              },
+              KFI: {
+                assetId: 'KFI',
+                buckets: [{ id: 'b2', delegation: 'klv1on' }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [] },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { validator: { list: 'active' } },
+      });
+
+    const result = await bucketsRequest('klv1abc')(2, 1);
+    const routes = mockGet.mock.calls.map(call => call[0].route);
+
+    expect(result.data.buckets.map(row => row.bucket.id)).toEqual(['b2']);
+    expect(result.data.buckets[0].validatorStatus).toBe('active');
+    expect(routes).toEqual([
+      'address/klv1abc',
+      'assets/list',
+      'validator/klv1on',
+    ]);
   });
 
   it('rewardsFPRPool keeps a logo next to each rewarded asset', async () => {

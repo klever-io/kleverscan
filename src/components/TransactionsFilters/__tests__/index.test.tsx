@@ -376,4 +376,17 @@ describe('TransactionsFilters account direction', () => {
       expect.anything(),
     );
   });
+
+  it('stays on the current page when the active direction is chosen again', () => {
+    routerPathname = '/account/[account]';
+    renderFilters({
+      account: 'klv1abc',
+      page: '5',
+      fromAddress: 'klv1abc',
+    });
+
+    pick('Out');
+
+    expect(mockedSetQuery).not.toHaveBeenCalled();
+  });
 });

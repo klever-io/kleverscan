@@ -6,7 +6,6 @@ describe('Account Page', () => {
     'klv1nnu8d0mcqnxunqyy5tc7kj7vqtp4auy4a24gv35fn58n2qytl9xsx7wsjl';
   const transaction_links: { name: string; link: string }[] = [];
   const PAGE_TITLE_SELECTOR = 'h1';
-  const TYPE_FILTER_SELECTOR = '[data-testid="selector"]';
   const TAB_SELECTOR = '[data-testid="tab"]';
   const TABLE_ROW_SELECTOR = '[data-testid^="table-row-"]';
   const TABLE_ROW_0_LINK_SELECTOR = '[data-testid="table-row-0"] a';
@@ -38,9 +37,10 @@ describe('Account Page', () => {
         expect(url.searchParams.get('tab')).to.eq('Transactions');
       });
 
-      cy.get(TYPE_FILTER_SELECTOR).first().click();
-      cy.get(TYPE_FILTER_SELECTOR)
-        .first()
+      cy.get(
+        '[data-testid="filter-direction"] [data-testid="selector"]',
+      ).click();
+      cy.get('[data-testid="filter-direction"] [data-testid="selector"]')
         .contains(type, { timeout: 5000 })
         .click();
 

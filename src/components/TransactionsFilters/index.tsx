@@ -165,6 +165,11 @@ const TransactionsFilters: React.FC<
   const showDirection = showsInOut(router) && accountAddress !== '';
 
   const selectDirection = (selected: string): void => {
+    // Filter reports the click even when the value is already selected.
+    // Resetting the page then jumps a reader from page 5 back to page 1.
+    if (selected === transactionDirectionLabel(router.query, accountAddress)) {
+      return;
+    }
     // Same reason as the other filters: a narrower set can have fewer pages
     // than the one on screen, and the pager hides when there is only one.
     const updatedQuery: NextParsedUrlQuery = { ...router.query, page: '1' };
@@ -208,10 +213,16 @@ const TransactionsFilters: React.FC<
       <DateFilter />
       {showDirection && (
         <Filter
-          title="Transaction In/Out"
+          title={t('transactions:Filters.Direction')}
           testId="direction"
           firstItem={DIRECTION_ALL}
           data={[DIRECTION_IN, DIRECTION_OUT]}
+          renderLabel={value => {
+            if (value === DIRECTION_ALL) return t('common:Buttons.All');
+            if (value === DIRECTION_IN) return t('transactions:Filters.In');
+            if (value === DIRECTION_OUT) return t('transactions:Filters.Out');
+            return value;
+          }}
           onClick={selectDirection}
           current={transactionDirectionLabel(router.query, accountAddress)}
           inputType="button"

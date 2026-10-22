@@ -276,6 +276,18 @@ describe('escaped route segments', () => {
     expect(result.data.proprietaryAssets[0].name).toBe('Wit3 AI');
   });
 
+  it('ownedAssetsRequest returns an empty list when kassets has no asset array', async () => {
+    mockGet.mockResolvedValueOnce({
+      error: '',
+      data: { assets: { nope: true } },
+      pagination: {},
+    });
+
+    const result = await ownedAssetsRequest('klv1abc')(1, 10);
+
+    expect(result.data.proprietaryAssets).toEqual([]);
+  });
+
   it('bucketsRequest loads a logo for every bucket asset', async () => {
     mockGet
       .mockResolvedValueOnce({

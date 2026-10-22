@@ -215,7 +215,7 @@ export const ownedAssetsRequest = (
     }
     const proprietaryAssets = {
       data: {
-        proprietaryAssets: ownedAssetsResponse.data.assets,
+        proprietaryAssets: owned,
       },
       error: '',
       code: 'successful',

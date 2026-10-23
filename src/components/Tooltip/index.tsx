@@ -1,8 +1,25 @@
+import { flip, Middleware, offset, shift } from '@floating-ui/dom';
 import { PropsWithChildren } from 'react';
 import { IconHelp } from '@/assets/help';
 import { ICustomStyles } from '@/types/index';
 import React, { useEffect, useId, useState } from 'react';
 import { StyledTooltip, ToolTipSpan } from './styles';
+
+const middlewares = (offsetValue: number): Middleware[] => {
+  const list: Middleware[] = [
+    offset(offsetValue),
+    flip({ crossAxis: false, fallbackAxisSideDirection: 'start' }),
+    shift({ padding: 5 }),
+  ];
+  const size = list.length;
+  Object.defineProperty(list, 'push', {
+    value: (...items: Middleware[]) => {
+      list.length = size;
+      return Array.prototype.push.apply(list, items);
+    },
+  });
+  return list;
+};
 
 interface ITooltipProps {
   msg: string;
@@ -82,7 +99,7 @@ const Tooltip: React.FC<PropsWithChildren<ITooltipProps>> = ({
           displayMsg={displayMessage}
           place={customStyles?.place || 'top'}
           delayShow={customStyles?.delayShow || 300}
-          offset={customStyles?.offset}
+          middlewares={middlewares(customStyles?.offset ?? 10)}
         >
           {parsedMsgs.map((parsedMsg, index) => (
             <span key={parsedMsg} style={{ color: 'white' }}>

@@ -12,7 +12,7 @@ import {
   parseWhitelistInfo,
 } from '@/components/TransactionForms/CustomForms/utils';
 import { useExtension } from '@/contexts/extension';
-import { capitalizeError } from '@/utils/errorMessage';
+import { mapTransactionError } from '@/utils/transactionError';
 import { gtagEvent } from '@/utils/gtag';
 import { parseAddress } from '@/utils/parseValues';
 import { Transaction } from '@klever/connect';
@@ -268,7 +268,7 @@ export const WizCreateITO: React.FC<PropsWithChildren<any>> = ({
       });
     } catch (error: any) {
       console.error(error);
-      toast.error(capitalizeError(error));
+      toast.error(mapTransactionError(error));
     }
   };
 

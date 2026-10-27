@@ -9,7 +9,9 @@ const DEV_PREFIXES =
 const INSUFFICIENT_FUNDS =
   /insufficient funds.*?kda:\s*([A-Za-z0-9-]+(?:\/\d+)?),\s*wanted\s*(-?\d+),\s*have\s*(-?\d+)/i;
 
-/** Scrubbed unconditionally, so redaction survives a format the parser misses. */
+/** Scrubbed unconditionally, so redaction survives a format the parser misses.
+ * The replacement names no owner: an unmapped error can carry a contract or a
+ * receiver, and calling those "your account" states something untrue. */
 const ADDRESS = /klv1[a-z0-9]{20,}/gi;
 
 interface IErrorRule {
@@ -55,7 +57,7 @@ const formatShortfall = (
   precision: number,
 ): string => {
   const missing = BigInt(wanted) - BigInt(have);
-  if (missing <= BigInt(0)) return (0).toFixed(precision);
+  if (missing <= BigInt(0)) return '';
 
   const digits = missing.toString().padStart(precision + 1, '0');
   const whole = digits.slice(0, digits.length - precision);
@@ -94,21 +96,25 @@ export const mapTransactionError = (
   error: unknown,
   precision?: number,
   asset?: string,
+  fallback = 'Transaction failed, please try again',
 ): string => {
   const raw = toMessage(error);
 
   const funds = raw.match(INSUFFICIENT_FUNDS);
   if (funds) {
     const [, kda, wanted, have] = funds;
-    if (!isUsablePrecision(precision) || (asset && asset !== kda)) {
-      return `Not enough ${kda}`;
-    }
-    return `Not enough ${kda}, need ${formatShortfall(wanted, have, precision)} more`;
+    const shortfall =
+      isUsablePrecision(precision) && (!asset || asset === kda)
+        ? formatShortfall(wanted, have, precision)
+        : '';
+    return shortfall
+      ? `Not enough ${kda}, need ${shortfall} more`
+      : `Not enough ${kda}`;
   }
 
   const rule = RULES.find(({ match }) => match.test(raw));
   if (rule) return rule.message;
 
-  const text = raw.replace(DEV_PREFIXES, '').replace(ADDRESS, 'your account');
-  return capitalizeError(text) || 'Transaction failed, please try again';
+  const text = raw.replace(DEV_PREFIXES, '').replace(ADDRESS, 'the address');
+  return capitalizeError(text) || fallback;
 };

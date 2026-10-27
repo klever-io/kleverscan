@@ -101,19 +101,29 @@ describe('mapTransactionError', () => {
       ).toBe('Not enough FPT-23O4, need 0.000001 more');
     });
 
-    // The inverse of the subtraction: a balance at or above the fee must never
-    // print a negative shortfall.
-    it('never prints a negative shortfall', () => {
+    // The inverse of the subtraction: a balance at or above the fee leaves
+    // nothing to ask for, and "need 0.000000 more" contradicts itself.
+    it('drops the amount when there is no shortfall left', () => {
       expect(
         mapTransactionError(
           `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 100, have 500`,
           6,
         ),
-      ).toBe('Not enough FPT-23O4, need 0.000000 more');
+      ).toBe('Not enough FPT-23O4');
     });
 
     it('never leaks the sender address', () => {
       expect(mapTransactionError(raw, 6)).not.toContain('klv1');
+    });
+
+    // An unmapped error can carry a contract or a receiver, so the replacement
+    // must not claim the address belongs to the reader.
+    it("does not call a redacted address the reader's own", () => {
+      const out = mapTransactionError(
+        `validation error: contract ${ADDRESS} not found`,
+      );
+      expect(out).not.toContain('klv1');
+      expect(out).toBe('Contract the address not found');
     });
 
     // The inverse of the branch above: without a precision the amount would be
@@ -166,6 +176,26 @@ describe('mapTransactionError', () => {
       expect(mapTransactionError(raw, 0)).toBe(
         'Not enough FPT-23O4, need 251 more',
       );
+    });
+  });
+
+  describe('the caller-supplied fallback', () => {
+    it('uses it when nothing readable is left', () => {
+      expect(mapTransactionError(null, undefined, undefined, 'Vertaald')).toBe(
+        'Vertaald',
+      );
+    });
+
+    // The inverse: a fallback must never displace a message the node did send.
+    it('keeps the real message when there is one', () => {
+      expect(
+        mapTransactionError(
+          'validation error: asset pool amount error',
+          undefined,
+          undefined,
+          'Vertaald',
+        ),
+      ).toBe('Fee too small to pay with this KDA');
     });
   });
 

@@ -234,9 +234,13 @@ function WriteEndpointCard({
         ),
       );
     } catch (err: any) {
+      const failed = t(
+        'ContractInteraction.status.failed',
+        'Transaction failed',
+      );
       const msg = err
-        ? mapTransactionError(err)
-        : t('ContractInteraction.status.failed', 'Transaction failed');
+        ? mapTransactionError(err, undefined, undefined, failed)
+        : failed;
       setError(msg);
       toast.error(msg);
     } finally {

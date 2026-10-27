@@ -5,6 +5,7 @@ import {
 } from '@/services/requests/contractValidator';
 import api from '@/services/api';
 import { ValidationJob } from '@/types/smart-contract';
+import { mapTransactionError } from '@/utils/transactionError';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { broadcastTXandCheckStatus } from '@/utils/transaction';
 import { Transaction } from '@klever/connect';
@@ -179,8 +180,9 @@ export function useContractCheck() {
         }
         paymentTxHash = hash;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Payment transaction failed';
+        const message = err
+          ? mapTransactionError(err)
+          : 'Payment transaction failed';
         toast.error(message);
         setSubmitting(false);
         setStatusText(null);

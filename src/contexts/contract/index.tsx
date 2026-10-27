@@ -536,7 +536,13 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
     } catch (e) {
       console.warn(`%c ${e}`, 'color: red');
 
-      toast.error(mapTransactionError(e, kdaFee.current?.precision));
+      toast.error(
+        mapTransactionError(
+          e,
+          kdaFee.current?.precision,
+          kdaFee.current?.value,
+        ),
+      );
     } finally {
       resetFormsData();
     }
@@ -578,7 +584,13 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
       await precisionParse(payload, contractType);
     } catch (e) {
-      toast.error(mapTransactionError(e, kdaFee.current?.precision));
+      toast.error(
+        mapTransactionError(
+          e,
+          kdaFee.current?.precision,
+          kdaFee.current?.value,
+        ),
+      );
       setTxLoading(false);
       return;
     }

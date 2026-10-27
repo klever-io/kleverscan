@@ -57,8 +57,9 @@ describe('mapTransactionError', () => {
   });
 
   describe('insufficient funds', () => {
-    const raw =
-      'validation error: insufficient funds, for address: klv1yluzr8yxpmunf4rx4lhuklwfky0fya0xa6ewxlelz8gygvhzvrlscu5uc2, kda: FPT-23O4, wanted 251, have 0';
+    const ADDRESS =
+      'klv1yluzr8yxpmunf4rx4lhuklwfky0fya0xa6ewxlelz8gygvhzvrlscu5uc2';
+    const raw = `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 251, have 0`;
 
     it('states the shortfall in tokens, not chain units', () => {
       expect(mapTransactionError(raw, 6)).toBe(
@@ -84,6 +85,46 @@ describe('mapTransactionError', () => {
       );
     });
 
+    // The parse is all-or-nothing, so a node format this regex does not know
+    // used to fall through with the address still in it.
+    it.each([
+      ['no comma after the asset id', 'kda: FPT-23O4 wanted 251, have 0'],
+      ['no asset segment', 'wanted 251, have 0'],
+      ['an underscore in the asset id', 'kda: FPT_23O4, wanted 251, have 0'],
+      ['a signed amount', 'kda: FPT-23O4, wanted -5, have 0'],
+    ])('hides the address when the funds error has %s', (_shape, tail) => {
+      const out = mapTransactionError(
+        `validation error: insufficient funds, for address: ${ADDRESS}, ${tail}`,
+        6,
+      );
+      expect(out).not.toContain('klv1');
+    });
+
+    // toFixed throws outside 0-100, and this runs inside a catch block, so the
+    // throw would escape and leave the user with no toast at all.
+    it.each([400, -3, 1e21])(
+      'names the asset without an amount for an out-of-range precision %p',
+      precision => {
+        expect(mapTransactionError(raw, precision)).toBe(
+          'Not enough FPT-23O4 to pay the fee',
+        );
+      },
+    );
+
+    // The precision belongs to the fee asset; the node names the short asset.
+    // Scaling one by the other's precision prints a confident wrong number.
+    it('drops the amount when the precision belongs to another asset', () => {
+      expect(mapTransactionError(raw, 6, 'KLV')).toBe(
+        'Not enough FPT-23O4 to pay the fee',
+      );
+    });
+
+    it('keeps the amount when the precision belongs to the named asset', () => {
+      expect(mapTransactionError(raw, 6, 'FPT-23O4')).toBe(
+        'Not enough FPT-23O4, need 0.000251',
+      );
+    });
+
     it('reads a precision of zero as a real precision, not as missing', () => {
       expect(mapTransactionError(raw, 0)).toBe('Not enough FPT-23O4, need 251');
     });
@@ -105,6 +146,14 @@ describe('mapTransactionError', () => {
     it('reads an Error object rather than stringifying it', () => {
       expect(mapTransactionError(new Error('network request failed'))).toBe(
         'Network request failed',
+      );
+    });
+
+    // Stripping the prefix off a message that is only the prefix would leave an
+    // empty toast, which is the blank-toast failure this module exists to end.
+    it('keeps the raw text when stripping would leave nothing', () => {
+      expect(mapTransactionError('validation error: ')).toBe(
+        'validation error: ',
       );
     });
 

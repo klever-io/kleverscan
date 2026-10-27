@@ -2,6 +2,7 @@ import { parseArgument } from '@/components/TransactionForms/CustomForms/SmartCo
 import { useExtension } from '@/contexts/extension';
 import { ABI, ABIType } from '@/types/contracts';
 import { ContractInfo } from '@/types/smart-contract';
+import { mapTransactionError } from '@/utils/transactionError';
 import { getPrecision } from '@/utils/precisionFunctions';
 
 import { buildTransaction } from '@/components/Contract/utils';
@@ -233,10 +234,9 @@ function WriteEndpointCard({
         ),
       );
     } catch (err: any) {
-      const msg =
-        err?.message ||
-        err?.toString() ||
-        t('ContractInteraction.status.failed', 'Transaction failed');
+      const msg = err
+        ? mapTransactionError(err)
+        : t('ContractInteraction.status.failed', 'Transaction failed');
       setError(msg);
       toast.error(msg);
     } finally {

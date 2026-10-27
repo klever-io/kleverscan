@@ -10,10 +10,14 @@ const VALIDATION_PREFIX = /^validation error:\s*/i;
 
 /**
  * Matches the funds error, which names the asset and the amount it is short of.
- * Both are worth keeping; the address and the `have` side are not.
+ * Both are worth keeping; the `have` side is not.
  */
 const INSUFFICIENT_FUNDS =
   /insufficient funds.*?kda:\s*([A-Za-z0-9-]+),\s*wanted\s*(\d+)/i;
+
+/** Bech32 account address. Scrubbed from any message that reaches the user,
+ * so redaction survives a node format this parser does not recognise. */
+const ADDRESS = /klv1[a-z0-9]{20,}/gi;
 
 interface IErrorRule {
   match: RegExp;
@@ -55,21 +59,35 @@ const RULES: IErrorRule[] = [
 const formatShortfall = (units: string, precision: number): string =>
   (Number(units) / 10 ** precision).toFixed(precision);
 
+/** toFixed throws a RangeError outside 0-100, and this runs inside a catch
+ * block, so an out-of-range precision would leave the user with no toast. */
+const isUsablePrecision = (precision?: number): precision is number =>
+  precision !== undefined &&
+  Number.isFinite(precision) &&
+  precision >= 0 &&
+  precision <= 100;
+
 /** Narrows the thrown value to a string without capitalizing it: the prefix is
  * stripped first, so capitalizing has to wait until the real message is bare. */
 const toMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
 
+/**
+ * `asset` is the KDA the precision belongs to. The node names the short asset
+ * itself, which is not always the fee asset, and scaling by another asset's
+ * precision prints a confident number that is wrong by orders of magnitude.
+ */
 export const mapTransactionError = (
   error: unknown,
   precision?: number,
+  asset?: string,
 ): string => {
   const raw = toMessage(error);
 
   const funds = raw.match(INSUFFICIENT_FUNDS);
   if (funds) {
     const [, kda, wanted] = funds;
-    if (precision === undefined || !Number.isFinite(precision)) {
+    if (!isUsablePrecision(precision) || (asset && asset !== kda)) {
       return `Not enough ${kda} to pay the fee`;
     }
     return `Not enough ${kda}, need ${formatShortfall(wanted, precision)}`;
@@ -78,5 +96,8 @@ export const mapTransactionError = (
   const rule = RULES.find(({ match }) => match.test(raw));
   if (rule) return rule.message;
 
-  return capitalizeError(raw.replace(VALIDATION_PREFIX, '')) || raw;
+  const text = raw
+    .replace(VALIDATION_PREFIX, '')
+    .replace(ADDRESS, 'your account');
+  return capitalizeError(text) || raw.replace(ADDRESS, 'your account');
 };

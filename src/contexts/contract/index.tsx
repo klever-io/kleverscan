@@ -16,6 +16,7 @@ import {
   INodeAccountResponse,
   Service,
 } from '@/types/index';
+import { mapTransactionError } from '@/utils/transactionError';
 import { contractOptions as allContractOptions } from '@/utils/contracts';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { gtagEvent } from '@/utils/gtag';
@@ -535,19 +536,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
     } catch (e) {
       console.warn(`%c ${e}`, 'color: red');
 
-      const errorMessage =
-        typeof e === 'object' && e !== null && 'message' in e
-          ? (e as { message: string }).message
-          : String(e);
-
-      if (
-        errorMessage.includes('invalid signature threshold') ||
-        errorMessage.includes('no contract permission')
-      ) {
-        toast.error(errorMessage.split(': ')[3]);
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error(mapTransactionError(e, kdaFee.current?.precision));
     } finally {
       resetFormsData();
     }
@@ -589,11 +578,7 @@ export const ContractProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
       await precisionParse(payload, contractType);
     } catch (e) {
-      const errorMessage =
-        typeof e === 'object' && e !== null && 'message' in e
-          ? (e as { message: string }).message
-          : String(e);
-      toast.error(errorMessage);
+      toast.error(mapTransactionError(e, kdaFee.current?.precision));
       setTxLoading(false);
       return;
     }

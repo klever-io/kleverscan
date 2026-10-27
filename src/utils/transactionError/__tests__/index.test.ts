@@ -58,7 +58,7 @@ describe('mapTransactionError', () => {
 
   describe('insufficient funds', () => {
     const ADDRESS =
-      'klv1yluzr8yxpmunf4rx4lhuklwfky0fya0xa6ewxlelz8gygvhzvrlscu5uc2';
+      'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq';
     const raw = `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 251, have 0`;
 
     it('states the shortfall in tokens, not chain units', () => {

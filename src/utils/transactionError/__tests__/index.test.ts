@@ -64,8 +64,41 @@ describe('mapTransactionError', () => {
 
     it('states the shortfall in tokens, not chain units', () => {
       expect(mapTransactionError(raw, 6)).toBe(
-        'Not enough FPT-23O4, need 0.000251',
+        'Not enough FPT-23O4, need 0.000251 more',
       );
+    });
+
+    // The node prints the full fee and the full balance, so a non-zero balance
+    // makes the fee itself larger than the amount the user still has to find.
+    it('subtracts the balance the node reports', () => {
+      expect(
+        mapTransactionError(
+          `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 251, have 200`,
+          6,
+        ),
+      ).toBe('Not enough FPT-23O4, need 0.000051 more');
+    });
+
+    // int64 printed with %v, so a negative balance is a shape the regex has to
+    // accept; dropping it would silently fall back to the whole fee.
+    it('reads a negative balance rather than falling through', () => {
+      expect(
+        mapTransactionError(
+          `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 100, have -50`,
+          6,
+        ),
+      ).toBe('Not enough FPT-23O4, need 0.000150 more');
+    });
+
+    // The inverse of the subtraction: a balance at or above the fee must never
+    // print a negative shortfall.
+    it('never prints a negative shortfall', () => {
+      expect(
+        mapTransactionError(
+          `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 100, have 500`,
+          6,
+        ),
+      ).toBe('Not enough FPT-23O4, need 0.000000 more');
     });
 
     it('never leaks the sender address', () => {
@@ -88,7 +121,7 @@ describe('mapTransactionError', () => {
       ['no comma after the asset id', 'kda: FPT-23O4 wanted 251, have 0'],
       ['no asset segment', 'wanted 251, have 0'],
       ['an underscore in the asset id', 'kda: FPT_23O4, wanted 251, have 0'],
-      ['a signed amount', 'kda: FPT-23O4, wanted -5, have 0'],
+      ['no balance segment', 'kda: FPT-23O4, wanted 251'],
     ])('hides the address when the funds error has %s', (_shape, tail) => {
       const out = mapTransactionError(
         `validation error: insufficient funds, for address: ${ADDRESS}, ${tail}`,
@@ -114,12 +147,14 @@ describe('mapTransactionError', () => {
 
     it('keeps the amount when the precision belongs to the named asset', () => {
       expect(mapTransactionError(raw, 6, 'FPT-23O4')).toBe(
-        'Not enough FPT-23O4, need 0.000251',
+        'Not enough FPT-23O4, need 0.000251 more',
       );
     });
 
     it('reads a precision of zero as a real precision, not as missing', () => {
-      expect(mapTransactionError(raw, 0)).toBe('Not enough FPT-23O4, need 251');
+      expect(mapTransactionError(raw, 0)).toBe(
+        'Not enough FPT-23O4, need 251 more',
+      );
     });
   });
 
@@ -179,6 +214,12 @@ describe('mapTransactionError', () => {
       ['an Error with no message', new Error('')],
       ['null', null],
       ['undefined', undefined],
+      // The inverse of reading `message` off an object: a present but unusable
+      // one must reach the fallback instead of printing "null" or "undefined".
+      ['an object whose message is null', { message: null }],
+      ['an object whose message is undefined', { message: undefined }],
+      ['an object whose message is blank', { message: '   ' }],
+      ['an object whose message is not a string', { message: { nested: 1 } }],
     ])('gives a real message for %s', (_label, thrown) => {
       expect(mapTransactionError(thrown)).toBe(
         'Transaction failed, please try again',
@@ -204,7 +245,7 @@ describe('mapTransactionError', () => {
           0,
           'NFT-ABCD/5',
         ),
-      ).toBe('Not enough NFT-ABCD/5, need 1');
+      ).toBe('Not enough NFT-ABCD/5, need 1 more');
     });
   });
 });

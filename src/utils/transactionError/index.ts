@@ -4,9 +4,10 @@ import { capitalizeError } from '../errorMessage';
 const DEV_PREFIXES =
   /(?:failed to build transaction:\s*|validation error:\s*)+/gi;
 
-/** The nonce suffix matters: this frontend builds NFT ids as COLLECTION/nonce. */
+/** The nonce suffix matters: this frontend builds NFT ids as COLLECTION/nonce.
+ * `have` is printed with %v from an int64, so it can carry a minus sign. */
 const INSUFFICIENT_FUNDS =
-  /insufficient funds.*?kda:\s*([A-Za-z0-9-]+(?:\/\d+)?),\s*wanted\s*(\d+)/i;
+  /insufficient funds.*?kda:\s*([A-Za-z0-9-]+(?:\/\d+)?),\s*wanted\s*(-?\d+),\s*have\s*(-?\d+)/i;
 
 /** Scrubbed unconditionally, so redaction survives a format the parser misses. */
 const ADDRESS = /klv1[a-z0-9]{20,}/gi;
@@ -43,9 +44,17 @@ const RULES: IErrorRule[] = [
   },
 ];
 
-/** The node counts in chain units: 251 at precision 6 is 0.000251, not 251. */
-const formatShortfall = (units: string, precision: number): string =>
-  (Number(units) / 10 ** precision).toFixed(precision);
+/** The node prints the full fee and the full balance, so the amount still
+ * missing is the difference. The chain counts in units: 251 at precision 6
+ * is 0.000251, not 251. */
+const formatShortfall = (
+  wanted: string,
+  have: string,
+  precision: number,
+): string => {
+  const missing = Math.max(Number(wanted) - Number(have), 0);
+  return (missing / 10 ** precision).toFixed(precision);
+};
 
 /** toFixed throws a RangeError outside 0-100, and this runs inside a catch
  * block, so an out-of-range precision would leave the user with no toast. */
@@ -60,7 +69,8 @@ const toMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
   if (typeof error === 'object' && error !== null && 'message' in error) {
-    return String((error as { message: unknown }).message);
+    const { message } = error as { message: unknown };
+    if (typeof message === 'string' && message.trim() !== '') return message;
   }
   return typeof error === 'number' || typeof error === 'boolean'
     ? String(error)
@@ -81,11 +91,11 @@ export const mapTransactionError = (
 
   const funds = raw.match(INSUFFICIENT_FUNDS);
   if (funds) {
-    const [, kda, wanted] = funds;
+    const [, kda, wanted, have] = funds;
     if (!isUsablePrecision(precision) || (asset && asset !== kda)) {
       return `Not enough ${kda}`;
     }
-    return `Not enough ${kda}, need ${formatShortfall(wanted, precision)}`;
+    return `Not enough ${kda}, need ${formatShortfall(wanted, have, precision)} more`;
   }
 
   const rule = RULES.find(({ match }) => match.test(raw));

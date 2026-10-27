@@ -263,7 +263,7 @@ export const ParticipateModal: React.FC<
       return;
     }
     if (!selectedPackData.precision) {
-      toast.error('Error while calculating pack price. Please reload page');
+      toast.error('Error calculating pack price, please reload page.');
       return;
     }
 
@@ -308,7 +308,7 @@ export const ParticipateModal: React.FC<
       }
 
       setTxHash(txHashes[0]);
-      toast.success('Transaction successfully broadcasted.');
+      toast.success('Transaction broadcast successfully');
       closeModal();
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');

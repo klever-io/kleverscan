@@ -5,6 +5,7 @@ import { getParsedAssetPool } from '@/services/requests/pool';
 import { IAsset, IAssetPool, ICollectionList } from '@/types';
 import { ContractsIndex } from '@/types/contracts';
 import { setQueryAndRouter } from '@/utils';
+import { capitalizeError } from '@/utils/errorMessage';
 import { BASE_TX_SIZE, KLV_PRECISION } from '@/utils/globalVariables';
 import { useRouter } from 'next/router';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
@@ -244,7 +245,7 @@ export const MulticontractProvider: React.FC<PropsWithChildren> = ({
       setQueue([...queue, newItem]);
       setSelectedId(componentIndex);
     } catch (e: any) {
-      toast.error(e.message ? e.message : e);
+      toast.error(capitalizeError(e));
     }
   };
 

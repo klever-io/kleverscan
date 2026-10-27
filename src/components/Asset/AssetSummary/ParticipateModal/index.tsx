@@ -1,4 +1,5 @@
 import FungibleITO, { isFloat } from '@/components/FungibleITO';
+import { mapTransactionError } from '@/utils/transactionError';
 import {
   ItemsContainer,
   KeyLabel,
@@ -311,7 +312,7 @@ export const ParticipateModal: React.FC<
       closeModal();
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
-      toast.error(e.message ? e.message : e);
+      toast.error(mapTransactionError(e));
     } finally {
       setLoading(false);
     }

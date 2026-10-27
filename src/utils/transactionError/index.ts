@@ -1,19 +1,19 @@
 import { capitalizeError } from '../errorMessage';
 
 /**
- * The node answers a rejected build with a `validation error: ...` string that
- * is written for a chain developer: it carries debug flags, the sender address
- * and amounts in chain units. Showing it raw is what users saw before this
- * module existed.
+ * Developer-facing prefixes. The node writes `validation error: ...`, and the
+ * wallet SDK wraps that again as `Failed to build transaction: ...`, so six of
+ * the call sites receive both.
  */
-const VALIDATION_PREFIX = /^validation error:\s*/i;
+const DEV_PREFIXES =
+  /(?:failed to build transaction:\s*|validation error:\s*)+/gi;
 
 /**
  * Matches the funds error, which names the asset and the amount it is short of.
  * Both are worth keeping; the `have` side is not.
  */
 const INSUFFICIENT_FUNDS =
-  /insufficient funds.*?kda:\s*([A-Za-z0-9-]+),\s*wanted\s*(\d+)/i;
+  /insufficient funds.*?kda:\s*([A-Za-z0-9-]+(?:\/\d+)?),\s*wanted\s*(\d+)/i;
 
 /** Bech32 account address. Scrubbed from any message that reaches the user,
  * so redaction survives a node format this parser does not recognise. */
@@ -69,8 +69,16 @@ const isUsablePrecision = (precision?: number): precision is number =>
 
 /** Narrows the thrown value to a string without capitalizing it: the prefix is
  * stripped first, so capitalizing has to wait until the real message is bare. */
-const toMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : String(error);
+const toMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return typeof error === 'number' || typeof error === 'boolean'
+    ? String(error)
+    : '';
+};
 
 /**
  * `asset` is the KDA the precision belongs to. The node names the short asset
@@ -88,7 +96,7 @@ export const mapTransactionError = (
   if (funds) {
     const [, kda, wanted] = funds;
     if (!isUsablePrecision(precision) || (asset && asset !== kda)) {
-      return `Not enough ${kda} to pay the fee`;
+      return `Not enough ${kda}`;
     }
     return `Not enough ${kda}, need ${formatShortfall(wanted, precision)}`;
   }
@@ -96,8 +104,6 @@ export const mapTransactionError = (
   const rule = RULES.find(({ match }) => match.test(raw));
   if (rule) return rule.message;
 
-  const text = raw
-    .replace(VALIDATION_PREFIX, '')
-    .replace(ADDRESS, 'your account');
-  return capitalizeError(text) || raw.replace(ADDRESS, 'your account');
+  const text = raw.replace(DEV_PREFIXES, '').replace(ADDRESS, 'your account');
+  return capitalizeError(text) || 'Transaction failed, please try again';
 };

@@ -1,7 +1,10 @@
 import { mapTransactionError } from '../index';
 
-// Every raw string here was returned by node.testnet.klever.org, except the
+// Every raw string here was captured from a real node rejection, except the
 // two permission errors, which are the substrings the caller matched before.
+const ADDRESS =
+  'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq';
+
 describe('mapTransactionError', () => {
   it('maps a fee below one chain unit', () => {
     expect(
@@ -57,8 +60,6 @@ describe('mapTransactionError', () => {
   });
 
   describe('insufficient funds', () => {
-    const ADDRESS =
-      'klv1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq';
     const raw = `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 251, have 0`;
 
     it('states the shortfall in tokens, not chain units', () => {
@@ -74,15 +75,11 @@ describe('mapTransactionError', () => {
     // The inverse of the branch above: without a precision the amount would be
     // wrong by orders of magnitude, so the asset is named without one.
     it('drops the amount when the precision is unknown', () => {
-      expect(mapTransactionError(raw)).toBe(
-        'Not enough FPT-23O4 to pay the fee',
-      );
+      expect(mapTransactionError(raw)).toBe('Not enough FPT-23O4');
     });
 
     it('drops the amount when the precision is not finite', () => {
-      expect(mapTransactionError(raw, NaN)).toBe(
-        'Not enough FPT-23O4 to pay the fee',
-      );
+      expect(mapTransactionError(raw, NaN)).toBe('Not enough FPT-23O4');
     });
 
     // The parse is all-or-nothing, so a node format this regex does not know
@@ -105,18 +102,14 @@ describe('mapTransactionError', () => {
     it.each([400, -3, 1e21])(
       'names the asset without an amount for an out-of-range precision %p',
       precision => {
-        expect(mapTransactionError(raw, precision)).toBe(
-          'Not enough FPT-23O4 to pay the fee',
-        );
+        expect(mapTransactionError(raw, precision)).toBe('Not enough FPT-23O4');
       },
     );
 
     // The precision belongs to the fee asset; the node names the short asset.
     // Scaling one by the other's precision prints a confident wrong number.
     it('drops the amount when the precision belongs to another asset', () => {
-      expect(mapTransactionError(raw, 6, 'KLV')).toBe(
-        'Not enough FPT-23O4 to pay the fee',
-      );
+      expect(mapTransactionError(raw, 6, 'KLV')).toBe('Not enough FPT-23O4');
     });
 
     it('keeps the amount when the precision belongs to the named asset', () => {
@@ -137,6 +130,28 @@ describe('mapTransactionError', () => {
       );
     });
 
+    // The wallet SDK re-throws a build failure as "Failed to build
+    // transaction: <node message>", which is what six call sites receive.
+    it('strips the wallet wrapper as well as the node prefix', () => {
+      expect(
+        mapTransactionError(
+          new Error(
+            'Failed to build transaction: validation error: brand new failure',
+          ),
+        ),
+      ).toBe('Brand new failure');
+    });
+
+    it('still maps a known error through the wallet wrapper', () => {
+      expect(
+        mapTransactionError(
+          new Error(
+            'Failed to build transaction: validation error: asset pool not found',
+          ),
+        ),
+      ).toBe('No fee pool for this KDA');
+    });
+
     it('keeps a message that has no prefix at all', () => {
       expect(mapTransactionError('something broke')).toBe('Something broke');
     });
@@ -151,14 +166,45 @@ describe('mapTransactionError', () => {
 
     // Stripping the prefix off a message that is only the prefix would leave an
     // empty toast, which is the blank-toast failure this module exists to end.
-    it('keeps the raw text when stripping would leave nothing', () => {
+    it('falls back to a real message when stripping would leave nothing', () => {
       expect(mapTransactionError('validation error: ')).toBe(
-        'validation error: ',
+        'Transaction failed, please try again',
+      );
+    });
+
+    // String(value) renders these as "[object Object]" and "", which are the
+    // blank and useless toasts this module exists to remove.
+    it.each([
+      ['a thrown plain object', { code: 500 }],
+      ['an Error with no message', new Error('')],
+      ['null', null],
+      ['undefined', undefined],
+    ])('gives a real message for %s', (_label, thrown) => {
+      expect(mapTransactionError(thrown)).toBe(
+        'Transaction failed, please try again',
+      );
+    });
+
+    it('reads the message of a thrown object that carries one', () => {
+      expect(mapTransactionError({ message: 'node unreachable' })).toBe(
+        'Node unreachable',
       );
     });
 
     it('survives a non-string, non-Error value', () => {
       expect(mapTransactionError(404)).toBe('404');
+    });
+
+    // The frontend itself builds an NFT kda as COLLECTION/nonce, so the node
+    // echoes that form back and the parser has to accept it.
+    it('parses an asset id that carries an NFT nonce', () => {
+      expect(
+        mapTransactionError(
+          `validation error: insufficient funds, for address: ${ADDRESS}, kda: NFT-ABCD/5, wanted 1, have 0`,
+          0,
+          'NFT-ABCD/5',
+        ),
+      ).toBe('Not enough NFT-ABCD/5, need 1');
     });
   });
 });

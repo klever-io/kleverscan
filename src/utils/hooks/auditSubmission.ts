@@ -2,7 +2,7 @@ import { AuditReport } from '@/types/smart-contract';
 import { isSafeUrl } from '@/components/SmartContracts/ContractVerification/utils';
 import { useExtension } from '@/contexts/extension';
 import { Transaction } from '@klever/connect';
-import { mapTransactionError } from '@/utils/transactionError';
+import { capitalizeError } from '@/utils/errorMessage';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -128,7 +128,7 @@ export function useAuditSubmission({
       toast.success('Audit report submitted successfully');
       onSubmitted();
     } catch (err: unknown) {
-      const message = err ? mapTransactionError(err) : 'Submission failed';
+      const message = err ? capitalizeError(err) : 'Submission failed';
       toast.error(message);
       setSubmitError(message);
     } finally {

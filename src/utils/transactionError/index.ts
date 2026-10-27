@@ -1,22 +1,14 @@
 import { capitalizeError } from '../errorMessage';
 
-/**
- * Developer-facing prefixes. The node writes `validation error: ...`, and the
- * wallet SDK wraps that again as `Failed to build transaction: ...`, so six of
- * the call sites receive both.
- */
+/** The wallet SDK wraps the node's own prefix, so six call sites get both. */
 const DEV_PREFIXES =
   /(?:failed to build transaction:\s*|validation error:\s*)+/gi;
 
-/**
- * Matches the funds error, which names the asset and the amount it is short of.
- * Both are worth keeping; the `have` side is not.
- */
+/** The nonce suffix matters: this frontend builds NFT ids as COLLECTION/nonce. */
 const INSUFFICIENT_FUNDS =
   /insufficient funds.*?kda:\s*([A-Za-z0-9-]+(?:\/\d+)?),\s*wanted\s*(\d+)/i;
 
-/** Bech32 account address. Scrubbed from any message that reaches the user,
- * so redaction survives a node format this parser does not recognise. */
+/** Scrubbed unconditionally, so redaction survives a format the parser misses. */
 const ADDRESS = /klv1[a-z0-9]{20,}/gi;
 
 interface IErrorRule {
@@ -51,11 +43,7 @@ const RULES: IErrorRule[] = [
   },
 ];
 
-/**
- * Renders `wanted` as a token amount. The node counts in chain units, so
- * without the asset's precision the number would be off by orders of
- * magnitude: 251 units of a precision 6 asset is 0.000251, not 251.
- */
+/** The node counts in chain units: 251 at precision 6 is 0.000251, not 251. */
 const formatShortfall = (units: string, precision: number): string =>
   (Number(units) / 10 ** precision).toFixed(precision);
 
@@ -67,8 +55,7 @@ const isUsablePrecision = (precision?: number): precision is number =>
   precision >= 0 &&
   precision <= 100;
 
-/** Narrows the thrown value to a string without capitalizing it: the prefix is
- * stripped first, so capitalizing has to wait until the real message is bare. */
+/** Capitalizing waits until the prefixes are off, so the real message leads. */
 const toMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;

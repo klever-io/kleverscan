@@ -46,21 +46,29 @@ const RULES: IErrorRule[] = [
 
 /** The node prints the full fee and the full balance, so the amount still
  * missing is the difference. The chain counts in units: 251 at precision 6
- * is 0.000251, not 251. */
+ * is 0.000251, not 251. Both sides come off an int64, so the subtraction and
+ * the decimal shift stay on BigInt: Number loses the last digits above 2^53
+ * and would report a one-unit shortfall as zero. */
 const formatShortfall = (
   wanted: string,
   have: string,
   precision: number,
 ): string => {
-  const missing = Math.max(Number(wanted) - Number(have), 0);
-  return (missing / 10 ** precision).toFixed(precision);
+  const missing = BigInt(wanted) - BigInt(have);
+  if (missing <= BigInt(0)) return (0).toFixed(precision);
+
+  const digits = missing.toString().padStart(precision + 1, '0');
+  const whole = digits.slice(0, digits.length - precision);
+  return precision === 0
+    ? whole
+    : `${whole}.${digits.slice(digits.length - precision)}`;
 };
 
-/** toFixed throws a RangeError outside 0-100, and this runs inside a catch
- * block, so an out-of-range precision would leave the user with no toast. */
+/** A precision that is not a whole number in 0-100 shifts the decimal point to
+ * a nonsense place, so the toast names the asset without an amount instead. */
 const isUsablePrecision = (precision?: number): precision is number =>
   precision !== undefined &&
-  Number.isFinite(precision) &&
+  Number.isInteger(precision) &&
   precision >= 0 &&
   precision <= 100;
 

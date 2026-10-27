@@ -90,6 +90,17 @@ describe('mapTransactionError', () => {
       ).toBe('Not enough FPT-23O4, need 0.000150 more');
     });
 
+    // Both sides come off an int64, so Number would collapse the difference to
+    // zero here and report a one-unit shortfall as nothing missing.
+    it('keeps a one-unit shortfall above 2^53', () => {
+      expect(
+        mapTransactionError(
+          `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 9007199254740993, have 9007199254740992`,
+          6,
+        ),
+      ).toBe('Not enough FPT-23O4, need 0.000001 more');
+    });
+
     // The inverse of the subtraction: a balance at or above the fee must never
     // print a negative shortfall.
     it('never prints a negative shortfall', () => {
@@ -130,10 +141,10 @@ describe('mapTransactionError', () => {
       expect(out).not.toContain('klv1');
     });
 
-    // toFixed throws outside 0-100, and this runs inside a catch block, so the
-    // throw would escape and leave the user with no toast at all.
-    it.each([400, -3, 1e21])(
-      'names the asset without an amount for an out-of-range precision %p',
+    // A precision outside 0-100, or one that is not whole, would shift the
+    // decimal point to a nonsense place: 2.5 used to render as ".251".
+    it.each([400, -3, 1e21, 2.5])(
+      'names the asset without an amount for an unusable precision %p',
       precision => {
         expect(mapTransactionError(raw, precision)).toBe('Not enough FPT-23O4');
       },

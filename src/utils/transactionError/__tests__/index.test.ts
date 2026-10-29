@@ -179,6 +179,76 @@ describe('mapTransactionError', () => {
     });
   });
 
+  describe('the default KLV fee path', () => {
+    const klv = `validation error: insufficient funds, for address: ${ADDRESS}, kda: KLV, wanted 251, have 0`;
+
+    // Most call sites pass no precision at all, and the fee is paid in KLV
+    // unless the user picks a KDA, so this is the common shortfall.
+    it('scales a KLV shortfall without a caller-supplied precision', () => {
+      expect(mapTransactionError(klv)).toBe(
+        'Not enough KLV, need 0.000251 more',
+      );
+    });
+
+    // The inverse: the constant must not be borrowed for another asset.
+    it('still needs a precision for any other asset', () => {
+      expect(
+        mapTransactionError(
+          `validation error: insufficient funds, for address: ${ADDRESS}, kda: FPT-23O4, wanted 251, have 0`,
+        ),
+      ).toBe('Not enough FPT-23O4');
+    });
+
+    // KLV resolves its own precision, so a fee asset naming something else
+    // must not suppress the amount the node asked for in KLV.
+    it('keeps the KLV amount when the fee asset is another KDA', () => {
+      expect(mapTransactionError(klv, 2, 'FPT-23O4')).toBe(
+        'Not enough KLV, need 0.000251 more',
+      );
+    });
+  });
+
+  describe('the wallet SDK wrappers', () => {
+    // One wrapper per step, and only the build one was stripped before.
+    it.each([
+      'Failed to build transaction',
+      'Failed to sign transaction',
+      'Failed to broadcast transactions',
+    ])('strips the %s wrapper', prefix => {
+      expect(
+        mapTransactionError(
+          new Error(`${prefix}: validation error: brand new failure`),
+        ),
+      ).toBe('Brand new failure');
+    });
+
+    // The inverse of widening the pattern: the node sends its own "failed to"
+    // messages, and those carry context the user needs.
+    it('keeps a failure message the node itself worded', () => {
+      expect(
+        mapTransactionError(
+          new Error('failed to execute contract: out of gas'),
+        ),
+      ).toBe('Failed to execute contract: out of gas');
+    });
+
+    // The SDK substitutes this when the extension rejects with a non-Error.
+    it('treats the SDK placeholder as no message at all', () => {
+      expect(
+        mapTransactionError(
+          new Error('Failed to build transaction: Unknown error'),
+        ),
+      ).toBe('Transaction failed, please try again');
+    });
+
+    // The inverse: a real message that merely contains the word must survive.
+    it('keeps a real message that mentions an unknown error', () => {
+      expect(mapTransactionError(new Error('unknown error code 42'))).toBe(
+        'Unknown error code 42',
+      );
+    });
+  });
+
   describe('the caller-supplied fallback', () => {
     it('uses it when nothing readable is left', () => {
       expect(mapTransactionError(null, undefined, undefined, 'Vertaald')).toBe(

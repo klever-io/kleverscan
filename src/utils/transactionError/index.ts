@@ -1,8 +1,15 @@
 import { capitalizeError } from '../errorMessage';
+import { KLV_PRECISION } from '../globalVariables';
 
-/** The wallet SDK wraps the node's own prefix, so six call sites get both. */
+/** The wallet SDK wraps the node's own prefix, one wrapper per step. Listed
+ * rather than matched loosely: the node sends its own "failed to ..." messages,
+ * and a pattern wide enough for the wrappers eats those too. */
 const DEV_PREFIXES =
-  /(?:failed to build transaction:\s*|validation error:\s*)+/gi;
+  /(?:failed to (?:build transaction|sign transaction|broadcast transactions):\s*|validation error:\s*)+/gi;
+
+/** The SDK substitutes this when the extension rejects with a non-Error, so it
+ * is a placeholder for "no message", not a message. */
+const SDK_PLACEHOLDER = /^unknown error$/i;
 
 /** The nonce suffix matters: this frontend builds NFT ids as COLLECTION/nonce.
  * `have` is printed with %v from an int64, so it can carry a minus sign. */
@@ -103,9 +110,13 @@ export const mapTransactionError = (
   const funds = raw.match(INSUFFICIENT_FUNDS);
   if (funds) {
     const [, kda, wanted, have] = funds;
+    // KLV's precision is fixed, so the default fee path needs no caller to
+    // supply it; every other asset still has to match the one passed in.
+    const isKlv = kda === 'KLV';
+    const scale = isKlv ? KLV_PRECISION : precision;
     const shortfall =
-      isUsablePrecision(precision) && (!asset || asset === kda)
-        ? formatShortfall(wanted, have, precision)
+      isUsablePrecision(scale) && (isKlv || !asset || asset === kda)
+        ? formatShortfall(wanted, have, scale)
         : '';
     return shortfall
       ? `Not enough ${kda}, need ${shortfall} more`
@@ -116,5 +127,6 @@ export const mapTransactionError = (
   if (rule) return rule.message;
 
   const text = raw.replace(DEV_PREFIXES, '').replace(ADDRESS, 'the address');
+  if (SDK_PLACEHOLDER.test(text.trim())) return fallback;
   return capitalizeError(text) || fallback;
 };

@@ -3,6 +3,7 @@ import { isSafeUrl } from '@/components/SmartContracts/ContractVerification/util
 import { useExtension } from '@/contexts/extension';
 import { Transaction } from '@klever/connect';
 import { capitalizeError } from '@/utils/errorMessage';
+import { mapTransactionError } from '@/utils/transactionError';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -97,8 +98,15 @@ export function useAuditSubmission({
       signedTransaction = await wallet.signTransaction(
         Transaction.fromTransaction(unsignedTx),
       );
-    } catch {
-      toast.error('Wallet signing was rejected or failed');
+    } catch (err) {
+      toast.error(
+        mapTransactionError(
+          err,
+          undefined,
+          undefined,
+          'Wallet signing was rejected or failed',
+        ),
+      );
       setSubmitting(false);
       return;
     }

@@ -337,6 +337,32 @@ describe('mapTransactionError', () => {
       );
     });
 
+    // The api layer and the status poller return the whole response, so the
+    // reason sits in `error`; reading only `message` lost it.
+    it('reads the reason off a response-shaped object', () => {
+      expect(
+        mapTransactionError({
+          error: 'validation error: asset pool amount error',
+        }),
+      ).toBe('Fee too small to pay with this KDA');
+    });
+
+    // The inverse: `message` is the thrown-error shape and stays preferred.
+    it('prefers message over error when both are present', () => {
+      expect(
+        mapTransactionError({ message: 'from message', error: 'from error' }),
+      ).toBe('From message');
+    });
+
+    it.each([
+      ['blank', { error: '   ' }],
+      ['not a string', { error: { nested: 1 } }],
+    ])('falls back when the error field is %s', (_label, thrown) => {
+      expect(mapTransactionError(thrown)).toBe(
+        'Transaction failed, please try again',
+      );
+    });
+
     it('reads the message of a thrown object that carries one', () => {
       expect(mapTransactionError({ message: 'node unreachable' })).toBe(
         'Node unreachable',

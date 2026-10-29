@@ -85,9 +85,16 @@ const isUsablePrecision = (precision?: number): precision is number =>
 const toMessage = (error: unknown): string => {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
-  if (typeof error === 'object' && error !== null && 'message' in error) {
-    const { message } = error as { message: unknown };
-    if (typeof message === 'string' && message.trim() !== '') return message;
+  // The api layer and the status poller both hand back the whole response,
+  // which carries the reason in `error` rather than in `message`.
+  if (typeof error === 'object' && error !== null) {
+    const { message, error: field } = error as {
+      message?: unknown;
+      error?: unknown;
+    };
+    for (const value of [message, field]) {
+      if (typeof value === 'string' && value.trim() !== '') return value;
+    }
   }
   return typeof error === 'number' || typeof error === 'boolean'
     ? String(error)

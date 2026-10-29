@@ -5,6 +5,7 @@ import {
 } from '@/services/requests/contractValidator';
 import api from '@/services/api';
 import { ValidationJob } from '@/types/smart-contract';
+import { mapTransactionError } from '@/utils/transactionError';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { broadcastTXandCheckStatus } from '@/utils/transaction';
 import { Transaction } from '@klever/connect';
@@ -156,8 +157,15 @@ export function useContractCheck() {
         signedTransaction = await wallet.signTransaction(
           Transaction.fromTransaction(unsignedTx),
         );
-      } catch {
-        toast.error('Wallet signing was rejected or failed');
+      } catch (err) {
+        toast.error(
+          mapTransactionError(
+            err,
+            undefined,
+            undefined,
+            'Wallet signing was rejected or failed',
+          ),
+        );
         setSubmitting(false);
         setStatusText(null);
         return;
@@ -174,13 +182,19 @@ export function useContractCheck() {
         } = await broadcastTXandCheckStatus(
           signedTransaction as Parameters<typeof broadcastTXandCheckStatus>[0],
         );
+        // broadcastTXandCheckStatus swallows its own error and returns it, so
+        // discarding txError here would lose the chain's reason for the failure.
         if (txError || status !== 'success' || !hash) {
-          throw new Error('Payment transaction failed');
+          throw txError || new Error('Payment transaction failed');
         }
         paymentTxHash = hash;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Payment transaction failed';
+        const message = mapTransactionError(
+          err,
+          undefined,
+          undefined,
+          'Payment transaction failed',
+        );
         toast.error(message);
         setSubmitting(false);
         setStatusText(null);

@@ -18,9 +18,14 @@ export interface Network {
   links: Link[];
 }
 
+const isCoordinate = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value);
+
 const groupSites = (nodes: Node[]): Site[] => {
   const sites = new Map<string, Site>();
-  nodes.forEach(({ coordinates: [lat, lng] }) => {
+  nodes.forEach(({ coordinates }) => {
+    const [lat, lng]: unknown[] = coordinates ?? [];
+    if (!isCoordinate(lat) || !isCoordinate(lng)) return;
     const key = `${lat.toFixed(1)}:${lng.toFixed(1)}`;
     const site = sites.get(key);
     if (site) site.count += 1;

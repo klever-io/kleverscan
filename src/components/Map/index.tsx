@@ -48,9 +48,13 @@ const Map: React.FC<PropsWithChildren<IMap>> = ({ nodes }) => {
 
   useEffect(() => {
     let active = true;
-    import('./countries').then(module => {
-      if (active) setCountries(module.countries);
-    });
+    import('./countries')
+      .then(module => {
+        if (active) setCountries(module.countries);
+      })
+      .catch(error => {
+        console.error('Failed to load map country outlines', error);
+      });
     return () => {
       active = false;
     };

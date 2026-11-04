@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   user-select: none;
-  pointer-events: none;
 
   .leaflet-container {
     width: 100%;
@@ -11,22 +10,73 @@ export const Container = styled.div`
 
     overflow: hidden;
 
-    background-color: ${props => props.theme.white};
+    background-color: #1a1a1a;
 
     border-radius: 0.5rem;
   }
 
   .map-marker {
-    width: 8px !important;
-    height: 8px !important;
-    border: 1px solid ${props => props.theme.gray800};
+    border: 1px solid ${props => props.theme.lightPurple};
 
-    background-color: ${props => transparentize(0.25, props.theme.gray700)};
+    background-color: ${props => props.theme.purple};
+    box-shadow: 0 0 8px 2px ${props => transparentize(0.4, props.theme.purple)};
 
     border-radius: 50%;
 
     pointer-events: none;
     cursor: unset;
+  }
+
+  .leaflet-container.leaflet-touch-drag {
+    touch-action: pan-y;
+  }
+
+  .map-network {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .map-link {
+    fill: none;
+    stroke: ${props => props.theme.purple};
+    stroke-width: 1.5;
+    stroke-opacity: 0.8;
+    stroke-linecap: round;
+    stroke-dasharray: 4 6;
+    animation: map-link-flow 1.2s linear infinite;
+  }
+
+  .map-link-halo {
+    fill: ${props => props.theme.purple};
+    fill-opacity: 0.35;
+  }
+
+  .map-link-dot {
+    fill: ${props => props.theme.lightPurple};
+  }
+
+  @keyframes map-link-flow {
+    from {
+      stroke-dashoffset: 10;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .map-link {
+      animation: none;
+    }
+
+    .map-link-traveler {
+      display: none;
+    }
   }
 
   .leaflet-control-container {

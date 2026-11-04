@@ -86,8 +86,12 @@ const BLOCK = {
   blockRewards: 15000000,
 } as IBlock;
 
-const renderCell = (key: string, block: IBlock = BLOCK) => {
-  const sections = blockRowSections(block);
+const renderCell = (
+  key: string,
+  block: IBlock = BLOCK,
+  t?: Parameters<typeof blockRowSections>[2],
+) => {
+  const sections = blockRowSections(block, 'Epoch', t);
   const index = BLOCK_COLUMNS.findIndex(column => column.key === key);
   return render(
     <ThemeProvider theme={theme}>{sections[index].element({})}</ThemeProvider>,
@@ -183,5 +187,15 @@ describe('blockRowSections', () => {
     expect(
       screen.getByTitle('08/27/26 23:06:04 UTC · Epoch 6076'),
     ).toBeTruthy();
+  });
+
+  it('translates the elapsed age using the translator passed to blockRowSections', () => {
+    const t = jest.fn((key: string) =>
+      key === 'Date.Elapsed_Time' ? 'atrás' : key,
+    );
+    renderCell('age', BLOCK, t as unknown as Parameters<typeof blockRowSections>[2]);
+
+    expect(t).toHaveBeenCalledWith('Date.Elapsed_Time');
+    expect(screen.getByText(/atrás/)).toBeTruthy();
   });
 });

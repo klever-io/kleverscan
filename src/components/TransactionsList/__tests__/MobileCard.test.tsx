@@ -53,11 +53,20 @@ jest.mock('@/utils/parseValues', () => ({
 // the card asks for that nobody ever added fails the suite here instead of
 // rendering "transactions:Table.Type" at a reader.
 jest.mock('next-i18next', () => {
+  const commonActual = jest.requireActual(
+    '../../../../public/locales/en/common.json',
+  );
   const bundles: Record<string, unknown> = {
     transactions: jest.requireActual(
       '../../../../public/locales/en/transactions.json',
     ),
-    common: jest.requireActual('../../../../public/locales/en/common.json'),
+    common: {
+      ...commonActual,
+      Date: {
+        ...commonActual.Date,
+        Elapsed_Time: 'mock-ago',
+      },
+    },
   };
 
   const resolve = (bundle: unknown, path: string): unknown =>
@@ -314,5 +323,11 @@ describe('TransactionsMobileCard', () => {
     // timestamp to 0, so without them the card dates the row 01/01/70 and
     // ages it in years.
     expect(card.textContent).not.toMatch(/year|\/70/);
+  });
+
+  it('translates the elapsed age from the common bundle', () => {
+    renderCard(transfer());
+
+    expect(screen.getByText(/mock-ago/)).toBeTruthy();
   });
 });

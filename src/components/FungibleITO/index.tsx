@@ -20,6 +20,7 @@ import {
   TotalPrice,
   ViewMoreButton,
 } from './styles';
+import { mapTransactionError } from '@/utils/transactionError';
 import { getPrecision } from '@/utils/precisionFunctions';
 
 interface IFungibleITO {
@@ -157,7 +158,7 @@ const FungibleITO: React.FC<PropsWithChildren<IFungibleITO>> = ({
       toast.success(t('itos:successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
-      toast.error(e.message ? e.message : e);
+      toast.error(mapTransactionError(e));
     } finally {
       setLoading(false);
     }

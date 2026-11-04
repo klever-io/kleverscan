@@ -47,6 +47,9 @@ module.exports = {
     ],
   },
   reactStrictMode: false,
+  experimental: {
+    agentUpgrade: 'security',
+  },
   turbopack: {
     resolveAlias: {
       fs: { browser: './empty.ts' },

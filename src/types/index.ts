@@ -318,11 +318,16 @@ export interface IBalance {
 export interface IAccountAsset {
   address: string;
   assetId: string;
+  assetName?: string;
   assetType: number;
   balance: number;
   precision: number;
   frozenBalance: number;
   unfrozenBalance: number;
+  /** Copied from assets/list. The address payload has no logo of its own. */
+  logo?: string;
+  ticker?: string;
+  verified?: boolean;
   lastClaim: {
     timestamp: number;
     epoch: number;
@@ -346,6 +351,10 @@ export interface IProprietaryAsset {
     interestType: string;
     totalStaked: number;
   };
+  name?: string;
+  ticker?: string;
+  logo?: string;
+  verified?: boolean;
 }
 
 export interface IRewardsAssets {
@@ -358,6 +367,10 @@ export interface IRewardsAssets {
     },
   ];
   assetId: string;
+  assetName?: string;
+  ticker?: string;
+  logo?: string;
+  verified?: boolean;
 }
 export interface IAssetsHoldersResponse extends IResponse {
   data: {

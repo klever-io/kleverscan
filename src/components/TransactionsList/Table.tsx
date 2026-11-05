@@ -22,7 +22,10 @@ const TransactionsTable = <TCard,>(
   const rowMinWidth = rowLayoutMinWidth(showsInOut(router));
 
   return (
-    <TransactionsTableWrapper $rowLayoutMin={rowMinWidth}>
+    <TransactionsTableWrapper
+      $rowLayoutMin={rowMinWidth}
+      $showInOut={showsInOut(router)}
+    >
       <Table {...props} cardBreakpoint={rowMinWidth} />
     </TransactionsTableWrapper>
   );

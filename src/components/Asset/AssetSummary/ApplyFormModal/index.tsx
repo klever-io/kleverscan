@@ -28,7 +28,6 @@ import {
 } from './styles';
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import Underline from '@tiptap/extension-underline';
 import { Toolbar } from './Toolbar';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { formatAmount } from '@/utils/formatFunctions';
@@ -178,8 +177,10 @@ export const ApplyFormModal: React.FC<
   };
 
   const editor = useEditor({
-    extensions: [StarterKit, Underline],
+    extensions: [StarterKit.configure({ link: false })],
     content: `${projectDescription}`,
+    immediatelyRender: false,
+    shouldRerenderOnTransaction: true,
     onUpdate({ editor }) {
       const textLength = editor.getHTML().length;
       if (textLength > PROJECT_DESCRIPTION_MAX_LENGTH) {

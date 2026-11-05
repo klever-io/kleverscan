@@ -32,6 +32,9 @@ import {
   KFIAllowancePromise,
   KLVAllowancePromise,
   assetsRequest,
+  bucketsRequest,
+  ownedAssetsRequest,
+  rewardsFPRPool,
 } from '@/services/requests/account';
 import {
   getAsset,
@@ -58,7 +61,7 @@ const routerWith = (query: Record<string, unknown>): NextRouter =>
 const callArg = (call = 0) => mockGet.mock.calls[call][0];
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  mockGet.mockReset();
   mockGet.mockResolvedValue({ error: '', code: 'successful', data: {} });
 });
 
@@ -180,6 +183,480 @@ describe('escaped route segments', () => {
     await assetsRequest('klv1?page=999&')(1, 10);
 
     expect(callArg().route).toBe('address/klv1%3Fpage%3D999%26');
+  });
+
+  it('assetsRequest loads a logo for every holding, not only the table page', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: { assetId: 'KLV', assetType: 0 },
+              'CHIPS-1GZP': { assetId: 'CHIPS-1GZP', assetType: 0 },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [
+            {
+              assetId: 'KLV',
+              logo: '/assets/klv-logo.png',
+              ticker: 'KLV',
+              name: 'KLEVER',
+              verified: true,
+              staking: { interestType: 'APRI' },
+            },
+            {
+              assetId: 'CHIPS-1GZP',
+              logo: 'https://example.test/chips.png',
+              ticker: 'CHIPS',
+              name: 'Dexbet Chips',
+              verified: false,
+              staking: { interestType: 'FPRI' },
+            },
+          ],
+        },
+      });
+
+    const result = await assetsRequest('klv1abc')(2, 10);
+
+    expect(callArg(1)).toEqual({
+      route: 'assets/list',
+      query: { page: 1, limit: 2, asset: 'KLV,CHIPS-1GZP' },
+    });
+    expect(
+      result.data.assets.map((asset: { logo?: string }) => asset.logo),
+    ).toEqual(['/assets/klv-logo.png', 'https://example.test/chips.png']);
+    expect(result.data.assets[0].staking).toEqual({ interestType: 'APRI' });
+    expect(result.data.assets[1].ticker).toBe('CHIPS');
+    expect(result.data.assets[1].verified).toBe(false);
+  });
+
+  it('assetsRequest asks the registry in pages of 100', async () => {
+    const assets: Record<string, { assetId: string; assetType: number }> = {};
+    for (let index = 0; index < 101; index += 1) {
+      const assetId = `T${String(index).padStart(3, '0')}`;
+      assets[assetId] = { assetId, assetType: 0 };
+    }
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: { account: { assets } },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [{}, { assetId: 'T000', logo: '/a.png' }],
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [{ assetId: 'T100', logo: '/b.png' }] },
+      });
+
+    const result = await assetsRequest('klv1abc')(1, 10);
+    const ids = Object.keys(assets);
+
+    expect(mockGet).toHaveBeenCalledTimes(3);
+    expect(callArg(1)).toEqual({
+      route: 'assets/list',
+      query: { asset: ids.slice(0, 100).join(','), page: 1, limit: 100 },
+    });
+    expect(callArg(2)).toEqual({
+      route: 'assets/list',
+      query: { asset: 'T100', page: 1, limit: 1 },
+    });
+    expect(result.data.assets).toHaveLength(101);
+    expect(result.data.assets[0].logo).toBe('/a.png');
+    expect(result.data.assets[100].logo).toBe('/b.png');
+  });
+
+  it('assetsRequest keeps a holding when a later registry page fails', async () => {
+    const assets: Record<string, { assetId: string; assetType: number }> = {};
+    for (let index = 0; index < 101; index += 1) {
+      const assetId = `T${String(index).padStart(3, '0')}`;
+      assets[assetId] = { assetId, assetType: 0 };
+    }
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: { account: { assets } },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [{ assetId: 'T000', logo: '/a.png' }] },
+      })
+      .mockResolvedValueOnce({
+        error: 'request failed',
+        data: { assets: null },
+      });
+
+    const result = await assetsRequest('klv1abc')(1, 10);
+
+    expect(mockGet).toHaveBeenCalledTimes(3);
+    expect(result.data.assets).toHaveLength(101);
+    expect(result.data.assets[0].logo).toBe('/a.png');
+    expect(result.data.assets[100].logo).toBeUndefined();
+  });
+
+  it('assetsRequest keeps the holdings when a registry page rejects', async () => {
+    const assets: Record<string, { assetId: string; assetType: number }> = {};
+    for (let index = 0; index < 101; index += 1) {
+      const assetId = `T${String(index).padStart(3, '0')}`;
+      assets[assetId] = { assetId, assetType: 0 };
+    }
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: { account: { assets } },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [{ assetId: 'T000', logo: '/a.png' }] },
+      })
+      .mockRejectedValueOnce(new Error('not json'));
+
+    const result = await assetsRequest('klv1abc')(1, 10);
+
+    expect(result.data.assets).toHaveLength(101);
+    expect(result.data.assets[0].logo).toBe('/a.png');
+    expect(result.data.assets[100].logo).toBeUndefined();
+  });
+
+  it('ownedAssetsRequest replaces a broken kassets logo with the registry logo', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [{ assetId: 'WIT3-QO2C', logo: 'https/', ticker: 'WIT3' }],
+        },
+        pagination: {},
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [
+            {
+              assetId: 'WIT3-QO2C',
+              logo: 'https://example.test/wit.png',
+              ticker: 'WIT3',
+              name: 'Wit3 AI',
+              verified: false,
+            },
+          ],
+        },
+      });
+
+    const result = await ownedAssetsRequest('klv1abc')(1, 10);
+
+    expect(callArg(0)).toEqual({
+      route: 'assets/kassets',
+      query: { owner: 'klv1abc', page: 1, limit: 10 },
+    });
+    expect(callArg(1)).toEqual({
+      route: 'assets/list',
+      query: { asset: 'WIT3-QO2C', page: 1, limit: 1 },
+    });
+    expect(result.data.proprietaryAssets[0].logo).toBe(
+      'https://example.test/wit.png',
+    );
+    expect(result.data.proprietaryAssets[0].name).toBe('Wit3 AI');
+  });
+
+  it('ownedAssetsRequest returns an empty list when kassets has no asset array', async () => {
+    mockGet.mockResolvedValueOnce({
+      error: '',
+      data: { assets: { nope: true } },
+      pagination: {},
+    });
+
+    const result = await ownedAssetsRequest('klv1abc')(1, 10);
+
+    expect(result.data.proprietaryAssets).toEqual([]);
+  });
+
+  it('bucketsRequest loads a logo for every bucket asset', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', balance: 1, delegation: '' }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [
+            {
+              assetId: 'KLV',
+              logo: '/assets/klv-logo.png',
+              ticker: 'KLV',
+              name: 'KLEVER',
+              verified: true,
+            },
+          ],
+        },
+        pagination: {},
+      });
+
+    const result = await bucketsRequest('klv1abc')(1, 10);
+
+    expect(callArg(1)).toEqual({
+      route: 'assets/list',
+      query: { asset: 'KLV', page: 1, limit: 1 },
+    });
+    expect(result.data.buckets[0].asset.logo).toBe('/assets/klv-logo.png');
+    expect(result.data.buckets[0].asset.ticker).toBe('KLV');
+  });
+
+  it('bucketsRequest keeps account buckets when the registry list returns none', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', balance: 1, delegation: '' }],
+              },
+              KFI: {
+                assetId: 'KFI',
+                buckets: [{ id: 'b2', balance: 2, delegation: '' }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: 'unavailable',
+        data: { assets: null },
+      });
+
+    const result = await bucketsRequest('klv1abc')(1, 10);
+
+    expect(result.data.buckets.map(row => row.asset.assetId)).toEqual([
+      'KLV',
+      'KFI',
+    ]);
+    expect(result.data.buckets[0].bucket.id).toBe('b1');
+    expect(result.data.buckets[1].bucket.id).toBe('b2');
+    expect(result.data.buckets[0].asset.logo).toBeUndefined();
+  });
+
+  it('bucketsRequest keeps a bucket the registry list left out', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', balance: 1, delegation: '' }],
+              },
+              KFI: {
+                assetId: 'KFI',
+                buckets: [{ id: 'b2', balance: 2, delegation: '' }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [
+            {
+              assetId: 'KLV',
+              logo: '/assets/klv-logo.png',
+              ticker: 'KLV',
+              name: 'KLEVER',
+              verified: true,
+            },
+          ],
+        },
+      });
+
+    const result = await bucketsRequest('klv1abc')(1, 10);
+
+    expect(result.data.buckets.map(row => row.asset.assetId)).toEqual([
+      'KLV',
+      'KFI',
+    ]);
+    expect(result.data.buckets[0].asset.logo).toBe('/assets/klv-logo.png');
+    expect(result.data.buckets[1].asset.logo).toBeUndefined();
+  });
+
+  it('bucketsRequest keeps account order when the registry returns the other order', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', balance: 1 }],
+              },
+              KFI: {
+                assetId: 'KFI',
+                buckets: [{ id: 'b2', balance: 2 }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [
+            { assetId: 'KFI', logo: '/kfi.png' },
+            { assetId: 'KLV', logo: '/klv.png' },
+          ],
+        },
+      });
+
+    const result = await bucketsRequest('klv1abc')(1, 10);
+
+    expect(result.data.buckets.map(row => row.bucket.id)).toEqual(['b1', 'b2']);
+    expect(result.data.buckets[1].asset.logo).toBe('/kfi.png');
+  });
+
+  it('bucketsRequest pages the bucket rows and still asks the registry for every asset', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', balance: 1, delegation: '' }],
+              },
+              KFI: {
+                assetId: 'KFI',
+                buckets: [{ id: 'b2', balance: 2, delegation: '' }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [] },
+      });
+
+    const result = await bucketsRequest('klv1abc')(2, 1);
+
+    expect(callArg(1)).toEqual({
+      route: 'assets/list',
+      query: { asset: 'KLV,KFI', page: 1, limit: 2 },
+    });
+    expect(result.data.buckets.map(row => row.bucket.id)).toEqual(['b2']);
+    expect(result.pagination).toEqual({
+      self: 2,
+      next: 0,
+      previous: 1,
+      perPage: 1,
+      totalPages: 2,
+      totalRecords: 2,
+    });
+  });
+
+  it('bucketsRequest looks up validator status only for the page on screen', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ id: 'b1', delegation: 'klv1off' }],
+              },
+              KFI: {
+                assetId: 'KFI',
+                buckets: [{ id: 'b2', delegation: 'klv1on' }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { assets: [] },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { validator: { list: 'active' } },
+      });
+
+    const result = await bucketsRequest('klv1abc')(2, 1);
+    const routes = mockGet.mock.calls.map(call => call[0].route);
+
+    expect(result.data.buckets.map(row => row.bucket.id)).toEqual(['b2']);
+    expect(result.data.buckets[0].validatorStatus).toBe('active');
+    expect(routes).toEqual([
+      'address/klv1abc',
+      'assets/list',
+      'validator/klv1on',
+    ]);
+  });
+
+  it('rewardsFPRPool keeps a logo next to each rewarded asset', async () => {
+    mockGet
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          account: {
+            assets: {
+              KLV: {
+                assetId: 'KLV',
+                buckets: [{ unstakedEpoch: 4294967295, balance: 1 }],
+              },
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: { result: { allowance: 5, allStakingRewards: [] } },
+      })
+      .mockResolvedValueOnce({
+        error: '',
+        data: {
+          assets: [
+            {
+              assetId: 'KLV',
+              logo: '/assets/klv-logo.png',
+              ticker: 'KLV',
+              name: 'KLEVER',
+              verified: true,
+            },
+          ],
+        },
+      });
+
+    const result = await rewardsFPRPool('klv1abc')(2, 10);
+
+    expect(callArg(2)).toEqual({
+      route: 'assets/list',
+      query: { asset: 'KLV', page: 1, limit: 1 },
+    });
+    expect(result.data.rewards[0].logo).toBe('/assets/klv-logo.png');
+    expect(result.data.rewards[0].assetName).toBe('KLEVER');
   });
 });
 

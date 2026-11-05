@@ -272,7 +272,7 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
         <span>
           <strong>Amount</strong>
         </span>
-        <CenteredRow>
+        <CenteredRow data-amount>
           <strong>
             {parameter.amount
               ? toLocaleFixed(parameter.amount / 10 ** precision, precision)
@@ -281,13 +281,15 @@ export const Transfer: React.FC<PropsWithChildren<IIndexedContract>> = ({
           {renderAssetId(parameter)}
         </CenteredRow>
       </Row>
-      <Row>
+      <Row data-address-row>
         <span>
           <strong>To</strong>
         </span>
-        <span>
-          <ExplorerLink type="account" value={parameter?.toAddress} />
-        </span>
+        {parameter?.toAddress ? (
+          <ExplorerLink type="account" value={parameter.toAddress} />
+        ) : (
+          <span>--</span>
+        )}
       </Row>
       {getCorrectKDARoyalty()}
       {hasTransferPercentageRoyalties && (

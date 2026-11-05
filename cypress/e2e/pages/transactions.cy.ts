@@ -604,8 +604,8 @@ describe('Block Page i18n', () => {
   // loaded no translation namespace at all before this branch, so its filter
   // bar rendered raw keys.
   const API_BASE =
-    Cypress.env('DEFAULT_API_HOST') || 'https://api.testnet.klever.org';
-  const API_VERSION = Cypress.env('DEFAULT_API_VERSION') || 'v1.0';
+    Cypress.expose('DEFAULT_API_HOST') || 'https://api.testnet.klever.org';
+  const API_VERSION = Cypress.expose('DEFAULT_API_VERSION') || 'v1.0';
 
   /**
    * Bounded backoff against a shared, rate-limited API.
@@ -655,18 +655,29 @@ describe('Block Page i18n', () => {
       timeout: 60000,
       failOnStatusCode: false,
     });
-    cy.get('body', { timeout: 15000 }).then($body => {
-      if ($body.find('[data-testid="filter-status"]').length) {
-        return;
-      }
-      if (retriesLeft <= 0) {
-        throw new Error(
-          `Block page did not load for ${blockNum} after retries (likely API 429 / notFound)`,
-        );
-      }
-      cy.wait(3000);
-      visitBlockPage(blockNum, retriesLeft - 1);
-    });
+    // The transactions tab only mounts once the router is ready, after
+    // hydration, so a single look right after the visit can land before it.
+    // Wait until the page settles on either the filters or the 404 page, and
+    // revisit only for the 404.
+    cy.get('body', { timeout: 20000 })
+      .should($body => {
+        const settled =
+          $body.find('[data-testid="filter-status"]').length > 0 ||
+          $body.find('h1:contains("Page not found!")').length > 0;
+        expect(settled, 'block page or 404 rendered').to.eq(true);
+      })
+      .then($body => {
+        if ($body.find('[data-testid="filter-status"]').length) {
+          return;
+        }
+        if (retriesLeft <= 0) {
+          throw new Error(
+            `Block page did not load for ${blockNum} after retries (likely API 429 / notFound)`,
+          );
+        }
+        cy.wait(3000);
+        visitBlockPage(blockNum, retriesLeft - 1);
+      });
   };
 
   it('serves the transactions tab with translated filters', () => {
@@ -687,8 +698,8 @@ describe('Transaction Details Page', () => {
   // Detail pages use getServerSideProps against the live API (browser intercepts
   // cannot stub Node). Resolve a real hash via cy.request, then visit SSR page.
   const API_BASE =
-    Cypress.env('DEFAULT_API_HOST') || 'https://api.testnet.klever.org';
-  const API_VERSION = Cypress.env('DEFAULT_API_VERSION') || 'v1.0';
+    Cypress.expose('DEFAULT_API_HOST') || 'https://api.testnet.klever.org';
+  const API_VERSION = Cypress.expose('DEFAULT_API_VERSION') || 'v1.0';
 
   const requestTxList = (
     typeIndex: number,

@@ -31,8 +31,7 @@ export const warningMessage = `You don't have enough currency. Please check the 
 
 const CreateTransaction: React.FC<PropsWithChildren> = () => {
   const [isAccountEmpty, setIsAccountEmpty] = React.useState<boolean>(false);
-  const { extensionInstalled, connectExtension, walletAddress } =
-    useExtension();
+  const { extensionInstalled, walletAddress } = useExtension();
 
   const { isTablet } = useMobile();
 
@@ -45,12 +44,6 @@ const CreateTransaction: React.FC<PropsWithChildren> = () => {
     showMultiContracts,
     setShowMultiContracts,
   } = useMulticontract();
-
-  useEffect(() => {
-    if (extensionInstalled) {
-      connectExtension();
-    }
-  }, [extensionInstalled]);
 
   useEffect(() => {
     const isAccountEmpty = async () => {

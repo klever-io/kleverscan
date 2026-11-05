@@ -63,7 +63,81 @@ jest.mock('react-dom', () => {
 
 import ExplorerLink from '../index';
 
+const LONG = 'klv1exampleaddressvalue000000000000000000000000000000';
+
 const HASH = 'abc123';
+
+describe('ExplorerLink detail mode', () => {
+  const originals = {
+    clientWidth: Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'clientWidth',
+    ),
+    scrollWidth: Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'scrollWidth',
+    ),
+  };
+
+  afterEach(() => {
+    if (originals.clientWidth) {
+      Object.defineProperty(
+        HTMLElement.prototype,
+        'clientWidth',
+        originals.clientWidth,
+      );
+    }
+    if (originals.scrollWidth) {
+      Object.defineProperty(
+        HTMLElement.prototype,
+        'scrollWidth',
+        originals.scrollWidth,
+      );
+    }
+  });
+
+  it('puts the open and copy controls on the value link', () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <ExplorerLink type="account" value="klv1abc" />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('link', { name: 'klv1abc' })).toHaveAttribute(
+      'href',
+      '/account/klv1abc',
+    );
+    expect(
+      screen.getByRole('link', { name: 'Open account in a new tab' }),
+    ).toHaveAttribute('target', '_blank');
+    expect(
+      screen.getByRole('button', { name: 'Copy Address' }),
+    ).toBeInTheDocument();
+  });
+
+  it('shortens a long value when the row is narrow', () => {
+    Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+      configurable: true,
+      get: () => 40,
+    });
+    Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
+      configurable: true,
+      get() {
+        return (this.textContent || '').length * 8;
+      },
+    });
+
+    render(
+      <ThemeProvider theme={theme}>
+        <ExplorerLink type="account" value={LONG} />
+      </ThemeProvider>,
+    );
+
+    const node = screen.getByTitle(LONG);
+    expect(node).toHaveAttribute('href', `/account/${LONG}`);
+    expect(node.textContent).toContain('...');
+  });
+});
 
 describe('ExplorerLink compact mode', () => {
   /**

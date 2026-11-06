@@ -17,12 +17,12 @@ interface MultisignThresholdSource {
  */
 export const normalizeMultisignTx = <T extends Record<string, unknown>>(
   tx: T,
-): T & { Threshold: number } => {
-  const { threshold, Threshold, ...rest } = tx as Record<string, unknown>;
+): Omit<T, 'threshold' | 'Threshold'> & { Threshold: number } => {
+  const { threshold, Threshold, ...rest } = tx;
   const value = Number(threshold ?? Threshold ?? 0);
 
   return {
-    ...(rest as T),
+    ...(rest as Omit<T, 'threshold' | 'Threshold'>),
     Threshold: Number.isFinite(value) ? value : 0,
   };
 };

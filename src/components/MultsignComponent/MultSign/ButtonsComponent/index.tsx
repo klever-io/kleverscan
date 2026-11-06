@@ -5,6 +5,7 @@ import api from '@/services/api';
 import { useExtension } from '@/contexts/extension';
 import { Service } from '@/types';
 import { toast } from 'react-toastify';
+import { canBroadcastMultisign } from '@/utils/multisign';
 import {
   ButtonContainer,
   ButtonsContainerApi,
@@ -43,8 +44,6 @@ export const ButtonsComponent: React.FC<
   refetchMultisignData,
 }) => {
   const { wallet, walletAddress } = useExtension();
-  const multisignTotalWeight =
-    multiSignData?.signers?.filter(e => e.signed)?.length || 0;
 
   const addNewSignatures = (
     signedTx: ITransaction,
@@ -311,7 +310,7 @@ export const ButtonsComponent: React.FC<
             </MultisignButton>
             <MultisignButton
               onClick={handleBroadcast}
-              disabled={multisignTotalWeight < (multiSignData?.Threshold ?? 0)}
+              disabled={!canBroadcastMultisign(multiSignData)}
               type="button"
             >
               Broadcast Transaction

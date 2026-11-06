@@ -46,6 +46,14 @@ export const ButtonsComponent: React.FC<
   const multisignTotalWeight =
     multiSignData?.signers?.filter(e => e.signed)?.length || 0;
 
+  // The list is the react-query cache array, which this component mutates in
+  // place (see handleDecodeRequest), so the entry is spliced out rather than
+  // filtered into a new array.
+  const removeImportedTx = (list: IMultisignData[], hash: string) => {
+    const index = list.findIndex(tx => tx.fromJSON && tx.hash === hash);
+    if (index !== -1) list.splice(index, 1);
+  };
+
   const addNewSignatures = (
     signedTx: ITransaction,
     raw: ITransaction,
@@ -328,19 +336,21 @@ export const ButtonsComponent: React.FC<
               >
                 Download JSON file
               </MultisignButton>
-              <MultisignButton
-                isJsonButton
-                type="button"
-                onClick={() => {
-                  setSignBcastTransaction(false);
-                  setTxHash(null);
-                  setSelectedHash('');
-                  setDragginOverlayCount(0);
-                  multiSignDataRef.pop();
-                }}
-              >
-                Remove JSON file
-              </MultisignButton>
+              {multiSignData.fromJSON && (
+                <MultisignButton
+                  isJsonButton
+                  type="button"
+                  onClick={() => {
+                    setSignBcastTransaction(false);
+                    setTxHash(null);
+                    setSelectedHash('');
+                    setDragginOverlayCount(0);
+                    removeImportedTx(multiSignDataRef, multiSignData.hash);
+                  }}
+                >
+                  Remove JSON file
+                </MultisignButton>
+              )}
             </>
           )}
 

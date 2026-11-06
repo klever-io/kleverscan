@@ -39,6 +39,14 @@ describe('requestMultisign', () => {
     expect(tx.Threshold).toBe(3);
   });
 
+  it('skips entries that are not objects instead of losing the list', async () => {
+    mockedGet.mockResolvedValue([null, 'x', { hash: 'a', threshold: 1 }]);
+
+    expect(await requestMultisign('klv1a')).toEqual([
+      { hash: 'a', Threshold: 1 },
+    ]);
+  });
+
   it('returns an empty list when the API answers with an error', async () => {
     mockedGet.mockResolvedValue({ data: null, error: 'x' });
 

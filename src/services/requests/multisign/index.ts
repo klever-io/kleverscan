@@ -29,7 +29,11 @@ export const requestMultisign = async (walletAddress: string): Promise<any> => {
 
     if (!Array.isArray(response)) return [];
 
-    return response.map(tx => normalizeMultisignTx(tx)) as IMultisignData[];
+    // One malformed entry must not cost the whole list: normalizeMultisignTx
+    // destructures its argument and would throw on null.
+    return response
+      .filter(tx => tx && typeof tx === 'object')
+      .map(tx => normalizeMultisignTx(tx)) as IMultisignData[];
   } catch (error) {
     console.error(error);
     return [];

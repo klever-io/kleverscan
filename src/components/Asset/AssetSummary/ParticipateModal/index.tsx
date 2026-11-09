@@ -1,4 +1,5 @@
 import FungibleITO, { isFloat } from '@/components/FungibleITO';
+import { mapTransactionError } from '@/utils/transactionError';
 import {
   ItemsContainer,
   KeyLabel,
@@ -262,7 +263,7 @@ export const ParticipateModal: React.FC<
       return;
     }
     if (!selectedPackData.precision) {
-      toast.error('Error while calculating pack price. Please reload page');
+      toast.error('Error calculating pack price, please reload page.');
       return;
     }
 
@@ -307,11 +308,11 @@ export const ParticipateModal: React.FC<
       }
 
       setTxHash(txHashes[0]);
-      toast.success('Transaction successfully broadcasted.');
+      toast.success('Transaction broadcast successfully');
       closeModal();
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
-      toast.error(e.message ? e.message : e);
+      toast.error(mapTransactionError(e));
     } finally {
       setLoading(false);
     }

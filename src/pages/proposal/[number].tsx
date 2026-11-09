@@ -36,6 +36,7 @@ import {
   NetworkParamsIndexer,
 } from '@/types/proposals';
 import { validateFormattedVotes } from '@/utils';
+import { mapTransactionError } from '@/utils/transactionError';
 import { formatAmount, toLocaleFixed } from '@/utils/formatFunctions';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { useSkeleton } from '@/utils/hooks';
@@ -257,19 +258,7 @@ const ProposalDetails: React.FC<PropsWithChildren> = () => {
     } catch (e) {
       console.warn(`%c ${e}`, 'color: red');
 
-      const errorMessage =
-        typeof e === 'object' && e !== null && 'message' in e
-          ? (e as { message: string }).message
-          : String(e);
-
-      if (
-        errorMessage.includes('invalid signature threshold') ||
-        errorMessage.includes('no contract permission')
-      ) {
-        toast.error(errorMessage.split(': ')[3]);
-      } else {
-        toast.error(errorMessage);
-      }
+      toast.error(mapTransactionError(e));
     }
   };
 

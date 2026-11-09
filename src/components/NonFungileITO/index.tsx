@@ -1,4 +1,5 @@
 import { PropsWithChildren } from 'react';
+import { mapTransactionError } from '@/utils/transactionError';
 
 import { useExtension } from '@/contexts/extension';
 import { Transaction } from '@klever/connect';
@@ -68,7 +69,7 @@ const NonFungibleITO: React.FC<PropsWithChildren<INonFungible>> = ({
       toast.success(t('successBroadcastTxToast'));
     } catch (e: any) {
       console.warn(`%c ${e}`, 'color: red');
-      toast.error(e.message ? e.message : e);
+      toast.error(mapTransactionError(e));
     } finally {
       setLoading(false);
     }

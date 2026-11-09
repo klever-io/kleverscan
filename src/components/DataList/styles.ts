@@ -325,6 +325,23 @@ export const AssetIdLine = styled.span`
   white-space: nowrap;
 `;
 
+/** Logo plus one text line. The cell's own `span` rule would pin that line
+ *  to 20px and `fit-content`, which clips it beside a 32px mark. */
+export const TokenMark = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+
+  && span {
+    height: auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
 export const AddressLink = styled(Link)`
   font-family: 'Fira Mono', monospace;
   /* Matches the Total Balance value, so identity and primary figure read as

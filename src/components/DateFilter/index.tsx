@@ -314,7 +314,7 @@ const DateFilter: React.FC<PropsWithChildren> = () => {
   // render's output is router-independent on both sides. Keep it that way: move
   // either call into the render body and the mismatch comes back.
   return (
-    <FilterContainer open={calendarOpen}>
+    <FilterContainer open={calendarOpen} data-testid="filter-date">
       <span>Date Filter</span>
       <Container
         onBlur={() => !dontBlur && setCalendarOpen(false)}

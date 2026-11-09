@@ -2,6 +2,7 @@ import { IMultisignData } from '@/components/MultsignComponent/MultSign';
 import api from '@/services/api';
 import { Service } from '@/types';
 import { ITransaction as ITransactionDecoded } from '@/types/index';
+import { normalizeMultisignTx } from '@/utils/multisign';
 import { toast } from 'react-toastify';
 
 interface ITransaction {
@@ -26,7 +27,13 @@ export const requestMultisign = async (walletAddress: string): Promise<any> => {
       return [];
     }
 
-    return response as IMultisignData;
+    if (!Array.isArray(response)) return [];
+
+    // One malformed entry must not cost the whole list: normalizeMultisignTx
+    // destructures its argument and would throw on null.
+    return response
+      .filter(tx => tx && typeof tx === 'object')
+      .map(tx => normalizeMultisignTx(tx)) as IMultisignData[];
   } catch (error) {
     console.error(error);
     return [];

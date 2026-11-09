@@ -26,13 +26,14 @@ import React, { PropsWithChildren } from 'react';
 const getRequest = (
   router: NextRouter,
   t: TFunction<[string, string], undefined>,
+  tab?: string | string[],
 ): ((page: number, limit: number) => Promise<IResponse | []>) => {
   const address = router.query.account as string;
   const rawAssetType = router.query.assetType as string | undefined;
   const assetType =
     rawAssetType && rawAssetType !== 'undefined' ? rawAssetType : undefined;
 
-  switch (router.query.tab) {
+  switch (tab || router.query.tab) {
     case t('common:Titles.Assets'):
       return (page: number, limit: number) =>
         assetsRequest(address, assetType)(page, limit);
@@ -88,6 +89,11 @@ const smartContractsTableProps: IPartialInnerTableProps = {
 
 interface ISelectedTabProps {
   showInteractionButtons: boolean;
+  /**
+   * The header the page already highlighted. Falls back to the URL when a
+   * caller does not pass it.
+   */
+  tab?: string;
 }
 
 export const EmptyComponent: React.FC<PropsWithChildren> = () => {
@@ -96,10 +102,13 @@ export const EmptyComponent: React.FC<PropsWithChildren> = () => {
 
 const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
   showInteractionButtons,
+  tab,
 }) => {
   const router = useRouter();
   const { t } = useTranslation(['common', 'accounts']);
   const { getInteractionsButtons } = useContractModal();
+  const selected = tab || router?.query?.tab || t('common:Titles.Assets');
+  const request = getRequest(router, t, selected);
 
   const [CreateAssetButton] = showInteractionButtons
     ? getInteractionsButtons([
@@ -112,14 +121,14 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
 
   const Filters = showInteractionButtons ? CreateAssetButton : undefined;
 
-  switch (router?.query?.tab || t('common:Titles.Assets')) {
+  switch (selected) {
     case t('common:Titles.Assets'):
       return (
         <Assets
           assetsTableProps={
             {
               ...assetsTableProps,
-              request: getRequest(router, t),
+              request,
               query: router.query,
             } as IInnerTableProps
           }
@@ -135,7 +144,7 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
           assetsTableProps={
             {
               ...proprietaryAssetsTableProps,
-              request: getRequest(router, t),
+              request,
               query: router.query,
             } as IInnerTableProps
           }
@@ -150,7 +159,7 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
           transactionsTableProps={
             {
               ...transactionTableProps,
-              request: getRequest(router, t),
+              request,
               query: router.query,
             } as IInnerTableProps
           }
@@ -162,7 +171,7 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
           bucketsTableProps={
             {
               ...bucketsTableProps,
-              request: getRequest(router, t),
+              request,
               query: router.query,
             } as IInnerTableProps
           }
@@ -175,7 +184,7 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
           rewardsTableProps={
             {
               ...rewardsTableProps,
-              request: getRequest(router, t),
+              request,
               query: router.query,
             } as IInnerTableProps
           }
@@ -187,7 +196,7 @@ const SelectedTabComponent: React.FC<PropsWithChildren<ISelectedTabProps>> = ({
           smartContractsTableProps={
             {
               ...smartContractsTableProps,
-              request: getRequest(router, t),
+              request,
               query: {
                 ...router.query,
                 deployer: router.query.account as string,

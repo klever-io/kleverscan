@@ -2,6 +2,7 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 import { IMultisignData } from '..';
 import { IMultisignList } from '../MultiSignList';
 import { getPrecision } from '@/utils/precisionFunctions';
+import { signedWeight } from '@/utils/multisign';
 import {
   PassThresholdContainer,
   ProgressBar,
@@ -9,7 +10,7 @@ import {
   ProgressBarVotes,
 } from '@/views/proposals/detail';
 import Tooltip from '@/components/Tooltip';
-import { OverviewDetails } from '@/pages/transaction/[hash]';
+import OverviewDetails from '@/components/TransactionDetails/OverviewDetails';
 
 interface IMultisignOverview {
   multiSignData: IMultisignData;
@@ -41,10 +42,10 @@ export const OverviewInfo: React.FC<PropsWithChildren<IMultisignOverview>> = ({
     fetchPrecision();
   }, []);
 
-  const multisignTotalWeight =
-    multiSignData?.signers?.filter(e => e.signed)?.length || 0;
+  const multisignTotalWeight = signedWeight(multiSignData?.signers);
+  const threshold = multiSignData?.Threshold ?? 0;
   const thresholdPercentage =
-    (multisignTotalWeight / (multiSignData?.Threshold ?? 0)) * 100;
+    threshold > 0 ? Math.min((multisignTotalWeight / threshold) * 100, 100) : 0;
 
   const Progress: React.FC<PropsWithChildren> = () => {
     return (
@@ -65,7 +66,7 @@ export const OverviewInfo: React.FC<PropsWithChildren<IMultisignOverview>> = ({
           </PassThresholdContainer>
         </ProgressBarVotes>
         <span>
-          {multisignTotalWeight}/{multiSignData?.Threshold ?? 0}
+          {multisignTotalWeight}/{threshold}
         </span>
         <Tooltip msg="The transaction below isn't processed yet, it must achieve the threshold" />
       </>

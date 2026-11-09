@@ -1,5 +1,8 @@
 import { PropsWithChildren } from 'react';
 import Copy from '@/components/Copy';
+import { ROW_LAYOUT_MIN_WIDTH } from '@/components/DataList/layout';
+import { TokenMark } from '@/components/DataList/styles';
+import AssetLogo from '@/components/Logo/AssetLogo';
 import Table, { ITable } from '@/components/Table';
 import { useContractModal } from '@/contexts/contractModal';
 import api from '@/services/api';
@@ -11,7 +14,12 @@ import { useTranslation } from 'next-i18next';
 import Link from 'next/link';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ContractContainer, Status, ValidatorStatusBadge } from './styles';
+import {
+  BucketsTableWrapper,
+  ContractContainer,
+  Status,
+  ValidatorStatusBadge,
+} from './styles';
 
 export interface IBuckets {
   bucketsTableProps: IInnerTableProps;
@@ -159,10 +167,20 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
       }
     };
 
+    const ticker = asset?.ticker || asset?.assetId?.split('-')[0] || '';
     const sections: IRowSection[] = [
       {
         element: props => (
-          <ExplorerLink type="asset" value={asset?.assetId} compact />
+          <TokenMark>
+            <AssetLogo
+              logo={asset?.logo || ''}
+              ticker={ticker}
+              name={asset?.assetName || ticker}
+              verified={asset?.verified}
+              size={32}
+            />
+            <ExplorerLink type="asset" value={asset?.assetId} compact />
+          </TokenMark>
         ),
         span: 1,
       },
@@ -270,9 +288,15 @@ const Buckets: React.FC<PropsWithChildren<IBuckets>> = ({
     type: 'buckets',
     header,
     rowSections,
+    singleLineSkeleton: true,
+    rightAlignedSkeletonColumns: [1, 3, 5, 6],
   };
 
-  return <Table {...tableProps} />;
+  return (
+    <BucketsTableWrapper>
+      <Table {...tableProps} cardBreakpoint={ROW_LAYOUT_MIN_WIDTH} />
+    </BucketsTableWrapper>
+  );
 };
 
 export default Buckets;

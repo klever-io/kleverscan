@@ -176,7 +176,7 @@ describe('Validators Page', () => {
           .slice(0, validatorsAmount)
           .map(el => toVisitPath(el.getAttribute('href') || ''));
         expect(hrefs.every(Boolean)).to.eq(true);
-        Cypress.env('validatorLinks', hrefs);
+        Cypress.expose('validatorLinks', hrefs);
       });
   });
 });
@@ -241,7 +241,7 @@ describe('Validator Details Page', () => {
   Array.from({ length: validatorsAmount }).forEach((_, index) => {
     it(`should load the validator page #${index + 1}`, () => {
       const links =
-        (Cypress.env('validatorLinks') as string[] | undefined) || [];
+        (Cypress.expose('validatorLinks') as string[] | undefined) || [];
       const link = links[index] || `/validator/${ownerAddressFor(index)}`;
 
       cy.visit(link);

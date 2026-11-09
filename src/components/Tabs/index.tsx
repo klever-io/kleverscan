@@ -13,19 +13,27 @@ import {
 export interface ITabs {
   headers: string[];
   onClick?(header: string, index: number): void;
+  /**
+   * When set, the parent owns which tab is highlighted. -1 highlights none,
+   * which is how a page avoids painting the first tab before it has read the
+   * URL. Omitted, the tab still follows `router.query.tab` itself.
+   */
+  selectedIndex?: number;
 }
 
 const Tabs: React.FC<PropsWithChildren<ITabs>> = ({
   headers,
   onClick,
   children,
+  selectedIndex,
 }) => {
   const router = useRouter();
   const [selected, setSelected] = useState<number>(0);
+  const active = selectedIndex === undefined ? selected : selectedIndex;
   useEffect(() => {
-    if (!router.isReady) return;
+    if (selectedIndex !== undefined || !router.isReady) return;
     setSelected(getSelectedTab(router.query.tab, headers));
-  }, [router.isReady, router.query, headers]);
+  }, [router.isReady, router.query, headers, selectedIndex]);
 
   return (
     <Container>
@@ -33,7 +41,7 @@ const Tabs: React.FC<PropsWithChildren<ITabs>> = ({
         <TabContent>
           {headers.map((header, index) => {
             const itemProps = {
-              selected: index === selected,
+              selected: index === active,
               onClick: () => {
                 if (onClick) {
                   onClick(header, index);
@@ -49,13 +57,13 @@ const Tabs: React.FC<PropsWithChildren<ITabs>> = ({
                 {...itemProps}
               >
                 <span>{header}</span>
-                <Indicator selected={index === selected} />
+                <Indicator selected={index === active} />
               </ItemContainer>
             );
           })}
         </TabContent>
       </TabContainer>
-      <div data-testid={`tab-content-${selected}`}>{children}</div>
+      <div data-testid={`tab-content-${active}`}>{children}</div>
     </Container>
   );
 };

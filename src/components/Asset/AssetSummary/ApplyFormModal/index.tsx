@@ -29,6 +29,7 @@ import {
 import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Toolbar } from './Toolbar';
+import { mapTransactionError } from '@/utils/transactionError';
 import { KLV_PRECISION } from '@/utils/globalVariables';
 import { formatAmount } from '@/utils/formatFunctions';
 import { InfoIcon } from '@/components/MultsignComponent/styles';
@@ -170,7 +171,7 @@ export const ApplyFormModal: React.FC<
       closeModal();
     } catch (error) {
       console.error(error);
-      toast.error(JSON.stringify(error));
+      toast.error(mapTransactionError(error));
     } finally {
       setLoading(false);
     }

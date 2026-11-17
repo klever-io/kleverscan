@@ -14,14 +14,24 @@ jest.mock('@/utils/parseValues', () => ({
   parseAddress: (value: string) => `${value.slice(0, 10)}...`,
 }));
 
-// Resolved against the shipped bundle, with i18next's plural resolution
+// Resolved against the shipped bundles, with i18next's plural resolution
 // mirrored: a `count` option first tries `<key>_one`/`<key>_other`, which is
 // exactly the mechanism the transaction count relies on.
 jest.mock('next-i18next', () => {
-  const bundle = jest.requireActual(
-    '../../../../public/locales/en/blocks.json',
+  const commonActual = jest.requireActual(
+    '../../../../public/locales/en/common.json',
   );
-  const lookup = (path: string): unknown =>
+  const bundles: Record<string, unknown> = {
+    blocks: jest.requireActual('../../../../public/locales/en/blocks.json'),
+    common: {
+      ...commonActual,
+      Date: {
+        ...commonActual.Date,
+        Elapsed_Time: 'mock-ago',
+      },
+    },
+  };
+  const lookup = (bundle: unknown, path: string): unknown =>
     path
       .split('.')
       .reduce<unknown>(
@@ -32,28 +42,32 @@ jest.mock('next-i18next', () => {
         bundle,
       );
   return {
-    useTranslation: () => ({
-      t: (
-        key: string,
-        options?: Record<string, unknown> & {
-          defaultValue?: string;
-          count?: number;
+    useTranslation: (ns: string | string[] = 'blocks') => {
+      const first = Array.isArray(ns) ? ns[0] : ns;
+      return {
+        t: (
+          key: string,
+          options?: Record<string, unknown> & {
+            defaultValue?: string;
+            count?: number;
+          },
+        ) => {
+          const [space, path] = key.includes(':') ? key.split(':') : [first, key];
+          const bundle = bundles[space];
+          let value: unknown;
+          if (typeof options?.count === 'number') {
+            value = lookup(bundle, `${path}_${options.count === 1 ? 'one' : 'other'}`);
+          }
+          if (typeof value !== 'string') value = lookup(bundle, path);
+          if (typeof value !== 'string') value = options?.defaultValue;
+          if (typeof value !== 'string')
+            throw new Error(`missing ${space} locale key: ${key}`);
+          return value.replace(/\{\{(\w+)\}\}/g, (whole, name) =>
+            options && name in options ? String(options[name]) : whole,
+          );
         },
-      ) => {
-        const path = key.includes(':') ? key.split(':')[1] : key;
-        let value: unknown;
-        if (typeof options?.count === 'number') {
-          value = lookup(`${path}_${options.count === 1 ? 'one' : 'other'}`);
-        }
-        if (typeof value !== 'string') value = lookup(path);
-        if (typeof value !== 'string') value = options?.defaultValue;
-        if (typeof value !== 'string')
-          throw new Error(`missing blocks locale key: ${key}`);
-        return value.replace(/\{\{(\w+)\}\}/g, (whole, name) =>
-          options && name in options ? String(options[name]) : whole,
-        );
-      },
-    }),
+      };
+    },
   };
 });
 
@@ -171,5 +185,12 @@ describe('BlocksMobileCard', () => {
 
     expect(screen.getByText(/Fee Rewards 0 KLV/)).toBeTruthy();
     expect(screen.getByText(/0 txs · 0 B/)).toBeTruthy();
+  });
+
+  it('translates the elapsed age from the common bundle', () => {
+    renderCard();
+
+    // The timestamp renders elapsed relative time followed by the unique common bundle translation.
+    expect(screen.getByText(/mock-ago/)).toBeTruthy();
   });
 });

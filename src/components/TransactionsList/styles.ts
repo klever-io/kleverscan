@@ -78,6 +78,17 @@ export const BadgeCount = styled.b`
   font-weight: 800;
 `;
 
+/** A contract type's detail (Staking Claim, Mint, ...). It is the badge that
+ *  gives way in a narrow type cell, cut with an ellipsis. */
+export const TypeDetailPill = styled(BadgePill)`
+  && {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
 /**
  * The document mark behind a contract address in the To column, the
  * Basescan affordance: its focusable tooltip carries "Contract" plus the
@@ -528,6 +539,10 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
       min-height: 18px;
     }
 
+    ${MobileCardItem} ${BadgePill}[data-contract-type] {
+      flex-shrink: 0;
+    }
+
     /* The skin removes the permanent underline; without a hover or focus
        replacement a link is indistinguishable from the static text next to
        it (the block number sits directly above the fee in the same style). */
@@ -539,7 +554,9 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
 
     /* The ten-column account row was auto-sized, so the skeleton bars and
        the loaded cells gave the header different widths. Shares of the
-       loaded 1278px row, measured on the account tab at 1440. */
+       1276px row (1310px viewport). Type needs 168px for CLAIM + ALLOWANCE
+       CLAIM: every column gives up 2px of padding and Fee its spare width
+       (the widest fee, "999.99 KLV", is 72px). */
     ${props =>
       props.$showInOut
         ? css`
@@ -548,45 +565,59 @@ export const TransactionsTableWrapper = styled.div<IRowLayoutWidth>`
               min-width: 0;
             }
 
+            ${HeaderItem},
+            ${MobileCardItem} {
+              padding-left: 7px;
+              padding-right: 7px;
+            }
+            ${HeaderItem}:first-child,
+            ${MobileCardItem}:first-child {
+              padding-left: 11px;
+            }
+            ${HeaderItem}:last-child,
+            ${MobileCardItem}:last-child {
+              padding-right: 11px;
+            }
+
             ${HeaderItem}:nth-child(1),
             ${MobileCardItem}:nth-child(1) {
-              width: 14.01%;
+              width: 13.85%;
             }
             ${HeaderItem}:nth-child(2),
             ${MobileCardItem}:nth-child(2) {
-              width: 12.83%;
+              width: 14.47%;
             }
             ${HeaderItem}:nth-child(3),
             ${MobileCardItem}:nth-child(3) {
-              width: 7.28%;
+              width: 7.12%;
             }
             ${HeaderItem}:nth-child(4),
             ${MobileCardItem}:nth-child(4) {
-              width: 8.61%;
+              width: 8.45%;
             }
             ${HeaderItem}:nth-child(5),
             ${MobileCardItem}:nth-child(5) {
-              width: 14.08%;
+              width: 13.92%;
             }
             ${HeaderItem}:nth-child(6),
             ${MobileCardItem}:nth-child(6) {
-              width: 3.36%;
+              width: 3.2%;
             }
             ${HeaderItem}:nth-child(7),
             ${MobileCardItem}:nth-child(7) {
-              width: 15.34%;
+              width: 15.18%;
             }
             ${HeaderItem}:nth-child(8),
             ${MobileCardItem}:nth-child(8) {
-              width: 5.32%;
+              width: 5.16%;
             }
             ${HeaderItem}:nth-child(9),
             ${MobileCardItem}:nth-child(9) {
-              width: 11.66%;
+              width: 11.5%;
             }
             ${HeaderItem}:nth-child(10),
             ${MobileCardItem}:nth-child(10) {
-              width: 7.51%;
+              width: 7.15%;
             }
           `
         : null}

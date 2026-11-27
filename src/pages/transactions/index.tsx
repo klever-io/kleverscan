@@ -10,7 +10,7 @@ import {
   showsInOut,
   TransactionColumnKey,
 } from '@/components/TransactionsList/columns';
-import { BadgePill, VisuallyHidden } from '@/components/DataList/styles';
+import { VisuallyHidden } from '@/components/DataList/styles';
 import { CustomFieldWrapper } from '@/components/Table/styles';
 import {
   DIRECTION_GLYPHS,
@@ -30,6 +30,7 @@ import TransactionsTable from '@/components/TransactionsList/Table';
 import {
   ContractMark,
   DirectionStatusBadge,
+  TypeDetailPill,
 } from '@/components/TransactionsList/styles';
 import Tooltip from '@/components/Tooltip';
 import TransactionsFilters from '@/components/TransactionsFilters';
@@ -379,7 +380,9 @@ export const transactionRowSections = (
           {/* The refinement the Misc column used to carry (StakingClaim,
               Mint, MarketBuy, ...), now riding with its type. */}
           {details.typeDetail && (
-            <BadgePill $variant="neutral">{details.typeDetail}</BadgePill>
+            <TypeDetailPill $variant="neutral" title={details.typeDetail}>
+              {details.typeDetail}
+            </TypeDetailPill>
           )}
         </CenteredRow>
       ),
